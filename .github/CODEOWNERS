@@ -1,0 +1,16 @@
+# Configuração global
+* @NEO-SH1W4
+
+# Documentação
+/docs/ @NEO-SH1W4
+*.md @NEO-SH1W4
+
+# Código fonte
+/src/ @NEO-SH1W4
+
+# Testes
+/tests/ @NEO-SH1W4
+
+# Configuração
+*.json @NEO-SH1W4
+*.config.* @NEO-SH1W4
