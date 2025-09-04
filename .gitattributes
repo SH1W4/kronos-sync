@@ -1,0 +1,61 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Documents
+*.md text diff=markdown
+*.txt text
+*.rst text
+
+# Scripts
+*.bash text eol=lf
+*.fish text eol=lf
+*.sh text eol=lf
+*.zsh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Python
+*.py text diff=python
+*.pyw text diff=python
+*.pyx text diff=python
+*.pxd text diff=python
+
+# JavaScript
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.json text
+
+# Docker
+*.dockerignore text
+Dockerfile text
+docker-compose*.yml text
+
+# Configs
+*.cnf text
+*.conf text
+.env* text
+.gitattributes text
+.gitconfig text
+*.lock text -diff
+package-lock.json text -diff
+yarn.lock text -diff
+*.toml text
+*.yaml text
+*.yml text
+
+# SQL
+*.sql text
+
+# Templates
+*.html text diff=html
+*.css text diff=css
+*.scss text diff=css
+*.sass text
+*.less text
+*.ejs text
+*.hbs text
+*.njk text
+*.tmpl text
