@@ -1,6 +1,6 @@
 # KRONOS SYNC
 
-![Kronos Sync Banner](https://placeholder-banner-url.com)
+![Kronos Sync Logo](kronos/public/brand/logo.png)
 <!-- Você pode substituir isso por um print da tela inicial depois -->
 
 > **Sistema de Gestão Premium para Estúdios de Tatuagem**  
