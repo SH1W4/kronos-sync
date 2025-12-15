@@ -3,21 +3,26 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { BrandLogo } from '@/components/ui/brand-logo'
 
 export default function SignInPage() {
     return (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
-            <div className="cyber-card max-w-md w-full p-8 space-y-8">
-                <div className="text-center">
-                    <h1 className="cyber-title text-3xl font-black mb-2">ACESSO KRONOS</h1>
-                    <p className="text-muted-foreground text-sm font-mono">
+        <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 cyber-grid opacity-10"></div>
+
+            <div className="cyber-card max-w-md w-full p-8 space-y-8 relative z-10 bg-black/80 backdrop-blur-sm">
+                <div className="flex flex-col items-center text-center">
+                    <BrandLogo size={60} className="mb-6" />
+                    <h2 className="cyber-title text-2xl font-black mb-2 sr-only">ACESSO KRONOS</h2>
+                    <p className="text-muted-foreground text-sm font-mono mt-2">
                         Faça login para continuar
                     </p>
                 </div>
 
                 <div className="space-y-4">
                     <Button
-                        className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold flex items-center justify-center gap-3"
+                        className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold flex items-center justify-center gap-3 transition-transform hover:scale-[1.02]"
                         onClick={() => alert('Integração Google em breve!')}
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -49,14 +54,14 @@ export default function SignInPage() {
                             <label className="text-xs font-mono uppercase text-muted-foreground">Senha</label>
                             <Input type="password" placeholder="••••••••" />
                         </div>
-                        <Button className="w-full border-primary/50" variant="outline">
+                        <Button className="w-full border-primary/50 hover:bg-primary/10 hover:border-primary transition-colors text-primary" variant="outline">
                             ENTRAR
                         </Button>
                     </form>
                 </div>
 
                 <div className="text-center">
-                    <a href="#" className="text-xs font-mono text-primary/70 hover:text-primary underline">
+                    <a href="#" className="text-xs font-mono text-primary/70 hover:text-primary underline decoration-primary/30 underline-offset-4">
                         Esqueceu sua senha?
                     </a>
                 </div>

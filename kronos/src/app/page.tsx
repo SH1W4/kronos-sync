@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import { BrandLogo } from '@/components/ui/brand-logo'
 import { SlotGrid } from '@/components/agenda/slot-grid'
 import { BookingModal } from '@/components/agenda/booking-modal'
 
@@ -66,25 +67,23 @@ export default function AgendaPage() {
             <header className="border-b border-primary/30 bg-muted/50 backdrop-blur-sm">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="cyber-title text-3xl font-orbitron font-black">
-                            KRONOS SYNC
-                        </h1>
-                        <div className="text-sm font-mono text-primary/70 uppercase tracking-wider">
+                        <BrandLogo size={48} />
+                        <div className="hidden md:block text-sm font-mono text-primary/70 uppercase tracking-wider">
                             Sistema de Agendamento Avançado
                         </div>
                     </div>
 
-                    <nav className="flex space-x-6 mt-4">
-                        <a href="/" className="text-primary font-mono uppercase tracking-wider hover:text-accent transition-colors">
+                    <nav className="flex space-x-6 mt-4 overflow-x-auto pb-2 md:pb-0">
+                        <a href="/" className="text-primary font-mono uppercase tracking-wider hover:text-accent transition-colors border-b-2 border-primary">
                             Agenda
                         </a>
-                        <a href="/marketplace" className="text-muted-foreground font-mono uppercase tracking-wider hover:text-primary transition-colors">
+                        <a href="/marketplace" className="text-muted-foreground font-mono uppercase tracking-wider hover:text-primary transition-colors whitespace-nowrap">
                             Marketplace
                         </a>
-                        <a href="/kiosk" className="text-muted-foreground font-mono uppercase tracking-wider hover:text-primary transition-colors">
+                        <a href="/kiosk" className="text-muted-foreground font-mono uppercase tracking-wider hover:text-primary transition-colors whitespace-nowrap">
                             Kiosk
                         </a>
-                        <a href="/dashboard" className="text-muted-foreground font-mono uppercase tracking-wider hover:text-primary transition-colors">
+                        <a href="/dashboard" className="text-muted-foreground font-mono uppercase tracking-wider hover:text-primary transition-colors whitespace-nowrap">
                             Dashboard
                         </a>
                     </nav>
@@ -104,7 +103,7 @@ export default function AgendaPage() {
                     </div>
 
                     {/* Legend */}
-                    <div className="flex justify-center space-x-8 mb-8">
+                    <div className="flex flex-wrap justify-center gap-4 md:space-x-8 mb-8">
                         <div className="flex items-center space-x-2">
                             <div className="w-4 h-4 bg-primary border border-primary"></div>
                             <span className="text-sm font-mono text-primary">Disponível</span>
