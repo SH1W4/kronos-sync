@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/theme-context";
-import { ThemeCustomizer } from "@/components/theme/theme-customizer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,9 +13,25 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#050505",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Impede zoom acidental no app
+}
+
 export const metadata: Metadata = {
-  title: "KRONOS SYNC - Sistema de Agendamento Avançado",
-  description: "Sistema completo de gestão para estúdios de tatuagem com agenda estilo cinema, marketplace integrado e kiosk de captação de leads.",
+  title: "KRONOS SYNC",
+  description: "Sistema Operacional do Kronos Tattoo Studio",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Kronos",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -27,12 +42,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
       >
-        <ThemeProvider>
-          {children}
-          <ThemeCustomizer />
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

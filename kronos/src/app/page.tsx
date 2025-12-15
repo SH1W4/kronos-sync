@@ -34,23 +34,24 @@ export default function LandingPage() {
                 <div className="container mx-auto max-w-6xl relative z-10 flex flex-col items-center">
 
                     {/* BRAND LOGO PRINCIPAL (Minimalista) */}
-                    <div className="mb-16 hover:scale-105 transition-transform duration-700">
-                        <BrandLogo size={180} variant="icon" animated={true} />
+                    <div className="mb-12 hover:scale-105 transition-transform duration-700">
+                        <BrandLogo size={160} variant="icon" animated={true} />
                     </div>
 
-                    <h1 className="text-5xl md:text-8xl font-black text-center tracking-tighter mb-6 leading-[0.9] text-white font-orbitron uppercase">
-                        Sistema<br />
-                        Operacional
+                    <h1 className="text-5xl md:text-8xl font-black text-center tracking-tighter mb-4 leading-[0.9] text-white font-orbitron uppercase">
+                        STUDIO<br />
+                        FLOW
                     </h1>
 
-                    <p className="text-xl md:text-2xl text-gray-400 text-center max-w-2xl font-mono mb-12 leading-relaxed">
-                        Plataforma central de gestão de fluxo, agenda e performance do <span className="text-white font-bold">Kronos Tattoo Studio</span>.
+                    <p className="text-lg md:text-xl text-gray-400 text-center max-w-2xl font-mono mb-12 leading-relaxed px-4">
+                        Otimização inteligente de agenda, clientes e performance. <br className="hidden md:block" />
+                        <span className="text-white">A ferramenta definitiva para o ecossistema Kronos.</span>
                     </p>
 
-                    <div className="flex flex-col md:flex-row gap-6 w-full max-w-md">
+                    <div className="flex flex-col md:flex-row gap-4 w-full max-w-md px-4">
                         <Link href="/auth/signin" className="w-full">
-                            <Button className="w-full h-16 text-lg bg-white hover:bg-gray-200 text-black font-black font-orbitron tracking-widest shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)] hover:shadow-[0_0_50px_-5px_rgba(255,255,255,0.5)] transition-all border-none">
-                                ACESSAR SISTEMA
+                            <Button className="w-full h-14 text-base bg-white hover:bg-gray-100 text-black font-bold font-orbitron tracking-widest shadow-lg transition-all rounded-sm">
+                                ACESSAR FLOW
                             </Button>
                         </Link>
                     </div>
