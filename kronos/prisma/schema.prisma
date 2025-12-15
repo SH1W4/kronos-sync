@@ -1,3 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  ARTIST
+  CLIENT
+}
+
+enum ArtistPlan {
+  RESIDENT
+  GUEST
+}
+
+enum BookingStatus {
+  OPEN
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
+enum ProductType {
+  DIGITAL
   PHYSICAL
 }
 
