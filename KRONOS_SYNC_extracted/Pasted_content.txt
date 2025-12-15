@@ -1,0 +1,195 @@
+perfeito 🚀 vou reescrever o prompt completo para o Manus AI, já com todos os módulos (agenda cinema, marketplace com markup, kiosk, ofertas/flash, dashboards), códigos promocionais e agora o fluxo atualizado: fichas de anamnese geradas no agendamento + confirmação automática para cliente e artista.
+
+⸻
+
+
+# KRONOS SYNC — Build Full App (Web + APIs + Seeds + Tests + UX/UI) — Manus AI
+
+## Missão
+Construir o **KRONOS SYNC** ponta a ponta, com foco em gestão de estúdios de tatuagem, integrando:
+- App Web (Next.js 14 + TS, App Router)
+- Backend (Prisma/PostgreSQL)
+- APIs REST
+- Seeds + Testes
+- UX/UI responsiva (estilo KRONOS: cyber minimal dark)
+- Integrações futuras via n8n (Drive, Calendar)
+
+---
+
+## Stack & Infra
+- **Web/Server:** Next.js 14 (App Router), TypeScript (strict)
+- **DB/ORM:** PostgreSQL + Prisma
+- **Infra local:** Docker (db + app)
+- **Auth:** NextAuth (Google/Email link) + RBAC (`MANAGER`, `ARTIST`, `CLIENT`) — pode ser stub no MVP
+- **Observabilidade:** logs estruturados, `/metrics`
+- **Integrações (stub + hook):** Google Drive (fichas), Google Calendar (slots)
+- **Mobile opcional:** Expo shell para agenda do dia + push notifications
+
+---
+
+## Design System (KRONOS)
+- **Paleta:** fundo `#0B0B0B`, texto `#E6E6E6`, acentos `#7C3AED` (roxo), `#22D3EE` (ciano)
+- **Fonte:** Inter / DM Sans (400–700)
+- **Componentes:** cards 16px radius, sombras suaves, ícones Lucide
+- **Estilo:** Dark cyber minimal — grid limpo, animações ≤200ms
+- **IA Unificada — Diretriz:** “Transparência e clareza. Agenda estilo cinema, dashboards objetivos, profissionalismo clínico.”
+
+---
+
+## Regras de Negócio (Core)
+
+### Agenda
+- **3 macas** com slots exibidos em grid estilo **mapa de cinema**
+- Estados: `OPEN`, `HELD` (timeout 2–5min), `BOOKED`
+- Anti-overbooking via transação (Prisma)
+
+### Booking
+- Valor mínimo: **R$ 400,00**
+- **Planos de artista**:
+  - **GUEST:** comissão fixa 30% (sem redução, sem marketplace)
+  - **RESIDENT:** começa em 30%, cai para 20% ao atingir teto estratégico (configurável em `.env`: ex. R$10k/mês ou por season)
+
+### Fichas de Anamnese
+- **Geradas no agendamento** (não no dia da tattoo)
+- Artista/manager gera ficha → link salvo em `booking.fichaUrl`
+- Cliente recebe link junto da confirmação
+- Cliente preenche antes da sessão → status atualizado no booking
+- **Proxy seguro** para abrir ficha (stub MVP + TODO audit log)
+
+### Confirmações
+- Após `POST /api/bookings`, enviar confirmações para ambos:
+  - **Cliente:** detalhes da sessão + link da ficha
+  - **Artista:** detalhes + status da ficha (“aguardando preenchimento”)
+- Stub: envio por e-mail/log
+- Flag `confirmationSent = true`
+
+### Marketplace
+- Apenas residentes podem listar produtos
+- Preço final = `basePrice * (1 + markup%)`
+- Artista recebe 100% do base, markup vai para estúdio
+- Tipos: print, digital, original, físico
+
+### Códigos Promocionais
+- Artista pode gerar cupons (`PERCENT` ou `FIXED`)
+- Aplicáveis no booking (sessão) e no marketplace
+- Clientes podem resgatar cupons no **kiosk**
+- Manager vê relatório de uso/performance dos cupons
+
+### Ofertas & Flash Days
+- Página pública com campanhas
+- Clientes e não-clientes podem assinar notificações
+- Notificações enviadas via stub (email/log)
+
+### Kiosk (Totem físico)
+- Fullscreen (tablet/totem)
+- Fluxos principais:
+  - Cadastro de clientes
+  - Cadastro de acompanhantes
+  - Resgate de códigos promocionais
+- Estilo minimal → inputs grandes, botões claros, acessibilidade
+
+---
+
+## UX & UI
+
+### Agenda
+- Grid horizontal (3 colunas = macas)
+- Cores: verde (OPEN), amarelo (HELD), roxo (BOOKED)
+- Hover → detalhes slot
+- Clique → modal booking + preview split (estúdio vs artista) + campo cupom
+
+### Booking Modal
+- Inputs: artista, cliente, slot, valor, cupom (opcional)
+- Preview: total bruto, desconto aplicado, split (estúdio/artista)
+- Botão confirmar → salva booking, envia confirmações, gera ficha
+
+### Marketplace
+- Grade de cards (imagem, título, artista, preço final)
+- Botão “Adicionar ao Carrinho”
+- Checkout com campo de cupom
+
+### Dashboards
+- **Artista:** ganhos mensais, barra de progresso até teto, lista de sessões do dia, status fichas, cupons ativos
+- **Manager:** ocupação geral, receita bruta vs estúdio, marketplace KPIs, performance dos cupons, status de fichas pendentes
+
+### Kiosk
+- Fullscreen
+- Botões grandes: “Cadastrar Cliente”, “Cadastrar Acompanhante”, “Resgatar Cupom”
+- Resgate → exibe QR/código atrelado ao artista
+- Estilo minimal (fundo preto, botões neon)
+
+---
+
+## APIs
+
+### Bookings
+- `POST /api/bookings` → cria booking, aplica cupom, split comissão, gera ficha, envia confirmações
+- `PATCH /api/bookings/:id/status`
+- `POST /api/bookings/:id/ficha` → força geração de ficha
+- `PATCH /api/bookings/:id/fichaUrl` → hook do n8n/Drive
+- `GET /api/bookings?artistId&status&page`
+
+### Coupons
+- `POST /api/coupons` (ARTIST)
+- `GET /api/coupons/validate?code&artistId`
+- `PATCH /api/coupons/:id/deactivate`
+- `GET /api/coupons/artist/:id`
+- `GET /api/admin/coupons/summary`
+
+### Marketplace
+- `GET /api/store/products`
+- `POST /api/store/products` (ARTIST = RESIDENT)
+- `POST /api/store/cart/checkout`
+- `POST /api/store/orders/:id/confirm`
+
+### Offers
+- `GET /api/offers`
+- `POST /api/subscribe`
+- `POST /api/notify/flash` (MANAGER)
+
+### Kiosk
+- `POST /api/kiosk/signup` (novo cliente)
+- `POST /api/kiosk/companion` (acompanhante)
+- `POST /api/kiosk/coupon` (resgatar cupom)
+
+### Fichas
+- `GET /fichas/[bookingId]/proxy` (proxy seguro)
+- `POST /api/hooks/drive/ficha-link` (hook atualiza URL)
+
+### Dashboards
+- `GET /api/me/summary` (ARTIST)
+- `GET /api/admin/summary` (MANAGER)
+
+---
+
+## Seeds
+- 1 manager, 1 residente (com produtos e cupons), 1 guest
+- 12 slots (3 macas × 4 horários)
+- 3 clientes demo
+- 2 bookings demo (1 com ficha pendente, 1 com ficha preenchida)
+
+---
+
+## Testes
+- Unitários: comissão, cupons, markup, ficha no booking
+- Integração: anti-overbooking, cupom aplicado corretamente, confirmação enviada
+- E2E: fluxo kiosk → cadastro → resgate cupom → booking com desconto → geração ficha → preenchimento → proxy
+
+---
+
+## Critérios de Aceite
+- Agenda cinema operante
+- Booking com split e valor mínimo validados
+- Fichas geradas no agendamento, link salvo, status controlado
+- Confirmação enviada para cliente e artista
+- Cupons ativos, validados e aplicados
+- Marketplace com markup funcionando
+- Dashboards exibem dados reais
+- UX/UI dark cyber minimal aplicada
+
+
+⸻
+
+⚡ esse prompt já está pronto para ser usado no Manus AI, cobrindo toda a lógica de negócio, UX, APIs e integrações.
+
+quer que eu também prepare uma versão reduzida (2 páginas) só com contratos de API e fluxos principais, para que o Manus construa mais rápido a base do app?
