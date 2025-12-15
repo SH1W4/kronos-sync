@@ -1,113 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-:root {
-  /* Monochrome Luxury Palette (High Contrast) */
-  --background: #050505; /* Preto absoluto quase */
-  --foreground: #FFFFFF;
-  
-  /* Tons de Cinza para hierarquia */
-  --primary: #FFFFFF;
-  --secondary: #888888;
-  --accent: #D4D4D4; /* Prata/Cinza claro */
-  
-  --muted: #1A1A1A;
-  --muted-foreground: #666666;
-  --border: #333333;
-  
-  /* Manter variáveis de efeito mas neutralizadas */
-  --cyber-green: #FFFFFF;
-  --cyber-blue: #CCCCCC;
-  --cyber-purple: #999999;
-  
-  /* Grid mais sutil */
-  --grid-opacity: 0.15;
-  --grid-size: 24px;
+@layer theme {
+  :root {
+    --background: 5 5 5;
+    --foreground: 255 255 255;
+  }
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* Custom Utilities that might be missing */
+@layer utilities {
+  .cyber-card {
+    background-color: #0A0A0A;
+    border: 1px solid #222;
+  }
 }
 
+/* Global Reset adjustments */
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  background-color: #050505;
+  color: #ffffff;
   font-family: 'JetBrains Mono', monospace;
-  background-color: var(--background);
-  color: var(--foreground);
-}
-
-body {
-  /* Grid pattern muito sutil, quase imperceptível, estilo papel milimetrado técnico */
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
-  background-position: 0 0, 0 0;
-}
-
-/* Classes Utilitárias de Estilo */
-
-.cyber-title {
-  font-family: 'Orbitron', monospace;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--foreground);
-  /* Remover gradiente neon, manter sólido ou gradiente sutil metalico */
-  background: linear-gradient(180deg, #FFFFFF 0%, #AAAAAA 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.cyber-card {
-  background: #0A0A0A;
-  border: 1px solid var(--border);
-  /* Sombra sharp, sem blur, estilo brutalista */
-  box-shadow: 4px 4px 0px rgba(20, 20, 20, 1);
-  transition: all 0.2s ease;
-}
-
-.cyber-card:hover {
-  border-color: var(--foreground);
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px rgba(40, 40, 40, 1);
-}
-
-.cyber-glow {
-  /* Glow branco sutil */
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.cyber-glow:hover {
-  box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
-}
-
-.cyber-grid {
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, var(--grid-opacity)) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, var(--grid-opacity)) 1px, transparent 1px);
-  background-size: var(--grid-size) var(--grid-size);
-}
-
-/* Custom Scrollbar - Minimalist */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #666;
 }

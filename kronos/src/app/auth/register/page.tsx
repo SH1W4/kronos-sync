@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input' // Supondo que você tenha este componente
-import Image from 'next/image'
+import { Input } from '@/components/ui/input'
+import { BrandLogo } from '@/components/ui/brand-logo'
 import Link from 'next/link'
 
 export default function RegisterPage() {
@@ -23,19 +23,14 @@ export default function RegisterPage() {
         <div className="min-h-screen bg-black flex flex-col md:flex-row">
             {/* Side Visual (Esquerda) - Destaque Visual */}
             <div className="hidden md:flex flex-1 bg-black items-center justify-center relative overflow-hidden border-r border-white/5">
-                <div className="absolute inset-0 cyber-grid opacity-20"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[100px] rounded-full"></div>
+                <div className="absolute inset-0 cyber-grid opacity-10"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/5 blur-[100px] rounded-full"></div>
 
                 <div className="relative z-10 flex flex-col items-center">
-                    <Image
-                        src="/brand/logo-neon.png"
-                        alt="Kronos"
-                        width={400}
-                        height={400}
-                        className="drop-shadow-[0_0_50px_rgba(0,255,136,0.3)] animate-pulse-cyber"
-                        style={{ animationDuration: '4s' }}
-                    />
-                    <h2 className="text-3xl font-orbitron font-bold text-white mt-8 tracking-widest text-center">
+                    <div className="transform scale-150">
+                        <BrandLogo size={200} variant="icon" />
+                    </div>
+                    <h2 className="text-3xl font-orbitron font-bold text-white mt-12 tracking-widest text-center">
                         JOIN THE <br /> REVOLUTION
                     </h2>
                 </div>
@@ -46,7 +41,7 @@ export default function RegisterPage() {
                 <div className="w-full max-w-md space-y-8">
 
                     <div className="md:hidden flex justify-center mb-8">
-                        <Image src="/brand/logo-neon.png" alt="Kronos" width={120} height={120} />
+                        <BrandLogo size={80} />
                     </div>
 
                     <div className="space-y-2">

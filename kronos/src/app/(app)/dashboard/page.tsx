@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { SlotGrid } from '@/components/agenda/slot-grid'
-import { BookingModal } from '@/components/agenda/booking-modal'
+import BookingModal from '@/components/agenda/booking-modal'
 
 interface Slot {
     id: string
@@ -126,10 +126,10 @@ export default function AgendaPage() {
             {/* Booking Modal */}
             {selectedSlot && (
                 <BookingModal
-                    isOpen={isModalOpen}
+                    open={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     slot={selectedSlot}
-                    onSuccess={handleBookingSuccess}
+                    onBookingCreated={handleBookingSuccess}
                 />
             )}
         </div>
