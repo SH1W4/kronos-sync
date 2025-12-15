@@ -45,7 +45,7 @@ export default function LandingPage() {
 
                     <p className="text-lg md:text-xl text-gray-400 text-center max-w-2xl font-mono mb-12 leading-relaxed px-4">
                         Otimização inteligente de agenda, clientes e performance. <br className="hidden md:block" />
-                        <span className="text-white">A ferramenta definitiva para o ecossistema Kronos.</span>
+                        <span className="text-white">Redefinindo o padrão de gestão para estúdios high-end.</span>
                     </p>
 
                     <div className="flex flex-col md:flex-row gap-4 w-full max-w-md px-4">
