@@ -1,6 +1,6 @@
-# KRONOS SYNC
-
-![Kronos Sync Logo](kronos/public/brand/logo.png)
+<div align="center">
+  <img src="./kronos/public/brand/logo.png" alt="Kronos Sync Logo" width="200" />
+</div>
 <!-- Você pode substituir isso por um print da tela inicial depois -->
 
 > **Sistema de Gestão Premium para Estúdios de Tatuagem**  
