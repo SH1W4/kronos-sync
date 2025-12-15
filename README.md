@@ -129,3 +129,4 @@ Este é um projeto proprietário do **Kronos Tattoo Studio**.
 ---
 
 Desenvolvido por **SH1W4** com arquitetura **Antigravity**.
+<!-- Deploy Trigger v2 -->
