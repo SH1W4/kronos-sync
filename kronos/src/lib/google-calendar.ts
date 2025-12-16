@@ -1,6 +1,6 @@
 import { google } from 'googleapis'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth-options'
 
 export interface CalendarEvent {
   id?: string
@@ -26,7 +26,7 @@ export class GoogleCalendarService {
   constructor(accessToken: string) {
     const auth = new google.auth.OAuth2()
     auth.setCredentials({ access_token: accessToken })
-    
+
     this.calendar = google.calendar({ version: 'v3', auth })
   }
 
@@ -35,7 +35,7 @@ export class GoogleCalendarService {
     if (!session?.accessToken) {
       throw new Error('No access token available')
     }
-    
+
     return new GoogleCalendarService(session.accessToken as string)
   }
 
@@ -45,7 +45,7 @@ export class GoogleCalendarService {
         calendarId: 'primary',
         requestBody: event,
       })
-      
+
       return response.data.id
     } catch (error) {
       console.error('Error creating calendar event:', error)
