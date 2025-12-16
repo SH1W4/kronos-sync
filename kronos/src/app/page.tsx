@@ -12,11 +12,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                     <BrandLogo size={40} animated={false} />
                     <div className="flex gap-4">
-                        <Link href="/auth/register">
-                            <Button variant="ghost" className="text-sm font-mono hover:text-white hover:bg-transparent text-gray-500">
-                                NOVO ARTISTA
-                            </Button>
-                        </Link>
+                        {/* Acesso de Artista removido da Home - Requer Convite */}
                         <Link href="/auth/signin">
                             <Button className="bg-white text-black hover:bg-gray-200 font-bold font-orbitron text-sm tracking-wider px-6">
                                 LOGIN
