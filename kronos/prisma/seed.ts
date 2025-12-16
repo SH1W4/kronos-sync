@@ -145,7 +145,7 @@ async function main() {
     prisma.coupon.create({
       data: {
         code: 'DESCONTO10',
-        type: 'PERCENT',
+        type: 'PERCENTAGE',
         value: 10,
         isActive: true,
         expiresAt: new Date('2025-12-31'),
@@ -165,7 +165,7 @@ async function main() {
     prisma.coupon.create({
       data: {
         code: 'FINELINE20',
-        type: 'PERCENT',
+        type: 'PERCENTAGE',
         value: 20,
         isActive: true,
         expiresAt: new Date('2025-12-31'),
@@ -184,7 +184,7 @@ async function main() {
         description: 'Design exclusivo de caveira em estilo tradicional',
         basePrice: 150,
         finalPrice: 180,
-        type: 'PRINT',
+        type: 'PHYSICAL',
         artistId: artists[0].id,
         isActive: true
       }
@@ -206,7 +206,7 @@ async function main() {
         description: 'Mandala geométrica detalhada',
         basePrice: 200,
         finalPrice: 240,
-        type: 'PRINT',
+        type: 'PHYSICAL',
         artistId: artists[2].id,
         isActive: true
       }
@@ -259,25 +259,25 @@ async function main() {
   // Criar slots de horários
   const slots = []
   const today = new Date()
-  
+
   // Criar slots para os próximos 7 dias
   for (let day = 0; day < 7; day++) {
     const date = new Date(today)
     date.setDate(today.getDate() + day)
-    
+
     // Para cada maca (1, 2, 3)
     for (let maca = 1; maca <= 3; maca++) {
       // Horários: 9h, 14h, 18h
       const times = ['09:00', '14:00', '18:00']
-      
+
       for (const time of times) {
         const [hours, minutes] = time.split(':')
         const startTime = new Date(date)
         startTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
-        
+
         const endTime = new Date(startTime)
         endTime.setHours(startTime.getHours() + 3) // 3 horas de duração
-        
+
         const slot = await prisma.slot.create({
           data: {
             macaId: maca,
@@ -304,7 +304,7 @@ async function main() {
         finalValue: 400,
         studioShare: 80,
         artistShare: 320,
-        status: 'BOOKED'
+        status: 'CONFIRMED'
       }
     }),
     prisma.booking.create({
