@@ -30,6 +30,15 @@ export default function LandingPage() {
             <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden">
                 {/* Background Effects */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-white/5 blur-[120px] rounded-full opacity-30 pointer-events-none"></div>
+                {/* Hero Background Image */}
+                <Image
+                    src="/hero-bg.png"
+                    alt="Abstract Liquid Background"
+                    fill
+                    className="object-cover opacity-40 mix-blend-screen pointer-events-none"
+                    priority
+                />
+
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
 
                 {/* --- FREQUENCY WAVES & SCANNER EFFECT --- */}
@@ -116,18 +125,32 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Feature 3: MARKETPLACE (Placeholder) */}
-                        <div className="cyber-card p-8 relative overflow-hidden group h-64 flex flex-col justify-end bg-gray-900/40">
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white relative z-10">MARKETPLACE</h3>
-                            <p className="text-gray-400 font-mono relative z-10">Gestão de vendas de prints e produtos exclusivos.</p>
+                        {/* Feature 3: MARKETPLACE */}
+                        <div className="cyber-card p-0 relative overflow-hidden group h-64">
+                            <Image
+                                src="/features/marketplace.png"
+                                alt="Digital Marketplace"
+                                fill
+                                className="object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/40 via-black/50 to-transparent p-8 flex flex-col justify-end">
+                                <h3 className="text-2xl font-orbitron font-bold mb-2 text-white relative z-10">MARKETPLACE</h3>
+                                <p className="text-gray-300 font-mono relative z-10 text-shadow">Gestão de vendas de prints e produtos exclusivos.</p>
+                            </div>
                         </div>
 
-                        {/* Feature 4: PERFORMANCE (Placeholder) */}
-                        <div className="cyber-card p-8 col-span-1 md:col-span-2 relative overflow-hidden group h-64 flex flex-col justify-end bg-gray-900/40">
-                            <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white relative z-10">PERFORMANCE DOS ARTISTAS</h3>
-                            <p className="text-gray-400 font-mono relative z-10">Acompanhamento em tempo real de comissões e faturamento.</p>
+                        {/* Feature 4: PERFORMANCE */}
+                        <div className="cyber-card p-0 col-span-1 md:col-span-2 relative overflow-hidden group h-64">
+                            <Image
+                                src="/features/performance.png"
+                                alt="Performance Dashboard"
+                                fill
+                                className="object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-green-900/40 via-black/50 to-transparent p-8 flex flex-col justify-end">
+                                <h3 className="text-2xl font-orbitron font-bold mb-2 text-white relative z-10">PERFORMANCE DOS ARTISTAS</h3>
+                                <p className="text-gray-300 font-mono relative z-10 text-shadow">Acompanhamento em tempo real de comissões e faturamento.</p>
+                            </div>
                         </div>
 
                     </div>
