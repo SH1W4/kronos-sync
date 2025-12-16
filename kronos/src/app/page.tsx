@@ -33,15 +33,15 @@ export default function LandingPage() {
 
                 <div className="container mx-auto max-w-6xl relative z-10 flex flex-col items-center">
 
-                    {/* BRAND LOGO PRINCIPAL (Minimalista) */}
-                    <div className="mb-12 hover:scale-105 transition-transform duration-700">
-                        <BrandLogo size={160} variant="icon" animated={true} />
+                    {/* BRAND LOGO PRINCIPAL (Minimalista & Central) */}
+                    <div className="mb-12 relative group">
+                        <div className="absolute inset-0 bg-white/10 blur-[60px] rounded-full animate-pulse-slow"></div>
+                        <div className="relative hover:scale-105 transition-transform duration-700">
+                            <BrandLogo size={200} variant="icon" animated={true} />
+                        </div>
                     </div>
 
-                    <h1 className="text-5xl md:text-8xl font-black text-center tracking-tighter mb-4 leading-[0.9] text-white font-orbitron uppercase">
-                        STUDIO<br />
-                        FLOW
-                    </h1>
+                    {/* Removido STUDIO FLOW H1 */}
 
                     <p className="text-lg md:text-xl text-gray-400 text-center max-w-2xl font-mono mb-12 leading-relaxed px-4">
                         Otimização inteligente de agenda, clientes e performance. <br className="hidden md:block" />
