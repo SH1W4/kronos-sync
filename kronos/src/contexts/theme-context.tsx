@@ -8,22 +8,22 @@ export interface ThemeConfig {
   secondaryColor: string
   accentColor: string
   backgroundColor: string
-  
+
   // Cyber Effects
   glitchIntensity: 'off' | 'low' | 'medium' | 'high'
   scanLinesEnabled: boolean
   gridOpacity: number
   pulseSpeed: 'slow' | 'normal' | 'fast'
-  
+
   // Typography
   fontFamily: 'jetbrains' | 'orbitron' | 'inter'
   fontSize: 'small' | 'normal' | 'large'
   letterSpacing: 'tight' | 'normal' | 'wide'
-  
+
   // Layout
   borderRadius: 'none' | 'small' | 'medium'
   shadowIntensity: 'none' | 'subtle' | 'normal' | 'intense'
-  
+
   // Animations
   animationsEnabled: boolean
   transitionSpeed: 'slow' | 'normal' | 'fast'
@@ -47,7 +47,7 @@ export const defaultTheme: ThemeConfig = {
   transitionSpeed: 'normal'
 }
 
-export const themePresets = {
+export const themePresets: Record<string, ThemeConfig> = {
   'cyber-green': {
     ...defaultTheme,
     primaryColor: '#00FF88',
@@ -127,21 +127,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Apply theme to CSS variables
   useEffect(() => {
     const root = document.documentElement
-    
+
     // Color variables
     root.style.setProperty('--cyber-green', theme.primaryColor)
     root.style.setProperty('--cyber-blue', theme.accentColor)
     root.style.setProperty('--cyber-purple', theme.secondaryColor)
     root.style.setProperty('--background', theme.backgroundColor)
-    
+
     // Grid opacity
     root.style.setProperty('--grid-opacity', theme.gridOpacity.toString())
-    
+
     // Animation speeds
     const speedMap = { slow: '3s', normal: '2s', fast: '1s' }
     root.style.setProperty('--pulse-speed', speedMap[theme.pulseSpeed])
     root.style.setProperty('--transition-speed', speedMap[theme.transitionSpeed])
-    
+
     // Font family
     const fontMap = {
       jetbrains: "'JetBrains Mono', monospace",
@@ -149,19 +149,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       inter: "'Inter', sans-serif"
     }
     root.style.setProperty('--font-family', fontMap[theme.fontFamily])
-    
+
     // Font size
     const sizeMap = { small: '0.875rem', normal: '1rem', large: '1.125rem' }
     root.style.setProperty('--font-size', sizeMap[theme.fontSize])
-    
+
     // Letter spacing
     const spacingMap = { tight: '-0.025em', normal: '0', wide: '0.1em' }
     root.style.setProperty('--letter-spacing', spacingMap[theme.letterSpacing])
-    
+
     // Border radius
     const radiusMap = { none: '0px', small: '4px', medium: '8px' }
     root.style.setProperty('--border-radius', radiusMap[theme.borderRadius])
-    
+
     // Shadow intensity
     const shadowMap = {
       none: 'none',
@@ -170,21 +170,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       intense: '0 0 40px rgba(0, 255, 136, 0.8)'
     }
     root.style.setProperty('--shadow-cyber', shadowMap[theme.shadowIntensity])
-    
+
     // Disable animations if needed
     if (!theme.animationsEnabled) {
       root.style.setProperty('--animation-duration', '0s')
     } else {
       root.style.removeProperty('--animation-duration')
     }
-    
+
     // Scan lines
     if (!theme.scanLinesEnabled) {
       root.style.setProperty('--scan-line-opacity', '0')
     } else {
       root.style.setProperty('--scan-line-opacity', '0.6')
     }
-    
+
   }, [theme])
 
   const setTheme = (newTheme: ThemeConfig) => {
