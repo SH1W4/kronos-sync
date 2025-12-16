@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { BrandLogo } from '@/components/ui/brand-logo'
 
@@ -87,34 +88,46 @@ export default function LandingPage() {
                 <div className="container mx-auto max-w-7xl">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                        {/* Feature 1 */}
-                        <div className="cyber-card p-8 col-span-1 md:col-span-2 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white">AGENDA GERAL 3x7</h3>
-                            <p className="text-gray-400 font-mono mb-8 max-w-md">Controle total das macas e horários dos residentes e guests.</p>
-                            <div className="w-full h-48 bg-gray-900/50 rounded border border-white/5 relative overflow-hidden">
-                                <div className="absolute inset-4 grid grid-cols-7 gap-1 opacity-50">
-                                    {[...Array(7)].map((_, i) => <div key={i} className="bg-white/5 rounded"></div>)}
-                                </div>
+                        {/* Feature 1: AGENDA */}
+                        <div className="cyber-card p-0 col-span-1 md:col-span-2 relative overflow-hidden group h-80">
+                            <Image
+                                src="/features/agenda.png"
+                                alt="Agenda Holográfica"
+                                fill
+                                className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent p-8 flex flex-col justify-end">
+                                <h3 className="text-2xl font-orbitron font-bold mb-2 text-white relative z-10">AGENDA GERAL 3x7</h3>
+                                <p className="text-gray-300 font-mono max-w-md relative z-10 text-shadow">Controle total das macas e horários dos residentes e guests.</p>
                             </div>
                         </div>
 
-                        {/* Feature 2 */}
-                        <div className="cyber-card p-8 relative overflow-hidden group">
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white">KIOSK MODE</h3>
-                            <p className="text-gray-400 font-mono">Terminal de auto-atendimento para recepção e check-in de clientes.</p>
+                        {/* Feature 2: KIOSK */}
+                        <div className="cyber-card p-0 relative overflow-hidden group h-80">
+                            <Image
+                                src="/features/kiosk.png"
+                                alt="Kiosk Mode"
+                                fill
+                                className="object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent p-8 flex flex-col justify-end">
+                                <h3 className="text-2xl font-orbitron font-bold mb-2 text-white relative z-10">KIOSK MODE</h3>
+                                <p className="text-gray-300 font-mono relative z-10 text-shadow">Auto-atendimento futurista para check-in.</p>
+                            </div>
                         </div>
 
-                        {/* Feature 3 */}
-                        <div className="cyber-card p-8 relative overflow-hidden group">
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white">MARKETPLACE</h3>
-                            <p className="text-gray-400 font-mono">Gestão de vendas de prints e produtos exclusivos do estúdio.</p>
+                        {/* Feature 3: MARKETPLACE (Placeholder) */}
+                        <div className="cyber-card p-8 relative overflow-hidden group h-64 flex flex-col justify-end bg-gray-900/40">
+                            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white relative z-10">MARKETPLACE</h3>
+                            <p className="text-gray-400 font-mono relative z-10">Gestão de vendas de prints e produtos exclusivos.</p>
                         </div>
 
-                        {/* Feature 4 */}
-                        <div className="cyber-card p-8 col-span-1 md:col-span-2 relative overflow-hidden group">
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white p-2">PERFORMANCE DOS ARTISTAS</h3>
-                            <p className="text-gray-400 font-mono pl-2">Acompanhamento em tempo real de comissões e faturamento.</p>
+                        {/* Feature 4: PERFORMANCE (Placeholder) */}
+                        <div className="cyber-card p-8 col-span-1 md:col-span-2 relative overflow-hidden group h-64 flex flex-col justify-end bg-gray-900/40">
+                            <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white relative z-10">PERFORMANCE DOS ARTISTAS</h3>
+                            <p className="text-gray-400 font-mono relative z-10">Acompanhamento em tempo real de comissões e faturamento.</p>
                         </div>
 
                     </div>
