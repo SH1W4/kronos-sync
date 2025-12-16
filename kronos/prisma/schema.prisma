@@ -52,14 +52,40 @@ model User {
   sessions      Session[]
   
   // Relations
-  artist   Artist?
-  bookings Booking[]
-  orders   Order[]
+  artist        Artist?
+  bookings      Booking[]
+  orders        Order[]
+  
+  // Invite System
+  invitedBy     User?         @relation("UserInvites", fields: [invitedById], references: [id])
+  invitedById   String?
+  invitedUsers  User[]        @relation("UserInvites")
+  createdInvites InviteCode[] @relation("Creator")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+// ... (rest of the file until the end)
+
+model InviteCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  role      UserRole  @default(CLIENT)
+  creatorId String
+  maxUses   Int       @default(1)
+  currentUses Int     @default(0)
+  expiresAt DateTime?
+  isActive  Boolean   @default(true)
+  
+  creator   User      @relation("Creator", fields: [creatorId], references: [id])
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("invite_codes")
 }
 
 model Account {
