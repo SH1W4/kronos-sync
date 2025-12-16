@@ -43,10 +43,10 @@ export async function GET() {
 
     const slot = await prisma.slot.create({
         data: {
-            artistId: artist.id,
+            macaId: 1,
             startTime: start,
             endTime: end,
-            isAvailable: false // Ocupado
+            isActive: true
         }
     })
 
