@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Check if slot is available
     const existingBooking = slot.bookings.find(b => 
-      b.status === 'BOOKED' || b.status === 'HELD'
+      b.status === 'CONFIRMED'
     )
     
     if (existingBooking) {
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
           finalValue,
           artistShare,
           studioShare,
-          status: 'BOOKED',
+          status: 'CONFIRMED',
           couponId,
           fichaUrl: null,
           fichaStatus: 'PENDING'
