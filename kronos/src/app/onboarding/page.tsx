@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { User, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function OnboardingPage() {
     const { data: session, update } = useSession()
     const router = useRouter()
