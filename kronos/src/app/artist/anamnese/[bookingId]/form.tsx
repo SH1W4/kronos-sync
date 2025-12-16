@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, ChevronRight, AlertTriangle, HeartPulse, ShieldCheck, PenTool } from "lucide-react"
+import { Check, ChevronRight, AlertTriangle, HeartPulse, ShieldCheck, PenTool, Loader2 } from "lucide-react"
+import { saveAnamnesis } from "@/app/actions/anamnese"
 
 interface AnamnesisFormProps {
     bookingId: string
@@ -16,6 +17,9 @@ interface AnamnesisFormProps {
 
 export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFormProps) {
     const [step, setStep] = useState(0)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false)
+
     const [formData, setFormData] = useState({
         condicaoMedica: false,
         detalhesCondicao: "",
@@ -29,7 +33,7 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
     const questions = [
         {
             id: "intro",
-            title: "Bem-vindo ao KRONOS",
+            title: "Bem-vindo, " + (initialData.name?.split(' ')[0] || "Cliente"),
             subtitle: "Vamos preparar sua sessão com segurança.",
             icon: <ShieldCheck size={48} className="text-purple-500" />,
             type: "intro"
@@ -67,17 +71,45 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
         }
     ]
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (step < questions.length - 1) {
             setStep(step + 1)
         } else {
-            console.log("Submitting:", formData)
-            // Aqui chamaremos a Server Action para salvar no banco
-            alert("Ficha salva com sucesso! (Simulação)")
+            // SUBMIT FINAL
+            setIsSubmitting(true)
+            const result = await saveAnamnesis(bookingId, clientId, formData)
+            setIsSubmitting(false)
+
+            if (result.success) {
+                setIsSuccess(true)
+            } else {
+                alert("Erro ao salvar: " + result.error)
+            }
         }
     }
 
     const currentQ = questions[step]
+
+    if (isSuccess) {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-6"
+            >
+                <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(34,197,94,0.3)]">
+                    <Check size={48} className="text-black" />
+                </div>
+                <h2 className="text-4xl font-orbitron font-bold text-white">Tudo Pronto!</h2>
+                <p className="text-zinc-400 max-w-md">
+                    Obrigado por preencher sua ficha. Seu artista já recebeu as informações e está preparando tudo.
+                </p>
+                <div className="p-4 bg-zinc-900 rounded-lg border border-zinc-800 text-sm font-mono text-zinc-500 mt-8">
+                    Pode devolver este dispositivo para a recepção.
+                </div>
+            </motion.div>
+        )
+    }
 
     return (
         <div className="w-full">
@@ -172,10 +204,10 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
 
                                 <button
                                     onClick={handleNext}
-                                    disabled={!formData.termos}
-                                    className="w-full bg-green-500 text-black py-4 rounded-xl font-bold tracking-wide hover:bg-green-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!formData.termos || isSubmitting}
+                                    className="w-full bg-green-500 text-black py-4 rounded-xl font-bold tracking-wide hover:bg-green-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    ASSINAR E FINALIZAR
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : "ASSINAR E FINALIZAR"}
                                 </button>
                             </div>
                         )}

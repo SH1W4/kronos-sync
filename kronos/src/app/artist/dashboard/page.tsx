@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { Clock, AlertCircle, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { redirect } from "next/navigation"
+import Link from "next/link"
 
 // Garante que a página seja sempre renderizada dinamicamente no servidor
 export const dynamic = 'force-dynamic'
@@ -261,14 +262,13 @@ function AppointmentCard({ id, time, client, project, status }: any) {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity">
-                    <a
+                <div className="flex gap-2">
+                    <Link
                         href={`/artist/anamnese/${id}`}
-                        target="_blank"
-                        className="px-4 py-2 bg-purple-600/10 border border-purple-500/50 text-purple-400 text-xs font-bold rounded hover:bg-purple-600 hover:text-white transition-all flex items-center gap-2"
+                        className="px-4 py-2 bg-purple-600/10 border border-purple-500/50 text-purple-400 text-xs font-bold rounded hover:bg-purple-600 hover:text-white transition-all flex items-center gap-2 z-50 relative cursor-pointer"
                     >
                         📝 FICHA
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
