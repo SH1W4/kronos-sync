@@ -134,6 +134,14 @@ const BookingModal: React.FC<BookingModalProps> = ({
 
   const [isSuccess, setIsSuccess] = useState(false)
 
+  const resetForm = () => {
+    setSelectedArtist('')
+    setSelectedClient('')
+    setValue(400)
+    setCouponCode('')
+    setCouponDiscount(0)
+  }
+
   const handleSuccessClose = () => {
     setIsSuccess(false)
     onClose()
