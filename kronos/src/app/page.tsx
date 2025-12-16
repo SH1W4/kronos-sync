@@ -31,6 +31,30 @@ export default function LandingPage() {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-white/5 blur-[120px] rounded-full opacity-30 pointer-events-none"></div>
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
 
+                {/* --- FREQUENCY WAVES & SCANNER EFFECT --- */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center opacity-40">
+                    {/* Scanner Line */}
+                    <div className="absolute top-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00FF88] to-transparent blur-sm opacity-20 animate-[scan_8s_ease-in-out_infinite]"></div>
+
+                    {/* Waves Container */}
+                    <div className="absolute w-[200%] h-full flex items-center opacity-30">
+                        {/* Wave 1 (Slow & Wide) */}
+                        <svg className="absolute w-full h-64 animate-[wave_15s_linear_infinite]" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                            <path d="M0,100 Q250,50 500,100 T1000,100" fill="none" stroke="#00FF88" strokeWidth="1" className="opacity-50" />
+                        </svg>
+
+                        {/* Wave 2 (Fast & Tight) */}
+                        <svg className="absolute w-full h-64 animate-[wave_10s_linear_infinite_reverse] translate-y-4" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                            <path d="M0,100 Q150,150 300,100 T600,100 T900,100" fill="none" stroke="#8B5CF6" strokeWidth="1" className="opacity-40" />
+                        </svg>
+
+                        {/* Wave 3 (Background Pulse) */}
+                        <svg className="absolute w-full h-96 animate-[pulse_4s_ease-in-out_infinite] opacity-20" viewBox="0 0 1000 200" preserveAspectRatio="none">
+                            <path d="M0,100 Q500,0 1000,100" fill="none" stroke="white" strokeWidth="0.5" strokeDasharray="5,5" />
+                        </svg>
+                    </div>
+                </div>
+
                 <div className="container mx-auto max-w-6xl relative z-10 flex flex-col items-center">
 
                     {/* BRAND LOGO PRINCIPAL (Minimalista & Central) */}
