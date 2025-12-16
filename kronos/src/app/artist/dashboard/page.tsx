@@ -169,6 +169,7 @@ export default async function ArtistDashboard() {
                             todaysBookings.map((booking) => (
                                 <AppointmentCard
                                     key={booking.id}
+                                    id={booking.id} // Passando ID para o link
                                     time={`${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
                                     client={booking.client.name || 'Cliente Sem Nome'}
                                     project={`Projeto ID: ${booking.id.slice(-6).toUpperCase()}`}
@@ -224,7 +225,7 @@ function MetricCard({ title, value, trend, icon, color }: any) {
     )
 }
 
-function AppointmentCard({ time, client, project, status }: any) {
+function AppointmentCard({ id, time, client, project, status }: any) {
     // Styling based on status
     const statusConfig: any = {
         'OPEN': { label: 'ABERTO', classes: 'border-yellow-500/30 text-yellow-300' },
@@ -239,7 +240,7 @@ function AppointmentCard({ time, client, project, status }: any) {
 
     return (
         <div className={`
-            relative overflow-hidden rounded-xl p-6 border transition-all duration-300
+            relative overflow-hidden rounded-xl p-6 border transition-all duration-300 group/card
             ${isLive ? 'bg-purple-900/5 border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.05)]' : 'bg-gray-900/30 border-white/5 hover:border-white/10'}
         `}>
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
@@ -257,6 +258,17 @@ function AppointmentCard({ time, client, project, status }: any) {
                     <p className="text-xs text-gray-500 font-mono uppercase tracking-wider flex items-center gap-2">
                         <span className="w-1 h-1 rounded-full bg-gray-600"></span> {project}
                     </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                    <a
+                        href={`/artist/anamnese/${id}`}
+                        target="_blank"
+                        className="px-4 py-2 bg-purple-600/10 border border-purple-500/50 text-purple-400 text-xs font-bold rounded hover:bg-purple-600 hover:text-white transition-all flex items-center gap-2"
+                    >
+                        📝 FICHA
+                    </a>
                 </div>
             </div>
         </div>

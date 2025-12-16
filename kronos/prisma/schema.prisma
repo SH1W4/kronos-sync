@@ -62,6 +62,7 @@ model User {
   invitedById   String?
   invitedUsers  User[]        @relation("UserInvites")
   createdInvites InviteCode[] @relation("Creator")
+  anamneses     Anamnesis[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -172,6 +173,7 @@ model Booking {
   client User   @relation(fields: [clientId], references: [id])
   slot   Slot   @relation(fields: [slotId], references: [id])
   coupon Coupon? @relation(fields: [couponId], references: [id])
+  anamnesis Anamnesis?
 
   @@map("bookings")
 }
@@ -304,3 +306,40 @@ model KioskEntry {
   @@map("kiosk_entries")
 }
 
+
+model Anamnesis {
+  id        String   @id @default(cuid())
+  clientId  String
+  bookingId String?  @unique 
+  
+  // Dados de Saúde (Baseado no CSV)
+  hasMedicalCondition     Boolean  @default(false)
+  conditionDetails        String?  // Ex: Diabetes, Epilepsia
+  
+  hasHealingIssues        Boolean  @default(false)
+  healingDetails          String?  // Ex: Quelóide
+  
+  hasAllergies            Boolean  @default(false)
+  allergyDetails          String?  // Ex: Tintas, Latex, Lâmina
+  
+  isPregnant              Boolean  @default(false)
+  isUnderMedication       Boolean  @default(false)
+  medicationDetails       String?
+
+  // Dados do Projeto Específico (Snapshot do momento)
+  projectDescription      String?  // "Arte" do CSV
+  agreedValue             Float?   // "Valor Acertado" do CSV
+
+  // Termos e Assinatura
+  acceptedTerms           Boolean  @default(false)
+  signatureData           String?  // Base64 ou URL da assinatura digital
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  client    User     @relation(fields: [clientId], references: [id])
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+  
+  @@map("anamneses")
+}

@@ -11,10 +11,15 @@ export default function LandingPage() {
             <nav className="fixed top-0 w-full z-50 border-b border-white/10 bg-black/50 backdrop-blur-md">
                 <div className="container mx-auto px-6 h-16 flex items-center justify-between">
                     <BrandLogo size={40} animated={false} />
-                    <div className="flex gap-4">
-                        {/* Acesso de Artista removido da Home - Requer Convite */}
+                    <div className="flex items-center gap-8">
+                        <Link href="#features" className="text-xs font-mono text-gray-400 hover:text-white tracking-widest transition-colors hidden md:block">
+                            THE SYSTEM
+                        </Link>
+                        <Link href="#" className="text-xs font-mono text-gray-400 hover:text-white tracking-widest transition-colors hidden md:block">
+                            MANIFESTO
+                        </Link>
                         <Link href="/auth/signin">
-                            <Button className="bg-white text-black hover:bg-gray-200 font-bold font-orbitron text-sm tracking-wider px-6">
+                            <Button className="bg-white text-black hover:bg-gray-200 font-bold font-orbitron text-sm tracking-wider px-6 rounded-none">
                                 LOGIN
                             </Button>
                         </Link>
@@ -89,7 +94,7 @@ export default function LandingPage() {
             </section>
 
             {/* Features Grid - Internal Tools */}
-            <section className="py-24 px-6 border-t border-white/5 bg-black/50">
+            <section id="features" className="py-24 px-6 border-t border-white/5 bg-black/50">
                 <div className="container mx-auto max-w-7xl">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
