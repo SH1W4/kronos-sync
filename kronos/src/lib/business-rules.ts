@@ -15,11 +15,11 @@ export function calculateCommission(
   if (artistPlan === 'GUEST') {
     return BUSINESS_RULES.GUEST_COMMISSION_RATE
   }
-  
+
   if (monthlyEarnings >= BUSINESS_RULES.RESIDENT_COMMISSION_THRESHOLD) {
     return BUSINESS_RULES.RESIDENT_REDUCED_COMMISSION_RATE
   }
-  
+
   return BUSINESS_RULES.RESIDENT_INITIAL_COMMISSION_RATE
 }
 
@@ -31,7 +31,7 @@ export function calculateBookingSplit(
   const finalValue = value - discountValue
   const artistShare = finalValue * (1 - commissionRate)
   const studioShare = finalValue * commissionRate
-  
+
   return {
     finalValue,
     artistShare,
@@ -45,10 +45,10 @@ export function calculateProductPrice(basePrice: number, markup: number): number
 
 export function applyCoupon(
   value: number,
-  couponType: 'PERCENT' | 'FIXED',
+  couponType: 'PERCENTAGE' | 'FIXED',
   couponValue: number
 ): number {
-  if (couponType === 'PERCENT') {
+  if (couponType === 'PERCENTAGE') {
     return value * (couponValue / 100)
   }
   return Math.min(couponValue, value)

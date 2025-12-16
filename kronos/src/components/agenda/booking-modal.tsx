@@ -104,7 +104,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
 
       if (response.ok) {
         const data = await response.json()
-        const discount = data.coupon.type === 'PERCENT'
+        const discount = data.coupon.type === 'PERCENTAGE'
           ? value * (data.coupon.value / 100)
           : Math.min(data.coupon.value, value)
 
