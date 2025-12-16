@@ -36,11 +36,11 @@ interface BookingModalProps {
   onBookingCreated: () => void
 }
 
-const BookingModal: React.FC<BookingModalProps> = ({ 
-  slot, 
-  open, 
-  onClose, 
-  onBookingCreated 
+const BookingModal: React.FC<BookingModalProps> = ({
+  slot,
+  open,
+  onClose,
+  onBookingCreated
 }) => {
   const [artists, setArtists] = useState<Artist[]>([])
   const [clients, setClients] = useState<Client[]>([])
@@ -101,13 +101,13 @@ const BookingModal: React.FC<BookingModalProps> = ({
     setValidatingCoupon(true)
     try {
       const response = await fetch(`/api/coupons?code=${couponCode}&artistId=${selectedArtist}`)
-      
+
       if (response.ok) {
         const data = await response.json()
-        const discount = data.coupon.type === 'PERCENT' 
+        const discount = data.coupon.type === 'PERCENT'
           ? value * (data.coupon.value / 100)
           : Math.min(data.coupon.value, value)
-        
+
         setCouponDiscount(discount)
       } else {
         setCouponDiscount(0)
@@ -132,6 +132,31 @@ const BookingModal: React.FC<BookingModalProps> = ({
     return { finalValue, artistShare, studioShare }
   }
 
+  const [isSuccess, setIsSuccess] = useState(false)
+
+  const handleSuccessClose = () => {
+    setIsSuccess(false)
+    onClose()
+  }
+
+  const sendWhatsApp = () => {
+    if (!slot || !selectedClient) return
+    const client = clients.find(c => c.id === selectedClient)
+    const artist = artists.find(a => a.id === selectedArtist)
+
+    if (!client || !artist) return
+
+    const date = new Date(slot.startTime).toLocaleDateString('pt-BR')
+    const time = new Date(slot.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+
+    const message = `Olá *${client.name}*! 👋%0A%0A` +
+      `Seu agendamento para o dia *${date} às ${time}* com *${artist.user.name}* está pré-reservado! ✅%0A%0A` +
+      `Para confirmar, por favor preencha nossa Ficha de Anamnese neste link:%0A` +
+      `👉 https://docs.google.com/forms/d/1j4bgfWDHxrFkqkIu4dIkNmdypRGDjKbewXX81zrK5yU/viewform`
+
+    window.open(`https://wa.me/?text=${message}`, '_blank')
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!slot || !selectedArtist || !selectedClient) return
@@ -151,10 +176,8 @@ const BookingModal: React.FC<BookingModalProps> = ({
       })
 
       if (response.ok) {
-        const data = await response.json()
-        alert('Agendamento criado com sucesso!')
+        setIsSuccess(true) // Mostra a tela de sucesso em vez de fechar
         onBookingCreated()
-        onClose()
         resetForm()
       } else {
         const error = await response.json()
@@ -168,26 +191,45 @@ const BookingModal: React.FC<BookingModalProps> = ({
     }
   }
 
-  const resetForm = () => {
-    setSelectedArtist('')
-    setSelectedClient('')
-    setValue(400)
-    setCouponCode('')
-    setCouponDiscount(0)
-  }
-
-  const { finalValue, artistShare, studioShare } = calculateSplit()
-
   if (!slot) return null
 
+  // Render Success Screen
+  if (isSuccess) {
+    return (
+      <Dialog open={open} onOpenChange={handleSuccessClose}>
+        <DialogContent className="max-w-md text-center py-10">
+          <div className="mx-auto w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-4 text-3xl">
+            🎉
+          </div>
+          <DialogTitle className="text-2xl font-orbitron text-center mb-2">Agendamento Criado!</DialogTitle>
+          <p className="text-muted-foreground mb-8">
+            Agora envie a ficha de anamnese para o cliente confirmar o horário.
+          </p>
+
+          <div className="space-y-3">
+            <Button onClick={sendWhatsApp} className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-black h-12 text-lg font-bold shadow-[0_0_15px_rgba(37,211,102,0.4)]">
+              Enviar via WhatsApp 📲
+            </Button>
+            <Button variant="outline" onClick={handleSuccessClose} className="w-full">
+              Fechar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
+  // Regular Form Render
+  const { finalValue, artistShare, studioShare } = calculateSplit()
+
   const formatTimeSlot = (startTime: string, endTime: string) => {
-    const start = new Date(startTime).toLocaleTimeString('pt-BR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const start = new Date(startTime).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
     })
-    const end = new Date(endTime).toLocaleTimeString('pt-BR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const end = new Date(endTime).toLocaleTimeString('pt-BR', {
+      hour: '2-digit',
+      minute: '2-digit'
     })
     return `${start} - ${end}`
   }
@@ -323,7 +365,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
                 }}
               >
                 <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                  <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" />
                 </svg>
                 Conectar
               </Button>
