@@ -3,23 +3,31 @@
 import { useState } from 'react'
 import { Bot, X, Send, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { queryAgent } from '@/app/actions/agent'
 
 export default function McpWidget() {
     const [isOpen, setIsOpen] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
     const [messages, setMessages] = useState<{ role: 'agent' | 'user', text: string }[]>([
-        { role: 'agent', text: 'Olá! Sou seu assistente MCP. Como posso ajudar a otimizar seu estúdio hoje?' }
+        { role: 'agent', text: 'Olá! Sou KAI. Como posso ajudar a otimizar seu estúdio hoje?' }
     ])
     const [input, setInput] = useState('')
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!input.trim()) return
-        setMessages([...messages, { role: 'user', text: input }])
+        const userMsg = input
+        setMessages(prev => [...prev, { role: 'user', text: userMsg }])
         setInput('')
+        setIsTyping(true)
 
-        // Simulação de resposta
-        setTimeout(() => {
-            setMessages(prev => [...prev, { role: 'agent', text: 'Estou processando sua solicitação... (Integração real em breve)' }])
-        }, 1000)
+        try {
+            const response = await queryAgent(userMsg, [])
+            setMessages(prev => [...prev, { role: 'agent', text: response.text }])
+        } catch (e) {
+            setMessages(prev => [...prev, { role: 'agent', text: 'Erro de conexão com o núcleo.' }])
+        } finally {
+            setIsTyping(false)
+        }
     }
 
     return (
@@ -42,7 +50,7 @@ export default function McpWidget() {
                     {/* Messages */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                         {messages.map((msg, i) => (
-                            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} `}>
                                 <div className={`
                                     max-w-[85%] p-3 rounded-xl text-xs font-mono
                                     ${msg.role === 'user'

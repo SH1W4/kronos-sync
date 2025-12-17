@@ -63,6 +63,7 @@ model User {
   invitedUsers  User[]        @relation("UserInvites")
   createdInvites InviteCode[] @relation("Creator")
   anamneses     Anamnesis[]
+  agentLogs     AgentLog[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -343,3 +344,29 @@ model Anamnesis {
   
   @@map("anamneses")
 }
+
+model HelpArticle {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  category  String
+  keywords  String[] // Simula embeddings para busca simples
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("help_articles")
+}
+
+model AgentLog {
+  id        String   @id @default(cuid())
+  userId    String
+  query     String   @db.Text
+  response  String   @db.Text
+  intent    String?
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("agent_logs")
+}
+
