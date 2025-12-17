@@ -103,7 +103,10 @@ export async function POST(request: NextRequest) {
       if (couponId) {
         await tx.coupon.update({
           where: { id: couponId },
-          data: { currentUses: { increment: 1 } }
+          data: {
+            status: 'USED',
+            usedByUserId: clientId
+          }
         })
       }
 
