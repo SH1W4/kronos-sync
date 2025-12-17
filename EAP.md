@@ -35,16 +35,25 @@
   - Manifest.json e Meta Tags iOS.
   - Ícones e Splash Screens.
 
-## Fase 4: Inteligência & Suporte (Em Andamento 🚧)
-- [ ] **Integração MCP (Model Context Protocol)**
-  - Criação do SYSTEM_MAP para contexto do agente.
-  - Capacidade de leitura de banco de dados via Agente.
-  - Capacidade de resposta de suporte N1 (Dúvidas de agendamento).
-- [ ] **Operação Assistida**
-  - Dashboard de Métricas para Artistas.
-  - Fluxo de Confirmação Automatizada.
+## Fase 4: Experiência do Artista (Em Andamento 🚧)
+- [x] **Dashboard do Artista**
+  - [x] Isolamento de Dados (Cada artista vê apenas o seu).
+  - [x] Métricas em Tempo Real (Faturamento, Sessões).
+  - [x] Visualização de Agenda do Dia.
+- [x] **Segurança & Acesso**
+  - [x] Modo Dev (Bypass para testes locais).
+  - [x] Correção de Fluxo de Login (Google + Roles).
+- [x] **Módulo 1: Dashboard Inicial** (KPIS, Agendamentos Hoje)
+- [x] **Módulo 2: Agenda** (Visualização, Novo Agendamento, Google Sync)
+- [x] **Módulo 3: Ficha de Anamnese** (Link Público, Assinatura Digital, Persistência)
+- [x] **Módulo 4: Financeiro** (Extrato, Comissões, Totais)
+- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca).
+  
+## Fase 5: Expansão (Planejado 🔮)
+- [ ] **Visão Master/Admin**
+  - Resumo de toda equipe.
+  - Gestão de Comissões.
+- [ ] **Kiosk Mode (Recepção)**
+  - Auto-checkin do cliente.
+- [ ] **Marketplace & Integrações**
 
-## Fase 5: Expansão (Futuro 🔮)
-- [ ] App Nativo (React Native) se necessário.
-- [ ] Marketplace de NFTs/Arte Digital integrado.
-- [ ] Totem de Autoatendimento (Kiosk Mode) para o estúdio físico.

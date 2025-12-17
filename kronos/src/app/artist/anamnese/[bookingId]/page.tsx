@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { saveAnamnesis } from '@/app/actions/anamnesis'
 
-export default function AnamnesePage({ params }: { params: { bookingId: string } }) {
+export default function AnamnesePage({ params }: { params: Promise<{ bookingId: string }> }) {
+    const { bookingId } = use(params)
     const router = useRouter()
     const [saving, setSaving] = useState(false)
 
@@ -25,9 +27,21 @@ export default function AnamnesePage({ params }: { params: { bookingId: string }
 
     const handleSave = async () => {
         setSaving(true)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setSaving(false)
-        router.back()
+        try {
+            const result = await saveAnamnesis(bookingId, formData)
+
+            if (result.success) {
+                // Poderíamos mostrar um toast aqui
+                console.log('Salvo com sucesso!')
+                router.back()
+            } else {
+                alert('Erro ao salvar: ' + result.error)
+            }
+        } catch (e) {
+            alert('Erro inesperado ao conectar com servidor.')
+        } finally {
+            setSaving(false)
+        }
     }
 
     return (
@@ -46,7 +60,7 @@ export default function AnamnesePage({ params }: { params: { bookingId: string }
                         </Link>
                         <div>
                             <h1 className="text-2xl font-orbitron font-bold text-white tracking-wide">FICHA DE ANAMNESE</h1>
-                            <p className="text-xs font-mono text-gray-500 uppercase">Sessão ID: {params.bookingId}</p>
+                            <p className="text-xs font-mono text-gray-500 uppercase">Sessão ID: {bookingId}</p>
                         </div>
                     </div>
                 </div>
