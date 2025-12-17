@@ -1,113 +1,67 @@
 <div align="center">
   <h1 align="center">KRONOS SYNC</h1>
   <p align="center">
-    <strong>The Operating System for High-End Tattoo Studios</strong>
+    <strong>Strategic Operating System for High-End Tattoo Studios</strong>
+  </p>
+  <p align="center">
+    <img src="https://img.shields.io/badge/STATUS-PRIVATE_BETA-purple?style=for-the-badge" alt="Status Private">
+    <img src="https://img.shields.io/badge/LICENSE-PROPRIETARY-black?style=for-the-badge" alt="License Proprietary">
   </p>
 </div>
 
 > *"Sync your art, manage your time."*
 
-O **KRONOS SYNC** é uma plataforma "all-in-one" desenvolvida para elevar a gestão de estúdios de tatuagem de alto padrão. Combinando estética **minimalista monocromática** com tecnologia de ponta, o sistema oferece um ecossistema completo para Artistas, Clientes e Managers.
+## 🔒 Acesso Restrito
+**Este software é proprietário e protegido por direitos autorais.**
+O código-fonte disponível neste repositório é destinado exclusivamente para fins de **auditoria, desenvolvimento interno e demonstração de portfólio**. A reprodução, distribuição ou uso comercial sem autorização expressa do **Kronos Tattoo Studio** é estritamente proibida.
 
 ---
 
-## 🌑 Estética & Design
-O sistema adota uma linguagem visual **Cyber-Minimalista / Tech-Noir**:
-*   **Contraste Alto:** Preto profundo e Branco Puro com acentos em Púrpura Neon (`#a855f7`).
-*   **Tipografia:** *Orbitron* (Identidade) & *Inter/JetBrains Mono* (Interface).
-*   **Experiência:** Animações fluidas, Glassmorphism e interações táteis.
+## 💎 Visão do Produto
+O **KRONOS SYNC** não é apenas um agendador; é um sistema operacional completo para estúdios que tratam tatuagem como arte e negócio de alto nível.
+
+Ele elimina a fricção administrativa, permitindo que artistas foquem unicamente em criar, enquanto o sistema orquestra a logística, financeiro e experiência do cliente com precisão cirúrgica.
 
 ---
 
-## 🚀 Módulos do Sistema
+## 🚀 Arquitetura & Módulos
 
 ### 🎨 Artist OS (Dashboard)
 Um painel de comando pessoal para cada tatuador resident ou guest.
-*   **Visão Geral:** Métricas de faturamento em tempo real e sessões do dia.
-*   **Agenda Inteligente:** Visualização integrada de slots e bloqueios.
-*   **Segurança:** Isolamento total de dados entre artistas.
+*   **Visão em Tempo Real:** Faturamento, metas e agenda diária.
+*   **Privacidade Nativa:** Isolamento rigoroso de dados sensíveis entre artistas.
+*   **Performance:** Carregamento instantâneo via Edge Computing.
 
-### 📋 Anamnese Digital 2.0
-Fichas médicas jurídicas integradas diretamente ao fluxo de agendamento.
-*   Preenchimento via tablet ou link.
-*   Assinatura digital.
-*   Alertas automáticos de riscos (Alergias, Condições Específicas).
+### 📋 Anamnese Digital 2.0 (Legal-grade)
+Segurança jurídica e clínica integrada ao fluxo.
+*   Assinatura biométrica/digital.
+*   Vinculação imutável com a sessão (Booking ID).
+*   Alertas de risco clínico automáticos.
 
-### 🛍️ Marketplace & Financeiro
-*   Extrato detalhado de comissões.
-*   Venda de artes e produtos.
-*   Relatórios de performance para o Admin.
-
----
-
-## 🛠️ Stack Tecnológico (2025)
-
-O projeto utiliza a arquitetura mais moderna disponível:
-
-*   **Frontend:** [Next.js 15](https://nextjs.org/) (App Router + Turbopack)
-*   **Linguagem:** TypeScript + React 19
-*   **Estilização:** Tailwind CSS + Lucide Icons
-*   **Banco de Dados:** PostgreSQL (Serverless via **Neon**)
-*   **ORM:** Prisma
-*   **Autenticação:** NextAuth.js (Google OAuth + Custom Credentials)
+### 🧠 Gestão Inteligente
+*   **Agenda Híbrida:** Suporte a Flash Days e Projetos de Longa Duração.
+*   **Financial Core:** Split automático de comissões e gestão de royalties.
+*   **Client CRM:** Histórico visual de projetos e preferências.
 
 ---
 
-## 🏁 Como Rodar (Dev Mode)
+## 🛠️ Engenharia de Software
 
-### Pré-requisitos
-*   Node.js 18+
-*   Conta no Neon (Postgres Serverless) ou Banco Local
+Construído sobre pilares de escalabilidade e segurança modernos:
 
-### 1. Clonar e Instalar
-```bash
-git clone https://github.com/SH1W4/kronos-sync.git
-cd kronos-sync/kronos
-npm install
-```
-
-### 2. Configurar Ambiente
-Crie um arquivo `.env.local` na pasta `kronos/` com suas credenciais:
-
-```env
-# Database (Neon/Postgres)
-POSTGRES_PRISMA_URL="sua_connection_string_pooled"
-POSTGRES_URL_NON_POOLING="sua_connection_string_direct"
-
-# Auth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="sua_chave_secreta"
-```
-
-### 3. Banco de Dados e Servidor
-```bash
-# Gerar Cliente Prisma
-npx prisma generate
-
-# Iniciar Servidor
-npm run dev
-```
-
-Acesse **`http://localhost:3000`**.
-*Para testes rápidos, use o botão **"Modo Dev (Bypass)"** na tela de login.*
+| Camada | Tecnologia |
+| -- | -- |
+| **Frontend** | Next.js 15 (App Router) + React 19 |
+| **Styling** | Tailwind CSS v4 + Design System "Noir" |
+| **Database** | PostgreSQL Serverless (Neon) + Prisma ORM |
+| **Auth** | NextAuth.js (RBAC System) |
+| **Infra** | Vercel Edge Network |
 
 ---
 
-## 📁 Estrutura
-```
-kronos/
-├── prisma/             # Schema e Migrations
-├── public/             # Assets
-├── src/
-│   ├── app/            # Rotas (App Router)
-│   │   ├── api/        # Endpoints (Auth, Webhooks)
-│   │   ├── artist/     # Módulo do Artista (Dashboard, Anamnese)
-│   │   └── auth/       # Telas de Login
-│   ├── components/     # UI Kit
-│   └── lib/            # Configurações (AuthOptions, Prisma)
-└── ...
-```
+## 🤝 Contato & Licenciamento
 
----
+Para discussões sobre licenciamento, parcerias ou acesso de demonstração:
 
-Desenvolvido por **SH1W4** // Arquitetura **Antigravity**.
+**Kronos Tech Division**
+*Developed by SH1W4 // Architecture by Antigravity*
