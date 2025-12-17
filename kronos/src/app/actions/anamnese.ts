@@ -17,7 +17,7 @@ export async function saveAnamnesis(bookingId: string, clientId: string, formDat
                 hasAllergies: formData.alergias,
                 allergyDetails: formData.detalhesAlergias,
                 acceptedTerms: formData.termos,
-                signatureData: "DIGITAL_SIGNATURE_V1", // Placeholder para futura assinatura canvas
+                signatureData: formData.signature || "DIGITAL_SIGNATURE_V1", // Aceita a real ou fallback
                 projectDescription: "Tatuagem Personalizada", // Padrão por enquanto
             }
         })

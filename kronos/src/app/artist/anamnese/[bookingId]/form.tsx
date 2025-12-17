@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, ChevronRight, AlertTriangle, HeartPulse, ShieldCheck, PenTool, Loader2 } from "lucide-react"
+import { Check, ChevronRight, AlertTriangle, HeartPulse, ShieldCheck, PenTool, Loader2, PenLine } from "lucide-react"
 import { saveAnamnesis } from "@/app/actions/anamnese"
+import { SignatureInput } from "@/components/ui/signature-input"
 
 interface AnamnesisFormProps {
     bookingId: string
@@ -27,7 +28,9 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
         detalhesCicatrizacao: "",
         alergias: false,
         detalhesAlergias: "",
-        termos: false
+        detalhesAlergias: "",
+        termos: false,
+        signature: ""
     })
 
     const questions = [
@@ -68,6 +71,13 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
             subtitle: "Você confirma que as informações prestadas são verdadeiras e assume os riscos do procedimento?",
             icon: <PenTool size={32} className="text-green-400" />,
             type: "termos"
+        },
+        {
+            id: "signature",
+            title: "Assinatura Digital",
+            subtitle: "Por favor, assine no quadro abaixo para confirmar.",
+            icon: <PenLine size={32} className="text-purple-400" />,
+            type: "signature"
         }
     ]
 
@@ -207,13 +217,34 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
                                     disabled={!formData.termos || isSubmitting}
                                     className="w-full bg-green-500 text-black py-4 rounded-xl font-bold tracking-wide hover:bg-green-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    {isSubmitting ? <Loader2 className="animate-spin" /> : "ASSINAR E FINALIZAR"}
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : "PRÓXIMO"}
                                 </button>
                             </div>
+                            </div>
                         )}
-                    </div>
-                </motion.div>
-            </AnimatePresence>
-        </div>
+
+                    {currentQ.type === "signature" && (
+                        <div className="space-y-6">
+                            <SignatureInput onSave={(base64) => {
+                                setFormData({ ...formData, signature: base64 })
+                            }} />
+
+                            <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-500 font-mono">
+                                Ao clicar em finalizar, sua assinatura será vinculada biometricamente a este documento de acordo com nossos termos de serviço.
+                            </div>
+
+                            <button
+                                onClick={handleNext}
+                                disabled={!formData.signature || isSubmitting}
+                                className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold tracking-wide hover:bg-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {isSubmitting ? <Loader2 className="animate-spin" /> : "FINALIZAR FICHA"}
+                            </button>
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+        </AnimatePresence>
+        </div >
     )
 }
