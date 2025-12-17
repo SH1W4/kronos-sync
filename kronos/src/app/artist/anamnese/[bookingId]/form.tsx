@@ -28,7 +28,7 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
         detalhesCicatrizacao: "",
         alergias: false,
         detalhesAlergias: "",
-        detalhesAlergias: "",
+
         termos: false,
         signature: ""
     })
