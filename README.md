@@ -1,132 +1,113 @@
 <div align="center">
-  <img src="./kronos/public/brand/logo.png" alt="Kronos Sync Logo" width="200" />
+  <h1 align="center">KRONOS SYNC</h1>
+  <p align="center">
+    <strong>The Operating System for High-End Tattoo Studios</strong>
+  </p>
 </div>
-<!-- Você pode substituir isso por um print da tela inicial depois -->
 
-> **Sistema de Gestão Premium para Estúdios de Tatuagem**  
 > *"Sync your art, manage your time."*
 
-O **KRONOS SYNC** é uma plataforma "all-in-one" desenvolvida para elevar a gestão de estúdios de tatuagem de alto padrão. Combinando estética **minimalista monocromática** com tecnologia de ponta, o sistema oferece controle total sobre agenda, vendas e experiência do cliente.
+O **KRONOS SYNC** é uma plataforma "all-in-one" desenvolvida para elevar a gestão de estúdios de tatuagem de alto padrão. Combinando estética **minimalista monocromática** com tecnologia de ponta, o sistema oferece um ecossistema completo para Artistas, Clientes e Managers.
 
 ---
 
 ## 🌑 Estética & Design
-O sistema adota uma linguagem visual **Tech-Noir / Minimalista Brutalista**:
-*   **Contraste Alto:** Preto profundo (`#050505`) e Branco Puro.
-*   **Tipografia:** *Orbitron* (Títulos) & *JetBrains Mono* (Dados).
-*   **Geometria:** Linhas sólidas, sem curvas desnecessárias, foco na informação.
+O sistema adota uma linguagem visual **Cyber-Minimalista / Tech-Noir**:
+*   **Contraste Alto:** Preto profundo e Branco Puro com acentos em Púrpura Neon (`#a855f7`).
+*   **Tipografia:** *Orbitron* (Identidade) & *Inter/JetBrains Mono* (Interface).
+*   **Experiência:** Animações fluidas, Glassmorphism e interações táteis.
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 🚀 Módulos do Sistema
 
-### 📅 Agenda Cinema
-Visualização exclusiva em grade 3x7 (Macas x Dias). Gestão visual de slots, reservas rápidas e integração de status.
+### 🎨 Artist OS (Dashboard)
+Um painel de comando pessoal para cada tatuador resident ou guest.
+*   **Visão Geral:** Métricas de faturamento em tempo real e sessões do dia.
+*   **Agenda Inteligente:** Visualização integrada de slots e bloqueios.
+*   **Segurança:** Isolamento total de dados entre artistas.
 
-### 🛍️ Marketplace Integrado
-Venda de prints, artes digitais e originais diretamente pelo sistema. Carrinho de compras e gestão de estoque por artista.
+### 📋 Anamnese Digital 2.0
+Fichas médicas jurídicas integradas diretamente ao fluxo de agendamento.
+*   Preenchimento via tablet ou link.
+*   Assinatura digital.
+*   Alertas automáticos de riscos (Alergias, Condições Específicas).
 
-### 🏪 Kiosk Mode
-Interface *touch-friendly* fullscreen para tablets na recepção. Permite que clientes façam check-in, assinem fichas e acompanhantes se cadastrem.
-
-### 📋 Fichas de Anamnese Digitais
-Formulários médicos e de consentimento completos, integrados ao agendamento e assinados digitalmente.
-
-### 📊 Dashboards Financeiros
-Visão clara de faturamento, comissões de artistas e métricas de desempenho do estúdio.
+### 🛍️ Marketplace & Financeiro
+*   Extrato detalhado de comissões.
+*   Venda de artes e produtos.
+*   Relatórios de performance para o Admin.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🛠️ Stack Tecnológico (2025)
 
-O projeto foi reconstruído utilizando as tecnologias mais modernas de 2025:
+O projeto utiliza a arquitetura mais moderna disponível:
 
-*   **Frontend:** [Next.js 15](https://nextjs.org/) (App Router)
+*   **Frontend:** [Next.js 15](https://nextjs.org/) (App Router + Turbopack)
 *   **Linguagem:** TypeScript + React 19
-*   **Estilização:** Tailwind CSS 4 + Design System Customizado
-*   **Banco de Dados:** PostgreSQL 15
+*   **Estilização:** Tailwind CSS + Lucide Icons
+*   **Banco de Dados:** PostgreSQL (Serverless via **Neon**)
 *   **ORM:** Prisma
-*   **Containerização:** Docker & Docker Compose
+*   **Autenticação:** NextAuth.js (Google OAuth + Custom Credentials)
 
 ---
 
-## 🏁 Como Rodar o Projeto
+## 🏁 Como Rodar (Dev Mode)
 
 ### Pré-requisitos
-*   Docker & Docker Compose
-*   Node.js 18+ (para desenvolvimento local fora do container)
+*   Node.js 18+
+*   Conta no Neon (Postgres Serverless) ou Banco Local
 
-### 1. Clonar o Repositório
+### 1. Clonar e Instalar
 ```bash
 git clone https://github.com/SH1W4/kronos-sync.git
-cd kronos-sync
-```
-
-### 2. Iniciar Infraestrutura (Banco de Dados)
-```bash
-docker-compose up -d
-```
-*Isso iniciará o PostgreSQL na porta 5432.*
-
-### 3. Configurar e Rodar a Aplicação
-Entre na pasta do projeto Next.js:
-```bash
-cd kronos
-```
-
-Instale as dependências:
-```bash
+cd kronos-sync/kronos
 npm install
 ```
 
-Configure o Banco de Dados:
-```bash
-# Gera o cliente Prisma
-npx prisma generate
+### 2. Configurar Ambiente
+Crie um arquivo `.env.local` na pasta `kronos/` com suas credenciais:
 
-# Aplica as migrações no banco
-npx prisma migrate dev --name init
+```env
+# Database (Neon/Postgres)
+POSTGRES_PRISMA_URL="sua_connection_string_pooled"
+POSTGRES_URL_NON_POOLING="sua_connection_string_direct"
 
-# (Opcional) Popula o banco com dados iniciais
-npm run db:seed
+# Auth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="sua_chave_secreta"
 ```
 
-Inicie o servidor de desenvolvimento:
+### 3. Banco de Dados e Servidor
 ```bash
+# Gerar Cliente Prisma
+npx prisma generate
+
+# Iniciar Servidor
 npm run dev
 ```
 
-Acesse **`http://localhost:3000`** no seu navegador.
+Acesse **`http://localhost:3000`**.
+*Para testes rápidos, use o botão **"Modo Dev (Bypass)"** na tela de login.*
 
 ---
 
-## 📁 Estrutura do Projeto
-
+## 📁 Estrutura
 ```
-kronos-sync/
-├── docker-compose.yml    # Configuração do Banco de Dados
-├── kronos/               # Aplicação Next.js Principal
-│   ├── prisma/           # Schema do Banco e Seeds
-│   ├── public/           # Assets estáticos
-│   └── src/
-│       ├── app/          # Rotas (Next.js App Router)
-│       │   ├── api/      # Backend API Routes
-│       │   ├── kiosk/    # Rota do Modo Kiosk
-│       │   └── ...
-│       ├── components/   # Componentes React Reutilizáveis
-│       │   ├── ui/       # Design System (BrandLogo, Buttons, etc)
-│       │   └── agenda/   # Componentes específicos da Agenda
-│       └── lib/          # Utilitários e Configurações
+kronos/
+├── prisma/             # Schema e Migrations
+├── public/             # Assets
+├── src/
+│   ├── app/            # Rotas (App Router)
+│   │   ├── api/        # Endpoints (Auth, Webhooks)
+│   │   ├── artist/     # Módulo do Artista (Dashboard, Anamnese)
+│   │   └── auth/       # Telas de Login
+│   ├── components/     # UI Kit
+│   └── lib/            # Configurações (AuthOptions, Prisma)
 └── ...
 ```
 
 ---
 
-## 🤝 Contribuição
-
-Este é um projeto proprietário do **Kronos Tattoo Studio**.
-
----
-
-Desenvolvido por **SH1W4** com arquitetura **Antigravity**.
-<!-- Deploy Trigger v2 -->
+Desenvolvido por **SH1W4** // Arquitetura **Antigravity**.
