@@ -3,23 +3,37 @@ import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
+console.log("⚠️ PRE-BOOT CHECK:")
+console.log("ID:", process.env.GOOGLE_CLIENT_ID?.substring(0, 10))
+console.log("SECRET:", process.env.GOOGLE_CLIENT_SECRET?.substring(0, 10))
+
+
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma) as any,
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
             authorization: {
                 params: {
-                    scope: "openid email profile https://www.googleapis.com/auth/calendar",
+                    scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
+                    prompt: "consent",
                     access_type: "offline",
-                    prompt: "consent", // Força perguntar permissão sempre, pra garantir o refresh token
                     response_type: "code"
                 }
             }
         }),
     ],
+    // DEBUG LOGS
     callbacks: {
+        async signIn({ account, profile }) {
+            console.log("DEBUG AUTH - ID STARTS WITH:", process.env.GOOGLE_CLIENT_ID?.substring(0, 5))
+            console.log("DEBUG AUTH - SECRET STARTS WITH:", process.env.GOOGLE_CLIENT_SECRET?.substring(0, 5))
+            if (account?.provider === "google") {
+                // You can add additional checks here if needed
+            }
+            return true // Allow sign-in by default
+        },
         async session({ session, user }) {
             // Adiciona o ID do usuário na sessão para fácil acesso
             if (session.user) {
