@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import McpWidget from '@/components/agent/McpWidget'
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession()
@@ -41,7 +42,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                 <div className="p-6">
                     <Link href="/artist/dashboard" className="block mb-10 group">
                         <h1 className="font-orbitron font-bold text-xl tracking-wider hidden md:block group-hover:text-purple-400 transition-colors">
-                            KRONOS <span className="text-purple-600">OS</span>
+                            KRONØS <span className="text-purple-600">OS</span>
                         </h1>
                         <span className="md:hidden font-orbitron font-bold text-2xl text-purple-600">K</span>
                     </Link>
@@ -70,6 +71,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
             <main className="flex-1 overflow-y-auto bg-black relative">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none fixed"></div>
                 {children}
+                <McpWidget />
             </main>
         </div>
     )

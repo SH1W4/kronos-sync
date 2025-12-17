@@ -73,7 +73,7 @@ export function BrandLogo({
                         className="font-orbitron font-bold tracking-[0.2em] leading-none text-foreground"
                         style={{ fontSize: size * 0.55 }}
                     >
-                        KRONOS
+                        KRONØS
                     </h1>
                     <span
                         className="font-mono text-muted-foreground tracking-[0.5em] font-normal uppercase border-t border-muted-foreground/30 mt-1 pt-1 w-full flex justify-between px-1"
