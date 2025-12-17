@@ -18,9 +18,15 @@ export async function queryAgent(userQuery: string, history: any[]) {
             user: true,
             bookings: {
                 where: {
-                    startTime: { gte: new Date() } // Booking futuros
+                    slot: {
+                        startTime: { gte: new Date() }
+                    }
                 },
-                orderBy: { startTime: 'asc' },
+                orderBy: {
+                    slot: {
+                        startTime: 'asc'
+                    }
+                },
                 include: { client: true, slot: true },
                 take: 5
             }
