@@ -220,31 +220,31 @@ export function AnamnesisForm({ bookingId, clientId, initialData }: AnamnesisFor
                                     {isSubmitting ? <Loader2 className="animate-spin" /> : "PRÓXIMO"}
                                 </button>
                             </div>
-                            </div>
+
                         )}
 
-                    {currentQ.type === "signature" && (
-                        <div className="space-y-6">
-                            <SignatureInput onSave={(base64) => {
-                                setFormData({ ...formData, signature: base64 })
-                            }} />
+                        {currentQ.type === "signature" && (
+                            <div className="space-y-6">
+                                <SignatureInput onSave={(base64) => {
+                                    setFormData({ ...formData, signature: base64 })
+                                }} />
 
-                            <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-500 font-mono">
-                                Ao clicar em finalizar, sua assinatura será vinculada biometricamente a este documento de acordo com nossos termos de serviço.
+                                <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg text-xs text-zinc-500 font-mono">
+                                    Ao clicar em finalizar, sua assinatura será vinculada biometricamente a este documento de acordo com nossos termos de serviço.
+                                </div>
+
+                                <button
+                                    onClick={handleNext}
+                                    disabled={!formData.signature || isSubmitting}
+                                    className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold tracking-wide hover:bg-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : "FINALIZAR FICHA"}
+                                </button>
                             </div>
-
-                            <button
-                                onClick={handleNext}
-                                disabled={!formData.signature || isSubmitting}
-                                className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold tracking-wide hover:bg-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                            >
-                                {isSubmitting ? <Loader2 className="animate-spin" /> : "FINALIZAR FICHA"}
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </motion.div>
-        </AnimatePresence>
+                        )}
+                    </div>
+                </motion.div>
+            </AnimatePresence>
         </div >
     )
 }
