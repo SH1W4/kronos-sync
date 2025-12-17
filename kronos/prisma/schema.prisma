@@ -64,6 +64,8 @@ model User {
   createdInvites InviteCode[] @relation("Creator")
   anamneses     Anamnesis[]
   agentLogs     AgentLog[]
+  generatedCoupons Coupon[] @relation("GeneratedBy")
+  usedCoupons      Coupon[] @relation("UsedBy")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -216,23 +218,28 @@ model Product {
 }
 
 model Coupon {
-  id          String     @id @default(cuid())
-  artistId    String
-  code        String     @unique
-  type        CouponType
-  value       Float      // Percentage (0-100) or fixed amount
-  minValue    Float?     // Minimum order value
-  maxUses     Int?       // Maximum number of uses
-  currentUses Int        @default(0)
-  isActive    Boolean    @default(true)
-  expiresAt   DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  // Relations
-  artist   Artist    @relation(fields: [artistId], references: [id])
-  bookings Booking[]
-  orders   Order[]
+  id            String   @id @default(cuid())
+  code          String   @unique
+  discountPercent Int    @default(10)
+  
+  // Referral Fields
+  originClientId String?
+  originClient   User?   @relation("GeneratedBy", fields: [originClientId], references: [id])
+  
+  usedByUserId   String?
+  usedByUser     User?   @relation("UsedBy", fields: [usedByUserId], references: [id])
+  
+  artistId       String?
+  status         String   @default("ACTIVE") // ACTIVE, USED, EXPIRED
+  
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime?
+  updatedAt      DateTime @updatedAt // Adicionado para manter compatibilidade
+  
+  // Relations preserved/updated
+  bookings       Booking[]
+  artist         Artist?   @relation(fields: [artistId], references: [id])
+  orders         Order[]
 
   @@map("coupons")
 }
@@ -369,4 +376,7 @@ model AgentLog {
 
   @@map("agent_logs")
 }
+
+
+
 

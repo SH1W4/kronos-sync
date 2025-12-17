@@ -17,7 +17,12 @@ export async function queryAgent(userQuery: string, history: any[]) {
         include: {
             user: true,
             bookings: {
-                where: { status: 'COMPLETED' }
+                where: {
+                    startTime: { gte: new Date() } // Booking futuros
+                },
+                orderBy: { startTime: 'asc' },
+                include: { client: true, slot: true },
+                take: 5
             }
         }
     })
@@ -28,13 +33,30 @@ export async function queryAgent(userQuery: string, history: any[]) {
     let responseText = ""
 
     if (query.includes('ganho') || query.includes('faturei') || query.includes('financeiro')) {
-        const total = artist.bookings.reduce((acc, b) => acc + (b.artistShare || 0), 0)
+        const aggregations = await prisma.booking.aggregate({
+            where: { artistId: artist.id, status: 'COMPLETED' },
+            _sum: { artistShare: true }
+        })
+        const total = aggregations._sum.artistShare || 0
         responseText = `Com base nos seus registros, você acumulou um total de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)} em comissões recebidas.`
     }
+    else if (query.includes('agenda') || query.includes('agendamento') || query.includes('hoje')) {
+        if (artist.bookings.length === 0) {
+            responseText = "Você não tem agendamentos próximos registrados no sistema."
+        } else {
+            const nextBooking = artist.bookings[0]
+            const date = new Date(nextBooking.slot.startTime).toLocaleDateString('pt-BR')
+            const time = new Date(nextBooking.slot.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            responseText = `Você tem ${artist.bookings.length} agendamentos futuros próximos. O próximo é com ${nextBooking.client.name} em ${date} às ${time}.`
+        }
+    }
     else if (query.includes('cliente') || query.includes('quantos')) {
-        // Count unique clients
-        const uniqueClients = new Set(artist.bookings.map(b => b.clientId)).size
-        responseText = `Você já atendeu ${uniqueClients} clientes únicos registrados no sistema.`
+        // Count unique clients (Total)
+        const totalClients = await prisma.booking.groupBy({
+            by: ['clientId'],
+            where: { artistId: artist.id }
+        })
+        responseText = `Você já atendeu ${totalClients.length} clientes únicos registrados no sistema.`
     }
     else if (query.includes('ola') || query.includes('oi') || query.includes('quem é você')) {
         responseText = `Olá ${artist.user.name?.split(' ')[0]}! Sou KAI, seu assistente pessoal no Kronos. Posso ajudar com dados financeiros, agenda ou dúvidas do estúdio.`
