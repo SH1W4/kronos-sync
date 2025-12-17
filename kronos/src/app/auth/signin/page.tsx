@@ -35,6 +35,13 @@ export default function SignInPage() {
                         Entrar com Google
                     </Button>
 
+                    <Button
+                        className="w-full h-12 bg-red-900/20 text-red-500 border border-red-900/50 hover:bg-red-900/40 hover:border-red-500 hover:text-red-200 font-mono text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all"
+                        onClick={() => signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })}
+                    >
+                        🐛 Modo Dev (Bypass)
+                    </Button>
+
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t border-muted"></span>
