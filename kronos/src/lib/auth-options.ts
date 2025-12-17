@@ -12,8 +12,9 @@ export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma) as any,
     providers: [
         GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+            // INVERTIDO TEMPORARIAMENTE PARA CORRIGIR ERRO DE AMBIENTE DA VERCEL
+            clientId: process.env.GOOGLE_CLIENT_SECRET ?? "",
+            clientSecret: process.env.GOOGLE_CLIENT_ID ?? "",
             authorization: {
                 params: {
                     scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
