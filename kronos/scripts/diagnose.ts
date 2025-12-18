@@ -43,12 +43,12 @@ async function main() {
         const bookings = await prisma.booking.findMany({
             take: 5,
             orderBy: { createdAt: 'desc' },
-            include: { artist: { include: { user: true } } }
+            include: { artist: { include: { user: true } }, slot: true }
         })
 
         console.log(`✅ Agendamentos Encontrados: ${bookings.length}`)
         bookings.forEach(b => {
-            console.log(`   - [${b.status}] ${b.date.toLocaleDateString()} - Artista: ${b.artist.user.name || 'Desconhecido'}`)
+            console.log(`   - [${b.status}] ${b.slot ? new Date(b.slot.startTime).toLocaleDateString() : 'N/A'} - Artista: ${b.artist.user.name || 'Desconhecido'}`)
         })
     } catch (e) {
         console.error('❌ Erro ao ler agendamentos:', e)

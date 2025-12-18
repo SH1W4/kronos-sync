@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
+import Link from 'next/link'
 import { Search, MapPin, Calendar, Mail, Phone } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -113,9 +114,11 @@ export default async function ClientsPage() {
                                     </div>
                                 </div>
 
-                                <button className="w-full mt-6 py-2 bg-white/5 hover:bg-white/10 rounded text-xs uppercase font-bold tracking-widest text-gray-300 transition-colors">
-                                    Ver Histórico Completo
-                                </button>
+                                <Link href={`/artist/clients/${client.id}`}>
+                                    <button className="w-full mt-6 py-2 bg-white/5 hover:bg-white/10 rounded text-xs uppercase font-bold tracking-widest text-gray-300 transition-colors">
+                                        Ver Histórico Completo
+                                    </button>
+                                </Link>
                             </div>
                         )
                     })

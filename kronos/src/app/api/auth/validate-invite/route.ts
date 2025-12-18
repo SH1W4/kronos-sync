@@ -22,32 +22,32 @@ export async function POST(req: NextRequest) {
         const cleanCode = code.trim()
 
         // 1. MASTER KEY CHECK (Environment Variable)
-        // Allows immediate promotion to Artist/Resident for team members
+        // Allows immediate promotion to ADMIN (Master) for the owner
         if (process.env.KRONOS_TEAM_KEY && cleanCode === process.env.KRONOS_TEAM_KEY) {
             const user = await prisma.user.findUnique({ where: { email: session.user.email } })
 
             if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
 
-            // Update User Role
+            // Update User to ADMIN (Master)
             await prisma.user.update({
                 where: { id: user.id },
-                data: { role: 'ARTIST' }
+                data: { role: 'ADMIN' }
             })
 
-            // Create/Update Artist Profile
+            // Create/Update Artist Profile as RESIDENT
             await prisma.artist.upsert({
                 where: { userId: user.id },
                 create: {
                     userId: user.id,
                     plan: 'RESIDENT',
-                    commissionRate: 0.30 // Default resident rate
+                    commissionRate: 0.85 // Master/Owner usually has higher share
                 },
                 update: {
                     plan: 'RESIDENT'
                 }
             })
 
-            return NextResponse.json({ success: true, role: 'ARTIST', message: 'Bem-vindo à equipe Kronos' })
+            return NextResponse.json({ success: true, role: 'ADMIN', message: 'Bem-vindo, Mestre do Workspace.' })
         }
 
         // 2. DATABASE INVITE CODE CHECK
@@ -91,17 +91,32 @@ export async function POST(req: NextRequest) {
             })
 
             // 3. Create Artist Profile if applicable
-            if (invite.role === 'ARTIST') {
-                // Build generic artist profile
-                // Check if exists first to avoid unique constraint errors
+            if (invite.role === 'ARTIST' || invite.role === 'ADMIN') {
                 const existingArtist = await tx.artist.findUnique({ where: { userId: updatedUser.id } })
+
+                // Calcular data de validade se for GUEST e tiver duração definida
+                let validUntil = null;
+                if (invite.targetPlan === 'GUEST' && invite.durationDays) {
+                    validUntil = new Date();
+                    validUntil.setDate(validUntil.getDate() + invite.durationDays);
+                }
 
                 if (!existingArtist) {
                     await tx.artist.create({
                         data: {
                             userId: updatedUser.id,
-                            plan: 'GUEST', // Default for invites unless specified otherwise in logic
-                            commissionRate: 0.30 // Guest rate
+                            plan: invite.targetPlan || 'GUEST',
+                            validUntil: validUntil,
+                            commissionRate: invite.targetPlan === 'RESIDENT' ? 0.30 : 0.35 // Residentes pagam menos taxa?
+                        }
+                    })
+                } else {
+                    // Update existing profile if changing plan via new invite
+                    await tx.artist.update({
+                        where: { id: existingArtist.id },
+                        data: {
+                            plan: invite.targetPlan || existingArtist.plan,
+                            validUntil: validUntil || existingArtist.validUntil
                         }
                     })
                 }

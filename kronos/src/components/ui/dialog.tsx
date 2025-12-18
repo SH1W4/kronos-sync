@@ -32,7 +32,7 @@ const Dialog: React.FC<DialogProps> = ({ open, onOpenChange, children }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         onClick={() => onOpenChange(false)}
       />
@@ -45,7 +45,7 @@ const DialogTrigger: React.FC<DialogTriggerProps> = ({ asChild, children }) => {
   if (asChild) {
     return <>{children}</>
   }
-  
+
   return (
     <button>
       {children}
@@ -80,5 +80,13 @@ const DialogTitle: React.FC<DialogTitleProps> = ({ className, children }) => {
   )
 }
 
-export { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle }
+const DialogDescription: React.FC<{ className?: string, children: React.ReactNode }> = ({ className, children }) => {
+  return (
+    <p className={cn("text-sm text-muted-foreground", className)}>
+      {children}
+    </p>
+  )
+}
+
+export { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription }
 

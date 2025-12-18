@@ -36,10 +36,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if slot is available
-    const existingBooking = slot.bookings.find(b => 
+    const existingBooking = slot.bookings.find(b =>
       b.status === 'CONFIRMED'
     )
-    
+
     if (existingBooking) {
       return NextResponse.json(
         { error: 'Slot não disponível' },
@@ -51,22 +51,23 @@ export async function POST(request: NextRequest) {
     let couponId = null
 
     // Apply coupon if provided
+    // Apply coupon if provided
     if (couponCode) {
-      const coupon = await prisma.coupon.findUnique({
-        where: { 
+      const coupon = await prisma.coupon.findFirst({
+        where: {
           code: couponCode,
-          isActive: true,
-          artistId: artistId
+          status: 'ACTIVE',
+          OR: [
+            { artistId: artistId },
+            { artistId: null }
+          ]
         }
       })
 
       if (coupon && (!coupon.expiresAt || coupon.expiresAt > new Date())) {
-        if (!coupon.maxUses || coupon.currentUses < coupon.maxUses) {
-          if (!coupon.minValue || value >= coupon.minValue) {
-            discountValue = applyCoupon(value, coupon.type, coupon.value)
-            couponId = coupon.id
-          }
-        }
+        const discount = (value * (coupon.discountPercent / 100))
+        discountValue = discount
+        couponId = coupon.id
       }
     }
 
@@ -102,7 +103,10 @@ export async function POST(request: NextRequest) {
       if (couponId) {
         await tx.coupon.update({
           where: { id: couponId },
-          data: { currentUses: { increment: 1 } }
+          data: {
+            status: 'USED',
+            usedByUserId: clientId
+          }
         })
       }
 
@@ -117,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     // Generate ficha (stub)
     const fichaUrl = `${process.env.NEXTAUTH_URL}/fichas/${booking.id}/proxy`
-    
+
     await prisma.booking.update({
       where: { id: booking.id },
       data: { fichaUrl }
@@ -125,7 +129,7 @@ export async function POST(request: NextRequest) {
 
     // Send confirmations (stub)
     console.log(`Confirmação enviada para cliente e artista - Booking ${booking.id}`)
-    
+
     await prisma.booking.update({
       where: { id: booking.id },
       data: { confirmationSent: true }

@@ -140,24 +140,22 @@ async function main() {
 
   console.log('🏪 Entradas do kiosk criadas:', kioskEntries.length)
 
-  // Criar cupons
+  // Criar cupons (Atualizado para Schema Novo)
   const coupons = await Promise.all([
     prisma.coupon.create({
       data: {
         code: 'DESCONTO10',
-        type: 'PERCENTAGE',
-        value: 10,
-        isActive: true,
+        discountPercent: 10,
+        status: 'ACTIVE',
         expiresAt: new Date('2025-12-31'),
         artistId: artists[0].id
       }
     }),
     prisma.coupon.create({
       data: {
-        code: 'PRIMEIRA50',
-        type: 'FIXED',
-        value: 50,
-        isActive: true,
+        code: 'VIP20',
+        discountPercent: 20,
+        status: 'ACTIVE',
         expiresAt: new Date('2025-12-31'),
         artistId: artists[0].id
       }
@@ -165,9 +163,8 @@ async function main() {
     prisma.coupon.create({
       data: {
         code: 'FINELINE20',
-        type: 'PERCENTAGE',
-        value: 20,
-        isActive: true,
+        discountPercent: 20,
+        status: 'ACTIVE',
         expiresAt: new Date('2025-12-31'),
         artistId: artists[1].id
       }
