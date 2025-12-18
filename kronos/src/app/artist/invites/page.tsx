@@ -75,19 +75,32 @@ export default function InvitesPage() {
                                 />
                             </div>
 
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Código Custom (Opcional)</label>
+                                <input
+                                    type="text"
+                                    placeholder="EX: GUEST-ART"
+                                    className="w-32 bg-black border border-white/10 rounded px-3 py-2 text-sm text-gray-300 focus:border-purple-500 outline-none uppercase font-mono"
+                                    id="customCodeInput"
+                                />
+                            </div>
+
                             <button
                                 onClick={async () => {
                                     const planSelect = document.getElementById('planSelect') as HTMLSelectElement;
                                     const durationInput = document.getElementById('durationInput') as HTMLInputElement;
+                                    const customCodeInput = document.getElementById('customCodeInput') as HTMLInputElement;
 
                                     setIsCreating(true)
                                     const res = await createInvite({
                                         role: "ARTIST",
                                         targetPlan: planSelect.value as any,
                                         durationDays: planSelect.value === 'GUEST' ? Number(durationInput.value) : undefined,
+                                        customCode: customCodeInput.value || undefined,
                                         maxUses: 1
                                     })
                                     if (res.success) {
+                                        customCodeInput.value = '';
                                         await loadInvites()
                                     } else {
                                         alert(res.error || "Erro ao criar convite")

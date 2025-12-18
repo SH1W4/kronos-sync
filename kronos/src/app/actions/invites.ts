@@ -19,7 +19,8 @@ export async function createInvite(options: {
     role: UserRole,
     targetPlan?: ArtistPlan,
     maxUses?: number,
-    durationDays?: number
+    durationDays?: number,
+    customCode?: string
 }) {
     const session = await getServerSession(authOptions)
 
@@ -27,7 +28,7 @@ export async function createInvite(options: {
         return { success: false, error: "Não autorizado" }
     }
 
-    const { role, targetPlan, maxUses = 1, durationDays } = options
+    const { role, targetPlan, maxUses = 1, durationDays, customCode } = options
 
     const creator = await prisma.user.findUnique({
         where: { email: session.user.email },
@@ -41,7 +42,13 @@ export async function createInvite(options: {
         return { success: false, error: "Apenas administradores podem convidar residentes ou novos admins" }
     }
 
-    const code = generateCode()
+    // Se tiver código personalizado, valida se já existe
+    if (customCode) {
+        const existing = await prisma.inviteCode.findUnique({ where: { code: customCode.toUpperCase() } })
+        if (existing) return { success: false, error: "Este código personalizado já está em uso" }
+    }
+
+    const code = customCode ? customCode.toUpperCase() : generateCode()
 
     try {
         const invite = await prisma.inviteCode.create({

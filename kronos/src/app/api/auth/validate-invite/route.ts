@@ -22,32 +22,32 @@ export async function POST(req: NextRequest) {
         const cleanCode = code.trim()
 
         // 1. MASTER KEY CHECK (Environment Variable)
-        // Allows immediate promotion to Artist/Resident for team members
+        // Allows immediate promotion to ADMIN (Master) for the owner
         if (process.env.KRONOS_TEAM_KEY && cleanCode === process.env.KRONOS_TEAM_KEY) {
             const user = await prisma.user.findUnique({ where: { email: session.user.email } })
 
             if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
 
-            // Update User Role
+            // Update User to ADMIN (Master)
             await prisma.user.update({
                 where: { id: user.id },
-                data: { role: 'ARTIST' }
+                data: { role: 'ADMIN' }
             })
 
-            // Create/Update Artist Profile
+            // Create/Update Artist Profile as RESIDENT
             await prisma.artist.upsert({
                 where: { userId: user.id },
                 create: {
                     userId: user.id,
                     plan: 'RESIDENT',
-                    commissionRate: 0.30 // Default resident rate
+                    commissionRate: 0.85 // Master/Owner usually has higher share
                 },
                 update: {
                     plan: 'RESIDENT'
                 }
             })
 
-            return NextResponse.json({ success: true, role: 'ARTIST', message: 'Bem-vindo à equipe Kronos' })
+            return NextResponse.json({ success: true, role: 'ADMIN', message: 'Bem-vindo, Mestre do Workspace.' })
         }
 
         // 2. DATABASE INVITE CODE CHECK
