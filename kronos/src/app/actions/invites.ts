@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
-import { UserRole } from "@prisma/client"
+import { UserRole, ArtistPlan } from "@prisma/client"
 
 function generateCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -15,20 +15,31 @@ function generateCode() {
     return code
 }
 
-export async function createInvite(role: UserRole = "ARTIST", maxUses: number = 1) {
+export async function createInvite(options: {
+    role: UserRole,
+    targetPlan?: ArtistPlan,
+    maxUses?: number,
+    durationDays?: number
+}) {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.email) {
         return { success: false, error: "Não autorizado" }
     }
 
+    const { role, targetPlan, maxUses = 1, durationDays } = options
+
     const creator = await prisma.user.findUnique({
-        where: { email: session.user.email }
+        where: { email: session.user.email },
+        include: { artist: true }
     })
 
     if (!creator) return { success: false, error: "Usuário não encontrado" }
 
-    // TODO: Verificar permissões reais no futuro (Só Admin/Manager)
+    // SEGURANÇA: Apenas ADMIN (Master) pode criar convites para Residentes ou outros Admins
+    if ((targetPlan === 'RESIDENT' || role === 'ADMIN') && creator.role !== 'ADMIN') {
+        return { success: false, error: "Apenas administradores podem convidar residentes ou novos admins" }
+    }
 
     const code = generateCode()
 
@@ -37,7 +48,9 @@ export async function createInvite(role: UserRole = "ARTIST", maxUses: number = 
             data: {
                 code,
                 role,
+                targetPlan,
                 maxUses,
+                durationDays,
                 creatorId: creator.id,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 dias
             }

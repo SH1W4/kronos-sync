@@ -91,17 +91,32 @@ export async function POST(req: NextRequest) {
             })
 
             // 3. Create Artist Profile if applicable
-            if (invite.role === 'ARTIST') {
-                // Build generic artist profile
-                // Check if exists first to avoid unique constraint errors
+            if (invite.role === 'ARTIST' || invite.role === 'ADMIN') {
                 const existingArtist = await tx.artist.findUnique({ where: { userId: updatedUser.id } })
+
+                // Calcular data de validade se for GUEST e tiver duração definida
+                let validUntil = null;
+                if (invite.targetPlan === 'GUEST' && invite.durationDays) {
+                    validUntil = new Date();
+                    validUntil.setDate(validUntil.getDate() + invite.durationDays);
+                }
 
                 if (!existingArtist) {
                     await tx.artist.create({
                         data: {
                             userId: updatedUser.id,
-                            plan: 'GUEST', // Default for invites unless specified otherwise in logic
-                            commissionRate: 0.30 // Guest rate
+                            plan: invite.targetPlan || 'GUEST',
+                            validUntil: validUntil,
+                            commissionRate: invite.targetPlan === 'RESIDENT' ? 0.30 : 0.35 // Residentes pagam menos taxa?
+                        }
+                    })
+                } else {
+                    // Update existing profile if changing plan via new invite
+                    await tx.artist.update({
+                        where: { id: existingArtist.id },
+                        data: {
+                            plan: invite.targetPlan || existingArtist.plan,
+                            validUntil: validUntil || existingArtist.validUntil
                         }
                     })
                 }

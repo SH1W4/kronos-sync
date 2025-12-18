@@ -76,19 +76,21 @@ model User {
 // ... (rest of the file until the end)
 
 model InviteCode {
-  id        String    @id @default(cuid())
-  code      String    @unique
-  role      UserRole  @default(CLIENT)
-  creatorId String
-  maxUses   Int       @default(1)
-  currentUses Int     @default(0)
-  expiresAt DateTime?
-  isActive  Boolean   @default(true)
+  id          String      @id @default(cuid())
+  code        String      @unique
+  role        UserRole    @default(CLIENT)
+  targetPlan  ArtistPlan? // Se for convite para artista, define se é RESIDENT ou GUEST
+  creatorId   String
+  maxUses     Int         @default(1)
+  currentUses Int         @default(0)
+  expiresAt   DateTime?
+  durationDays Int?       // Para convites GUEST, define quantos dias o perfil será válido
+  isActive    Boolean     @default(true)
   
-  creator   User      @relation("Creator", fields: [creatorId], references: [id])
+  creator     User        @relation("Creator", fields: [creatorId], references: [id])
   
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@map("invite_codes")
 }
@@ -140,6 +142,7 @@ model Artist {
   monthlyEarnings   Float      @default(0)
   commissionThreshold Float    @default(10000)
   isActive          Boolean    @default(true)
+  validUntil        DateTime?  // Data limite para perfis GUEST (provisórios)
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 
