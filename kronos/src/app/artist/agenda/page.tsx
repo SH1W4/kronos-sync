@@ -6,7 +6,7 @@ import { Calendar, Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getMyBookings } from '@/app/actions/bookings'
 import { CalendarView } from '@/components/agenda/CalendarView'
-import { BookingModal } from '@/components/agenda/BookingModal'
+import { BookingModal } from '@/components/agenda/NewBookingModal'
 import { format, startOfWeek, endOfWeek, addDays, subDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -108,8 +108,8 @@ export default function AgendaPage() {
                         <button
                             onClick={() => setView('day')}
                             className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${view === 'day'
-                                    ? 'bg-purple-600 text-white'
-                                    : 'text-gray-400 hover:text-white'
+                                ? 'bg-purple-600 text-white'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             Dia
@@ -117,8 +117,8 @@ export default function AgendaPage() {
                         <button
                             onClick={() => setView('week')}
                             className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${view === 'week'
-                                    ? 'bg-purple-600 text-white'
-                                    : 'text-gray-400 hover:text-white'
+                                ? 'bg-purple-600 text-white'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             Semana
