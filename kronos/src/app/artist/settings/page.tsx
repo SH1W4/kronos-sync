@@ -6,19 +6,46 @@ import { Settings, User, Shield, Calendar, CreditCard, Bell } from 'lucide-react
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
+import { updateArtistSettings } from '@/app/actions/settings'
 
 export default function SettingsPage() {
-    const { data: session } = useSession()
+    const { data: session, update: updateSession } = useSession()
     const [loading, setLoading] = useState(false)
 
-    // Example state for form
-    const [name, setName] = useState(session?.user?.name || '')
-    const [commission, setCommission] = useState('30')
+    // Form state
+    const [name, setName] = useState('')
+    const [commission, setCommission] = useState('')
+
+    // Initialize values when session is available
+    useEffect(() => {
+        if (session?.user) {
+            setName(session.user.name || '')
+            if ((session.user as any).commissionRate !== undefined) {
+                setCommission(String((session.user as any).commissionRate * 100))
+            }
+        }
+    }, [session])
 
     const handleSave = async () => {
         setLoading(true)
-        // TODO: Implement save logic in actions
-        setTimeout(() => setLoading(false), 1000)
+        try {
+            const result = await updateArtistSettings({
+                name,
+                commissionRate: parseFloat(commission)
+            })
+
+            if (result.success) {
+                await updateSession()
+                alert('Configurações salvas com sucesso!')
+            } else {
+                alert(result.error || 'Erro ao salvar')
+            }
+        } catch (error) {
+            console.error('Error saving settings:', error)
+            alert('Erro ao salvar as configurações')
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (

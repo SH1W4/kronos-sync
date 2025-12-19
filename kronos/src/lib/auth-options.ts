@@ -96,11 +96,15 @@ export const authOptions: NextAuthOptions = {
             if (token.id) {
                 const dbUser = await prisma.user.findUnique({
                     where: { id: token.id as string },
-                    select: { role: true }
+                    include: { artist: true }
                 })
 
                 if (dbUser) {
                     token.role = dbUser.role
+                    if (dbUser.artist) {
+                        token.isArtist = true
+                        token.commissionRate = dbUser.artist.commissionRate
+                    }
                 }
 
                 const memberships = await prisma.workspaceMember.findMany({
@@ -141,6 +145,8 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).role = token.role;
                 (session.user as any).workspaces = token.workspaces;
                 (session.user as any).activeWorkspaceId = token.activeWorkspaceId;
+                (session.user as any).commissionRate = token.commissionRate;
+                (session.user as any).isArtist = token.isArtist;
             }
             return session
         }
