@@ -56,6 +56,8 @@ model User {
   artist        Artist?
   bookings      Booking[]
   orders        Order[]
+  memberships   WorkspaceMember[]
+  ownedWorkspaces Workspace[]   @relation("WorkspaceOwner")
   
   // Invite System
   invitedBy     User?         @relation("UserInvites", fields: [invitedById], references: [id])
@@ -66,6 +68,7 @@ model User {
   agentLogs     AgentLog[]
   generatedCoupons Coupon[] @relation("GeneratedBy")
   usedCoupons      Coupon[] @relation("UsedBy")
+  workspaceRequests WorkspaceRequest[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -81,6 +84,7 @@ model InviteCode {
   role        UserRole    @default(CLIENT)
   targetPlan  ArtistPlan? // Se for convite para artista, define se é RESIDENT ou GUEST
   creatorId   String
+  workspaceId String?     // Se for convite para workspace específico
   maxUses     Int         @default(1)
   currentUses Int         @default(0)
   expiresAt   DateTime?
@@ -88,11 +92,57 @@ model InviteCode {
   isActive    Boolean     @default(true)
   
   creator     User        @relation("Creator", fields: [creatorId], references: [id])
+  workspace   Workspace?  @relation(fields: [workspaceId], references: [id])
   
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
   @@map("invite_codes")
+}
+
+model Workspace {
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  logoUrl       String?
+  primaryColor  String    @default("#8B5CF6")
+  ownerId       String
+  owner         User      @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  
+  members       WorkspaceMember[]
+  artists       Artist[]
+  bookings      Booking[]
+  slots         Slot[]
+  products      Product[]
+  coupons       Coupon[]
+  orders        Order[]
+  offers        Offer[]
+  subscribers   Subscriber[]
+  kioskEntries  KioskEntry[]
+  invites       InviteCode[]
+  helpArticles  HelpArticle[]
+  anamneses     Anamnesis[]
+  agentLogs     AgentLog[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        UserRole  @default(ARTIST)
+  
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime  @default(now())
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
 }
 
 model Account {
@@ -137,20 +187,29 @@ model VerificationToken {
 model Artist {
   id                String     @id @default(cuid())
   userId            String     @unique
+  workspaceId       String?    // Inicialmente opcional para facilitar migração
   plan              ArtistPlan @default(GUEST)
   commissionRate    Float      @default(0.30)
   monthlyEarnings   Float      @default(0)
   commissionThreshold Float    @default(10000)
   isActive          Boolean    @default(true)
   validUntil        DateTime?  // Data limite para perfis GUEST (provisórios)
+  
+  // Google Calendar Integration
+  googleCalendarId     String?    // Primary calendar ID
+  googleRefreshToken   String?    @db.Text // For API access (encrypted)
+  calendarSyncEnabled  Boolean    @default(false)
+  lastSyncedAt         DateTime?
+  
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 
   // Relations
-  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bookings Booking[]
-  products Product[]
-  coupons  Coupon[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  bookings  Booking[]
+  products  Product[]
+  coupons   Coupon[]
 
   @@map("artists")
 }
@@ -159,6 +218,7 @@ model Booking {
   id               String        @id @default(cuid())
   artistId         String
   clientId         String
+  workspaceId      String?
   slotId           String
   value            Float
   discountValue    Float         @default(0)
@@ -169,32 +229,41 @@ model Booking {
   fichaUrl         String?
   fichaStatus      FichaStatus   @default(PENDING)
   confirmationSent Boolean       @default(false)
-  googleEventId    String?       // ID do evento no Google Calendar
+  scheduledFor     DateTime
+  duration         Int           @default(120) // em minutos
+  
+  // Google Calendar Sync
+  googleEventId    String?       // Link to Google Calendar event
+  syncedToGoogle   Boolean       @default(false)
+  
   couponId         String?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 
   // Relations
-  artist Artist @relation(fields: [artistId], references: [id])
-  client User   @relation(fields: [clientId], references: [id])
-  slot   Slot   @relation(fields: [slotId], references: [id])
-  coupon Coupon? @relation(fields: [couponId], references: [id])
+  artist    Artist    @relation(fields: [artistId], references: [id])
+  client    User      @relation(fields: [clientId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  slot      Slot      @relation(fields: [slotId], references: [id])
+  coupon    Coupon?   @relation(fields: [couponId], references: [id])
   anamnesis Anamnesis?
 
   @@map("bookings")
 }
 
 model Slot {
-  id        String   @id @default(cuid())
-  macaId    Int      // 1, 2, 3
-  startTime DateTime
-  endTime   DateTime
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  workspaceId String?
+  macaId      Int      // 1, 2, 3
+  startTime   DateTime
+  endTime     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  bookings Booking[]
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  bookings  Booking[]
 
   @@map("slots")
 }
@@ -202,6 +271,7 @@ model Slot {
 model Product {
   id          String      @id @default(cuid())
   artistId    String
+  workspaceId String?
   title       String
   description String?
   basePrice   Float
@@ -215,6 +285,7 @@ model Product {
 
   // Relations
   artist     Artist      @relation(fields: [artistId], references: [id])
+  workspace  Workspace?  @relation(fields: [workspaceId], references: [id])
   orderItems OrderItem[]
 
   @@map("products")
@@ -224,6 +295,7 @@ model Coupon {
   id            String   @id @default(cuid())
   code          String   @unique
   discountPercent Int    @default(10)
+  workspaceId   String?
   
   // Referral Fields
   originClientId String?
@@ -240,6 +312,7 @@ model Coupon {
   updatedAt      DateTime @updatedAt // Adicionado para manter compatibilidade
   
   // Relations preserved/updated
+  workspace      Workspace? @relation(fields: [workspaceId], references: [id])
   bookings       Booking[]
   artist         Artist?   @relation(fields: [artistId], references: [id])
   orders         Order[]
@@ -250,6 +323,7 @@ model Coupon {
 model Order {
   id            String   @id @default(cuid())
   clientId      String
+  workspaceId   String?
   total         Float
   discountValue Float    @default(0)
   finalTotal    Float
@@ -259,8 +333,9 @@ model Order {
   updatedAt     DateTime @updatedAt
 
   // Relations
-  client User        @relation(fields: [clientId], references: [id])
-  coupon Coupon?     @relation(fields: [couponId], references: [id])
+  client    User        @relation(fields: [clientId], references: [id])
+  workspace Workspace?  @relation(fields: [workspaceId], references: [id])
+  coupon    Coupon?     @relation(fields: [couponId], references: [id])
   items  OrderItem[]
 
   @@map("orders")
@@ -282,6 +357,7 @@ model OrderItem {
 
 model Offer {
   id          String    @id @default(cuid())
+  workspaceId String?
   title       String
   description String
   imageUrl    String?
@@ -291,22 +367,28 @@ model Offer {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+
   @@map("offers")
 }
 
 model Subscriber {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  workspaceId String?
+  email       String   @unique
+  name        String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("subscribers")
 }
 
 model KioskEntry {
   id           String   @id @default(cuid())
+  workspaceId  String?
   name         String
   email        String?
   phone        String?
@@ -314,14 +396,17 @@ model KioskEntry {
   marketingOptIn Boolean @default(false)
   createdAt    DateTime @default(now())
 
+  workspace    Workspace? @relation(fields: [workspaceId], references: [id])
+
   @@map("kiosk_entries")
 }
 
 
 model Anamnesis {
-  id        String   @id @default(cuid())
-  clientId  String
-  bookingId String?  @unique 
+  id          String   @id @default(cuid())
+  clientId    String
+  workspaceId String?
+  bookingId   String?  @unique 
   
   // Dados de Saúde (Baseado no CSV)
   hasMedicalCondition     Boolean  @default(false)
@@ -349,35 +434,62 @@ model Anamnesis {
   updatedAt DateTime @updatedAt
   
   // Relations
-  client    User     @relation(fields: [clientId], references: [id])
-  booking   Booking? @relation(fields: [bookingId], references: [id])
+  client    User       @relation(fields: [clientId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  booking   Booking?   @relation(fields: [bookingId], references: [id])
   
   @@map("anamneses")
 }
 
 model HelpArticle {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.Text
-  category  String
-  keywords  String[] // Simula embeddings para busca simples
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  workspaceId String?
+  title       String
+  content     String   @db.Text
+  category    String
+  keywords    String[] // Simula embeddings para busca simples
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("help_articles")
 }
 
 model AgentLog {
-  id        String   @id @default(cuid())
-  userId    String
-  query     String   @db.Text
-  response  String   @db.Text
-  intent    String?
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String
+  workspaceId String?
+  query       String   @db.Text
+  response    String   @db.Text
+  intent      String?
+  createdAt   DateTime @default(now())
   
-  user      User     @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("agent_logs")
+}
+
+model WorkspaceRequest {
+  id              String   @id @default(cuid())
+  userId          String
+  studioName      String
+  teamDetails     String?  @db.Text
+  motivation      String?  @db.Text
+  status          RequestStatus @default(PENDING)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@map("workspace_requests")
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 

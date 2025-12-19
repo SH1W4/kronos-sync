@@ -84,17 +84,63 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     callbacks: {
-        async jwt({ token, user, account }) {
+        async jwt({ token, user, trigger, session }) {
+            // Se houver usuário (primeiro login), preenche os dados iniciais
             if (user) {
                 token.id = user.id
                 token.role = (user as any).role
             }
+
+            // Sempre busca/atualiza os dados de workspace e role se tivermos o ID
+            // Isso permite que o update() do frontend funcione para convites e promoções
+            if (token.id) {
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: token.id as string },
+                    select: { role: true }
+                })
+
+                if (dbUser) {
+                    token.role = dbUser.role
+                }
+
+                const memberships = await prisma.workspaceMember.findMany({
+                    where: { userId: token.id as string },
+                    include: { workspace: true }
+                })
+
+                token.workspaces = memberships.map(m => ({
+                    id: m.workspaceId,
+                    name: m.workspace.name,
+                    slug: m.workspace.slug,
+                    role: m.role,
+                    primaryColor: m.workspace.primaryColor
+                }))
+
+                // Define o workspace ativo se não tiver um ou se o atual não estiver mais na lista
+                const currentWorkspaces = token.workspaces as any[]
+                if (currentWorkspaces.length > 0) {
+                    const isValid = currentWorkspaces.some(w => w.id === token.activeWorkspaceId)
+                    if (!token.activeWorkspaceId || !isValid) {
+                        token.activeWorkspaceId = currentWorkspaces[0].id
+                    }
+                } else {
+                    token.activeWorkspaceId = null
+                }
+            }
+
+            // Permite troca manual de workspace via update({ activeWorkspaceId: '...' })
+            if (trigger === "update" && session?.activeWorkspaceId) {
+                token.activeWorkspaceId = session.activeWorkspaceId
+            }
+
             return token
         },
         async session({ session, token }) {
             if (session.user) {
                 (session.user as any).id = token.id;
                 (session.user as any).role = token.role;
+                (session.user as any).workspaces = token.workspaces;
+                (session.user as any).activeWorkspaceId = token.activeWorkspaceId;
             }
             return session
         }

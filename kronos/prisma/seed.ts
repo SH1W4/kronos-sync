@@ -15,10 +15,29 @@ async function main() {
   await prisma.offer.deleteMany()
   await prisma.subscriber.deleteMany()
   await prisma.kioskEntry.deleteMany()
+  await prisma.workspace.deleteMany()
   await prisma.artist.deleteMany()
   await prisma.user.deleteMany()
 
   console.log('🗑️ Dados existentes removidos')
+
+  // 1. Criar o Workspace Principal
+  const workspace = await prisma.workspace.create({
+    data: {
+      name: 'Kronos Studio',
+      slug: 'kronos-studio',
+      primaryColor: '#8B5CF6',
+      owner: {
+        create: {
+          name: 'João Founder',
+          email: 'joao@kronosync.com',
+          role: 'ADMIN'
+        }
+      }
+    }
+  })
+
+  console.log('🏛️ Workspace criado:', workspace.name)
 
   // Criar usuários (artistas)
   const artistUsers = await Promise.all([
@@ -27,7 +46,13 @@ async function main() {
         name: 'Marcus Silva',
         email: 'marcus@kronosync.com',
         phone: '(11) 99999-1111',
-        role: 'ARTIST'
+        role: 'ARTIST',
+        memberships: {
+          create: {
+            workspaceId: workspace.id,
+            role: 'ARTIST'
+          }
+        }
       }
     }),
     prisma.user.create({
@@ -35,7 +60,13 @@ async function main() {
         name: 'Ana Costa',
         email: 'ana@kronosync.com',
         phone: '(11) 99999-2222',
-        role: 'ARTIST'
+        role: 'ARTIST',
+        memberships: {
+          create: {
+            workspaceId: workspace.id,
+            role: 'ARTIST'
+          }
+        }
       }
     }),
     prisma.user.create({
@@ -43,7 +74,13 @@ async function main() {
         name: 'Carlos Mendes',
         email: 'carlos@kronosync.com',
         phone: '(11) 99999-3333',
-        role: 'ARTIST'
+        role: 'ARTIST',
+        memberships: {
+          create: {
+            workspaceId: workspace.id,
+            role: 'ARTIST'
+          }
+        }
       }
     })
   ])
@@ -53,6 +90,7 @@ async function main() {
     prisma.artist.create({
       data: {
         userId: artistUsers[0].id,
+        workspaceId: workspace.id,
         plan: 'RESIDENT',
         commissionRate: 0.8,
         isActive: true
@@ -61,6 +99,7 @@ async function main() {
     prisma.artist.create({
       data: {
         userId: artistUsers[1].id,
+        workspaceId: workspace.id,
         plan: 'RESIDENT',
         commissionRate: 0.75,
         isActive: true
@@ -69,6 +108,7 @@ async function main() {
     prisma.artist.create({
       data: {
         userId: artistUsers[2].id,
+        workspaceId: workspace.id,
         plan: 'GUEST',
         commissionRate: 0.7,
         isActive: true
@@ -148,7 +188,8 @@ async function main() {
         discountPercent: 10,
         status: 'ACTIVE',
         expiresAt: new Date('2025-12-31'),
-        artistId: artists[0].id
+        artistId: artists[0].id,
+        workspaceId: workspace.id
       }
     }),
     prisma.coupon.create({
@@ -157,7 +198,8 @@ async function main() {
         discountPercent: 20,
         status: 'ACTIVE',
         expiresAt: new Date('2025-12-31'),
-        artistId: artists[0].id
+        artistId: artists[0].id,
+        workspaceId: workspace.id
       }
     }),
     prisma.coupon.create({
@@ -166,7 +208,8 @@ async function main() {
         discountPercent: 20,
         status: 'ACTIVE',
         expiresAt: new Date('2025-12-31'),
-        artistId: artists[1].id
+        artistId: artists[1].id,
+        workspaceId: workspace.id
       }
     })
   ])
@@ -183,6 +226,7 @@ async function main() {
         finalPrice: 180,
         type: 'PHYSICAL',
         artistId: artists[0].id,
+        workspaceId: workspace.id,
         isActive: true
       }
     }),
@@ -194,6 +238,7 @@ async function main() {
         finalPrice: 120,
         type: 'DIGITAL',
         artistId: artists[1].id,
+        workspaceId: workspace.id,
         isActive: true
       }
     }),
@@ -205,6 +250,7 @@ async function main() {
         finalPrice: 240,
         type: 'PHYSICAL',
         artistId: artists[2].id,
+        workspaceId: workspace.id,
         isActive: true
       }
     }),
@@ -216,6 +262,7 @@ async function main() {
         finalPrice: 300,
         type: 'DIGITAL',
         artistId: artists[0].id,
+        workspaceId: workspace.id,
         isActive: true
       }
     })
@@ -230,7 +277,8 @@ async function main() {
         title: 'Flash Day - Tatuagens Pequenas',
         description: 'Tatuagens pequenas por apenas R$ 200! Válido apenas hoje.',
         isActive: true,
-        endsAt: new Date('2025-09-15')
+        endsAt: new Date('2025-09-15'),
+        workspaceId: workspace.id
       }
     }),
     prisma.offer.create({
@@ -238,7 +286,8 @@ async function main() {
         title: 'Promoção Fine Line',
         description: 'Desconto especial em tatuagens fine line durante todo o mês',
         isActive: true,
-        endsAt: new Date('2025-09-30')
+        endsAt: new Date('2025-09-30'),
+        workspaceId: workspace.id
       }
     }),
     prisma.offer.create({
@@ -246,7 +295,8 @@ async function main() {
         title: 'Evento Tribal',
         description: 'Workshop de tatuagem tribal + desconto especial',
         isActive: true,
-        endsAt: new Date('2025-10-15')
+        endsAt: new Date('2025-10-15'),
+        workspaceId: workspace.id
       }
     })
   ])
@@ -280,7 +330,8 @@ async function main() {
             macaId: maca,
             startTime,
             endTime,
-            isActive: true
+            isActive: true,
+            workspaceId: workspace.id
           }
         })
         slots.push(slot)
@@ -297,6 +348,7 @@ async function main() {
         clientId: clients[0].id,
         artistId: artists[0].id,
         slotId: slots[0].id,
+        workspaceId: workspace.id,
         value: 400,
         finalValue: 400,
         studioShare: 80,
@@ -309,6 +361,7 @@ async function main() {
         clientId: clients[1].id,
         artistId: artists[1].id,
         slotId: slots[3].id,
+        workspaceId: workspace.id,
         value: 300,
         finalValue: 300,
         studioShare: 75,
@@ -326,14 +379,16 @@ async function main() {
       data: {
         name: 'João Silva',
         email: 'joao@email.com',
-        isActive: true
+        isActive: true,
+        workspaceId: workspace.id
       }
     }),
     prisma.subscriber.create({
       data: {
         name: 'Maria Santos',
         email: 'maria@email.com',
-        isActive: true
+        isActive: true,
+        workspaceId: workspace.id
       }
     })
   ])

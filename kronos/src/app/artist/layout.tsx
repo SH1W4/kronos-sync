@@ -1,16 +1,17 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession()
     const router = useRouter()
+    const pathname = usePathname()
 
     useEffect(() => {
         if (status === 'loading') return
@@ -19,9 +20,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
             return
         }
 
-        // Proteção de Rota: Apenas ARTIST e ADMIN
-        // @ts-ignore - role existe no nosso type customizado
-        const userRole = session.user?.role
+        const userRole = (session?.user as any)?.role
         if (userRole !== 'ARTIST' && userRole !== 'ADMIN') {
             router.push('/dashboard')
         }
@@ -48,20 +47,44 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                     </Link>
 
                     <nav className="space-y-2">
-                        <NavItem href="/artist/dashboard" icon={<LayoutDashboard size={20} />} label="VISÃO GERAL" active />
-                        <NavItem href="/artist/calendar" icon={<Calendar size={20} />} label="AGENDA" />
-                        <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" />
-                        <NavItem href="/artist/clients" icon={<Users size={20} />} label="CLIENTES" />
-                        <NavItem href="/artist/settings" icon={<Settings size={20} />} label="SISTEMA" />
+                        <NavItem href="/artist/dashboard" icon={<LayoutDashboard size={20} />} label="VISÃO GERAL" active={pathname === '/artist/dashboard'} />
+                        <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="AGENDA" active={pathname === '/artist/agenda'} />
+                        <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
+                        <NavItem href="/artist/clients" icon={<Users size={20} />} label="CLIENTES" active={pathname === '/artist/clients'} />
+                        {/* @ts-ignore */}
+                        {session?.user?.role === 'ADMIN' && (
+                            <NavItem href="/artist/team" icon={<Shield size={20} />} label="EQUIPE" active={pathname === '/artist/team'} />
+                        )}
+                        <NavItem href="/artist/settings" icon={<Settings size={20} />} label="SISTEMA" active={pathname === '/artist/settings'} />
                     </nav>
                 </div>
 
                 <div className="p-6 border-t border-white/5">
+                    {/* Workspace Switcher Lite (Display only for now) */}
+                    {(session as any)?.activeWorkspaceId && (
+                        <div className="mb-6 p-3 bg-white/5 rounded-xl border border-white/10 hidden md:block group cursor-pointer hover:border-purple-500/50 transition-all">
+                            <p className="text-[10px] text-gray-500 font-mono mb-1 text-purple-400/50">WORKSPACE ATIVO</p>
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor]"
+                                    style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
+                                />
+                                <span className="text-xs font-bold text-white truncate uppercase tracking-tighter">
+                                    {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-3 mb-4 overflow-hidden">
-                        <div className="w-8 h-8 rounded bg-gradient-to-tr from-purple-500 to-blue-500 flex-shrink-0"></div>
+                        <div className="w-8 h-8 rounded bg-gradient-to-tr from-purple-500 to-blue-500 flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
+                            {session?.user?.name?.charAt(0)}
+                        </div>
                         <div className="hidden md:block">
                             <p className="text-sm font-bold truncate max-w-[120px]">{session?.user?.name}</p>
-                            <p className="text-xs text-gray-500 font-mono">ARTISTA</p>
+                            <p className="text-xs text-gray-500 font-mono uppercase">
+                                {(session?.user as any)?.role}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -81,12 +104,13 @@ function NavItem({ href, icon, label, active = false }: { href: string, icon: Re
     return (
         <Link href={href}>
             <div className={`
-                flex items-center gap-4 px-4 py-3 rounded-lg transition-all duration-200 group
-                ${active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-white'}
+                flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group
+                ${active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_20px_rgba(168,85,247,0.1)] translate-x-1' : 'text-gray-500 hover:bg-white/5 hover:text-white'}
             `}>
-                <span className="group-hover:scale-110 transition-transform duration-200">{icon}</span>
-                <span className="text-xs font-mono tracking-wider font-bold hidden md:block">{label}</span>
+                <span className={`group-hover:scale-110 transition-transform duration-200 ${active ? 'scale-110' : ''}`}>{icon}</span>
+                <span className="text-[10px] font-mono tracking-widest font-black hidden md:block">{label}</span>
             </div>
         </Link>
     )
 }
+

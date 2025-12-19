@@ -1,39 +1,30 @@
 # Registro de Sessão - Desenvolvimento Kronos Sync
-**Data:** 15/12/2025 - 16/12/2025
-**Foco:** Autenticação, Banco de Dados e Deploy.
+**Data:** 18/12/2025
+**Foco:** Multi-Workspace Architecture & UI Polish.
 
 ## 🛠️ Realizações Técnicas
 
-### 1. Autenticação Google (OAuth 2.0)
-- **Desafio:** Configurar login social que permitisse acesso futuro à Agenda do Google.
-- **Solução:** Implementado `next-auth` com provider Google.
-- **Configuração Crítica:**
-  - Scopes adicionados: `https://www.googleapis.com/auth/calendar`, `userinfo.profile`, `userinfo.email`.
-  - `access_type: "offline"`: Garante recebimento do **Refresh Token** para operações em background.
-  - `prompt: "consent"`: Força o consentimento para garantir a entrega dos tokens.
+### 1. Pivô para SaaS Multi-Tenant
+- **Arquitetura de Isolamento:** Transição de banco único para lógica de múltiplos workspaces compartilhados.
+- **Modelos Prisma:** Introdução de `Workspace` e `WorkspaceMember` com relações em cascata para isolamento de dados.
+- **Auth Updates:** Sessão agora transporta o contexto do workspace ativo, permitindo que todo o sistema seja sensível ao estúdio atual do usuário.
 
-### 2. Banco de Dados (Prisma & Postgres)
-- **Schema:** Expandido para suportar Marketplace, Cupons e Agendamentos Complexos.
-- **Enums:** Padronizados (`BookingStatus`, `ProductType`, etc).
-- **Incidentes Resolvidos:**
-  - Conflito de conexão Docker no Windows (`localhost` vs `127.0.0.1`).
-  - Correção de erros no `seed.ts` (Enums antigos `PRINT`/`PERCENT`).
-  - Reset completo do banco local para garantir integridade.
-- **Status Atual:** Seed rodando 100%, banco populado com dados de teste robustos.
+### 2. Refatoração de Inteligência (KAI)
+- **Contextualização:** O agente `KAI` agora só acessa dados (ganhos, agenda, equipe) pertencentes ao workspace onde o usuário está logado.
+- **Audit:** Logs de interação de IA agora incluem `workspaceId`.
 
-### 3. Deploy (Vercel)
-- **Configuração:** Projeto importado do GitHub (`SH1W4/kronos-sync`).
-- **Infra:** Vercel Postgres conectado.
-- **Correções de Build:**
-  - Adicionado pacote `@auth/prisma-adapter`.
-  - Incluído script `"postinstall": "prisma generate"` para garantir geração do cliente na nuvem.
-  - Ajuste na raiz do projeto (`Root Directory: kronos`).
-- **Status:** **ONLINE** em `https://kronos-sync.vercel.app`.
+### 3. Upgrade de UI/UX (Premium Feel)
+- **Tactile Elements:** Implementação de feedback tátil em botões usando `framer-motion`. Adicionado estados de `isLoading` nativos para melhorar a percepção de performance.
+- **Team Management:** Criada interface de `/artist/team` para administradores gerenciarem convidados e residentes com controle de validade de acesso.
+
+### 4. Ciclo de Convites & Curadoria
+- **Vetted Onboarding:** Implementado fluxo de `Solicitar Acesso` ao invés de criação livre de workspaces. Isso permite que a equipe KRONØS avalie a equipe e motivação de novos estúdios antes de liberar a infraestrutura.
+- **Modelagem:** Criado modelo `WorkspaceRequest` para rastrear aplicações de novos parceiros.
 
 ## 📝 Notas para Próxima Sessão
-- O ambiente local está apontando para o Docker (`.env` criado a partir do `.env.local`).
-- O ambiente de produção (Vercel) tem seu próprio banco de dados independente.
-- Para popular a produção, deve-se alterar a connection string no `.env` temporariamente e rodar o seed.
+- O Switcher de Workspace na Sidebar é puramente visual por enquanto; precisa da lógica de `update()` da sessão ao clicar.
+- O `dev artist` do modo bypass não está vinculado a nenhum workspace.
 
 ## ⚠️ Pontos de Atenção
-- A conexão Docker vs Windows é sensível a timeouts. Manter `connect_timeout` aumentado na string de conexão se voltar a dar erro.
+- A migração de banco agora suporta o sistema de curadoria (`WorkspaceRequest`).
+- O `onboarding` agora atende tanto convidados (via código) quanto novos parceiros (via solicitação).

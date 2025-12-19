@@ -1,60 +1,56 @@
-# ⚔️ KRONOS TASKMASH - Phase: Screens & Logic
+# ⚔️ KRONOS TASKMASH - Phase: SaaS Multi-Workspace
+**Status:** 🏗️ SaaS Pivot Executed - Data Isolation Active.
 
 ## 🎯 Objetivo da Fase
-Transformar o esqueleto do sistema em um organismo vivo. O foco é diferenciar quem é **Artista** e quem é **Cliente**, e garantir que o fluxo de dados (especialmente a Ficha de Anamnese) funcione de ponta a ponta.
+Transformar o KRONOS em um ecossistema **Multitenant**. O sistema agora não atende apenas a um estúdio, mas funciona como uma plataforma onde múltiplos donos de estúdio podem ter seu ambiente isolado, gerenciar suas próprias equipes (Residentes e Guests) e ter dashboards independentes.
 
 ---
 
-## 🟢 Missão 1: Identidade & Acesso (Quem é você?)
-*O sistema precisa saber se o usuário logado é staff ou cliente para mostrar a tela certa.*
+## 🟢 Missão 1: Arquitetura SaaS & Isolamento
+*Garantir que os dados do Estúdio A nunca apareçam para o Estúdio B.*
 
-- [ ] **Middleware de Redirecionamento**
-  - [ ] Verificar no login: Se o usuário é novo (sem telefone/dados), redirecionar para `/onboarding`.
-  - [ ] Se `role == ARTIST`, redirecionar para `/artist/dashboard`.
-  - [ ] Se `role == CLIENT`, redirecionar para `/dashboard` (padrão).
-
-- [ ] **Tela de Onboarding (`/onboarding`)**
-  - [ ] Formulário simples: Nome, Telefone (WhatsApp) e "Como você se identifica?".
-  - [ ] **Lógica de Staff:** Se o usuário tentar se cadastrar como Artista/Staff, pedir um "Código de Convite" (secret key) para evitar que clientes virem admins.
-
----
-
-## 🟡 Missão 2: A Ficha de Anamnese (O Coração dos Dados)
-*A ficha visual já existe, agora ela precisa ter cérebro.*
-
-- [ ] **Backend (API Route)**
-  - [ ] Criar endpoint `POST /api/fichas`:
-    - Receber JSON com as respostas.
-    - Validar dados (Zod Schema).
-    - Salvar no banco (update `Booking` ou criar `Anamnesis` - *Nota: Verificar se precisamos de tabela separada ou JSONB no Booking*).
-
-- [ ] **Frontend (Conexão)**
-  - [ ] Adicionar `React Hook Form` no formulário atual (`src/app/fichas/[bookingId]/page.tsx`).
-  - [ ] Criar função de `onSubmit` que chama a API.
-  - [ ] Feedback visual de Sucesso ("Ficha assinada com sucesso!").
-  - [ ] Gerar PDF (Opcional/Futuro): Botão para exportar a ficha assinada.
+- [x] **Database Multi-Workspace**
+  - [x] Implementar modelos `Workspace` e `WorkspaceMember`.
+  - [x] Adicionar `workspaceId` em todas as tabelas de negócio (Artist, Booking, Product, etc).
+  - [x] Rodar migrações e atualizar Seed para o "Kronos Studio" (Flagship).
+- [x] **Contexto de Sessão**
+  - [x] Atualizar `authOptions` para injetar `activeWorkspaceId` e lista de workspaces na sessão.
+  - [ ] Implementar Switcher interativo na Sidebar para troca de estúdio.
+- [x] **Vetted Onboarding (Curadoria)**
+  - [x] Implementar tela de `Solicitar Acesso` ao invés de criação aberta.
+  - [x] Criar modelo `WorkspaceRequest` para análise manual de estúdios.
+  - [x] Fluxo de confirmação e coleta de motivação/equipe.
 
 ---
 
-## 🔴 Missão 3: Dashboards Dedicados
-*Cada um no seu quadrado.*
+## 🟡 Missão 2: Gestão de Equipe & Convites
+*O dono do estúdio precisa convidar e gerenciar seus artistas.*
 
-- [ ] **Dashboard do Artista (`/artist/dashboard`)**
-  - [ ] **Resumo Financeiro:** Card com "Faturamento do Mês" e "Comissão a Receber".
-  - [ ] **Próximos Clientes:** Lista cronológica do dia.
-  - [ ] **Botão "Ver Ficha":** Ao clicar no agendamento, abrir a ficha preenchida pelo cliente.
-
-- [ ] **Dashboard do Cliente (`/dashboard`)**
-  - [ ] **Meus Agendamentos:** Histórico e futuros.
-  - [ ] **Status da Ficha:** Aviso "Pendente" se ele ainda não preencheu a ficha do próximo tattoo.
+- [x] **Sistema de Convites Workspace-Aware**
+  - [x] Gerar códigos de convite vinculados ao workspace ativo.
+  - [x] Atribuir automaticamente o usuário ao workspace na aceitação do convite.
+- [x] **Painel de Equipe (`/artist/team`)**
+  - [x] Listagem de artistas do estúdio (Residentes vs Guests).
+  - [x] Controle de comissão e data de validade para tatuadores convidados.
 
 ---
 
-## 🟣 Missão 4: Teste de Campo (Equipe)
-- [ ] Criar usuário "Mestre" (Admin/Dono) via banco de dados diretamente.
-- [ ] Equipe loga e cai no Onboarding.
-- [ ] Admin promove membros da equipe para `ARTIST` manualmente (ou via código de convite).
-- [ ] Simulação completa: Artista cria slot -> Cliente agenda -> Cliente preenche ficha -> Artista vê ficha.
+## 🔴 Missão 3: Inteligência & Dashboards
+*KAI e os indicadores agora falam a língua do estúdio.*
+
+- [x] **Agent KAI SaaS Refactor**
+  - [x] Filtrar todas as queries (Ganhos, Clientes, Agenda) pelo workspace ativo.
+  - [x] Garantir que o log do agente tenha rastreabilidade por workspace.
+- [ ] **Dashboards Evoluídos**
+  - [ ] Gráficos de desempenho por artista dentro do estúdio.
+  - [ ] Visão de administrador consolidada vs Visão de artista limitada.
 
 ---
-**Status:** 🚀 Pronto para iniciar.
+
+## 🟣 Missão 4: UI/UX & Responsividade
+- [x] **Tactile Feedback:** Botões com escala, loading states e animações Framer Motion.
+- [ ] **Branding Dinâmico:** Layouts adaptando cores (primaryColor) conforme as configurações do workspace.
+- [ ] **Mobile First Audit:** Garantir que todas as telas de gestão funcionem perfeitamente no celular do tatuador.
+
+---
+**Status Atual:** 🚀 Núcleo SaaS operacional. Próximo foco: Customização de marca e Switcher interativo.
