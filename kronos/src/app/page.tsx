@@ -15,7 +15,7 @@ const FEATURES = [
         title: 'GESTÃO DE ESTÚDIO',
         subtitle: 'Controle integral de agenda e residentes.',
         colSpan: 'md:col-span-2',
-        image: '/features/agenda.png', // Manter placeholder ou trocar depois
+        image: '/features/studio-management.png',
         description: `
             A visão "Studio Manager" oferece um panorama completo de todas as macas.
             Ideal para o gerente ou head artist acompanhar o fluxo do estúdio em tempo real.
