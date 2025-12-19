@@ -56,12 +56,22 @@ export function CalendarView({
                                 <div className="flex-1 space-y-2">
                                     {slotBookings.length > 0 ? (
                                         slotBookings.map(booking => (
-                                            <BookingCard
-                                                key={booking.id}
-                                                booking={booking}
-                                                onClick={() => onBookingClick(booking)}
-                                                onStatusChange={onRefresh}
-                                            />
+                                            booking.isExternal ? (
+                                                <div
+                                                    key={booking.id}
+                                                    className="flex items-center gap-2 p-3 bg-gray-800/50 border border-white/5 rounded-lg opacity-60"
+                                                >
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                                                    <span className="text-sm font-medium text-gray-400">Ocupado (Google Agenda)</span>
+                                                </div>
+                                            ) : (
+                                                <BookingCard
+                                                    key={booking.id}
+                                                    booking={booking}
+                                                    onClick={() => onBookingClick(booking)}
+                                                    onStatusChange={onRefresh}
+                                                />
+                                            )
                                         ))
                                     ) : (
                                         <div className="text-sm text-gray-600 italic">
@@ -126,13 +136,24 @@ export function CalendarView({
                                         className="p-2 border-r border-white/5 hover:bg-white/5 transition-colors min-h-[80px]"
                                     >
                                         {slotBookings.map(booking => (
-                                            <BookingCard
-                                                key={booking.id}
-                                                booking={booking}
-                                                onClick={() => onBookingClick(booking)}
-                                                onStatusChange={onRefresh}
-                                                compact
-                                            />
+                                            booking.isExternal ? (
+                                                <div
+                                                    key={booking.id}
+                                                    className="p-1 px-2 mb-1 bg-gray-800/50 border border-white/5 rounded text-[10px] text-gray-400 opacity-60 flex items-center gap-1"
+                                                    title={booking.title}
+                                                >
+                                                    <div className="w-1 h-1 rounded-full bg-gray-500" />
+                                                    <span className="truncate">Ocupado</span>
+                                                </div>
+                                            ) : (
+                                                <BookingCard
+                                                    key={booking.id}
+                                                    booking={booking}
+                                                    onClick={() => onBookingClick(booking)}
+                                                    onStatusChange={onRefresh}
+                                                    compact
+                                                />
+                                            )
                                         ))}
                                     </div>
                                 )

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
+import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, getGoogleCalendarClient } from "@/lib/google"
 
 /**
  * Create a new booking
@@ -72,9 +73,9 @@ export async function createBooking(data: {
                 status: data.status || 'OPEN',
                 scheduledFor: data.scheduledFor,
                 duration: data.duration,
-                notes: data.notes,
+                notes: data.notes as any,
                 syncedToGoogle: false
-            },
+            } as any,
             include: {
                 client: {
                     select: {
@@ -87,7 +88,29 @@ export async function createBooking(data: {
             }
         })
 
-        // TODO: Sync to Google Calendar if syncToGoogle is true
+        // 3. Sync to Google Calendar
+        if (data.syncToGoogle) {
+            try {
+                const googleResult = await createCalendarEvent(user.id, {
+                    summary: `Tatuagem: ${(booking as any).client.name}`,
+                    description: `Sessão agendada via KRONØS\n\nTipo: ${data.type}\nObs: ${data.notes || ''}`,
+                    startTime: data.scheduledFor,
+                    endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000)
+                })
+
+                if (googleResult.success && googleResult.eventId) {
+                    await prisma.booking.update({
+                        where: { id: booking.id },
+                        data: {
+                            googleEventId: googleResult.eventId,
+                            syncedToGoogle: true
+                        }
+                    })
+                }
+            } catch (syncError) {
+                console.warn('⚠️ Falha no sync inicial com Google:', syncError)
+            }
+        }
 
         revalidatePath('/artist/agenda')
         return { success: true, booking }
@@ -145,9 +168,47 @@ export async function getMyBookings(data: {
             }
         })
 
-        // TODO: Merge with Google Calendar events if includeGoogleEvents is true
+        // 3. Merge with Google Calendar events if requested
+        let unifiedEvents: any[] = [...bookings]
 
-        return { success: true, bookings }
+        if (data.includeGoogleEvents) {
+            try {
+                const calendar = await getGoogleCalendarClient(user.id)
+                if (calendar) {
+                    const googleResponse = await calendar.events.list({
+                        calendarId: 'primary',
+                        timeMin: data.startDate.toISOString(),
+                        timeMax: data.endDate.toISOString(),
+                        singleEvents: true,
+                        orderBy: 'startTime',
+                    })
+
+                    const googleEvents = googleResponse.data.items || []
+
+                    // Filter out events that are already in KRONØS (matches by googleEventId)
+                    const kronosGoogleIds = new Set(bookings.map(b => b.googleEventId).filter(Boolean))
+
+                    const externalEvents = googleEvents
+                        .filter((ge: any) => !kronosGoogleIds.has(ge.id))
+                        .map((ge: any) => ({
+                            id: `google-${ge.id}`,
+                            isExternal: true,
+                            title: ge.summary || '(Sem Título)',
+                            scheduledFor: new Date(ge.start?.dateTime || ge.start?.date || ''),
+                            duration: ge.end?.dateTime
+                                ? Math.floor((new Date(ge.end.dateTime).getTime() - new Date(ge.start?.dateTime || '').getTime()) / 60000)
+                                : 60,
+                            status: 'EXTERNAL'
+                        }))
+
+                    unifiedEvents = [...unifiedEvents, ...externalEvents]
+                }
+            } catch (syncError) {
+                console.warn('⚠️ Erro ao buscar eventos do Google para o calendário:', syncError)
+            }
+        }
+
+        return { success: true, bookings: unifiedEvents }
 
     } catch (error) {
         console.error('Error fetching bookings:', error)
@@ -206,7 +267,17 @@ export async function updateBookingStatus(data: {
             }
         })
 
-        // TODO: Update Google Calendar event if synced
+        // 3. Update Google Calendar event if synced
+        if (updatedBooking.syncedToGoogle && updatedBooking.googleEventId) {
+            try {
+                await updateCalendarEvent(user.id, updatedBooking.googleEventId, {
+                    summary: `Tatuagem: ${updatedBooking.client.name} (${data.status})`,
+                    description: `Status atualizado para: ${data.status}\n\nObs: ${(updatedBooking as any).notes || ''}`
+                })
+            } catch (syncError) {
+                console.warn('⚠️ Falha ao atualizar evento no Google:', syncError)
+            }
+        }
 
         revalidatePath('/artist/agenda')
         return { success: true, booking: updatedBooking }
@@ -254,7 +325,14 @@ export async function deleteBooking(bookingId: string) {
             where: { id: bookingId }
         })
 
-        // TODO: Delete Google Calendar event if synced
+        // 3. Delete Google Calendar event if synced
+        if (booking.syncedToGoogle && booking.googleEventId) {
+            try {
+                await deleteCalendarEvent(user.id, booking.googleEventId)
+            } catch (syncError) {
+                console.warn('⚠️ Falha ao deletar evento no Google:', syncError)
+            }
+        }
 
         revalidatePath('/artist/agenda')
         return { success: true }

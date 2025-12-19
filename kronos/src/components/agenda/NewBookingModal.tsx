@@ -34,6 +34,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
     const [type, setType] = useState('Nova tattoo')
     const [price, setPrice] = useState(400)
     const [notes, setNotes] = useState('')
+    const [syncToGoogle, setSyncToGoogle] = useState(true)
 
     const [loading, setLoading] = useState(false)
     const [searchLoading, setSearchLoading] = useState(false)
@@ -108,7 +109,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                 estimatedPrice: price,
                 notes,
                 status: 'OPEN',
-                syncToGoogle: false
+                syncToGoogle
             })
 
             if (result.success) {
@@ -307,6 +308,20 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                             className="w-full bg-black border border-white/10 rounded-lg p-3 text-white min-h-[80px]"
                             placeholder="Detalhes do agendamento..."
                         />
+                    </div>
+
+                    {/* Google Sync Toggle */}
+                    <div className="flex items-center gap-3 p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+                        <input
+                            type="checkbox"
+                            id="syncToGoogle"
+                            checked={syncToGoogle}
+                            onChange={(e) => setSyncToGoogle(e.target.checked)}
+                            className="w-4 h-4 rounded border-white/10 bg-black text-purple-600 focus:ring-purple-500"
+                        />
+                        <label htmlFor="syncToGoogle" className="text-sm font-medium text-gray-300 cursor-pointer">
+                            Sincronizar com Google Agenda
+                        </label>
                     </div>
 
                     {/* Actions */}

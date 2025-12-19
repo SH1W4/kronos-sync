@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { getMyBookings } from '@/app/actions/bookings'
 import { CalendarView } from '@/components/agenda/CalendarView'
 import { BookingModal } from '@/components/agenda/NewBookingModal'
+import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { format, startOfWeek, endOfWeek, addDays, subDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -37,7 +38,7 @@ export default function AgendaPage() {
             const result = await getMyBookings({
                 startDate,
                 endDate,
-                includeGoogleEvents: false
+                includeGoogleEvents: true
             })
 
             if (result.success && result.bookings) {
@@ -92,13 +93,16 @@ export default function AgendaPage() {
                         </div>
                     </div>
 
-                    <Button
-                        onClick={() => setShowBookingModal(true)}
-                        className="bg-purple-600 hover:bg-purple-500 gap-2 font-bold"
-                    >
-                        <Plus size={18} />
-                        <span className="hidden sm:inline">Novo</span>
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <GoogleSyncStatus />
+                        <Button
+                            onClick={() => setShowBookingModal(true)}
+                            className="bg-purple-600 hover:bg-purple-500 gap-2 font-bold"
+                        >
+                            <Plus size={18} />
+                            <span className="hidden sm:inline">Novo</span>
+                        </Button>
+                    </div>
                 </div>
 
                 {/* View Controls */}
