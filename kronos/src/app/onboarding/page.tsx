@@ -104,8 +104,8 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl md:text-5xl font-orbitron font-bold mb-4 tracking-tight">BEM-VINDO AO <span className="text-[#00FF88]">KRONOS</span></h1>
-                    <p className="text-gray-400 font-mono">Identifique-se para configurar seu ambiente.</p>
+                    <h1 className="text-4xl md:text-5xl font-orbitron font-bold mb-4 tracking-tight">BOAS-VINDAS</h1>
+                    <p className="text-gray-400 font-mono text-sm md:text-base">Escolha como você vai usar a plataforma.</p>
                 </div>
 
                 {mode === 'SELECT' ? (
