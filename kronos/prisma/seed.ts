@@ -353,7 +353,9 @@ async function main() {
         finalValue: 400,
         studioShare: 80,
         artistShare: 320,
-        status: 'CONFIRMED'
+        status: 'CONFIRMED',
+        scheduledFor: new Date('2025-01-15T14:00:00'),
+        duration: 120
       }
     }),
     prisma.booking.create({
@@ -366,7 +368,9 @@ async function main() {
         finalValue: 300,
         studioShare: 75,
         artistShare: 225,
-        status: 'OPEN'
+        status: 'OPEN',
+        scheduledFor: new Date('2025-01-16T10:00:00'),
+        duration: 180
       }
     })
   ])

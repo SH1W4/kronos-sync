@@ -95,7 +95,9 @@ export async function POST(request: NextRequest) {
           status: 'CONFIRMED',
           couponId,
           fichaUrl: null,
-          fichaStatus: 'PENDING'
+          fichaStatus: 'PENDING',
+          scheduledFor: slot.startTime,
+          duration: Math.floor((slot.endTime.getTime() - slot.startTime.getTime()) / (1000 * 60))
         }
       })
 

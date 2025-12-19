@@ -235,6 +235,7 @@ model Booking {
   // Google Calendar Sync
   googleEventId    String?       // Link to Google Calendar event
   syncedToGoogle   Boolean       @default(false)
+  notes            String?       @db.Text
   
   couponId         String?
   createdAt        DateTime      @default(now())
