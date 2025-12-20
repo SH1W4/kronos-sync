@@ -1,0 +1,36 @@
+
+> kronos-sync@2.0.0 build
+> next build
+
+ ÔÜá Invalid next.config.js options detected: 
+ ÔÜá     Unrecognized key(s) in object: 'turbo' at "experimental"
+ ÔÜá See more info here: https://nextjs.org/docs/messages/invalid-next-config
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Jo├úo\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\Jo├úo\Desktop\PROJETOS\05_PLATFORMS\kronos_sync\kronos\package-lock.json
+
+   Ôû▓ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     ? turbo (invalid experimental key)
+
+ ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 18.2s
+   Running TypeScript ...
+Failed to compile.
+
+./src/app/artist/clients/[id]/page.tsx:162:94
+Type error: Property 'projectDescription' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; workspaceId: string | null; clientId: string; bookingId: string | null; fullName: string | null; whatsapp: string | null; birthDate: string | null; ... 10 more ...; signatureData: string | null; }'. Did you mean 'artDescription'?
+
+  160 |                                 <div>
+  161 |                                     <p className="font-bold text-white">Sess├úo de Tatuagem</p>
+> 162 |                                     <p className="text-xs text-gray-400">{booking.anamnesis?.projectDescription || 'Sem descri├º├úo'}</p>
+      |                                                                                              ^
+  163 |                                 </div>
+  164 |                             </div>
+  165 |
+Next.js build worker exited with code: 1 and signal: null

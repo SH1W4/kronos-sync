@@ -159,7 +159,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                                 </div>
                                 <div>
                                     <p className="font-bold text-white">Sessão de Tatuagem</p>
-                                    <p className="text-xs text-gray-400">{booking.anamnesis?.projectDescription || 'Sem descrição'}</p>
+                                    <p className="text-xs text-gray-400">{booking.anamnesis?.artDescription || 'Sem descrição'}</p>
                                 </div>
                             </div>
 
