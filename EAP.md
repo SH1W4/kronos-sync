@@ -45,9 +45,10 @@
   - [x] Correção de Fluxo de Login (Google + Roles).
 - [x] **Módulo 1: Dashboard Inicial** (KPIS, Agendamentos Hoje)
 - [x] **Módulo 2: Agenda** (Visualização, Novo Agendamento, Google Sync)
-- [x] **Módulo 3: Ficha de Anamnese** (Link Público, Assinatura Digital, Persistência)
+- [x] **Módulo 3: Ficha de Anamnese** (Padronização KRONØS, Assinatura Digital, Alertas Clínicos)
 - [x] **Módulo 4: Financeiro** (Extrato, Comissões, Totais)
-- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca).
+- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca)
+- [x] **Estabilidade do Sistema** (Otimização Turbopack, Prisma Windows Compatibility)
   
 ## Fase 5: Expansão (Planejado 🔮)
 - [ ] **Visão Master/Admin**

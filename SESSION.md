@@ -1,4 +1,26 @@
 # Registro de Sessão - Desenvolvimento Kronos Sync
+
+**Data:** 20/12/2025
+**Foco:** Anamnese KRONØS Standard & Estabilização de Performance.
+
+## 🛠️ Realizações Técnicas
+
+### 1. Refinamento de Anamnese (KRONØS Standard)
+- **Conformidade CSV:** Implementação total dos campos do padrão KRONØS (`fullName`, `whatsapp`, `birthDate`) tanto no formulário público quanto na visão do artista.
+- **Assinatura Digital:** Integração do `SignatureCanvas` com captura e persistência de dados em Base64.
+- **Visão do Artista:** Snapshot de identificação e sistema de Alertas Clínicos baseado nas respostas do cliente.
+
+### 2. Estabilização & Performance (System Recovery)
+- **Turbopack Fix:** Resolvida a causa raiz dos travamentos do servidor. O Next.js estava escaneando o diretório `home` do usuário; a configuração `experimental.turbo.root` agora restringe o escaneamento à pasta do projeto.
+- **Button Crash:** Corrigido erro de "Neural Link" ao converter o componente `Button.tsx` (que usa Framer Motion) para Client Component.
+- **Prisma Windows Fix:** Downgrade estratégico para Prisma v5.22.0 para garantir compatibilidade dos binários no ambiente host.
+
+## 📝 Notas para Próxima Sessão
+- O banco de dados foi sincronizado manualmente via SQL puro para contornar falhas do Prisma CLI (Arquivado em `sync-db-raw.js`).
+- Scripts de auditoria e sementes de teste foram limpos para manter o repositório organizado.
+
+---
+
 **Data:** 18/12/2025
 **Foco:** Multi-Workspace Architecture & UI Polish.
 
