@@ -67,18 +67,21 @@ export async function createQuickClient(data: {
             return { error: 'Não autorizado' }
         }
 
+        const email = data.email?.trim() === "" ? undefined : data.email?.trim()
+
         // Check if client already exists
         const existing = await prisma.user.findFirst({
             where: {
                 OR: [
                     { phone: data.phone },
-                    ...(data.email ? [{ email: data.email }] : [])
+                    ...(email ? [{ email }] : [])
                 ]
             }
         })
 
         if (existing) {
-            return { error: 'Cliente já cadastrado com este telefone ou email' }
+            const field = existing.phone === data.phone ? 'telefone' : 'email'
+            return { error: `Cliente já cadastrado com este ${field}` }
         }
 
         // Create new client
@@ -86,7 +89,7 @@ export async function createQuickClient(data: {
             data: {
                 name: data.name,
                 phone: data.phone,
-                email: data.email,
+                email: email || null,
                 role: 'CLIENT'
             },
             select: {
@@ -97,11 +100,12 @@ export async function createQuickClient(data: {
             }
         })
 
+        console.log("✅ Cliente criado com sucesso:", client.name)
         return { success: true, client }
 
     } catch (error) {
         console.error('Error creating client:', error)
-        return { error: 'Erro ao criar cliente' }
+        return { error: 'Erro ao criar cliente. Verifique se os dados são válidos.' }
     }
 }
 

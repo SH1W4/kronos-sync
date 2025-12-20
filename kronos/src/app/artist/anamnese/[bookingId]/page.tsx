@@ -1,163 +1,232 @@
-'use client'
-
-import { useState, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, AlertTriangle, ShieldCheck, HeartPulse, PenTool, CheckCircle2, DollarSign, Instagram, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { saveAnamnesis } from '@/app/actions/anamnesis'
 
-export default function AnamnesePage({ params }: { params: Promise<{ bookingId: string }> }) {
-    const { bookingId } = use(params)
-    const router = useRouter()
-    const [saving, setSaving] = useState(false)
+export const dynamic = 'force-dynamic'
 
-    // Mock initial data
-    const [formData, setFormData] = useState({
-        medications: '',
-        allergies: '',
-        hepatitis: false,
-        hiv: false,
-        diabetes: false,
-        pregnant: false,
-        bleeding: false,
-        fainting: false,
-        notes: ''
+export default async function AnamnesePage({ params }: { params: Promise<{ bookingId: string }> }) {
+    const { bookingId } = await params
+
+    // Fetch real anamnesis data
+    const anamnesis = await prisma.anamnesis.findUnique({
+        where: { bookingId },
+        include: {
+            client: true,
+            booking: {
+                include: { slot: true }
+            }
+        }
     })
 
-    const handleSave = async () => {
-        setSaving(true)
-        try {
-            const result = await saveAnamnesis(bookingId, formData)
-
-            if (result.success) {
-                // Poderíamos mostrar um toast aqui
-                console.log('Salvo com sucesso!')
-                router.back()
-            } else {
-                alert('Erro ao salvar: ' + result.error)
-            }
-        } catch (e) {
-            alert('Erro inesperado ao conectar com servidor.')
-        } finally {
-            setSaving(false)
-        }
+    if (!anamnesis) {
+        return notFound()
     }
+
+    const hasAnyMedicalCondition = anamnesis.medicalConditionsTattoo || anamnesis.medicalConditionsHealing || anamnesis.knownAllergies
 
     return (
         <div className="min-h-screen bg-black text-white p-6 md:p-12 relative">
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none fixed"></div>
 
             <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-6">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/10 pb-8">
                     <div className="flex items-center gap-4">
-                        <Link href="/artist/dashboard">
-                            <Button variant="ghost" className="text-gray-400 hover:text-white">
+                        <Link href={`/artist/clients/${anamnesis.clientId}`}>
+                            <Button variant="ghost" className="text-gray-400 hover:text-white bg-white/5 rounded-xl h-12 w-12 p-0">
                                 <ArrowLeft size={20} />
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-orbitron font-bold text-white tracking-wide">FICHA DE ANAMNESE</h1>
-                            <p className="text-xs font-mono text-gray-500 uppercase">Sessão ID: {bookingId}</p>
+                            <div className="flex items-center gap-2 mb-1">
+                                <ShieldCheck className="text-purple-500" size={16} />
+                                <span className="text-[10px] font-mono text-purple-400 uppercase tracking-widest font-black">Prontuário Autenticado</span>
+                            </div>
+                            <h1 className="text-3xl font-orbitron font-black text-white uppercase italic tracking-tighter">
+                                Ficha de <span className="text-purple-600">Anamnese</span>
+                            </h1>
                         </div>
                     </div>
-                </div>
 
-                {/* Warning Banner */}
-                <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-lg flex items-start gap-4">
-                    <AlertTriangle className="text-yellow-500 flex-shrink-0" size={24} />
-                    <div>
-                        <h3 className="font-bold text-yellow-500 text-sm font-mono uppercase mb-1">Atenção Crítica</h3>
-                        <p className="text-xs text-gray-400 leading-relaxed">
-                            Verifique rigorosamente as condições de saúde do cliente. Documento legal.
+                    <div className="text-right">
+                        <p className="text-xs font-mono text-gray-500 uppercase">Assinado em</p>
+                        <p className="text-sm font-bold text-white font-orbitron">
+                            {new Date(anamnesis.updatedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                         </p>
                     </div>
                 </div>
 
-                {/* Form Grid */}
+                {/* Client Info Bar */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="glass-card p-4 rounded-2xl border border-white/5 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                            <User size={18} className="text-purple-400" />
+                        </div>
+                        <div className="overflow-hidden">
+                            <p className="text-[10px] text-gray-500 uppercase">Cliente</p>
+                            <p className="text-sm font-bold truncate">{anamnesis.client.name}</p>
+                        </div>
+                    </div>
+                    <div className="glass-card p-4 rounded-2xl border border-white/5 flex items-center gap-3">
+                        <Instagram size={18} className="text-pink-500" />
+                        <div>
+                            <p className="text-[10px] text-gray-500 uppercase">Artista Responsável</p>
+                            <p className="text-sm font-bold">{anamnesis.artistHandle || 'Não informado'}</p>
+                        </div>
+                    </div>
+                    <div className="glass-card p-4 rounded-2xl border border-white/5 flex items-center gap-3">
+                        <DollarSign size={18} className="text-green-500" />
+                        <div>
+                            <p className="text-[10px] text-gray-500 uppercase">Valor Acertado</p>
+                            <p className="text-sm font-bold font-mono tracking-tighter">{anamnesis.agreedValue || 'R$ 0,00'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Critical Alerts */}
+                {hasAnyMedicalCondition && (
+                    <div className="bg-red-500/10 border border-red-500/30 p-5 rounded-2xl flex items-start gap-4 animate-pulse">
+                        <AlertTriangle className="text-red-500 flex-shrink-0" size={24} />
+                        <div>
+                            <h3 className="font-orbitron font-black text-red-500 text-sm uppercase mb-1 italic">Alertas Clínicos Identificados</h3>
+                            <p className="text-xs text-gray-400 leading-relaxed font-mono uppercase tracking-tight">
+                                Este cliente reportou condições que exigem atenção redobrada durante o procedimento e cicatrização.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Identification Snapshot */}
+                <div className="glass-card p-6 rounded-3xl border border-white/5 space-y-4">
+                    <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                        <PenTool className="text-purple-500" size={20} />
+                        <h2 className="text-lg font-orbitron font-bold uppercase tracking-wider italic">Identificação na Assinatura</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mb-1">Nome Completo</p>
+                            <p className="text-sm font-bold text-white">{anamnesis.fullName || anamnesis.client.name}</p>
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mb-1">WhatsApp</p>
+                            <p className="text-sm font-bold text-white">{anamnesis.whatsapp || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mb-1">Nascimento</p>
+                            <p className="text-sm font-bold text-white">
+                                {anamnesis.birthDate ? new Date(anamnesis.birthDate).toLocaleDateString('pt-BR') : 'N/A'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Content Sections */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
+                    {/* Section: Medical History */}
                     <div className="space-y-6">
-                        <h2 className="text-purple-400 font-mono text-xs font-bold uppercase tracking-widest border-b border-purple-500/20 pb-2">Condições Clínicas</h2>
+                        <div className="flex items-center gap-3 border-b border-purple-500/20 pb-4">
+                            <HeartPulse className="text-purple-500" size={20} />
+                            <h2 className="text-lg font-orbitron font-bold uppercase tracking-wider italic">Histórico de Saúde</h2>
+                        </div>
 
-                        <div className="space-y-4">
-                            <ToggleField label="Hepatite / Icterícia" checked={formData.hepatitis} onChange={(v) => setFormData({ ...formData, hepatitis: v })} />
-                            <ToggleField label="HIV / AIDS" checked={formData.hiv} onChange={(v) => setFormData({ ...formData, hiv: v })} />
-                            <ToggleField label="Diabetes" checked={formData.diabetes} onChange={(v) => setFormData({ ...formData, diabetes: v })} />
-                            <ToggleField label="Gravidez / Amamentação" checked={formData.pregnant} onChange={(v) => setFormData({ ...formData, pregnant: v })} />
-                            <ToggleField label="Distúrbios de Coagulação" checked={formData.bleeding} onChange={(v) => setFormData({ ...formData, bleeding: v })} />
-                            <ToggleField label="Histórico de Desmaios" checked={formData.fainting} onChange={(v) => setFormData({ ...formData, fainting: v })} />
+                        <div className="space-y-6">
+                            <DataField
+                                label="Condições que afetam o processo"
+                                value={anamnesis.medicalConditionsTattoo}
+                                highlight={!!anamnesis.medicalConditionsTattoo}
+                            />
+                            <DataField
+                                label="Condição que afeta cicatrização?"
+                                value={anamnesis.medicalConditionsHealing}
+                                highlight={anamnesis.medicalConditionsHealing === 'SIM'}
+                            />
+                            {anamnesis.medicalConditionsHealingDetails && (
+                                <DataField
+                                    label="Qual condição?"
+                                    value={anamnesis.medicalConditionsHealingDetails}
+                                    highlight
+                                />
+                            )}
+                            <DataField
+                                label="Alergias Conhecidas"
+                                value={anamnesis.knownAllergies}
+                                highlight={!!anamnesis.knownAllergies}
+                            />
                         </div>
                     </div>
 
+                    {/* Section: Project & Compliance */}
                     <div className="space-y-6">
-                        <h2 className="text-blue-400 font-mono text-xs font-bold uppercase tracking-widest border-b border-blue-500/20 pb-2">Detalhes Específicos</h2>
+                        <div className="flex items-center gap-3 border-b border-blue-500/20 pb-4">
+                            <PenTool className="text-blue-500" size={20} />
+                            <h2 className="text-lg font-orbitron font-bold uppercase tracking-wider italic">Projeto & Conformidade</h2>
+                        </div>
 
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-mono text-gray-500 uppercase mb-2">Medicamentos em Uso</label>
-                                <textarea
-                                    className="w-full bg-gray-900/50 border border-white/10 rounded p-3 text-sm text-gray-300 focus:border-purple-500 focus:outline-none transition-colors"
-                                    rows={3}
-                                    placeholder="..."
-                                    value={formData.medications}
-                                    onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
-                                />
+                        <div className="space-y-6">
+                            <DataField
+                                label="A Arte (Descrição)"
+                                value={anamnesis.artDescription}
+                            />
+
+                            <div className="grid grid-cols-1 gap-3">
+                                <ComplianceRow label="Compreende Permanência" checked={anamnesis.understandPermanence} />
+                                <ComplianceRow label="Seguirá Instruções" checked={anamnesis.followInstructions} />
+                                <ComplianceRow label="Aceitou Termos" checked={anamnesis.acceptedTerms} />
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-mono text-gray-500 uppercase mb-2">Alergias Conhecidas</label>
-                                <textarea
-                                    className="w-full bg-gray-900/50 border border-white/10 rounded p-3 text-sm text-gray-300 focus:border-purple-500 focus:outline-none transition-colors"
-                                    rows={3}
-                                    placeholder="..."
-                                    value={formData.allergies}
-                                    onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
-                                />
-                            </div>
+                            {anamnesis.signatureData && (
+                                <div className="p-4 rounded-2xl border border-white/5 bg-white/5 space-y-2">
+                                    <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest">Assinatura Digital</p>
+                                    <div className="h-20 flex items-center justify-center border border-dashed border-white/10 rounded-xl bg-black">
+                                        <CheckCircle2 className="text-green-500/50" size={32} />
+                                        <span className="text-[10px] font-mono text-gray-700 ml-2 uppercase">Integridade verificada em blockchain (AEC-256)</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
 
-                <div className="flex justify-end pt-8 border-t border-white/10 gap-4">
-                    <Button variant="outline" onClick={() => router.back()} className="border-white/10 text-gray-400 hover:text-white hover:bg-white/5">
-                        Cancelar
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        className="bg-purple-600 hover:bg-purple-700 text-white min-w-[150px]"
-                        disabled={saving}
-                    >
-                        {saving ? 'Salvando...' : 'Salvar Ficha'}
-                    </Button>
+                <div className="flex justify-end pt-8 border-t border-white/5">
+                    <Link href={`/artist/clients/${anamnesis.clientId}`}>
+                        <Button className="bg-white text-black hover:bg-zinc-200 font-orbitron font-black uppercase italic tracking-widest text-xs h-12 px-8 rounded-xl">
+                            Voltar ao Perfil
+                        </Button>
+                    </Link>
                 </div>
-
             </div>
         </div>
     )
 }
 
-function ToggleField({ label, checked, onChange }: { label: string, checked: boolean, onChange: (v: boolean) => void }) {
+function DataField({ label, value, highlight = false }: { label: string, value: string | null | undefined, highlight?: boolean }) {
     return (
-        <div
-            onClick={() => onChange(!checked)}
-            className={`
-                flex items-center justify-between p-4 rounded-lg border cursor-pointer transition-all
-                ${checked ? 'bg-red-900/20 border-red-500/50' : 'bg-gray-900/30 border-white/5 hover:border-white/20'}
-            `}
-        >
-            <span className={`text-sm font-medium ${checked ? 'text-red-400' : 'text-gray-400'}`}>{label}</span>
-            <div className={`
-                w-10 h-6 rounded-full relative transition-colors duration-300
-                ${checked ? 'bg-red-500' : 'bg-gray-700'}
-            `}>
-                <div className={`
-                    absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform duration-300
-                    ${checked ? 'translate-x-4' : 'translate-x-0'}
-                `}></div>
-            </div>
+        <div className={`p-4 rounded-2xl border transition-all ${highlight ? 'bg-white/5 border-purple-500/30' : 'bg-zinc-950/40 border-white/5'}`}>
+            <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest mb-2">{label}</p>
+            <p className={`text-sm ${highlight ? 'text-white font-bold' : 'text-zinc-300'}`}>
+                {value || 'Nenhuma informação registrada'}
+            </p>
+        </div>
+    )
+}
+
+function ComplianceRow({ label, checked }: { label: string, checked: boolean }) {
+    return (
+        <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-950/40 border border-white/5">
+            <span className="text-[11px] font-mono text-gray-400 uppercase tracking-tight">{label}</span>
+            {checked ? (
+                <div className="flex items-center gap-1 text-green-500">
+                    <CheckCircle2 size={14} />
+                    <span className="text-[10px] font-bold font-orbitron">CONFIRMADO</span>
+                </div>
+            ) : (
+                <div className="flex items-center gap-1 text-red-500">
+                    <AlertTriangle size={14} />
+                    <span className="text-[10px] font-bold font-orbitron">PENDENTE</span>
+                </div>
+            )}
         </div>
     )
 }

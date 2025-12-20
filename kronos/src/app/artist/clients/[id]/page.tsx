@@ -41,9 +41,23 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
 
     // Safety Alerts from Anamnesis
     const allAnamnesis = client.bookings.map(b => b.anamnesis).filter(Boolean)
-    const hasConditions = allAnamnesis.some(a => a?.hasMedicalCondition || a?.hasAllergies || a?.isUnderMedication)
-    const conditionsList = Array.from(new Set(allAnamnesis.flatMap(a => (a?.conditionDetails || '').split(',').map(s => s.trim()).filter(Boolean))))
-    const allergiesList = Array.from(new Set(allAnamnesis.flatMap(a => (a?.allergyDetails || '').split(',').map(s => s.trim()).filter(Boolean))))
+    const hasConditions = allAnamnesis.some(a =>
+        (a?.medicalConditionsTattoo && a.medicalConditionsTattoo !== 'NÃO') ||
+        (a?.medicalConditionsHealing === 'SIM') ||
+        (a?.knownAllergies && a.knownAllergies !== 'NÃO')
+    )
+
+    // Aggregated lists for display
+    const conditionsList = Array.from(new Set(allAnamnesis.flatMap(a => {
+        const list = []
+        if (a?.medicalConditionsTattoo && a.medicalConditionsTattoo !== 'NÃO') list.push(a.medicalConditionsTattoo)
+        if (a?.medicalConditionsHealingDetails) list.push(a.medicalConditionsHealingDetails)
+        return list
+    })))
+
+    const allergiesList = Array.from(new Set(allAnamnesis.flatMap(a =>
+        (a?.knownAllergies && a.knownAllergies !== 'NÃO') ? [a.knownAllergies] : []
+    )))
 
     return (
         <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 text-white">

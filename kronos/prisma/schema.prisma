@@ -409,27 +409,27 @@ model Anamnesis {
   workspaceId String?
   bookingId   String?  @unique 
   
-  // Dados de Saúde (Baseado no CSV)
-  hasMedicalCondition     Boolean  @default(false)
-  conditionDetails        String?  // Ex: Diabetes, Epilepsia
+  // Questionário baseado no CSV fornecido (KRONØS Standard)
+  fullName                  String?   // Qual seu nome completo?
+  whatsapp                  String?   // Qual é o seu número do WhatsApp?
+  birthDate                 String?   // Quando é o seu aniversário?
+  medicalConditionsTattoo   String?   @db.Text // Você tem alguma condição médica que possa afetar o processo de tatuagem?
+  medicalConditionsHealing  String?   @db.Text // Você possui alguma condição médica que possa afetar o processo de cicatrização da tatuagem?
+  medicalConditionsHealingDetails String? @db.Text // Se sim, qual?
+  knownAllergies           String?   @db.Text // Tem alguma alergia conhecida a produtos, como; tintas ou materiais de curativo?
   
-  hasHealingIssues        Boolean  @default(false)
-  healingDetails          String?  // Ex: Quelóide
+  // Detalhes do Projeto (Snapshot)
+  artistHandle             String?   // Qual o @ da(o) artista responsável pelo seu projeto?
+  artDescription           String?   @db.Text // qual a arte?
+  agreedValue              String?   // Qual foi o valor acertado entre você e o artista?
   
-  hasAllergies            Boolean  @default(false)
-  allergyDetails          String?  // Ex: Tintas, Latex, Lâmina
-  
-  isPregnant              Boolean  @default(false)
-  isUnderMedication       Boolean  @default(false)
-  medicationDetails       String?
+  // Confirmações e Termos
+  understandPermanence      Boolean   @default(false) // Você compreende que a tatuagem é permanente e que os resultados podem variar?
+  followInstructions        Boolean   @default(false) // Você seguirá as instruções do(a) tatuador(a) para garantir a correta cicatrização?
+  acceptedTerms             Boolean   @default(false) // Confirmação dos TERMOS DE RESPONSABILIDADE
 
-  // Dados do Projeto Específico (Snapshot do momento)
-  projectDescription      String?  // "Arte" do CSV
-  agreedValue             Float?   // "Valor Acertado" do CSV
-
-  // Termos e Assinatura
-  acceptedTerms           Boolean  @default(false)
-  signatureData           String?  // Base64 ou URL da assinatura digital
+  // Assinatura e Metadados
+  signatureData           String?   @db.Text // Assinatura digital (Base64/SVG)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

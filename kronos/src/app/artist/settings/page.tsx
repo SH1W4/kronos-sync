@@ -2,19 +2,28 @@
 
 import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { Settings, User, Shield, Calendar, CreditCard, Bell } from 'lucide-react'
+import { Settings, User, Shield, Calendar, CreditCard, Bell, Link as LinkIcon, Copy, Check, Instagram, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { updateArtistSettings } from '@/app/actions/settings'
+import { analyzeInstagramProfile, applyKaiBranding } from '@/app/actions/kai'
+import { KaiAnalysisModal } from '@/components/kai/AnalysisModal'
 
 export default function SettingsPage() {
     const { data: session, update: updateSession } = useSession()
     const [loading, setLoading] = useState(false)
+    const [copied, setCopied] = useState(false)
 
     // Form state
     const [name, setName] = useState('')
     const [commission, setCommission] = useState('')
+    const [instagram, setInstagram] = useState('')
+
+    // KAI State
+    const [isKaiModalOpen, setIsKaiModalOpen] = useState(false)
+    const [isKaiLoading, setIsKaiLoading] = useState(false)
+    const [kaiSuggestions, setKaiSuggestions] = useState<any>(undefined)
 
     // Initialize values when session is available
     useEffect(() => {
@@ -48,6 +57,56 @@ export default function SettingsPage() {
         }
     }
 
+    const handleKaiAnalysis = async () => {
+        if (!instagram) {
+            alert('Por favor, insira o seu arroba do Instagram primeiro.')
+            return
+        }
+        setIsKaiModalOpen(true)
+        setIsKaiLoading(true)
+        try {
+            const result = await analyzeInstagramProfile(instagram)
+            if (result.success) {
+                setKaiSuggestions(result.suggestions)
+            } else {
+                alert(result.error || 'Falha na análise KAI')
+                setIsKaiModalOpen(false)
+            }
+        } catch (error) {
+            console.error('KAI Error:', error)
+            alert('Erro ao processar análise KAI')
+            setIsKaiModalOpen(false)
+        } finally {
+            setIsKaiLoading(false)
+        }
+    }
+
+    const handleApplyKaiBranding = async (data: any) => {
+        setLoading(true)
+        try {
+            const result = await applyKaiBranding(data)
+            if (result.success) {
+                // Mock update local status
+                alert('Branding aplicado com sucesso!')
+                setIsKaiModalOpen(false)
+            } else {
+                alert(result.error || 'Erro ao aplicar')
+            }
+        } catch (e) {
+            alert('Erro ao aplicar branding')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const clientLink = session?.user ? `${window.location.protocol}//${window.location.host}/onboarding` : '#'
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(clientLink)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+    }
+
     return (
         <div className="min-h-screen bg-black text-white p-6 md:p-12">
             <div className="max-w-4xl mx-auto space-y-12 pb-20">
@@ -66,9 +125,9 @@ export default function SettingsPage() {
                     {/* Navigation Sidebar */}
                     <aside className="space-y-2">
                         <SidebarLink icon={<User size={18} />} label="Perfil do Artista" active />
+                        <SidebarLink icon={<LinkIcon size={18} />} label="Link do Cliente" />
                         <SidebarLink icon={<Calendar size={18} />} label="Sincronização" />
                         <SidebarLink icon={<CreditCard size={18} />} label="Assinatura & Plano" />
-                        <SidebarLink icon={<Bell size={18} />} label="Notificações" />
                         <SidebarLink icon={<Shield size={18} />} label="Segurança" />
                     </aside>
 
@@ -90,6 +149,34 @@ export default function SettingsPage() {
                                         className="bg-black/50 border-white/10"
                                     />
                                 </div>
+
+                                {/* Instagram & KAI Section */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-mono text-gray-500 uppercase">Instagram Business (@)</label>
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Instagram size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                            <Input
+                                                placeholder="@seu_perfil"
+                                                value={instagram}
+                                                onChange={(e) => setInstagram(e.target.value)}
+                                                className="bg-black/50 border-white/10 pl-9"
+                                            />
+                                        </div>
+                                        <Button
+                                            onClick={handleKaiAnalysis}
+                                            disabled={isKaiLoading}
+                                            className="bg-purple-600/10 border border-purple-500/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all gap-2 text-xs font-bold"
+                                        >
+                                            <Sparkles size={14} className={isKaiLoading ? 'animate-spin' : ''} />
+                                            ANALISAR KAI
+                                        </Button>
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 leading-relaxed italic">
+                                        DICA: Usamos IA para analisar seu feed e sugerir automaticamente bio, cores e tags de estilo para o seu perfil.
+                                    </p>
+                                </div>
+
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-mono text-gray-500 uppercase">Comissão Padrão (%)</label>
                                     <Input
@@ -98,6 +185,39 @@ export default function SettingsPage() {
                                         onChange={(e) => setCommission(e.target.value)}
                                         className="bg-black/50 border-white/10"
                                     />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Client Link Section */}
+                        <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <LinkIcon className="text-purple-400" size={20} />
+                                <h2 className="font-bold uppercase tracking-wider text-sm">Jornada do Cliente</h2>
+                            </div>
+
+                            <div className="space-y-4">
+                                <p className="text-xs text-gray-400 leading-relaxed">
+                                    Compartilhe este link com seus clientes ou gere um QR Code para que eles iniciem o processo de agendamento e anamnese.
+                                </p>
+
+                                <div className="flex gap-2">
+                                    <div className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 h-12 flex items-center overflow-hidden">
+                                        <code className="text-xs text-purple-400 truncate">{clientLink}</code>
+                                    </div>
+                                    <Button
+                                        onClick={copyToClipboard}
+                                        variant="outline"
+                                        className="h-12 w-12 border-white/10 p-0 flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                                    >
+                                        {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+                                    </Button>
+                                </div>
+
+                                <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+                                    <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest text-center">
+                                        DICA: Este link levará o cliente diretamente para o fluxo de triagem do seu estúdio.
+                                    </p>
                                 </div>
                             </div>
                         </section>
@@ -132,6 +252,15 @@ export default function SettingsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* KAI MODAL */}
+            <KaiAnalysisModal
+                isOpen={isKaiModalOpen}
+                isLoading={isKaiLoading}
+                suggestions={kaiSuggestions}
+                onClose={() => setIsKaiModalOpen(false)}
+                onApply={handleApplyKaiBranding}
+            />
         </div>
     )
 }

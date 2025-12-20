@@ -278,9 +278,10 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                                 className="w-full bg-black border border-white/10 rounded-lg p-2 text-white"
                             >
                                 <option>Nova tattoo</option>
+                                <option>Sessão</option>
+                                <option>Cobertura</option>
+                                <option>Promoção</option>
                                 <option>Retoque</option>
-                                <option>Orçamento</option>
-                                <option>Cover-up</option>
                                 <option>Remoção</option>
                             </select>
                         </div>

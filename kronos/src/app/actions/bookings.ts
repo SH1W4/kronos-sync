@@ -59,13 +59,24 @@ export async function createBooking(data: {
             return { error: 'Já existe um agendamento neste horário' }
         }
 
+        // Create Slot first (needed as it's a required related model)
+        const slot = await prisma.slot.create({
+            data: {
+                workspaceId,
+                macaId: 1, // Defaulting to table 1 for demo
+                startTime: data.scheduledFor,
+                endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000),
+                isActive: true
+            }
+        })
+
         // Create booking
         const booking = await prisma.booking.create({
             data: {
                 artistId: user.artist.id,
                 clientId: data.clientId,
                 workspaceId,
-                slotId: 'temp-slot-' + Date.now(), // TODO: Implement proper slot management
+                slotId: slot.id,
                 value: data.estimatedPrice,
                 finalValue: data.estimatedPrice,
                 studioShare: data.estimatedPrice * (1 - user.artist.commissionRate),

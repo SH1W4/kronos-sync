@@ -36,43 +36,97 @@ export const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 try {
                     if (credentials?.username === "dev") {
-                        console.log("🔓 ACESSO DEV: Procurando Artista...")
+                        console.log("🔓 ACESSO DEV: Garantindo Perfil de Artista...")
 
-                        // Busca usuário existente
-                        let user = await prisma.user.findFirst({
-                            where: { role: "ARTIST" }
+                        // 1. Garante que o Workspace de demonstração exista
+                        let workspace = await prisma.workspace.findFirst()
+                        if (!workspace) {
+                            workspace = await prisma.workspace.create({
+                                data: {
+                                    name: "Kronus Demo Studio",
+                                    slug: "demo-studio",
+                                    primaryColor: "#8B5CF6",
+                                    owner: {
+                                        create: {
+                                            email: "admin@kronos.com",
+                                            name: "Admin System",
+                                            role: "ADMIN"
+                                        }
+                                    }
+                                }
+                            })
+                        }
+
+                        // 2. Garante que o usuário 'dev' específico exista
+                        let devUser = await prisma.user.findUnique({
+                            where: { email: "dev@kronos.com" },
+                            include: { artist: true }
                         })
 
-                        if (!user) {
-                            console.log("⚠️ Criando 'Dev Artist' completo...")
-
-                            // Cria User E Artist em uma transação
-                            user = await prisma.user.create({
+                        if (!devUser) {
+                            devUser = await prisma.user.create({
                                 data: {
                                     email: "dev@kronos.com",
                                     name: "Dev Artist",
                                     role: "ARTIST",
                                     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                                    artist: {
-                                        create: {
-                                            plan: "RESIDENT",
-                                            commissionRate: 0.30,
-                                            isActive: true
-                                        }
-                                    }
-                                }
+                                },
+                                include: { artist: true }
                             })
-
-                            console.log("✅ Dev Artist criado com ID:", user.id)
+                        } else if (devUser.role !== "ARTIST") {
+                            devUser = await prisma.user.update({
+                                where: { id: devUser.id },
+                                data: { role: "ARTIST" },
+                                include: { artist: true }
+                            })
                         }
 
-                        // Retorna objeto limpo (sem relações nested)
+                        // 3. Garante que o registro de Artist exista
+                        if (!devUser.artist) {
+                            await prisma.artist.create({
+                                data: {
+                                    userId: devUser.id,
+                                    workspaceId: workspace.id,
+                                    plan: "RESIDENT",
+                                    commissionRate: 0.30,
+                                    isActive: true
+                                }
+                            })
+                        } else if (!devUser.artist.workspaceId) {
+                            await prisma.artist.update({
+                                where: { id: devUser.artist.id },
+                                data: { workspaceId: workspace.id }
+                            })
+                        }
+
+                        // 4. Garante que o Membership no workspace exista
+                        const membership = await prisma.workspaceMember.findUnique({
+                            where: {
+                                workspaceId_userId: {
+                                    workspaceId: workspace.id,
+                                    userId: devUser.id
+                                }
+                            }
+                        })
+
+                        if (!membership) {
+                            await prisma.workspaceMember.create({
+                                data: {
+                                    workspaceId: workspace.id,
+                                    userId: devUser.id,
+                                    role: "ADMIN"
+                                }
+                            })
+                        }
+
+                        console.log("✅ Perfil Dev Artista verificado e pronto.")
+
                         return {
-                            id: user.id,
-                            email: user.email,
-                            name: user.name,
-                            image: user.image,
-                            role: user.role
+                            id: devUser.id,
+                            email: devUser.email,
+                            name: devUser.name,
+                            image: devUser.image,
+                            role: devUser.role
                         }
                     }
                     return null
@@ -94,41 +148,47 @@ export const authOptions: NextAuthOptions = {
             // Sempre busca/atualiza os dados de workspace e role se tivermos o ID
             // Isso permite que o update() do frontend funcione para convites e promoções
             if (token.id) {
-                const dbUser = await prisma.user.findUnique({
-                    where: { id: token.id as string },
-                    include: { artist: true }
-                })
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: token.id as string },
+                        include: { artist: true }
+                    })
 
-                if (dbUser) {
-                    token.role = dbUser.role
-                    if (dbUser.artist) {
-                        token.isArtist = true
-                        token.commissionRate = dbUser.artist.commissionRate
+                    if (dbUser) {
+                        token.role = dbUser.role
+                        if (dbUser.artist) {
+                            token.isArtist = true
+                            token.commissionRate = dbUser.artist.commissionRate
+                        }
                     }
-                }
 
-                const memberships = await prisma.workspaceMember.findMany({
-                    where: { userId: token.id as string },
-                    include: { workspace: true }
-                })
+                    const memberships = await prisma.workspaceMember.findMany({
+                        where: { userId: token.id as string },
+                        include: { workspace: true }
+                    })
 
-                token.workspaces = memberships.map(m => ({
-                    id: m.workspaceId,
-                    name: m.workspace.name,
-                    slug: m.workspace.slug,
-                    role: m.role,
-                    primaryColor: m.workspace.primaryColor
-                }))
+                    if (memberships && memberships.length > 0) {
+                        token.workspaces = memberships.map(m => ({
+                            id: m.workspaceId,
+                            name: m.workspace?.name || "Sem Nome",
+                            slug: m.workspace?.slug || "",
+                            role: m.role,
+                            primaryColor: m.workspace?.primaryColor || "#8B5CF6"
+                        }))
 
-                // Define o workspace ativo se não tiver um ou se o atual não estiver mais na lista
-                const currentWorkspaces = token.workspaces as any[]
-                if (currentWorkspaces.length > 0) {
-                    const isValid = currentWorkspaces.some(w => w.id === token.activeWorkspaceId)
-                    if (!token.activeWorkspaceId || !isValid) {
-                        token.activeWorkspaceId = currentWorkspaces[0].id
+                        // Define o workspace ativo
+                        const currentWorkspaces = token.workspaces as any[]
+                        const isValid = currentWorkspaces.some(w => w.id === token.activeWorkspaceId)
+                        if (!token.activeWorkspaceId || !isValid) {
+                            token.activeWorkspaceId = currentWorkspaces[0].id
+                        }
+                    } else {
+                        token.workspaces = []
+                        token.activeWorkspaceId = null
                     }
-                } else {
-                    token.activeWorkspaceId = null
+                } catch (error) {
+                    console.error("❌ Erro ao buscar dados do usuário no JWT callback:", error)
+                    // Não lança erro para não quebrar o login, apenas mantém o token base
                 }
             }
 
