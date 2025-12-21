@@ -1,107 +1,72 @@
 <div align="center">
-  <img src="docs/assets/kiosk_landing.png" width="800" alt="KRONOS SYNC Hero">
-  <h1 align="center">KRONOS SYNC</h1>
+  <img src="docs/assets/kiosk_landing.png" width="900" alt="KRONOS SYNC">
+  <br/>
+  <br/>
+  <h1 align="center">K R O N O S _ S Y N C</h1>
   <p align="center">
-    <strong>The High-End Operating System for Artistic Tattoo Studios</strong>
+    <strong>OPERATING SYSTEM FOR THE ARTISTIC ELITE</strong>
   </p>
-  <p align="center">
-    <img src="https://img.shields.io/badge/STATUS-ALPHA_RELEASE-purple?style=for-the-badge" alt="Status Alpha">
-    <img src="https://img.shields.io/badge/ENGINEX-AI_ENABLED-blue?style=for-the-badge" alt="AI Enabled">
-    <img src="https://img.shields.io/badge/AESTHETIC-NOIR-black?style=for-the-badge" alt="Aesthetic Noir">
-  </p>
+  <br/>
+  <img src="docs/assets/arrival_symbols.png" width="120" alt="Sync Glyph">
 </div>
 
-> *"Where technology meets the soul of the ink."*
+<br/>
+
+> *"Where technology meets the soul of the ink. A seamless fusion between surgical management and pure artistic expression."*
 
 ---
 
-## 🌑 Identidade Visual & Sincronia
+## [ 01 ] THE IDENTITY
+**Digital Anamnese & Legal Safety**
 
-O KRONOS SYNC utiliza uma linguagem visual inspirada em glifos de alta complexidade e interfaces futuristas minimalistas para representar a conexão entre artista, cliente e estúdio.
-
-| **Sync Engine** | **Ink Link Protocol** | **Arrival Spec** |
-| :---: | :---: | :---: |
-| ![Sync Bar](docs/assets/soul_sync.png) | ![Ink Link](docs/assets/ink_link_modal.png) | ![Arrival Symbols](docs/assets/arrival_symbols.png) |
-
----
-
-## 🔒 Acesso Restrito
-**Este software é proprietário e protegido por direitos autorais.**
-O código-fonte disponível neste repositório é destinado exclusivamente para fins de **auditoria, desenvolvimento interno e demonstração de portfólio**. A reprodução, distribuição ou uso comercial sem autorização expressa do **Kronos Tattoo Studio** é estritamente proibida.
+O KRONOS SYNC captura a essência da segurança clínica com elegância. Assinaturas biométricas e triagem inteligente transformam burocracia em um snapshot de identidade.
+- **Biometric Flow:** Assinatura digital fluida.
+- **Clinical Insight:** Alertas automáticos de condições médicas.
 
 ---
 
-## 💎 Visão do Produto
-O **KRONOS SYNC** não é apenas um agendador; é um sistema operacional completo para estúdios que tratam tatuagem como arte e negócio de alto nível.
+## [ 02 ] THE LINK
+**Kiosk, Conversion & Lead Magnet**
 
-Ele elimina a fricção administrativa, permitindo que artistas foquem unicamente em criar, enquanto o sistema orquestra a logística, financeiro e experiência do cliente com precisão cirúrgica.
+A recepção é o primeiro contato com o sagrado. O **THE LINK** gamifica a jornada do acompanhante, convertendo curiosos em clientes via **Soul Sync**.
 
----
+![Soul Sync](docs/assets/soul_sync.png)
 
-## 🚀 Arquitetura & Módulos
-
-### 🎨 Artist OS (Dashboard)
-Um painel de comando pessoal para cada tatuador resident ou guest.
-*   **Visão em Tempo Real:** Faturamento, metas e agenda diária.
-*   **Privacidade Nativa:** Isolamento rigoroso de dados sensíveis entre artistas.
-*   **Performance:** Carregamento instantâneo via Edge Computing.
-
-### 📋 Anamnese Digital 2.0 (Legal-grade)
-Segurança jurídica e clínica integrada ao fluxo.
-*   Assinatura biométrica/digital.
-*   Vinculação imutável com a sessão (Booking ID).
-*   Alertas de risco clínico automáticos.
-
-### 🏛️ KRONOS Kiosk (Recepção & Conversão)
-Transformando o check-in em uma experiência de marca.
-*   **Soul Sync:** Gamificação para captura de acompanhantes (Lead Magnet).
-*   **Ink Pass:** Geração de cupons automáticos via PIN do Artista.
-*   **UX Noir:** Interface mobile-first de alto impacto.
-
-![Kiosk Hub](docs/assets/kiosk_landing.png)
-
-### 💰 Financeiro & IA (Settlement 2.0)
-Acerto de comissões sem fricção e com auditoria inteligente.
-*   **Digital Settlement:** Seleção múltipla de projetos para liquidação PIX.
-*   **Vision Agent:** Validação automática de comprovantes via IA OCR.
-*   **Sync Glyphs:** Recompensas gamificadas por profissionalismo financeiro.
-
-![Finance & Tokens](docs/assets/soul_sync.png)
-
-### 🧠 Gestão Inteligente
-*   **Agenda Híbrida:** Suporte a Flash Days e Projetos de Longa Duração.
-*   **Financial Core:** Split automático de comissões e gestão de royalties.
-*   **Client CRM:** Histórico visual de projetos e preferências.
+*O "INK PASS" não é um desconto; é um convite para a sincronização.*
 
 ---
 
-## 📺 Demonstração em Vídeo
+## [ 03 ] THE VAULT
+**Settle, AI Vision & Tokenization**
 
-| Jornada do Acompanhante (Kiosk) | Acerto de Comissão (IA Vision) |
+Transparência financeira absoluta. O **THE VAULT** utiliza Visão Computacional para validar liquidações e premiar o profissionalismo com glifos digitais.
+
+![Artist Pin](docs/assets/artist_pin.png)
+
+- **AI Vision:** Validação OCR instantânea de comprovantes.
+- **Sync Glyphs:** Tokens de prestígio para a equipe.
+
+---
+
+## [ EVOLUTION ] THE FLOW
+
+| JOURNEY | SETTLEMENT |
 | :---: | :---: |
 | ![Kiosk Demo](docs/assets/kiosk_demo.webp) | ![Finance Demo](docs/assets/finance_demo.webp) |
 
-> *Nota: Os vídeos acima são demonstrações técnicas do fluxo Alpha.*
+---
+
+## ARCHITECTURE (NOIR)
+
+Construído sob o silêncio da noite, utilizando as tecnologias mais robustas da era digital:
+- **Next.js 15** // **Prisma ORM** // **Tailwind CSS v4** // **AI Vision**
 
 ---
 
-## 🛠️ Engenharia de Software
-
-Construído sobre pilares de escalabilidade e segurança modernos:
-
-| Camada | Tecnologia |
-| -- | -- |
-| **Frontend** | Next.js 15 (App Router) + React 19 |
-| **Styling** | Tailwind CSS v4 + Design System "Noir" |
-| **Database** | PostgreSQL Serverless (Neon) + Prisma ORM |
-| **Auth** | NextAuth.js (RBAC System) |
-| **Infra** | Vercel Edge Network |
-
----
-
-## 🤝 Contato & Licenciamento
-
-Para discussões sobre licenciamento, parcerias ou acesso de demonstração:
-
-**Kronos Tech Division**
-*Developed by SH1W4 // Architecture by Antigravity*
+<div align="center">
+  <p align="center">
+    <strong>KRONOS TECH DIVISION</strong><br/>
+    Developed by SH1W4 // Architecture by Antigravity
+  </p>
+  <img src="docs/assets/arrival_symbols.png" width="60" opacity="0.5">
+</div>
