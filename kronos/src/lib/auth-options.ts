@@ -4,9 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 
-console.log("⚠️ PRE-BOOT CHECK:")
-console.log("ID:", process.env.GOOGLE_CLIENT_ID?.substring(0, 10))
-console.log("SECRET:", process.env.GOOGLE_CLIENT_SECRET?.substring(0, 10))
+console.log("⚠️ Auth initialized")
 
 
 export const authOptions: NextAuthOptions = {
@@ -28,6 +26,67 @@ export const authOptions: NextAuthOptions = {
             }
         }),
         CredentialsProvider({
+            id: "magic-link",
+            name: "Magic Link",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                code: { label: "Code", type: "text" }
+            },
+            async authorize(credentials) {
+                if (!credentials?.email || !credentials?.code) return null
+
+                try {
+                    // 1. Validate Code
+                    const verificationCode = await prisma.verificationCode.findFirst({
+                        where: {
+                            email: credentials.email.toLowerCase(),
+                            code: credentials.code.trim(),
+                            used: false,
+                            expiresAt: { gte: new Date() }
+                        },
+                        orderBy: { createdAt: 'desc' }
+                    })
+
+                    if (!verificationCode) {
+                        throw new Error("Código inválido ou expirado")
+                    }
+
+                    // 2. Mark code as used
+                    await prisma.verificationCode.update({
+                        where: { id: verificationCode.id },
+                        data: { used: true }
+                    })
+
+                    // 3. Find or Create User
+                    let user = await prisma.user.findUnique({
+                        where: { email: credentials.email.toLowerCase() }
+                    })
+
+                    if (!user) {
+                        user = await prisma.user.create({
+                            data: {
+                                email: credentials.email.toLowerCase(),
+                                name: credentials.email.split('@')[0],
+                                role: 'CLIENT'
+                            }
+                        })
+                    }
+
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
+                        image: user.image
+                    }
+                } catch (error) {
+                    console.error("❌ Magic Link Error:", error)
+                    return null
+                }
+            }
+        }),
+        CredentialsProvider({
+            id: "credentials", // Dev Mode
             name: "Modo Dev (Bypass)",
             credentials: {
                 username: { label: "Username (use 'dev')", type: "text", placeholder: "dev" },

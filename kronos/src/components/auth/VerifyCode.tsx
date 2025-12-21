@@ -36,8 +36,8 @@ export default function VerifyCode({ email, onBack }: VerifyCodeProps) {
                 return
             }
 
-            // Sign in with NextAuth using credentials
-            const result = await signIn('credentials', {
+            // Sign in with NextAuth using magic-link provider
+            const result = await signIn('magic-link', {
                 email,
                 code,
                 redirect: false
