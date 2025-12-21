@@ -96,3 +96,7 @@
 - `team_onboarding_guide.md`: Guia para artistas e staff testarem o app.
 - `admin_guide.md`: Manual para gestão de workspaces e convites.
 - `magic_link_checklist.md`: Procedimento de verificação de auth.
+- `NEXT_SESSION_BRIEF.md`: **LEITURA OBRIGATÓRIA** para próxima sessão (Limites de API e Ações de Infra).
+
+## 🏁 Próximos Passos (Infraestrutura)
+Para que a equipe possa testar na segunda-feira, é CRÍTICO resolver os pontos de domínio listados em `NEXT_SESSION_BRIEF.md`.
