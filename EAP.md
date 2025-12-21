@@ -49,14 +49,23 @@
   - [x] **Upgrade KRONØS:** Conformidade total com campos do CSV Standard.
   - [x] **Triagem Inteligente:** Sistema de Alertas Clínicos para o artista.
 - [x] **Módulo 4: Financeiro** (Extrato, Comissões, Totais)
-- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca).
+  - [x] **Liquidação Digital:** Fluxo de acerto manual via PIX com upload de comprovante.
+  - [x] **IA Vision (Alpha):** Agente de validação automática de recibos com OCR.
+  - [x] **Sync Glyphs:** Sistema de tokenização digital para liquidações aprovadas.
+- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca)
+- [x] **Módulo 6: KRONOS Kiosk** (Recepção & Vendas)
+  - [x] **Conversion Hub:** Landing page com foco em Loja e Experiência de Acompanhante.
+  - [x] **Soul Sync:** Gamificação de captura de leads com progressão visual.
+  - [x] **Ink Pass:** Geração automática de cupons focado em "Primeira Tattoo".
 - [x] **Estabilidade & Recovery** (Turbopack optimization, Prisma Windows bypass, Component hydration fix)
   
-## Fase 5: Expansão (Planejado 🔮)
+## Fase 5: Expansão & Inteligência (Em Foco 🔮)
 - [ ] **Visão Master/Admin**
-  - Resumo de toda equipe.
-  - Gestão de Comissões.
-- [ ] **Kiosk Mode (Recepção)**
-  - Auto-checkin do cliente.
-- [ ] **Marketplace & Integrações**
+  - Resumo de toda equipe e performance global.
+  - Gestão e Auditoria de Liquidações Pendentes.
+- [ ] **Marketplace Multi-Artist**
+  - CRUD completo de inventário por artista.
+  - Checkout integrado com Mercado Pago/Pix Direto.
+- [ ] **KAI Advanced**
+  - Integração de Visão Computacional real para análise de portfólio.
 
