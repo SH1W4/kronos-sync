@@ -70,8 +70,15 @@ async function validateSettlementWithAI(settlementId: string) {
 
         const isValueMatch = Math.abs(extractedValue - settlement.totalValue) < 0.01
 
-        // High confidence only if paying the STUDIO
-        const aiConfidence = isStudioRecipient && isValueMatch ? 0.99 : 0.45
+        // Combine OCR confidence with business logic
+        let aiConfidence = 0.0
+        if (ocrConfidence > 0.8 && isStudioRecipient && isValueMatch) {
+            aiConfidence = 0.99
+        } else if (ocrConfidence > 0.6 && (isStudioRecipient || isValueMatch)) {
+            aiConfidence = 0.65
+        } else {
+            aiConfidence = 0.30
+        }
 
         if (aiConfidence > 0.90) {
             await prisma.settlement.update({
@@ -79,7 +86,7 @@ async function validateSettlementWithAI(settlementId: string) {
                 data: {
                     status: "APPROVED",
                     aiConfidence,
-                    aiFeedback: `Sincronia Perfeita ✨. Comprovante de comissão validado para o estúdio: ${studioName}.`,
+                    aiFeedback: `✨ Sincronia Perfeita. Comprovante validado: R$ ${extractedValue.toFixed(2)} para ${studioName}. OCR: ${(ocrConfidence * 100).toFixed(0)}%`,
                     tokenData: {
                         glyphId: "GLYPH_SYNC_KAI",
                         points: 100,
@@ -94,7 +101,7 @@ async function validateSettlementWithAI(settlementId: string) {
                 data: {
                     status: "REVIEW",
                     aiConfidence,
-                    aiFeedback: `Discrepância detectada. O destinatário esperado era o estúdio (${studioName}), mas a IA não pôde confirmar.`
+                    aiFeedback: `Discrepâncias: ${!isStudioRecipient ? `Destinatário "${extractedDestinatario}" ≠ estúdio` : ''} ${!isValueMatch ? `Valor R$ ${extractedValue.toFixed(2)} ≠ R$ ${settlement.totalValue.toFixed(2)}` : ''} ${ocrConfidence < 0.7 ? `OCR baixo (${(ocrConfidence * 100).toFixed(0)}%)` : ''}`.trim()
                 }
             })
             console.log(`[AI] Settlement ${settlementId} flagged for REVIEW (Studio mismatch).`)

@@ -55,9 +55,18 @@ export async function queryAgent(userQuery: string, history: any[]) {
         const total = aggregations._sum.artistShare || 0
         responseText = `Com base nos seus registros deste estúdio, você acumulou um total de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)} em comissões.`
     }
-    else if (query.includes('equipe') || query.includes('artistas')) {
-        const count = await prisma.artist.count({ where: { workspaceId: session.activeWorkspaceId } })
-        responseText = `Atualmente temos ${count} artistas registrados neste estúdio.`
+    else if (query.includes('equipe') || query.includes('artistas') || query.includes('instagram')) {
+        const artistsInWorkspace = await prisma.artist.findMany({
+            where: { workspaceId: session.activeWorkspaceId },
+            include: { user: true }
+        })
+        const count = artistsInWorkspace.length
+        const instaList = artistsInWorkspace
+            .filter(a => a.instagram)
+            .map(a => `@${a.instagram?.replace('@', '')}`)
+            .join(', ')
+
+        responseText = `Atualmente temos ${count} artistas neste estúdio. IDs digitais ativos: ${instaList || 'Nenhum Instagram mapeado ainda.'}.`
     }
     else if (query.includes('agenda') || query.includes('agendamento')) {
         if (artist.bookings.length === 0) {
