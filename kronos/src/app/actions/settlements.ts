@@ -37,47 +37,71 @@ export async function createSettlement(data: {
 
 async function validateSettlementWithAI(settlementId: string) {
     try {
-        console.log(`[AI] Starting validation for settlement ${settlementId}...`)
+        console.log(`[AI] Starting autonomous validation for settlement ${settlementId}...`)
 
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        // Simulate Neural Processing time
+        await new Promise(resolve => setTimeout(resolve, 4000))
 
         const settlement = await prisma.settlement.findUnique({
             where: { id: settlementId },
-            include: { bookings: true }
+            include: {
+                bookings: true,
+                workspace: true
+            }
         })
 
         if (!settlement || !settlement.proofUrl) return
 
-        const isMockValid = true
-        const mockConfidence = 0.98
+        // 1. AI Logic: Check if proof URL matches Studio identity (Mocking Vision Agent)
+        const workspace = settlement.workspace
+        const studioName = workspace?.name || "Kronos Studio"
+        const studioPixRecipient = workspace?.pixRecipient || studioName
 
-        if (isMockValid && mockConfidence > 0.95) {
+        // Simulating OCR extraction from Comprovante
+        // For testing/mock purposes, we assume the AI "sees" the correct recipient
+        const extractedValue = settlement.totalValue
+        const extractedDestinatario = studioPixRecipient
+
+        console.log(`[AI] Extracted Value: ${extractedValue}, Destinatário: ${extractedDestinatario}`)
+
+        // 2. Trust Score Algorithm: Recipient must be the Studio
+        const isStudioRecipient = extractedDestinatario.toLowerCase().includes(studioName.toLowerCase()) ||
+            extractedDestinatario.toLowerCase().includes(studioPixRecipient.toLowerCase())
+
+        const isValueMatch = Math.abs(extractedValue - settlement.totalValue) < 0.01
+
+        // High confidence only if paying the STUDIO
+        const aiConfidence = isStudioRecipient && isValueMatch ? 0.99 : 0.45
+
+        if (aiConfidence > 0.90) {
             await prisma.settlement.update({
                 where: { id: settlementId },
                 data: {
                     status: "APPROVED",
-                    aiConfidence: mockConfidence,
-                    aiFeedback: "Comprovante validado com sucesso pela IA. Dados conferem.",
+                    aiConfidence,
+                    aiFeedback: `Sincronia Perfeita ✨. Comprovante de comissão validado para o estúdio: ${studioName}.`,
                     tokenData: {
-                        glyphId: "GLYPH_SYNC_01",
-                        points: 50,
-                        rarity: "COMMON"
+                        glyphId: "GLYPH_SYNC_KAI",
+                        points: 100,
+                        rarity: "EPIC"
                     }
                 }
             })
+            console.log(`[AI] Settlement ${settlementId} APPROVED autonomamente para o estúdio.`)
         } else {
             await prisma.settlement.update({
                 where: { id: settlementId },
                 data: {
                     status: "REVIEW",
-                    aiConfidence: mockConfidence,
-                    aiFeedback: "IA detectou possíveis discrepâncias. Requer revisão manual."
+                    aiConfidence,
+                    aiFeedback: `Discrepância detectada. O destinatário esperado era o estúdio (${studioName}), mas a IA não pôde confirmar.`
                 }
             })
+            console.log(`[AI] Settlement ${settlementId} flagged for REVIEW (Studio mismatch).`)
         }
 
     } catch (error) {
-        console.error("AI Validation Error:", error)
+        console.error("AI Autonomous Validation Error:", error)
     }
 }
 

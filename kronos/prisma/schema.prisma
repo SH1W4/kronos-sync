@@ -205,6 +205,7 @@ model Artist {
   monthlyEarnings   Float      @default(0)
   commissionThreshold Float    @default(10000)
   isActive          Boolean    @default(true)
+  instagram         String?    @db.Text
   validUntil        DateTime?  // Data limite para perfis GUEST (provisórios)
   
   // Google Calendar Integration

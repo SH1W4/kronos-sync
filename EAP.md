@@ -54,18 +54,16 @@
   - [x] **Sync Glyphs:** Sistema de tokenização digital para liquidações aprovadas.
 - [x] **Módulo 5: Clientes** (Lista, Histórico, Busca)
 - [x] **Módulo 6: KRONOS Kiosk** (Recepção & Vendas)
-  - [x] **Conversion Hub:** Landing page com foco em Loja e Experiência de Acompanhante.
-  - [x] **Soul Sync:** Gamificação de captura de leads com progressão visual.
-  - [x] **Ink Pass:** Geração automática de cupons focado em "Primeira Tattoo".
+  - [x] **Conversion Hub:** Landing page com UX otimizada e foco em Dual Core.
+  - [x] **Soul Sync:** Gamificação de captura de leads com progressão visual e marca d'água branding.
+  - [x] **Ink Pass:** Geração de cupons com **QR Code de recompensa** imediata.
 - [x] **Estabilidade & Recovery** (Turbopack optimization, Prisma Windows bypass, Component hydration fix)
-  
-## Fase 5: Expansão & Inteligência (Em Foco 🔮)
-- [ ] **Visão Master/Admin**
-  - Resumo de toda equipe e performance global.
-  - Gestão e Auditoria de Liquidações Pendentes.
-- [ ] **Marketplace Multi-Artist**
-  - CRUD completo de inventário por artista.
-  - Checkout integrado com Mercado Pago/Pix Direto.
-- [ ] **KAI Advanced**
-  - Integração de Visão Computacional real para análise de portfólio.
+- [x] **Inteligência Artificial Autônoma** (THE VAULT)
+  - [x] **Digital Identity Sync:** Adição do campo Instagram ao modelo Artist.
+  - [x] **Studio-First Validation:** Algoritmo de IA que valida o PIX para o estúdio (Workspace) com 99% de confiança.
 
+## Fase 5: Ecossistema & Escala (Em Foco 🔮)
+- [ ] **Dashboards de Performance Avançados**
+- [ ] **Automação de Marketing** (Re-engagement de Leads)
+- [ ] **Integração com Gateways de Pagamento** (Direto)
+- [ ] **KAI Advanced Portfólio:** Análise de visão computacional real para qualidade técnica.

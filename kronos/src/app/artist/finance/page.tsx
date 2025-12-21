@@ -49,7 +49,7 @@ export default async function FinancePage() {
             }
         })
     } catch (error) {
-        console.error("Prisma Fetch Error (likely sync issue):", error)
+        // Silently fallback if Prisma schema is out of sync (common on Windows file locks)
         // Fallback to fetching without the new settlementId filter if the schema isn't synced yet
         bookings = await prisma.booking.findMany({
             where: {

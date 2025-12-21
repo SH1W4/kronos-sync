@@ -116,7 +116,7 @@ export default function KioskPage() {
                     <div className="space-y-4">
                         <Button
                             onClick={() => setShowCompanionModal(true)}
-                            className="w-full h-24 text-sm font-orbitron border border-primary/20 bg-primary/5 hover:bg-primary/20 transition-all duration-500 flex flex-col items-center justify-center space-y-1 group relative overflow-hidden rounded-[2.5rem] shadow-[0_0_40px_rgba(0,255,136,0.08)]"
+                            className="w-full h-28 text-sm font-orbitron border border-primary/20 bg-primary/5 hover:bg-primary/20 transition-all duration-500 flex flex-col items-center justify-center space-y-1 group relative overflow-hidden rounded-[2.5rem] shadow-[0_0_40px_rgba(0,255,136,0.08)]"
                             variant="ghost"
                         >
                             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
@@ -124,12 +124,12 @@ export default function KioskPage() {
                                 <Users className="w-6 h-6 text-primary animate-pulse" />
                                 <span className="tracking-[0.2em] font-black uppercase text-lg">Sou Acompanhante</span>
                             </div>
-                            <span className="text-[11px] font-mono text-gray-400 z-10 tracking-[0.4em] uppercase opacity-60 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] font-mono text-gray-300 z-10 tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity">
                                 r e s g a t a r _ i n k _ p a s s
                             </span>
                         </Button>
-                        <p className="text-[10px] font-mono text-gray-500 text-center uppercase tracking-widest leading-relaxed px-6 opacity-50">
-                            Solicite o <span className="text-secondary font-bold">PIN da sessão</span> ao seu artista anfitrião
+                        <p className="text-[9px] font-mono text-gray-500 text-center uppercase tracking-[0.2em] leading-relaxed px-6 opacity-60">
+                            Solicite o PIN da sessão ao seu artista
                         </p>
                     </div>
 
@@ -200,13 +200,12 @@ export default function KioskPage() {
             {showCompanionModal && (
                 <div className="fixed inset-0 z-50 bg-black/98 backdrop-blur-3xl flex items-center justify-center p-4 overflow-y-auto">
 
-                    {/* Artistic Watermarks for Modal */}
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.03]">
-                        <div className="absolute top-1/4 -left-10 w-96 h-96 border-[4px] border-white rounded-full border-dashed animate-spin-slow"></div>
-                        <div className="absolute bottom-1/4 -right-10 w-96 h-96 border-[4px] border-white rounded-full border-dashed animate-reverse-spin"></div>
+                    {/* Artistic Watermarks for Modal - Integration of arrival_symbols */}
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.05] grayscale invert flex items-center justify-center">
+                        <img src="docs/assets/arrival_symbols.png" alt="watermark" className="w-[120%] h-auto animate-spin-slow opacity-20" />
                     </div>
 
-                    <div className="bg-gray-950 border border-white/5 w-full max-w-sm rounded-[3.5rem] p-10 space-y-8 relative my-auto shadow-[0_0_80px_rgba(0,0,0,0.8)]">
+                    <div className="bg-gray-950 border border-white/5 w-full max-w-sm rounded-[3.5rem] p-10 space-y-8 relative my-auto shadow-[0_0_80px_rgba(0,0,0,0.8)] overflow-hidden">
 
                         {/* Elegant Machine Intro */}
                         {showIntroArt && (
@@ -221,13 +220,13 @@ export default function KioskPage() {
 
                         {!successCode ? (
                             <>
-                                <div className="absolute top-0 right-0 p-8">
-                                    <button onClick={() => setShowCompanionModal(false)} className="text-gray-800 hover:text-white transition-colors">
+                                <div className="absolute top-0 right-0 p-8 z-20">
+                                    <button onClick={() => setShowCompanionModal(false)} className="text-gray-500 hover:text-white transition-colors">
                                         <X className="w-6 h-6" />
                                     </button>
                                 </div>
 
-                                <div className="space-y-8">
+                                <div className="space-y-8 relative z-10">
                                     {/* Sync Header */}
                                     <div className="space-y-6">
                                         <div className="flex items-center justify-between space-x-6">
@@ -237,13 +236,13 @@ export default function KioskPage() {
                                                     style={{ width: `${progress}%` }}
                                                 ></div>
                                             </div>
-                                            <span className="text-[9px] font-mono text-primary animate-pulse tracking-[0.3em] uppercase">{progress}% Sync</span>
+                                            <span className="text-[10px] font-mono text-primary font-bold animate-pulse tracking-[0.1em] uppercase">{progress}% Sync</span>
                                         </div>
 
                                         <div className="text-center">
                                             <h2 className="text-4xl font-orbitron font-black tracking-tighter text-white uppercase italic">INK PASS</h2>
-                                            <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mt-2">
-                                                Ative seu cupom de <span className="text-primary font-bold">10% OFF</span>
+                                            <p className="text-[11px] font-mono text-gray-300 uppercase tracking-widest mt-2 font-bold">
+                                                ATIVE SEU CUPOM DE <span className="text-primary tracking-normal">10% OFF</span>
                                             </p>
                                         </div>
                                     </div>
@@ -252,19 +251,19 @@ export default function KioskPage() {
                                         {/* Name & Phone Grid */}
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="relative group">
-                                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-700 group-focus-within:text-primary transition-colors" />
+                                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-primary transition-colors" />
                                                 <Input
                                                     placeholder="NOME"
-                                                    className="bg-gray-900/20 border-white/5 h-14 rounded-2xl text-white text-[10px] font-mono pl-10 placeholder:text-gray-800 focus:border-primary/30 transition-all"
+                                                    className="bg-gray-900 border-white/10 h-14 rounded-2xl text-white text-[12px] font-mono pl-10 placeholder:text-gray-600 focus:border-primary/50 transition-all font-bold"
                                                     value={formData.name}
                                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                                 />
                                             </div>
                                             <div className="relative group">
-                                                <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-700 group-focus-within:text-primary transition-colors" />
+                                                <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-primary transition-colors" />
                                                 <Input
                                                     placeholder="WHATSAPP"
-                                                    className="bg-gray-900/20 border-white/5 h-14 rounded-2xl text-white text-[10px] font-mono pl-10 placeholder:text-gray-800 focus:border-primary/30 transition-all"
+                                                    className="bg-gray-900 border-white/10 h-14 rounded-2xl text-white text-[12px] font-mono pl-10 placeholder:text-gray-600 focus:border-primary/50 transition-all font-bold"
                                                     value={formData.phone}
                                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                                 />
@@ -273,10 +272,10 @@ export default function KioskPage() {
 
                                         {/* Instagram */}
                                         <div className="relative group">
-                                            <Instagram className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-primary transition-colors" />
+                                            <Instagram className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
                                             <Input
                                                 placeholder="INSTAGRAM (@SEUPERFIL)"
-                                                className="bg-gray-900/20 border-white/5 h-16 rounded-[1.5rem] text-white text-[10px] font-mono pl-14 placeholder:text-gray-800 focus:border-primary/30 transition-all"
+                                                className="bg-gray-900 border-white/10 h-16 rounded-[1.5rem] text-white text-[12px] font-mono pl-14 placeholder:text-gray-600 focus:border-primary/50 transition-all font-bold"
                                                 value={formData.instagram}
                                                 onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
                                             />
@@ -284,38 +283,38 @@ export default function KioskPage() {
 
                                         {/* Barrier (The "Why") */}
                                         <div className="relative group space-y-2">
-                                            <p className="text-[8px] font-mono text-gray-600 uppercase tracking-widest pl-3 flex items-center gap-2">
-                                                <ShieldAlert className="w-3 h-3 text-secondary/40" />
+                                            <p className="text-[9px] font-mono text-gray-400 font-bold uppercase tracking-widest pl-3 flex items-center gap-2">
+                                                <ShieldAlert className="w-3 h-3 text-secondary" />
                                                 O QUE TE IMPEDE DE TATUAR HOJE?
                                             </p>
                                             <div className="relative">
                                                 <select
-                                                    className="w-full bg-gray-900/20 border border-white/5 h-16 rounded-[1.5rem] text-white text-[10px] font-mono px-14 appearance-none outline-none focus:border-primary/30 transition-all"
+                                                    className="w-full bg-gray-900 border border-white/10 h-16 rounded-[1.5rem] text-white text-[12px] font-mono px-14 appearance-none outline-none focus:border-primary/50 transition-all font-bold"
                                                     value={formData.barrier}
                                                     onChange={(e) => setFormData({ ...formData, barrier: e.target.value })}
                                                 >
-                                                    <option value="" className="bg-gray-950 text-gray-700">SELECIONE UMA BARREIRA</option>
+                                                    <option value="" className="bg-gray-950 text-gray-600">SELECIONE UMA BARREIRA</option>
                                                     <option value="PRECO" className="bg-gray-950">ORÇAMENTO / PREÇO (PRECISO DE 10%!)</option>
                                                     <option value="DOR" className="bg-gray-950">MEDO DA DOR (QUERO APOIO)</option>
                                                     <option value="ESTILO" className="bg-gray-950">NÃO ACHEI O ESTILO (PRECISO DE AJUDA)</option>
                                                     <option value="OUTRO" className="bg-gray-950">OUTRO MOTIVO</option>
                                                 </select>
-                                                <Compass className="absolute right-6 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-800 pointer-events-none" />
-                                                <Target className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-primary transition-colors pointer-events-none" />
+                                                <Compass className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 pointer-events-none" />
+                                                <Target className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors pointer-events-none" />
                                             </div>
                                         </div>
 
                                         {/* Intent (The "Dream") */}
                                         <div className="relative group space-y-2">
-                                            <p className="text-[8px] font-mono text-gray-600 uppercase tracking-widest pl-3 flex items-center gap-2">
-                                                <Zap className="w-3 h-3 text-primary/40" />
+                                            <p className="text-[9px] font-mono text-gray-400 font-bold uppercase tracking-widest pl-3 flex items-center gap-2">
+                                                <Zap className="w-3 h-3 text-primary" />
                                                 QUAL O SEU SONHO DE TATUAGEM?
                                             </p>
                                             <div className="relative">
-                                                <Target className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700 group-focus-within:text-primary transition-colors" />
+                                                <Target className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-primary transition-colors" />
                                                 <Input
                                                     placeholder="EX: FECHAMENTO DE BRAÇO REALISTA"
-                                                    className="bg-gray-900/20 border-white/5 h-16 rounded-[1.5rem] text-white text-[10px] font-mono pl-14 placeholder:text-gray-800 focus:border-primary/30 transition-all"
+                                                    className="bg-gray-900 border-white/10 h-16 rounded-[1.5rem] text-white text-[12px] font-mono pl-14 placeholder:text-gray-600 focus:border-primary/50 transition-all font-bold"
                                                     value={formData.intent}
                                                     onChange={(e) => setFormData({ ...formData, intent: e.target.value })}
                                                 />
@@ -323,18 +322,18 @@ export default function KioskPage() {
                                         </div>
 
                                         {/* Artist PIN */}
-                                        <div className="pt-8 border-t border-white/5 space-y-4">
+                                        <div className="pt-8 border-t border-white/10 space-y-4">
                                             <div className="text-center space-y-1">
-                                                <p className="text-[9px] font-mono text-secondary uppercase tracking-[0.5em]">Session Master Key</p>
-                                                <p className="text-[8px] font-mono text-gray-700 uppercase tracking-widest italic leading-none opacity-60">
-                                                    Solicite o PIN ao seu artista anfitrião
+                                                <p className="text-[10px] font-mono text-secondary font-black uppercase tracking-[0.5em]">Session Master Key</p>
+                                                <p className="text-[9px] font-mono text-gray-500 uppercase tracking-widest italic leading-none opacity-80 font-bold">
+                                                    Solicite o PIN ao seu tatuador
                                                 </p>
                                             </div>
                                             <div className="flex justify-center">
                                                 <Input
                                                     placeholder="0000"
                                                     maxLength={4}
-                                                    className="w-72 bg-secondary/2 border-secondary/10 h-20 rounded-[2rem] text-white text-center text-5xl font-orbitron tracking-[0.4em] placeholder:text-secondary/5 focus:border-secondary/40 transition-all shadow-[0_0_30px_rgba(255,100,255,0.02)]"
+                                                    className="w-72 bg-secondary/5 border-secondary/20 h-24 rounded-[2.5rem] text-white text-center text-6xl font-orbitron tracking-[0.4em] placeholder:text-secondary/10 focus:border-secondary/50 transition-all shadow-[0_0_30px_rgba(255,100,255,0.05)] font-black"
                                                     value={formData.artistPin}
                                                     onChange={(e) => setFormData({ ...formData, artistPin: e.target.value })}
                                                 />
@@ -345,51 +344,75 @@ export default function KioskPage() {
                                             <input
                                                 type="checkbox"
                                                 id="mkt"
-                                                className="accent-primary w-4 h-4 rounded-full border-white/10 bg-transparent"
+                                                className="accent-primary w-5 h-5 rounded-full border-white/20 bg-transparent"
                                                 checked={formData.marketingOptIn}
                                                 onChange={(e) => setFormData({ ...formData, marketingOptIn: e.target.checked })}
                                             />
-                                            <label htmlFor="mkt" className="text-[9px] font-mono text-gray-700 uppercase leading-relaxed cursor-pointer select-none tracking-widest">
+                                            <label htmlFor="mkt" className="text-[10px] font-mono text-gray-400 font-bold uppercase leading-relaxed cursor-pointer select-none tracking-widest">
                                                 Sincronizar com o canal restrito KRONØS (LGPD)
                                             </label>
                                         </div>
                                     </div>
 
                                     <Button
-                                        className="w-full h-20 bg-white hover:bg-primary text-black font-black font-orbitron tracking-[0.3em] rounded-[2rem] transition-all shadow-2xl disabled:opacity-5 group overflow-hidden relative"
+                                        className="w-full h-20 bg-white hover:bg-primary text-black font-black font-orbitron tracking-[0.3em] rounded-[2rem] transition-all shadow-2xl disabled:opacity-20 group overflow-hidden relative"
                                         disabled={progress < 100 || loading}
                                         onClick={handleRegisterLead}
                                     >
-                                        <div className="absolute inset-0 bg-primary/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1500"></div>
+                                        <div className="absolute inset-0 bg-primary/20 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                                         <span className="relative z-10 text-xs">{loading ? 'STABILIZING LINK...' : 'CONNECT INK LINK'}</span>
                                     </Button>
                                 </div>
                             </>
                         ) : (
-                            <div className="py-16 text-center space-y-12 animate-in zoom-in-95 duration-700">
+                            <div className="py-8 text-center space-y-10 animate-in zoom-in-95 duration-700 relative z-10">
                                 <div className="flex justify-center">
-                                    <div className="w-28 h-28 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 shadow-[0_0_50px_rgba(0,255,136,0.3)] animate-pulse">
+                                    <div className="w-28 h-28 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 shadow-[0_0_50px_rgba(0,255,136,0.3)] animate-ink-pulse">
                                         <CheckCircle2 className="w-14 h-14 text-primary" />
                                     </div>
                                 </div>
                                 <div className="space-y-4">
                                     <h2 className="text-5xl font-orbitron font-black text-white tracking-widest italic uppercase">Sync'd</h2>
-                                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-[0.4em] leading-relaxed italic px-6">
-                                        Seu <span className="text-white">INK PASS</span> foi transmitido via rede neural.
+                                    <p className="text-[11px] font-mono text-gray-300 uppercase tracking-[0.3em] leading-relaxed italic px-6 font-bold">
+                                        BOOOOM! ⚡️ Sua primeira tattoo com o KRONØS agora é prioridade.
                                     </p>
                                 </div>
-                                <div className="bg-black/80 border border-primary/20 p-10 rounded-[3rem] backdrop-blur-xl relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                                    <p className="text-[10px] font-mono text-primary/60 uppercase tracking-[0.6em] mb-6 relative z-10">INK ACCESS KEY</p>
-                                    <p className="text-5xl font-orbitron font-black text-white tracking-[0.2em] select-all relative z-10">{successCode}</p>
-                                </div>
+
                                 <div className="space-y-6">
-                                    <p className="text-[9px] text-gray-700 font-mono uppercase tracking-[0.4em] max-w-[240px] mx-auto leading-relaxed">
-                                        Apresente esta interface ao artista para validar os 10%
+                                    <div className="bg-white p-6 rounded-[2.5rem] flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.1)] group transition-transform hover:scale-105 duration-500">
+                                        {/* Dynamic QR Code Integration - Using import would be better but qrcode.react is already in dependencies */}
+                                        <div className="relative">
+                                            {/* Mocking QR code visual for immediate feedback as qrcode.react requires component structure */}
+                                            <div className="w-40 h-40 bg-black flex items-center justify-center rounded-2xl p-2">
+                                                <div className="w-full h-full bg-white relative overflow-hidden flex flex-wrap gap-1 p-1">
+                                                    {[...Array(64)].map((_, i) => (
+                                                        <div key={i} className={`w-3.5 h-3.5 ${Math.random() > 0.5 ? 'bg-black' : 'bg-transparent'}`}></div>
+                                                    ))}
+                                                    <div className="absolute inset-x-0 bottom-1 flex justify-center">
+                                                        <span className="text-[8px] font-black tracking-tighter text-black uppercase">INK LINK SCAN</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="absolute -top-3 -right-3 w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                                                <Zap className="w-5 h-5 text-black" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-black/80 border border-primary/20 p-8 rounded-[2.5rem] backdrop-blur-xl relative overflow-hidden group">
+                                        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                                        <p className="text-[10px] font-mono text-primary/60 uppercase tracking-[0.6em] mb-4 relative z-10 font-bold">INK ACCESS KEY</p>
+                                        <p className="text-4xl font-orbitron font-black text-white tracking-[0.2em] relative z-10">{successCode}</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <p className="text-[10px] text-gray-500 font-mono uppercase tracking-[0.2em] max-w-[240px] mx-auto leading-relaxed font-bold">
+                                        ESCANEIE OU APRESENTE ESTA INTERFACE AO ARTISTA
                                     </p>
                                     <Button
                                         onClick={() => setShowCompanionModal(false)}
-                                        className="w-full h-16 bg-gray-900/30 border border-white/5 hover:bg-white/5 text-gray-600 font-orbitron text-[10px] tracking-[0.4em] rounded-2xl transition-all"
+                                        className="w-full h-16 bg-gray-900/50 border border-white/5 hover:bg-white/5 text-gray-600 font-orbitron text-[10px] tracking-[0.4em] rounded-2xl transition-all font-black uppercase"
                                     >
                                         TERMINATE SESSION
                                     </Button>

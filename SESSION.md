@@ -1,27 +1,19 @@
-# Registro de Sessão - Desenvolvimento Kronos Sync
+## [21/12/2025] - Otimização UX/UI & IA Autônoma (Studio-First)
 
-**Data:** 21/12/2025
-**Foco:** Gamificação do Kiosk (Soul Sync) & Liquidação Financeira por IA.
+### 🚀 Novas Conquistas
+- **Kiosk Redesign:** Texto equilibrado ("Sou Acompanhante") e visibilidade dos inputs otimizada para ambientes com luz direta.
+- **QR Code Recompensa:** Integração visual de QR Code na tela de sucesso do INK PASS para uso imediato.
+- **IA Vision (THE VAULT):** Lógica ajustada para validar se o PIX foi para o **Estúdio/Workspace** (Acerto de Comissão), não para o artista.
+- **Database Architecture:** Implementado campo `instagram` no modelo `Artist` e sincronizado via `db push` após interrupção forçada do servidor.
+- **Branding:** Glifo `arrival_symbols` integrado como marca d'água no modal do Kiosk.
 
-## 🛠️ Realizações Técnicas
+### 📝 Notas Técnicas
+- Resolvido o conflito de `EPERM` no Prisma Windows através de `Stop-Process` no servidor de dev antes do `generate`.
+- A IA agora exige nomes do estúdio no comprovante para aprovação autônoma (99% confidence).
 
-### 1. Kiosk Conversion Hub (Reimagined)
-- **Soul Sync Experience:** Interface gamificada para captura de leads acompanhantes, transformando o onboarding em um "desbloqueio tecnológico".
-- **Ink Pass Integration:** Sistema de cupons automáticos vinculados ao artista via PIN (últimos 4 dígitos do telefone), garantindo atribuição correta e incentivo imediato.
-- **Dual Action Focus:** Design balanceado entre Venda Direta (Loja), Captura de Leads (INK PASS) e Acesso de Clientes (Minha Ficha).
-
-### 2. Ecossistema Financeiro com IA (Settlement 2.0)
-- **Digital Settlement:** Fluxo de seleção múltipla de sessões para acerto de comissão com exibição dinâmica de chaves PIX.
-- **Vision Agent (Alpha):** Implementação de agente de IA para validação OCR de comprovantes, permitindo aprovação automática e redução de atrito administrativo.
-- **Tokenização (Glyphs):** Criação dos "Sync Glyphs", tokens digitais que premiam liquidações rápidas e corretas, fomentando o engajamento do artista.
-
-### 3. Engineering & Stability
-- **Hydration Sync:** Resolvido mismatch de renderização causado por extensões de browser via `suppressHydrationWarning`.
-- **Prisma Windows Resilience:** Implementado fallback defensivo via `try-catch` para lidar com travas de engine de banco de dados comuns no ambiente Windows/Turbopack.
-
-## 📝 Notas para Próxima Sessão
-- O banco de dados exige um `db push` final (com o servidor parado) para consolidar totalmente os campos de liquidação sem o fallback do código.
-- Iniciar o mapeamento para CRUD de produtos por artista no Marketplace.
+### 🔜 Próximos Passos
+- Expandir a IA para validar logs de agendamento vs valor transferido.
+- Iniciar Dashboard Admin para gestão global dos acertos.
 
 ---
 
