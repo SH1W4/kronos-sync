@@ -70,6 +70,9 @@ async function validateSettlementWithAI(settlementId: string) {
 
         const isValueMatch = Math.abs(extractedValue - settlement.totalValue) < 0.01
 
+        // TODO: Replace with real OCR when Tesseract is fully integrated
+        const ocrConfidence = 0.95 // Mock confidence for now
+
         // Combine OCR confidence with business logic
         let aiConfidence = 0.0
         if (ocrConfidence > 0.8 && isStudioRecipient && isValueMatch) {
