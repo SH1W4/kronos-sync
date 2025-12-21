@@ -83,7 +83,9 @@ async function validateSettlementWithAI(settlementId: string) {
             aiConfidence = 0.30
         }
 
-        if (aiConfidence > 0.90) {
+        // SAFETY: Auto-approval disabled until OCR is fully integrated
+        // All settlements will go to REVIEW for manual verification
+        if (aiConfidence > 1.0) { // Threshold set to impossible value (100%+)
             await prisma.settlement.update({
                 where: { id: settlementId },
                 data: {
