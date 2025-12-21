@@ -1,15 +1,29 @@
 <div align="center">
+  <img src="docs/assets/kiosk_landing.png" width="800" alt="KRONOS SYNC Hero">
   <h1 align="center">KRONOS SYNC</h1>
   <p align="center">
-    <strong>Strategic Operating System for High-End Tattoo Studios</strong>
+    <strong>The High-End Operating System for Artistic Tattoo Studios</strong>
   </p>
   <p align="center">
-    <img src="https://img.shields.io/badge/STATUS-PRIVATE_BETA-purple?style=for-the-badge" alt="Status Private">
-    <img src="https://img.shields.io/badge/LICENSE-PROPRIETARY-black?style=for-the-badge" alt="License Proprietary">
+    <img src="https://img.shields.io/badge/STATUS-ALPHA_RELEASE-purple?style=for-the-badge" alt="Status Alpha">
+    <img src="https://img.shields.io/badge/ENGINEX-AI_ENABLED-blue?style=for-the-badge" alt="AI Enabled">
+    <img src="https://img.shields.io/badge/AESTHETIC-NOIR-black?style=for-the-badge" alt="Aesthetic Noir">
   </p>
 </div>
 
-> *"Sync your art, manage your time."*
+> *"Where technology meets the soul of the ink."*
+
+---
+
+## 🌑 Identidade Visual & Sincronia
+
+O KRONOS SYNC utiliza uma linguagem visual inspirada em glifos de alta complexidade e interfaces futuristas minimalistas para representar a conexão entre artista, cliente e estúdio.
+
+| **Sync Engine** | **Ink Link Protocol** | **Arrival Spec** |
+| :---: | :---: | :---: |
+| ![Sync Bar](docs/assets/soul_sync.png) | ![Ink Link](docs/assets/ink_link_modal.png) | ![Arrival Symbols](docs/assets/arrival_symbols.png) |
+
+---
 
 ## 🔒 Acesso Restrito
 **Este software é proprietário e protegido por direitos autorais.**
