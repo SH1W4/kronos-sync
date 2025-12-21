@@ -1,10 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
+import { ShoppingCart, Search, Filter, Tag, ArrowLeft, Heart, ShoppingBag, X } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import Link from 'next/link'
+import { BrandLogo } from '@/components/ui/brand-logo'
 
 interface Product {
   id: string
@@ -27,7 +30,8 @@ interface CartItem {
   product: Product
 }
 
-export default function MarketplacePage() {
+function MarketplaceContent() {
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,360 +39,285 @@ export default function MarketplacePage() {
   const [typeFilter, setTypeFilter] = useState('')
   const [couponCode, setCouponCode] = useState('')
   const [couponDiscount, setCouponDiscount] = useState(0)
+  const [isCartOpen, setIsCartOpen] = useState(false)
 
   useEffect(() => {
     fetchProducts()
-  }, [])
+
+    // Auto-apply coupon from URL
+    const urlCoupon = searchParams.get('coupon')
+    if (urlCoupon) {
+      setCouponCode(urlCoupon)
+      handleApplyCoupon(urlCoupon)
+    }
+  }, [searchParams])
 
   const fetchProducts = async () => {
     try {
-      // Mock data - in real app, fetch from API
+      // Mock data for Alpha
       const mockProducts: Product[] = [
         {
           id: 'prod-1',
-          title: 'Flash Tattoo - Caveira',
-          description: 'Design exclusivo de caveira estilizada',
+          title: 'Print: Cyber Skull',
+          description: 'High-quality print on metallic paper.',
           basePrice: 150,
-          finalPrice: 180,
+          finalPrice: 150,
           type: 'PRINT',
-          imageUrl: '/placeholder-tattoo.jpg',
-          artist: { user: { name: 'João Silva' } }
+          artist: { user: { name: 'KRONØS Resident' } }
         },
         {
           id: 'prod-2',
-          title: 'Arte Digital - Mandala',
-          description: 'Mandala complexa para tatuagem grande',
-          basePrice: 300,
-          finalPrice: 360,
-          type: 'DIGITAL',
-          artist: { user: { name: 'Maria Santos' } }
+          title: 'Aftercare Kit Deluxe',
+          description: 'Everything you need for perfect healing.',
+          basePrice: 85,
+          finalPrice: 85,
+          type: 'PHYSICAL',
+          artist: { user: { name: 'Studio Staff' } }
         },
         {
           id: 'prod-3',
-          title: 'Original - Dragão Oriental',
-          description: 'Arte original única de dragão oriental',
-          basePrice: 500,
+          title: 'Flash: Neotrad Dragon',
+          description: 'One-off design for immediate booking.',
+          basePrice: 600,
           finalPrice: 600,
           type: 'ORIGINAL',
-          artist: { user: { name: 'Pedro Costa' } }
-        },
-        {
-          id: 'prod-4',
-          title: 'Stencil - Rosa Geométrica',
-          description: 'Stencil físico de rosa com elementos geométricos',
-          basePrice: 80,
-          finalPrice: 96,
-          type: 'PHYSICAL',
-          artist: { user: { name: 'João Silva' } }
+          artist: { user: { name: 'Artisan One' } }
         }
       ]
-
       setProducts(mockProducts)
-    } catch (error) {
-      console.error('Error fetching products:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleApplyCoupon = async (code: string) => {
+    const { validateCoupon } = await import('@/app/actions/coupons')
+    const res = await validateCoupon(code)
+    if (res.valid) {
+      setCouponDiscount(res.discountPercent || 0)
+    } else {
+      if (code && !searchParams.get('coupon')) alert(res.message)
+      setCouponDiscount(0)
     }
   }
 
   const addToCart = (product: Product) => {
     setCart(prev => {
       const existing = prev.find(item => item.productId === product.id)
-      if (existing) {
-        return prev.map(item =>
-          item.productId === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        )
-      }
+      if (existing) return prev.map(item => item.productId === product.id ? { ...item, quantity: item.quantity + 1 } : item)
       return [...prev, { productId: product.id, quantity: 1, product }]
     })
+    setIsCartOpen(true)
   }
 
-  const removeFromCart = (productId: string) => {
-    setCart(prev => prev.filter(item => item.productId !== productId))
-  }
-
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId)
-      return
-    }
-    setCart(prev =>
-      prev.map(item =>
-        item.productId === productId ? { ...item, quantity } : item
-      )
-    )
-  }
-
-  const getCartTotal = () => {
-    return cart.reduce((total, item) => total + (item.product.finalPrice * item.quantity), 0)
-  }
-
-  const getFinalTotal = () => {
-    return getCartTotal() - couponDiscount
-  }
-
-  const validateCoupon = async () => {
-    if (!couponCode) return
-
-    try {
-      // Mock coupon validation
-      if (couponCode === 'DESCONTO10') {
-        setCouponDiscount(getCartTotal() * 0.1)
-      } else if (couponCode === 'SAVE50') {
-        setCouponDiscount(50)
-      } else {
-        setCouponDiscount(0)
-        alert('Cupom inválido')
-      }
-    } catch (error) {
-      console.error('Error validating coupon:', error)
-    }
-  }
-
-  const handleCheckout = async () => {
-    if (cart.length === 0) return
-
-    try {
-      const response = await fetch('/api/store/cart/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientId: 'client-1', // Mock client ID
-          items: cart.map(item => ({
-            productId: item.productId,
-            quantity: item.quantity
-          })),
-          couponCode: couponCode || undefined
-        })
-      })
-
-      if (response.ok) {
-        alert('Pedido realizado com sucesso!')
-        setCart([])
-        setCouponCode('')
-        setCouponDiscount(0)
-      } else {
-        alert('Erro ao processar pedido')
-      }
-    } catch (error) {
-      console.error('Error during checkout:', error)
-      alert('Erro ao processar pedido')
-    }
-  }
-
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.title.toLowerCase().includes(filter.toLowerCase()) ||
-                         product.artist.user.name.toLowerCase().includes(filter.toLowerCase())
-    const matchesType = !typeFilter || product.type === typeFilter
-    return matchesSearch && matchesType
-  })
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
+  const getCartTotal = () => cart.reduce((total, item) => total + (item.product.finalPrice * item.quantity), 0)
+  const getDiscountValue = () => (getCartTotal() * couponDiscount) / 100
+  const getFinalTotal = () => getCartTotal() - getDiscountValue()
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-muted/50">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-primary">KRONOS SYNC</h1>
-              <p className="text-muted-foreground">Marketplace de Arte</p>
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-primary selection:text-black">
+      {/* Premium Header */}
+      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/kiosk" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center group-hover:border-primary/50 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-primary" />
             </div>
-            <nav className="flex gap-4">
-              <a href="/" className="text-foreground hover:text-primary transition-colors">
-                Agenda
-              </a>
-              <a href="/marketplace" className="text-primary font-medium">
-                Marketplace
-              </a>
-              <a href="/kiosk" className="text-foreground hover:text-primary transition-colors">
-                Kiosk
-              </a>
-              <a href="/dashboard" className="text-foreground hover:text-primary transition-colors">
-                Dashboard
-              </a>
-            </nav>
+            <span className="hidden md:block text-[10px] font-mono text-gray-500 uppercase tracking-widest">Retornar</span>
+          </Link>
+
+          <div className="flex flex-col items-center">
+            <h1 className="text-xl font-orbitron font-black tracking-tighter">
+              KRONØS <span className="text-primary italic">LOJA</span>
+            </h1>
+            <p className="text-[8px] font-mono text-gray-500 uppercase tracking-[0.4em]">Official Boutique</p>
           </div>
+
+          <button
+            onClick={() => setIsCartOpen(!isCartOpen)}
+            className="p-3 border border-white/10 rounded-xl relative hover:bg-white/5 transition-all"
+          >
+            <ShoppingBag className="w-6 h-6 text-primary" />
+            {cart.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-[10px] font-bold rounded-full flex items-center justify-center text-white ring-2 ring-black">
+                {cart.length}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Products Section */}
-          <div className="lg:col-span-3">
-            {/* Filters */}
-            <div className="mb-6 space-y-4">
-              <div className="flex gap-4">
-                <Input
-                  placeholder="Buscar produtos ou artistas..."
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                  className="flex-1"
-                />
-                <Select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                >
-                  <option value="">Todos os tipos</option>
-                  <option value="PRINT">Print</option>
-                  <option value="DIGITAL">Digital</option>
-                  <option value="ORIGINAL">Original</option>
-                  <option value="PHYSICAL">Físico</option>
-                </Select>
+      <main className="container mx-auto px-6 py-12">
+        {/* Search & Filters */}
+        <div className="mb-12 flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Pesquisar itens ou coleções..."
+              className="pl-12 bg-gray-900/50 border-white/5 h-14 rounded-2xl focus:border-primary transition-all text-white"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            {['PRINT', 'PHYSICAL', 'ORIGINAL'].map(type => (
+              <button
+                key={type}
+                onClick={() => setTypeFilter(typeFilter === type ? '' : type)}
+                className={`px-6 rounded-2xl border text-[10px] font-mono uppercase tracking-widest transition-all ${typeFilter === type ? 'bg-primary border-primary text-black font-bold' : 'border-white/5 bg-gray-900/50 text-gray-400 hover:border-white/20'
+                  }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Dynamic Coupon Banner */}
+        {couponDiscount > 0 && (
+          <div className="mb-12 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <Tag className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs font-mono uppercase tracking-widest text-primary font-bold">Cupom Ativado</p>
+                <p className="text-[10px] text-gray-400">Você está economizando <span className="text-white font-bold">{couponDiscount}%</span> nesta compra.</p>
               </div>
             </div>
+            <button onClick={() => setCouponDiscount(0)} className="text-[10px] font-mono text-gray-500 hover:text-white uppercase transition-colors">Remover</button>
+          </div>
+        )}
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredProducts.map(product => (
-                <div key={product.id} className="card hover:shadow-xl transition-shadow">
-                  <div className="aspect-square bg-accent rounded-lg mb-4 flex items-center justify-center">
-                    {product.imageUrl ? (
-                      <img 
-                        src={product.imageUrl} 
-                        alt={product.title}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="text-muted-foreground text-4xl">🎨</div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-foreground">{product.title}</h3>
-                    <p className="text-sm text-muted-foreground">{product.description}</p>
-                    <p className="text-xs text-secondary">Por {product.artist.user.name}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold text-primary">
-                          {formatCurrency(product.finalPrice)}
-                        </span>
-                        {product.basePrice !== product.finalPrice && (
-                          <span className="text-sm text-muted-foreground line-through ml-2">
-                            {formatCurrency(product.basePrice)}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs bg-accent px-2 py-1 rounded">
-                        {product.type}
-                      </span>
-                    </div>
-                    
-                    <Button 
-                      onClick={() => addToCart(product)}
-                      className="w-full"
-                    >
-                      Adicionar ao Carrinho
-                    </Button>
-                  </div>
+        {/* Products Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.filter(p => !typeFilter || p.type === typeFilter).map(product => (
+            <div key={product.id} className="group bg-gray-900/40 border border-white/5 rounded-[2.5rem] p-4 hover:border-primary/30 transition-all hover:bg-gray-900/60 flex flex-col">
+              <div className="aspect-[4/5] bg-black rounded-[2rem] overflow-hidden relative mb-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                {/* Image placeholder */}
+                <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">
+                  {product.type === 'PRINT' ? '🖼️' : product.type === 'PHYSICAL' ? '🧴' : '🎨'}
                 </div>
-              ))}
+                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                  <span className="text-[8px] font-mono text-gray-400 uppercase tracking-widest">{product.type}</span>
+                </div>
+              </div>
+
+              <div className="flex-1 px-2">
+                <p className="text-[10px] font-mono text-primary uppercase tracking-widest mb-1 italic">{product.artist.user.name}</p>
+                <h3 className="text-xl font-orbitron font-bold text-white mb-2 leading-tight group-hover:text-primary transition-colors">{product.title}</h3>
+                <p className="text-sm text-gray-500 line-clamp-2 mb-6 h-10">{product.description}</p>
+              </div>
+
+              <div className="px-2 pb-2">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-orbitron font-black text-white">{formatCurrency(product.finalPrice)}</span>
+                    <span className="text-[8px] font-mono text-gray-500 uppercase">Preço Final</span>
+                  </div>
+                  <button className="p-3 text-gray-500 hover:text-secondary transition-colors">
+                    <Heart className="w-5 h-5" />
+                  </button>
+                </div>
+                <Button
+                  onClick={() => addToCart(product)}
+                  className="w-full h-14 bg-white/5 hover:bg-primary hover:text-black border border-white/10 hover:border-primary rounded-2xl transition-all font-orbitron font-bold tracking-widest text-xs"
+                >
+                  ADICIONAR
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+
+      {/* Cart Sidebar */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
+          <div className="relative w-full max-w-md bg-gray-950 border-l border-white/10 p-8 flex flex-col h-full animate-in slide-in-from-right duration-500">
+            <div className="flex items-center justify-between mb-10">
+              <h3 className="text-2xl font-orbitron font-bold text-white">CARRINHO</h3>
+              <button onClick={() => setIsCartOpen(false)} className="text-gray-500 hover:text-white"><X className="w-8 h-8" /></button>
             </div>
 
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">Nenhum produto encontrado</p>
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+              {cart.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center opacity-20">
+                  <ShoppingBag className="w-16 h-16 mb-4" />
+                  <p className="font-orbitron tracking-widest">Carrinho Vazio</p>
+                </div>
+              ) : (
+                cart.map(item => (
+                  <div key={item.productId} className="flex gap-4 bg-white/5 p-4 rounded-3xl border border-white/5">
+                    <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center text-2xl">
+                      {item.product.type === 'PRINT' ? '🖼️' : '🧴'}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-white mb-1">{item.product.title}</h4>
+                      <p className="text-xs text-gray-500 mb-2">{item.product.artist.user.name}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-primary font-bold">{formatCurrency(item.product.finalPrice)}</span>
+                        <div className="flex items-center space-x-3 bg-black/40 rounded-full px-2 py-1 border border-white/5">
+                          <button onClick={() => addToCart({ ...item.product, finalPrice: -1 } as any)} className="w-6 h-6 flex items-center justify-center text-gray-500">-</button>
+                          <span className="text-xs font-mono">{item.quantity}</span>
+                          <button onClick={() => addToCart(item.product)} className="w-6 h-6 flex items-center justify-center text-primary">+</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {cart.length > 0 && (
+              <div className="mt-8 border-t border-white/10 pt-8 space-y-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Subtotal</span>
+                    <span className="text-white font-mono">{formatCurrency(getCartTotal())}</span>
+                  </div>
+                  {couponDiscount > 0 && (
+                    <div className="flex justify-between text-sm text-primary">
+                      <span>Desconto ({couponDiscount}%)</span>
+                      <span className="font-mono">-{formatCurrency(getDiscountValue())}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-2xl font-orbitron font-black pt-2 border-t border-white/5">
+                    <span className="text-white">TOTAL</span>
+                    <span className="text-primary">{formatCurrency(getFinalTotal())}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="CUPOM"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      className="bg-black/50 border-white/10 text-center font-orbitron tracking-widest"
+                    />
+                    <Button variant="outline" onClick={() => handleApplyCoupon(couponCode)}>APLICAR</Button>
+                  </div>
+                  <Button className="w-full h-16 bg-primary hover:bg-primary-dark text-black font-black font-orbitron text-base rounded-2xl shadow-[0_0_30px_rgba(0,255,136,0.2)]">
+                    FINALIZAR PEDIDO
+                  </Button>
+                </div>
               </div>
             )}
           </div>
-
-          {/* Cart Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="card sticky top-4">
-              <h3 className="font-semibold text-foreground mb-4">
-                Carrinho ({cart.length})
-              </h3>
-
-              {cart.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  Carrinho vazio
-                </p>
-              ) : (
-                <div className="space-y-4">
-                  {cart.map(item => (
-                    <div key={item.productId} className="flex items-center gap-3 p-3 bg-accent rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{item.product.title}</h4>
-                        <p className="text-xs text-muted-foreground">
-                          {formatCurrency(item.product.finalPrice)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                        >
-                          -
-                        </Button>
-                        <span className="text-sm w-8 text-center">{item.quantity}</span>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="border-t border-border pt-4 space-y-3">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Cupom de desconto"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      />
-                      <Button variant="outline" onClick={validateCoupon}>
-                        Aplicar
-                      </Button>
-                    </div>
-
-                    {couponDiscount > 0 && (
-                      <p className="text-sm text-green-400">
-                        Desconto: {formatCurrency(couponDiscount)}
-                      </p>
-                    )}
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Subtotal:</span>
-                        <span>{formatCurrency(getCartTotal())}</span>
-                      </div>
-                      {couponDiscount > 0 && (
-                        <div className="flex justify-between text-sm text-green-400">
-                          <span>Desconto:</span>
-                          <span>-{formatCurrency(couponDiscount)}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-semibold">
-                        <span>Total:</span>
-                        <span>{formatCurrency(getFinalTotal())}</span>
-                      </div>
-                    </div>
-
-                    <Button onClick={handleCheckout} className="w-full">
-                      Finalizar Compra
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
-      </div>
+      )}
     </div>
+  )
+}
+
+export default function MarketplacePage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <MarketplaceContent />
+    </Suspense>
   )
 }
 

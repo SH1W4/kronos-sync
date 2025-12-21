@@ -41,6 +41,13 @@ enum FichaStatus {
   COMPLETED
 }
 
+enum SettlementStatus {
+  PENDING
+  REVIEW
+  APPROVED
+  REJECTED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -109,6 +116,10 @@ model Workspace {
   ownerId       String
   owner         User      @relation("WorkspaceOwner", fields: [ownerId], references: [id])
   
+  // Payment Config (Custom PIX)
+  pixKey        String? 
+  pixRecipient  String?
+  
   members       WorkspaceMember[]
   artists       Artist[]
   bookings      Booking[]
@@ -123,6 +134,7 @@ model Workspace {
   helpArticles  HelpArticle[]
   anamneses     Anamnesis[]
   agentLogs     AgentLog[]
+  settlements   Settlement[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -210,6 +222,8 @@ model Artist {
   bookings  Booking[]
   products  Product[]
   coupons   Coupon[]
+  kioskEntries KioskEntry[]
+  settlements  Settlement[]
 
   @@map("artists")
 }
@@ -248,6 +262,9 @@ model Booking {
   slot      Slot      @relation(fields: [slotId], references: [id])
   coupon    Coupon?   @relation(fields: [couponId], references: [id])
   anamnesis Anamnesis?
+  
+  settlementId String?
+  settlement   Settlement? @relation(fields: [settlementId], references: [id])
 
   @@map("bookings")
 }
@@ -395,9 +412,17 @@ model KioskEntry {
   phone        String?
   type         String   // "CLIENT" or "COMPANION"
   marketingOptIn Boolean @default(false)
+  
+  // Strategic Profiling Fields
+  instagram    String?
+  barrier      String?  // What prevents them from tattooing
+  intent       String?  // What they want to tattoo
+  artistId     String?  // Lead attribution
+  
   createdAt    DateTime @default(now())
 
   workspace    Workspace? @relation(fields: [workspaceId], references: [id])
+  artist       Artist?    @relation(fields: [artistId], references: [id])
 
   @@map("kiosk_entries")
 }
@@ -491,8 +516,29 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+}model Settlement {
+  id              String           @id @default(cuid())
+  artistId        String
+  workspaceId     String
+  totalValue      Float
+  proofUrl        String?          @db.Text
+  status          SettlementStatus @default(PENDING)
+  
+  // AI Validation Data
+  aiConfidence    Float?           // 0.0 to 1.0
+  aiExtractedData Json?            // { value, date, recipient, etc }
+  aiFeedback      String?          @db.Text
+  
+  // Gamification / Token
+  tokenData       Json?            // { glyphId, points, sequence }
+  
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  artist          Artist           @relation(fields: [artistId], references: [id])
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id])
+  bookings        Booking[]
+
+  @@map("settlements")
 }
-
-
-
 

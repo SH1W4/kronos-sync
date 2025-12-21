@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
             }
             // Se for Cliente, vai para o dashboard de cliente
             if (token.role === 'CLIENT') {
-                return NextResponse.redirect(new URL('/dashboard', request.url))
+                return NextResponse.redirect(new URL('/marketplace', request.url))
             }
         }
     }
