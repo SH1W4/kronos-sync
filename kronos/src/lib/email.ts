@@ -1,14 +1,22 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Fallback for build time when env var might not be set
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null
 
 export async function sendVerificationCode(email: string, code: string) {
-    try {
-        await resend.emails.send({
-            from: 'KRONOS SYNC <onboarding@resend.dev>', // Você vai trocar depois
-            to: email,
-            subject: 'Seu código de acesso - KRONOS SYNC',
-            html: `
+  if (!resend) {
+    console.error('Resend not configured. Please add RESEND_API_KEY to environment variables.')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'KRONOS SYNC <onboarding@resend.dev>', // Você vai trocar depois
+      to: email,
+      subject: 'Seu código de acesso - KRONOS SYNC',
+      html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #000; color: #fff;">
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #8B5CF6; margin: 0;">KRONOS SYNC</h1>
@@ -35,14 +43,14 @@ export async function sendVerificationCode(email: string, code: string) {
           </div>
         </div>
       `
-        })
-        return { success: true }
-    } catch (error) {
-        console.error('Error sending email:', error)
-        return { success: false, error }
-    }
+    })
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending email:', error)
+    return { success: false, error }
+  }
 }
 
 export function generateVerificationCode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString()
+  return Math.floor(100000 + Math.random() * 900000).toString()
 }
