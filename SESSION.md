@@ -11,13 +11,15 @@
 - **Alertas Clínicos:** Algoritmo de triagem automática que destaca condições médicas críticas para o artista.
 
 ### 2. Recuperação de Infraestrutura (Performance Fix)
-- **Turbopack Routing:** Resolvida inércia do servidor Next.js ao limitar o `experimental.turbo.root` à pasta do projeto, evitando o scan recursivo do diretório pessoal.
-- **Hydration & Client Logic:** Correção do "Neural Link error" ao tipar corretamente componentes interativos (Button, Textarea) como Client Components.
-- **Prisma Survival:** Downgrade para v5.22.0 e sincronização manual via SQL para contornar falhas de binário no Windows Host.
+- **Turbopack Routing:** Resolvida inércia do servidor Next.js ao limitar o `experimental.turbo.root` à pasta do projeto.
+- **Hydration & Client Logic:** Correção do "Neural Link error" ao converter componentes interativos para Client Components.
+- **Prisma Survival:** Downgrade para v5.22.0 e sincronização manual via SQL para contornar falhas de binário.
+- **Definitive Bypass Alpha:** Removida verificação condicional de ambiente para o botão "Modo Dev". O botão passa a ser exibido permanentemente em produção no Vercel para garantir acesso ininterrupto durante a fase Alpha de testes.
 
 ## 📝 Notas para Próxima Sessão
 - O banco de dados está sincronizado e verificado (Auditado via `audit-db.js`).
 - Scripts de recuperação arquivados para segurança.
+- O botão "Modo Dev" deve ser ocultado novamente apenas quando o Google OAuth estiver 100% estabilizado no Vercel (Production Secrets).
 
 ---
 
