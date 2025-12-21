@@ -70,3 +70,29 @@
 ## ⚠️ Pontos de Atenção
 - A migração de banco agora suporta o sistema de curadoria (`WorkspaceRequest`).
 - O `onboarding` agora atende tanto convidados (via código) quanto novos parceiros (via solicitação).
+
+## 📅 Sessão 21/12/2025 - Magic Link, PWA & Kiosk Finalization
+
+### 1. Magic Link Authentication & Security
+- **Fluxo sem senha:** Implementado login via email + código (6 dígitos) usando Resend.
+- **Provider Customizado:** Criado `CredentialsProvider` ('magic-link') para validação segura.
+- **Google OAuth Removido:** Login com Google desabilitado para acesso (mantido apenas para agenda).
+- **Modo Dev Protegido:** Botão de bypass oculto em produção (`NODE_ENV === 'production'`).
+- **Senha Mestre:** Mantida como etapa secundária de elevação de privilégio (Master Key -> Admin).
+
+### 2. PWA (Progressive Web App)
+- **Instalação Nativa:** Configurado `manifest.json` com nome, cores e display standalone.
+- **Ícones Adaptativos:** Gerados 8 tamanhos de ícones (72x72 a 512x512) via script `sharp`.
+- **Service Worker:** Implementado cache offline básico.
+- **Smart Banner:** Detecta iOS/Android e sugere instalação no topo do layout.
+
+### 3. Vercel & Database Sync
+- **Hotfixes de Deploy:** 
+  - Resolvido erro de build por falta de API Key (fallback seguro).
+  - Sincronizado schema do banco de produção (Neon) com migrations manuais (`pixKey`, `pixRecipient`, `instagram`).
+- **Resend Integration:** Configurada `RESEND_API_KEY` no ambiente de produção.
+
+### 4. Documentação de Entrega
+- `team_onboarding_guide.md`: Guia para artistas e staff testarem o app.
+- `admin_guide.md`: Manual para gestão de workspaces e convites.
+- `magic_link_checklist.md`: Procedimento de verificação de auth.
