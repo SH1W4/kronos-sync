@@ -38,10 +38,36 @@ Segurança jurídica e clínica integrada ao fluxo.
 *   Vinculação imutável com a sessão (Booking ID).
 *   Alertas de risco clínico automáticos.
 
+### 🏛️ KRONOS Kiosk (Recepção & Conversão)
+Transformando o check-in em uma experiência de marca.
+*   **Soul Sync:** Gamificação para captura de acompanhantes (Lead Magnet).
+*   **Ink Pass:** Geração de cupons automáticos via PIN do Artista.
+*   **UX Noir:** Interface mobile-first de alto impacto.
+
+![Kiosk Hub](docs/assets/kiosk_landing.png)
+
+### 💰 Financeiro & IA (Settlement 2.0)
+Acerto de comissões sem fricção e com auditoria inteligente.
+*   **Digital Settlement:** Seleção múltipla de projetos para liquidação PIX.
+*   **Vision Agent:** Validação automática de comprovantes via IA OCR.
+*   **Sync Glyphs:** Recompensas gamificadas por profissionalismo financeiro.
+
+![Finance & Tokens](docs/assets/soul_sync.png)
+
 ### 🧠 Gestão Inteligente
 *   **Agenda Híbrida:** Suporte a Flash Days e Projetos de Longa Duração.
 *   **Financial Core:** Split automático de comissões e gestão de royalties.
 *   **Client CRM:** Histórico visual de projetos e preferências.
+
+---
+
+## 📺 Demonstração em Vídeo
+
+| Jornada do Acompanhante (Kiosk) | Acerto de Comissão (IA Vision) |
+| :---: | :---: |
+| ![Kiosk Demo](docs/assets/kiosk_demo.webp) | ![Finance Demo](docs/assets/finance_demo.webp) |
+
+> *Nota: Os vídeos acima são demonstrações técnicas do fluxo Alpha.*
 
 ---
 
