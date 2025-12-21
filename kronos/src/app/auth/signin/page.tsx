@@ -63,13 +63,15 @@ export default function SignInPage() {
                                 Google (Agenda)
                             </Button>
 
-                            <Button
-                                className="w-full h-8 bg-transparent text-gray-600 hover:text-white text-[10px] uppercase tracking-widest"
-                                onClick={() => signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })}
-                                variant="ghost"
-                            >
-                                🐛 DEV MODE
-                            </Button>
+                            {process.env.NODE_ENV === 'development' && (
+                                <Button
+                                    className="w-full h-8 bg-transparent text-gray-600 hover:text-white text-[10px] uppercase tracking-widest"
+                                    onClick={() => signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })}
+                                    variant="ghost"
+                                >
+                                    🐛 DEV MODE
+                                </Button>
+                            )}
                         </>
                     )}
                 </div>
