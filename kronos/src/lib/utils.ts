@@ -26,3 +26,13 @@ export function generateId(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36)
 }
 
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')     // Substitui espaços por -
+    .replace(/[^\w-]+/g, '')  // Remove caracteres não alfanuméricos
+    .replace(/--+/g, '-')     // Substitui múltiplos - por um único -
+}
+

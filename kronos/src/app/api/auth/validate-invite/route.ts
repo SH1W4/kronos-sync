@@ -22,60 +22,72 @@ export async function POST(req: NextRequest) {
         const cleanCode = code.trim()
 
         // 1. MASTER KEY CHECK (Environment Variable)
-        // Allows immediate promotion to ADMIN (Master) for the owner
         if (process.env.KRONOS_TEAM_KEY && cleanCode === process.env.KRONOS_TEAM_KEY) {
-            const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-
+            const user = await prisma.user.findUnique({ where: { email: session.user.email! } })
             if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
 
-            // Update User to ADMIN (Master)
-            await prisma.user.update({
-                where: { id: user.id },
-                data: { role: 'ADMIN' }
-            })
+            // Busca ou Cria o Workspace principal
+            let workspace = await prisma.workspace.findFirst({ where: { slug: 'kronos-studio' } })
+            if (!workspace) {
+                workspace = await prisma.workspace.create({
+                    data: {
+                        name: 'Kronos Studio',
+                        slug: 'kronos-studio',
+                        ownerId: user.id
+                    }
+                })
+            }
 
-            // Create/Update Artist Profile as RESIDENT
-            await prisma.artist.upsert({
-                where: { userId: user.id },
-                create: {
-                    userId: user.id,
-                    plan: 'RESIDENT',
-                    commissionRate: 0.85 // Master/Owner usually has higher share
-                },
-                update: {
-                    plan: 'RESIDENT'
-                }
-            })
+            // Update User and Membership
+            await prisma.$transaction([
+                prisma.user.update({
+                    where: { id: user.id },
+                    data: { role: 'ADMIN' }
+                }),
+                prisma.workspaceMember.upsert({
+                    where: { workspaceId_userId: { workspaceId: workspace.id, userId: user.id } },
+                    create: { workspaceId: workspace.id, userId: user.id, role: 'ADMIN' },
+                    update: { role: 'ADMIN' }
+                }),
+                prisma.artist.upsert({
+                    where: { userId: user.id },
+                    create: {
+                        userId: user.id,
+                        workspaceId: workspace.id,
+                        plan: 'RESIDENT',
+                        commissionRate: 0.85
+                    },
+                    update: {
+                        plan: 'RESIDENT',
+                        workspaceId: workspace.id
+                    }
+                })
+            ])
 
-            return NextResponse.json({ success: true, role: 'ADMIN', message: 'Bem-vindo, Mestre do Workspace.' })
+            return NextResponse.json({ success: true, role: 'ADMIN', message: 'Bem-vindo ao Workspace Mestre.' })
         }
 
         // 2. DATABASE INVITE CODE CHECK
         const invite = await prisma.inviteCode.findUnique({
             where: { code: cleanCode },
-            include: { creator: true }
+            include: { creator: true, workspace: true }
         })
 
-        // Validations
-        if (!invite) {
-            return NextResponse.json({ error: 'Código inválido' }, { status: 400 })
+        if (!invite) return NextResponse.json({ error: 'Código inválido' }, { status: 400 })
+        if (!invite.isActive) return NextResponse.json({ error: 'Código inativo' }, { status: 400 })
+
+        // Check Expiration
+        if (invite.expiresAt && invite.expiresAt < new Date()) {
+            return NextResponse.json({ error: 'Este código expirou' }, { status: 400 })
         }
 
-        if (!invite.isActive) {
-            return NextResponse.json({ error: 'Código inativo' }, { status: 400 })
-        }
-
+        // Check Usage Limit
         if (invite.maxUses > 0 && invite.currentUses >= invite.maxUses) {
             return NextResponse.json({ error: 'Este código atingiu o limite de usos' }, { status: 400 })
         }
 
-        if (invite.expiresAt && new Date() > invite.expiresAt) {
-            return NextResponse.json({ error: 'Código expirado' }, { status: 400 })
-        }
-
         // Execute Transaction
         await prisma.$transaction(async (tx) => {
-            // 1. Update User
             const updatedUser = await tx.user.update({
                 where: { email: session.user.email! },
                 data: {
@@ -84,17 +96,23 @@ export async function POST(req: NextRequest) {
                 }
             })
 
-            // 2. Increment Invite Usage
+            // Add Membership to the Workspace
+            if (invite.workspaceId) {
+                await tx.workspaceMember.upsert({
+                    where: { workspaceId_userId: { workspaceId: invite.workspaceId, userId: updatedUser.id } },
+                    create: { workspaceId: invite.workspaceId, userId: updatedUser.id, role: invite.role },
+                    update: { role: invite.role }
+                })
+            }
+
             await tx.inviteCode.update({
                 where: { id: invite.id },
                 data: { currentUses: { increment: 1 } }
             })
 
-            // 3. Create Artist Profile if applicable
             if (invite.role === 'ARTIST' || invite.role === 'ADMIN') {
                 const existingArtist = await tx.artist.findUnique({ where: { userId: updatedUser.id } })
 
-                // Calcular data de validade se for GUEST e tiver duração definida
                 let validUntil = null;
                 if (invite.targetPlan === 'GUEST' && invite.durationDays) {
                     validUntil = new Date();
@@ -105,17 +123,18 @@ export async function POST(req: NextRequest) {
                     await tx.artist.create({
                         data: {
                             userId: updatedUser.id,
+                            workspaceId: invite.workspaceId,
                             plan: invite.targetPlan || 'GUEST',
                             validUntil: validUntil,
-                            commissionRate: invite.targetPlan === 'RESIDENT' ? 0.30 : 0.35 // Residentes pagam menos taxa?
+                            commissionRate: invite.targetPlan === 'RESIDENT' ? 0.30 : 0.35
                         }
                     })
                 } else {
-                    // Update existing profile if changing plan via new invite
                     await tx.artist.update({
                         where: { id: existingArtist.id },
                         data: {
                             plan: invite.targetPlan || existingArtist.plan,
+                            workspaceId: invite.workspaceId || existingArtist.workspaceId,
                             validUntil: validUntil || existingArtist.validUntil
                         }
                     })

@@ -1,0 +1,90 @@
+
+> kronos-sync@2.0.0 build
+> next build
+
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Jo├úo\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\Jo├úo\Desktop\PROJETOS\05_PLATFORMS\kronos_sync\kronos\package-lock.json
+
+   Ôû▓ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local, .env
+
+ ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 27.8s
+   Running TypeScript ...
+   Collecting page data using 11 workers ...
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+   Generating static pages using 11 workers (0/21) ...
+ÔÜá´©Å PRE-BOOT CHECK:
+ID: 6485704046
+SECRET: GOCSPX-lDE
+   Generating static pages using 11 workers (5/21) 
+   Generating static pages using 11 workers (10/21) 
+   Generating static pages using 11 workers (15/21) 
+ Ô£ô Generating static pages using 11 workers (21/21) in 2.1s
+   Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ ãÆ /api/auth/[...nextauth]
+Ôö£ ãÆ /api/auth/error
+Ôö£ ãÆ /api/auth/validate-invite
+Ôö£ ãÆ /api/bookings
+Ôö£ ãÆ /api/clean-dev
+Ôö£ ãÆ /api/debug-db
+Ôö£ ãÆ /api/seed
+Ôö£ ãÆ /api/workspace/team
+Ôö£ Ôùï /artist/agenda
+Ôö£ ãÆ /artist/anamnese/[bookingId]
+Ôö£ ãÆ /artist/clients
+Ôö£ ãÆ /artist/clients/[id]
+Ôö£ ãÆ /artist/dashboard
+Ôö£ ãÆ /artist/finance
+Ôö£ Ôùï /artist/invites
+Ôö£ Ôùï /artist/settings
+Ôö£ Ôùï /artist/team
+Ôö£ Ôùï /auth/register
+Ôö£ Ôùï /auth/select
+Ôö£ Ôùï /auth/signin
+Ôö£ Ôùï /dashboard
+Ôö£ ãÆ /fichas/[bookingId]
+Ôö£ ãÆ /gift/[code]
+Ôö£ Ôùï /kiosk
+Ôö£ Ôùï /manifest.webmanifest
+Ôö£ Ôùï /marketplace
+Ôöö Ôùï /onboarding
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

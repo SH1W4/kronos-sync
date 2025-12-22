@@ -1,67 +1,101 @@
 <div align="center">
-  <h1 align="center">KRONOS SYNC</h1>
+  <img src="docs/assets/kiosk_landing.png" width="900" alt="KRONOS SYNC">
+  <br/>
+  <br/>
+  <h1 align="center">K R O N O S _ S Y N C</h1>
   <p align="center">
-    <strong>Strategic Operating System for High-End Tattoo Studios</strong>
+    <strong>OPERATING SYSTEM FOR THE ARTISTIC ELITE</strong>
   </p>
-  <p align="center">
-    <img src="https://img.shields.io/badge/STATUS-PRIVATE_BETA-purple?style=for-the-badge" alt="Status Private">
-    <img src="https://img.shields.io/badge/LICENSE-PROPRIETARY-black?style=for-the-badge" alt="License Proprietary">
-  </p>
+  <br/>
+  <img src="docs/assets/arrival_symbols.png" width="120" alt="Sync Glyph">
 </div>
 
-> *"Sync your art, manage your time."*
+<br/>
 
-## 🔒 Acesso Restrito
+> *"Where technology meets the soul of the ink. A seamless fusion between surgical management and pure artistic expression."*
+
+---
+
+## 🔒 ACESSO RESTRITO & LICENCIAMENTO
 **Este software é proprietário e protegido por direitos autorais.**
 O código-fonte disponível neste repositório é destinado exclusivamente para fins de **auditoria, desenvolvimento interno e demonstração de portfólio**. A reprodução, distribuição ou uso comercial sem autorização expressa do **Kronos Tattoo Studio** é estritamente proibida.
 
 ---
 
-## 💎 Visão do Produto
-O **KRONOS SYNC** não é apenas um agendador; é um sistema operacional completo para estúdios que tratam tatuagem como arte e negócio de alto nível.
-
-Ele elimina a fricção administrativa, permitindo que artistas foquem unicamente em criar, enquanto o sistema orquestra a logística, financeiro e experiência do cliente com precisão cirúrgica.
+## 💎 VISÃO DO PRODUTO
+O **KRONOS SYNC** não é apenas um agendador; é um sistema operacional completo para estúdios que tratam tatuagem como arte e negócio de alto nível. Ele elimina a fricção administrativa, permitindo que artistas foquem unicamente em criar, enquanto o sistema orquestra a logística, financeiro e experiência do cliente com precisão cirúrgica.
 
 ---
 
-## 🚀 Arquitetura & Módulos
+## [ 01 ] THE IDENTITY
+**Digital Anamnese & Legal Safety**
 
-### 🎨 Artist OS (Dashboard)
-Um painel de comando pessoal para cada tatuador resident ou guest.
-*   **Visão em Tempo Real:** Faturamento, metas e agenda diária.
-*   **Privacidade Nativa:** Isolamento rigoroso de dados sensíveis entre artistas.
-*   **Performance:** Carregamento instantâneo via Edge Computing.
-
-### 📋 Anamnese Digital 2.0 (Legal-grade)
-Segurança jurídica e clínica integrada ao fluxo.
-*   Assinatura biométrica/digital.
-*   Vinculação imutável com a sessão (Booking ID).
-*   Alertas de risco clínico automáticos.
-
-### 🧠 Gestão Inteligente
-*   **Agenda Híbrida:** Suporte a Flash Days e Projetos de Longa Duração.
-*   **Financial Core:** Split automático de comissões e gestão de royalties.
-*   **Client CRM:** Histórico visual de projetos e preferências.
+O KRONOS SYNC captura a essência da segurança clínica com elegância. Assinaturas biométricas e triagem inteligente transformam burocracia em um snapshot de identidade.
+- **Biometric Flow:** Assinatura digital fluida.
+- **Clinical Insight:** Alertas automáticos de condições médicas (KRONØS Standard).
 
 ---
 
-## 🛠️ Engenharia de Software
+## [ 02 ] THE LINK
+**Kiosk, Conversion & Lead Magnet**
 
-Construído sobre pilares de escalabilidade e segurança modernos:
-
-| Camada | Tecnologia |
-| -- | -- |
-| **Frontend** | Next.js 15 (App Router) + React 19 |
-| **Styling** | Tailwind CSS v4 + Design System "Noir" |
-| **Database** | PostgreSQL Serverless (Neon) + Prisma ORM |
-| **Auth** | NextAuth.js (RBAC System) |
-| **Infra** | Vercel Edge Network |
+A recepção é o primeiro contato com o sagrado. O **THE LINK** gamifica a jornada do acompanhante, convertendo curiosos em clientes via **Soul Sync**.
+![Soul Sync](docs/assets/soul_sync.png)
+*O "INK PASS" não é um desconto; é um convite para a sincronização.*
 
 ---
 
-## 🤝 Contato & Licenciamento
+## [ 03 ] THE VAULT
+**Settle, AI Vision & Tokenization**
 
-Para discussões sobre licenciamento, parcerias ou acesso de demonstração:
+Transparência financeira absoluta. O **THE VAULT** utiliza Visão Computacional para validar liquidações e premiar o profissionalismo com glifos digitais.
+![Artist Pin](docs/assets/artist_pin.png)
+- **AI Vision Agent:** Validação OCR instantânea de comprovantes.
+- **Sync Glyphs:** Tokens de prestígio gerados por algoritmos de sincronia.
 
-**Kronos Tech Division**
-*Developed by SH1W4 // Architecture by Antigravity*
+---
+
+## [ EVOLUTION ] THE FLOW
+
+| JOURNEY | SETTLEMENT |
+| :---: | :---: |
+| ![Kiosk Demo](docs/assets/kiosk_demo.webp) | ![Finance Demo](docs/assets/finance_demo.webp) |
+
+---
+
+## [ 04 ] THE CODEX
+**Knowledge Sovereignty & Agent-Ready Documentation**
+
+O **CODEX** é a biblioteca de conhecimento tático do KRONØS. Não é apenas documentação; é um sistema vivo de treinamento e governança.
+
+- **Role-Based Access:** Curadoria automática por hierarquia (Artist/Admin/Dev)
+- **DocSync Integration:** Metadados semânticos para interoperabilidade com agentes de IA
+- **Dev Layer:** Trava de identidade para documentos de infraestrutura sensíveis
+- **Premium UI:** Interface de terminal tático com renderização Markdown dinâmica
+
+**Documentação Disponível:**
+- 📘 Guias de Treinamento (Artista & Administrador)
+- 🛡️ Manifesto de Soberania de Dados
+- 📋 SOPs (Standard Operating Procedures)
+- 📈 Estratégias de Crescimento & ROI
+- 🔐 Documentação Root (Dev-Only)
+
+---
+
+## 🛠️ ENGENHARIA (THE STACK)
+
+Construído sob o silêncio da noite, utilizando as camadas mais profundas de performance:
+- **Engine:** Next.js 16 (Turbopack) // React 19 // Tailwind CSS v4
+- **Persistence:** Prisma ORM v5.22.0 // PostgreSQL (Neon/Vercel)
+- **Intelligence:** Google Calendar API Sync // AI Vision (OCR)
+- **Connectivity:** PWA (Progressive Web App) para Experiência Mobile Nativa
+
+---
+
+<div align="center">
+  <p align="center">
+    <strong>KRONOS TECH DIVISION</strong><br/>
+    Developed by SH1W4 // Architecture by Antigravity
+  </p>
+  <img src="docs/assets/arrival_symbols.png" width="60" opacity="0.5">
+</div>

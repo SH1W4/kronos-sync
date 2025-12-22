@@ -6,17 +6,22 @@ import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BrandLogo } from '@/components/ui/brand-logo'
-import { User, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react'
+import { User, ShieldCheck, ArrowRight, Loader2, Rocket, Palette, MessageSquare, Users as UsersIcon, CheckCircle2 } from 'lucide-react'
+import { submitWorkspaceRequest } from '@/app/actions/workspaces'
 
 export const dynamic = 'force-dynamic'
 
 export default function OnboardingPage() {
     const { data: session, update } = useSession()
     const router = useRouter()
-    const [mode, setMode] = useState<'SELECT' | 'CODE'>('SELECT')
+    const [mode, setMode] = useState<'SELECT' | 'CODE' | 'REQUEST' | 'SUCCESS'>('SELECT')
     const [inviteCode, setInviteCode] = useState('')
+    const [studioName, setStudioName] = useState('')
+    const [motivation, setMotivation] = useState('')
+    const [teamDetails, setTeamDetails] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [successMessage, setSuccessMessage] = useState('')
 
     const handleClientAccess = async () => {
         // Para clientes, apenas redirecionamos.
@@ -60,6 +65,33 @@ export default function OnboardingPage() {
         }
     }
 
+    const handleRequestAccess = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!studioName || !motivation) return
+
+        setLoading(true)
+        setError('')
+
+        try {
+            const result = await submitWorkspaceRequest({
+                studioName,
+                teamDetails,
+                motivation
+            })
+
+            if (result.success) {
+                setSuccessMessage(result.message || '')
+                setMode('SUCCESS')
+            } else {
+                setError(result.error || 'Erro ao enviar solicitação')
+            }
+        } catch (err) {
+            setError('Falha de conexão com o servidor.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
             {/* Background FX */}
@@ -72,8 +104,8 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="text-center mb-12">
-                    <h1 className="text-3xl md:text-5xl font-orbitron font-bold mb-4 tracking-tight">BEM-VINDO AO <span className="text-[#00FF88]">KRONOS</span></h1>
-                    <p className="text-gray-400 font-mono">Identifique-se para configurar seu ambiente.</p>
+                    <h1 className="text-4xl md:text-5xl font-orbitron font-bold mb-4 tracking-tight">BOAS-VINDAS</h1>
+                    <p className="text-gray-400 font-mono text-sm md:text-base">Escolha como você vai usar a plataforma.</p>
                 </div>
 
                 {mode === 'SELECT' ? (
@@ -112,7 +144,7 @@ export default function OnboardingPage() {
                             </div>
                         </button>
                     </div>
-                ) : (
+                ) : mode === 'CODE' ? (
                     <div className="max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="bg-gray-900/50 border border-white/10 p-8 rounded-xl backdrop-blur-sm">
                             <h3 className="text-xl font-orbitron font-bold mb-6 text-center">VALIDAÇÃO DE ACESSO</h3>
@@ -141,10 +173,114 @@ export default function OnboardingPage() {
                                     </Button>
                                     <Button type="submit" disabled={loading} className="flex-1 bg-[#8B5CF6] hover:bg-[#7c4dff] text-white">
                                         {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
-                                        Validar
+                                        VALIDAR
+                                    </Button>
+                                </div>
+
+                                <div className="mt-6 pt-6 border-t border-white/5 text-center">
+                                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-3">Não tem um convite?</p>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        className="text-white hover:text-purple-400 group"
+                                        onClick={() => setMode('REQUEST')}
+                                    >
+                                        QUERO CRIAR MEU ESTÚDIO <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                ) : mode === 'REQUEST' ? (
+                    <div className="max-w-md mx-auto animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div className="bg-gray-900/50 border border-purple-500/20 p-8 rounded-3xl backdrop-blur-md shadow-[0_0_50px_rgba(139,92,246,0.1)]">
+                            <div className="flex justify-center mb-6">
+                                <div className="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
+                                    <Rocket className="text-purple-400 animate-bounce" size={32} />
+                                </div>
+                            </div>
+
+                            <h3 className="text-2xl font-orbitron font-bold mb-2 text-center text-white">SOLICITAR ACESSO</h3>
+                            <p className="text-[10px] text-gray-500 font-mono text-center mb-8 uppercase tracking-widest leading-relaxed">
+                                Conte mais sobre seu estúdio para construirmos o alicerce do KRONØS juntos.
+                            </p>
+
+                            <form onSubmit={handleRequestAccess} className="space-y-4 text-left">
+                                <div>
+                                    <label className="text-[10px] font-mono uppercase text-gray-400 mb-2 block tracking-widest">Nome do Estúdio</label>
+                                    <Input
+                                        className="bg-black/50 border-white/10 h-10 font-bold placeholder:text-gray-700 uppercase"
+                                        placeholder="NOME DO SEU ESPAÇO"
+                                        value={studioName}
+                                        onChange={(e) => setStudioName(e.target.value.toUpperCase())}
+                                        autoFocus
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-mono uppercase text-gray-400 mb-2 block tracking-widest flex items-center gap-2 text-gray-400">
+                                        <UsersIcon size={12} /> Equipe (Artistas/Staff)
+                                    </label>
+                                    <textarea
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-purple-500 outline-none min-h-[80px] text-white"
+                                        placeholder="Ex: 3 artistas residentes, 1 recepcionista..."
+                                        value={teamDetails}
+                                        onChange={(e) => setTeamDetails(e.target.value)}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="text-[10px] font-mono uppercase text-gray-400 mb-2 block tracking-widest flex items-center gap-2 text-gray-400">
+                                        <MessageSquare size={12} /> Por que o KRONØS?
+                                    </label>
+                                    <textarea
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-purple-500 outline-none min-h-[100px] text-white"
+                                        placeholder="Como o KRONOS seria útil para sua equipe hoje?"
+                                        value={motivation}
+                                        onChange={(e) => setMotivation(e.target.value)}
+                                        required
+                                    />
+                                </div>
+
+                                {error && (
+                                    <p className="text-red-500 text-[10px] font-mono text-center bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                                        {error}
+                                    </p>
+                                )}
+
+                                <div className="flex gap-3 pt-2">
+                                    <Button type="button" variant="outline" onClick={() => setMode('CODE')} className="flex-1 rounded-xl font-bold">
+                                        VOLTAR
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={loading || !studioName || !motivation}
+                                        className="flex-[2] bg-purple-600 hover:bg-purple-500 text-white rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.2)] font-bold transition-all hover:scale-[1.02]"
+                                    >
+                                        {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
+                                        ENVIAR SOLICITAÇÃO
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                ) : (
+                    /* SUCCESS MODE */
+                    <div className="max-w-md mx-auto animate-in zoom-in-95 duration-500 text-center">
+                        <div className="bg-gray-900/50 border border-[#00FF88]/20 p-12 rounded-3xl backdrop-blur-md shadow-[0_0_50px_rgba(0,255,136,0.05)]">
+                            <div className="flex justify-center mb-6">
+                                <div className="w-20 h-20 bg-[#00FF88]/10 rounded-full flex items-center justify-center border border-[#00FF88]/20 shadow-[0_0_30px_rgba(0,255,136,0.1)]">
+                                    <CheckCircle2 className="text-[#00FF88]" size={40} />
+                                </div>
+                            </div>
+                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white uppercase tracking-tight">Solicitação Recebida</h3>
+                            <p className="text-gray-400 font-mono text-xs leading-relaxed mb-8">
+                                {successMessage}
+                            </p>
+                            <Button onClick={() => setMode('SELECT')} variant="outline" className="w-full rounded-xl border-[#00FF88]/20 hover:bg-[#00FF88]/10 hover:text-[#00FF88] font-bold">
+                                VOLTAR AO INÍCIO
+                            </Button>
                         </div>
                     </div>
                 )}

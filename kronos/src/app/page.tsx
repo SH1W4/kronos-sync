@@ -15,7 +15,7 @@ const FEATURES = [
         title: 'GESTÃO DE ESTÚDIO',
         subtitle: 'Controle integral de agenda e residentes.',
         colSpan: 'md:col-span-2',
-        image: '/features/agenda.png', // Manter placeholder ou trocar depois
+        image: '/features/studio-management.png',
         description: `
             A visão "Studio Manager" oferece um panorama completo de todas as macas.
             Ideal para o gerente ou head artist acompanhar o fluxo do estúdio em tempo real.
@@ -78,7 +78,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <BrandLogo size={32} animated={false} />
                     <div className="flex items-center gap-8">
-                        <Link href="/auth/signin">
+                        <Link href="/auth/select">
                             <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-medium tracking-wide text-xs h-9 px-6 uppercase transition-all">
                                 Login
                             </Button>
@@ -97,21 +97,21 @@ export default function LandingPage() {
                     className="object-cover opacity-40 mix-blend-screen pointer-events-none"
                     priority
                 />
-                
+
                 {/* Background Noise/Texture Overlay */}
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-soft-light"></div>
-                
+
                 {/* Subtle spotlight */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 blur-[100px] rounded-full pointer-events-none opacity-40"></div>
 
                 <div className="container mx-auto max-w-4xl relative z-10 flex flex-col items-center text-center">
-                    <div className="mb-8 opacity-90 hover:opacity-100 transition-opacity duration-1000">
-                        <BrandLogo size={140} variant="icon" animated={false} />
+                    <div className="mb-8">
+                        <BrandLogo size={140} variant="icon" animated={true} />
                     </div>
 
-                    <h1 className="text-3xl md:text-5xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight">
+                    <h1 className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight">
                         Gestão inteligente para <br />
-                        <span className="font-sans font-light italic text-zinc-400">estúdios de alto padrão.</span>
+                        <span className="font-orbitron font-light text-zinc-400">estúdios de alto padrão.</span>
                     </h1>
 
                     <p className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10">
@@ -120,7 +120,7 @@ export default function LandingPage() {
                     </p>
 
                     <div className="flex gap-4">
-                        <Link href="/auth/signin">
+                        <Link href="/auth/select">
                             <Button className="h-12 px-8 bg-white text-black hover:bg-zinc-200 text-xs font-bold font-orbitron tracking-widest uppercase rounded flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
                                 ACESSAR FLOW
                             </Button>
@@ -134,7 +134,7 @@ export default function LandingPage() {
                 <div className="container mx-auto max-w-6xl">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {FEATURES.map((feature) => (
-                            <div 
+                            <div
                                 key={feature.id}
                                 onClick={() => setActiveFeature(feature)}
                                 className={`
@@ -181,36 +181,36 @@ export default function LandingPage() {
                 <DialogContent className="bg-zinc-950 border border-zinc-800 text-zinc-100 max-w-2xl p-0 overflow-hidden">
                     <div className="relative h-48 w-full">
                         {activeFeature && (
-                            <Image 
-                                src={activeFeature.image} 
+                            <Image
+                                src={activeFeature.image}
                                 alt={activeFeature.title}
                                 fill
                                 className="object-cover opacity-60 grayscale"
                             />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
-                        <button 
+                        <button
                             onClick={() => setActiveFeature(null)}
                             className="absolute top-4 right-4 p-2 bg-black/50 rounded-full hover:bg-white/10 transition-colors"
                         >
                             <X size={20} />
                         </button>
                     </div>
-                    
+
                     <div className="p-8">
                         <div className="mb-6">
                             <h2 className="text-2xl font-light tracking-tight text-white mb-1">{activeFeature?.title}</h2>
                             <p className="text-zinc-500 text-sm tracking-widest uppercase">{activeFeature?.subtitle}</p>
                         </div>
-                        
+
                         <div className="space-y-4 text-zinc-400 font-light leading-relaxed whitespace-pre-line">
                             {activeFeature?.description}
                         </div>
 
                         <div className="mt-8 flex justify-end">
-                            <Button 
+                            <Button
                                 onClick={() => setActiveFeature(null)}
-                                variant="outline" 
+                                variant="outline"
                                 className="border-white/10 text-white hover:bg-white hover:text-black"
                             >
                                 Fechar

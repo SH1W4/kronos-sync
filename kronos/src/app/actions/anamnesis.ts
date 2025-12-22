@@ -2,104 +2,103 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 
-export type AnamnesisData = {
-    medications: string
-    allergies: string
-    hepatitis: boolean
-    hiv: boolean
-    diabetes: boolean
-    pregnant: boolean
-    bleeding: boolean
-    fainting: boolean
-    notes: string
-    agreedValue?: string | number
-    projectDescription?: string
-    signatureData?: string
-}
+// Schema de validação para anamnese (compatível com CSV)
+const anamnesisDataSchema = z.object({
+    fullName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').optional(),
+    whatsapp: z.string().regex(/^\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}$/, 'Formato esperado: (11) 99999-9999').optional(),
+    birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida').optional(),
+    medicalConditionsTattoo: z.string().max(500).optional(),
+    medicalConditionsHealing: z.string().max(500).optional(),
+    medicalConditionsHealingDetails: z.string().max(500).optional(),
+    knownAllergies: z.string().max(500).optional(),
+    artistHandle: z.string().optional(),
+    artDescription: z.string().max(1000).optional(),
+    agreedValue: z.string().optional(),
+    understandPermanence: z.boolean(),
+    followInstructions: z.boolean(),
+    acceptedTerms: z.boolean().refine((val) => val === true, 'Termos devem ser aceitos'),
+    signatureData: z.string().min(100, 'Assinatura obrigatória').optional()
+})
 
-export async function saveAnamnesis(bookingId: string, data: AnamnesisData) {
+export type AnamnesisData = z.infer<typeof anamnesisDataSchema>
+
+export async function saveAnamnesis(bookingId: string, data: unknown) {
     try {
-        console.log(`💾 Salvando anamnese para Booking: ${bookingId}`)
+        // Validar dados de entrada
+        const validated = anamnesisDataSchema.safeParse(data)
+        if (!validated.success) {
+            const firstError = validated.error.errors[0]
+            return {
+                success: false,
+                error: firstError.message,
+                field: firstError.path[0]
+            }
+        }
 
-        // 1. Validar se o booking existe e pegar o ClientID
+        console.log(`💾 Salvando anamnese (CSV Flow) para Booking: ${bookingId}`)
+
+        const validData = validated.data
+
+        // 1. Validar se o agendamento existe
         const booking = await prisma.booking.findUnique({
             where: { id: bookingId },
-            select: { clientId: true }
+            select: { clientId: true, workspaceId: true }
         })
 
         if (!booking) {
             throw new Error('Agendamento não encontrado.')
         }
 
-        const numericValue = data.agreedValue ? Number(data.agreedValue) : null
-
-        // 2. Upsert (Criar ou Atualizar) Anamnese
+        // 2. Criar ou Atualizar Anamnese com os campos exatos do CSV
         const anamnesis = await prisma.anamnesis.upsert({
             where: {
                 bookingId: bookingId
             },
             update: {
-                // Novos Campos
-                projectDescription: data.projectDescription,
-                agreedValue: numericValue,
-                signatureData: data.signatureData,
-                acceptedTerms: true,
-
-                // Campos de Saúde
-                isUnderMedication: !!data.medications,
-                medicationDetails: data.medications,
-                hasAllergies: !!data.allergies,
-                allergyDetails: data.allergies,
-
-                // Mapeando booleanos genéricos para campos de condição (ajustar conforme schema real)
-                hasMedicalCondition: data.hepatitis || data.hiv || data.diabetes || data.bleeding || data.fainting,
-                conditionDetails: [
-                    data.hepatitis ? 'Hepatite' : '',
-                    data.hiv ? 'HIV' : '',
-                    data.diabetes ? 'Diabetes' : '',
-                    data.bleeding ? 'Coagulação' : '',
-                    data.fainting ? 'Desmaios' : '',
-                    data.notes
-                ].filter(Boolean).join(', '),
-
-                isPregnant: data.pregnant,
-
+                fullName: validData.fullName,
+                whatsapp: validData.whatsapp,
+                birthDate: validData.birthDate,
+                medicalConditionsTattoo: validData.medicalConditionsTattoo,
+                medicalConditionsHealing: validData.medicalConditionsHealing,
+                medicalConditionsHealingDetails: validData.medicalConditionsHealingDetails,
+                knownAllergies: validData.knownAllergies,
+                artistHandle: validData.artistHandle,
+                artDescription: validData.artDescription,
+                agreedValue: validData.agreedValue,
+                understandPermanence: validData.understandPermanence,
+                followInstructions: validData.followInstructions,
+                acceptedTerms: validData.acceptedTerms,
+                signatureData: validData.signatureData,
                 updatedAt: new Date()
             },
             create: {
                 bookingId: bookingId,
                 clientId: booking.clientId,
-
-                // Novos Campos
-                projectDescription: data.projectDescription,
-                agreedValue: numericValue,
-                signatureData: data.signatureData,
-
-                isUnderMedication: !!data.medications,
-                medicationDetails: data.medications,
-                hasAllergies: !!data.allergies,
-                allergyDetails: data.allergies,
-
-                hasMedicalCondition: data.hepatitis || data.hiv || data.diabetes || data.bleeding || data.fainting,
-                conditionDetails: [
-                    data.hepatitis ? 'Hepatite' : '',
-                    data.hiv ? 'HIV' : '',
-                    data.diabetes ? 'Diabetes' : '',
-                    data.bleeding ? 'Coagulação' : '',
-                    data.fainting ? 'Desmaios' : '',
-                    data.notes
-                ].filter(Boolean).join(', '),
-
-                isPregnant: data.pregnant,
-                acceptedTerms: true // Assumindo aceite ao salvar
+                workspaceId: booking.workspaceId,
+                fullName: validData.fullName,
+                whatsapp: validData.whatsapp,
+                birthDate: validData.birthDate,
+                medicalConditionsTattoo: validData.medicalConditionsTattoo,
+                medicalConditionsHealing: validData.medicalConditionsHealing,
+                medicalConditionsHealingDetails: validData.medicalConditionsHealingDetails,
+                knownAllergies: validData.knownAllergies,
+                artistHandle: validData.artistHandle,
+                artDescription: validData.artDescription,
+                agreedValue: validData.agreedValue,
+                understandPermanence: validData.understandPermanence,
+                followInstructions: validData.followInstructions,
+                acceptedTerms: validData.acceptedTerms,
+                signatureData: validData.signatureData,
             }
         })
 
-        console.log('✅ Anamnese salva com sucesso:', anamnesis.id)
+        console.log('✅ Anamnese sincronizada com CSV salva:', anamnesis.id)
 
-        revalidatePath(`/artist/anamnese/${bookingId}`)
-        revalidatePath('/artist/dashboard')
+        // Revalida caminhos relevantes
+        revalidatePath(`/fichas/${bookingId}`)
+        revalidatePath('/artist/agenda')
 
         return { success: true, id: anamnesis.id }
 

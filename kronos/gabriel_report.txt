@@ -1,0 +1,6 @@
+[dotenv@17.2.3] injecting env (2) from .env.local -- tip: ­ƒæÑ sync secrets across teammates & machines: https://dotenvx.com/ops
+­ƒºÉ Investigando agendamentos do Gabriel...
+­ƒæñ Cliente: Gabriel X
+­ƒôà Total de Bookings: 0
+
+Ô£à Bookings COMPLETED: 0

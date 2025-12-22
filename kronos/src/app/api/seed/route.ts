@@ -61,7 +61,9 @@ export async function GET() {
             studioShare: 1000.00,
             artistShare: 1000.00,
             status: "CONFIRMED",
-            fichaStatus: "PENDING"
+            fichaStatus: "PENDING",
+            scheduledFor: start,
+            duration: 240
         }
     })
 

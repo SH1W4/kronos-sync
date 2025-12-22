@@ -48,6 +48,7 @@ export default async function ArtistDashboard() {
     startOfMonth.setHours(0, 0, 0, 0)
 
     // 3. Buscar Dados em Paralelo
+    const now = new Date()
     const [todaysBookings, monthMetrics, totalSessionsCount] = await Promise.all([
         // A. Agendamentos Hoje
         prisma.booking.findMany({
@@ -69,40 +70,57 @@ export default async function ArtistDashboard() {
                 slot: { startTime: 'asc' }
             }
         }),
-        // B. Faturamento Mês
-        prisma.booking.aggregate({
+        // B. Faturamento Mês (Sincronizado com Auto-Settle)
+        prisma.booking.findMany({
             where: {
                 artistId: artist.id,
-                createdAt: { gte: startOfMonth },
-                status: { in: ['CONFIRMED', 'COMPLETED'] }
-            },
-            _sum: {
-                artistShare: true
+                slot: { startTime: { gte: startOfMonth } },
+                OR: [
+                    { status: { in: ['CONFIRMED', 'COMPLETED'] } },
+                    {
+                        AND: [
+                            { status: { not: 'CANCELLED' } },
+                            { slot: { endTime: { lt: now } } }
+                        ]
+                    }
+                ]
             }
         }),
-        // C. Total de Sessões
+        // C. Total de Sessões (Sincronizado com Auto-Settle)
         prisma.booking.count({
             where: {
                 artistId: artist.id,
-                status: { in: ['CONFIRMED', 'COMPLETED'] }
+                OR: [
+                    { status: { in: ['CONFIRMED', 'COMPLETED'] } },
+                    {
+                        AND: [
+                            { status: { not: 'CANCELLED' } },
+                            { slot: { endTime: { lt: now } } }
+                        ]
+                    }
+                ]
             }
         })
     ])
 
-    const monthlyEarnings = monthMetrics._sum.artistShare || 0
+    const monthlyEarnings = monthMetrics.reduce((acc, b) => acc + (b.artistShare || 0), 0)
     const userName = session.user.name?.split(' ')[0] || 'Artista'
     const todayDate = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' }).toUpperCase()
 
     return (
-        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8 relative overflow-hidden min-h-screen p-4 md:p-8">
+            {/* Ambient FX */}
+            <div className="scanline" />
+            <div className="absolute inset-0 data-pattern-grid opacity-30 pointer-events-none" />
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/5 pb-6">
                 <div>
                     <h2 className="text-gray-400 font-mono text-xs uppercase tracking-widest mb-2">Painel de Controle</h2>
-                    <h1 className="text-3xl font-orbitron font-bold text-white">
-                        Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{userName}</span>
+                    <h1 className="text-3xl font-orbitron font-bold tracking-tight pixel-text">
+                        BEM-VINDO, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 uppercase">{userName}</span>
                     </h1>
+                    <p className="text-gray-500 font-mono text-xs uppercase tracking-widest mt-1">Status do Sistema: <span className="text-green-500 animate-pulse font-bold tracking-tighter">OPERACIONAL</span></p>
                 </div>
                 <div className="flex gap-4">
                     <div className="bg-gray-900/50 border border-white/5 px-4 py-2 rounded flex items-center gap-3 shadow-[0_0_10px_rgba(34,197,94,0.1)]">

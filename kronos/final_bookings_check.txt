@@ -1,0 +1,5 @@
+[dotenv@17.2.3] injecting env (2) from .env.local -- tip: ­ƒùé´©Å backup and recover secrets: https://dotenvx.com/ops
+­ƒºÉ Listando TODO o banco de Agendamentos...
+­ƒôè Encontrados 2 agendamentos totais.
+[1] Cliente: Gabriel | Status: COMPLETED | Valor: 1400 | ID: cmjdlpoy1000f5kycy0dmvsx8
+[2] Cliente: Gabriel | Status: COMPLETED | Valor: 400 | ID: cmjed31ky0003wlzqh8a0aaqk

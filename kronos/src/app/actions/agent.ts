@@ -5,19 +5,24 @@ import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 
 export async function queryAgent(userQuery: string, history: any[]) {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) return { text: "Preciso que você faça login primeiro.", role: 'System' }
+    const session = await getServerSession(authOptions) as any
+    if (!session?.user || !session?.activeWorkspaceId) {
+        return { text: "Preciso que você selecione um workspace primeiro.", role: 'KAI' }
+    }
 
-    // Simulação de RAG/Intenção
     const query = userQuery.toLowerCase()
 
-    // 1. Identificar Contexto do Usuário
-    const artist = await prisma.artist.findUnique({
-        where: { userId: session.user.id },
+    // 1. Identificar Contexto do Usuário no Workspace Ativo
+    const artist = await prisma.artist.findFirst({
+        where: {
+            userId: session.user.id,
+            workspaceId: session.activeWorkspaceId
+        },
         include: {
             user: true,
             bookings: {
                 where: {
+                    workspaceId: session.activeWorkspaceId,
                     slot: {
                         startTime: { gte: new Date() }
                     }
@@ -33,62 +38,57 @@ export async function queryAgent(userQuery: string, history: any[]) {
         }
     })
 
-    if (!artist) return { text: "Não encontrei seu perfil de artista.", role: 'KAI' }
+    if (!artist) return { text: "Não encontrei seu perfil de artista neste workspace.", role: 'KAI' }
 
-    // 2. Lógica de Resposta baseada em Regras (MVP do RAG)
+    // 2. Lógica de Resposta baseada em Regras (Com Workspace Isolation)
     let responseText = ""
 
     if (query.includes('ganho') || query.includes('faturei') || query.includes('financeiro')) {
         const aggregations = await prisma.booking.aggregate({
-            where: { artistId: artist.id, status: 'COMPLETED' },
+            where: {
+                workspaceId: session.activeWorkspaceId,
+                artistId: artist.id,
+                status: 'COMPLETED'
+            },
             _sum: { artistShare: true }
         })
         const total = aggregations._sum.artistShare || 0
-        responseText = `Com base nos seus registros, você acumulou um total de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)} em comissões recebidas.`
+        responseText = `Com base nos seus registros deste estúdio, você acumulou um total de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)} em comissões.`
     }
-    else if (query.includes('agenda') || query.includes('agendamento') || query.includes('hoje')) {
+    else if (query.includes('equipe') || query.includes('artistas') || query.includes('instagram')) {
+        const artistsInWorkspace = await prisma.artist.findMany({
+            where: { workspaceId: session.activeWorkspaceId },
+            include: { user: true }
+        })
+        const count = artistsInWorkspace.length
+        const instaList = artistsInWorkspace
+            .filter(a => a.instagram)
+            .map(a => `@${a.instagram?.replace('@', '')}`)
+            .join(', ')
+
+        responseText = `Atualmente temos ${count} artistas neste estúdio. IDs digitais ativos: ${instaList || 'Nenhum Instagram mapeado ainda.'}.`
+    }
+    else if (query.includes('agenda') || query.includes('agendamento')) {
         if (artist.bookings.length === 0) {
-            responseText = "Você não tem agendamentos próximos registrados no sistema."
+            responseText = "Você não tem agendamentos próximos registrados aqui."
         } else {
             const nextBooking = artist.bookings[0]
             const date = new Date(nextBooking.slot.startTime).toLocaleDateString('pt-BR')
-            const time = new Date(nextBooking.slot.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-            responseText = `Você tem ${artist.bookings.length} agendamentos futuros próximos. O próximo é com ${nextBooking.client.name} em ${date} às ${time}.`
+            responseText = `Você tem ${artist.bookings.length} agendamentos futuros. O próximo é com ${nextBooking.client.name} em ${date}.`
         }
-    }
-    else if (query.includes('cliente') || query.includes('quantos')) {
-        // Count unique clients (Total)
-        const totalClients = await prisma.booking.groupBy({
-            by: ['clientId'],
-            where: { artistId: artist.id }
-        })
-        responseText = `Você já atendeu ${totalClients.length} clientes únicos registrados no sistema.`
-    }
-    else if (query.includes('ola') || query.includes('oi') || query.includes('quem é você')) {
-        responseText = `Olá ${artist.user.name?.split(' ')[0]}! Sou KAI, seu assistente pessoal no Kronos. Posso ajudar com dados financeiros, agenda ou dúvidas do estúdio.`
     }
     else {
-        // Fallback: Busca na base FAQ (SImulada)
-        const article = await prisma.helpArticle.findFirst({
-            where: {
-                keywords: { hasSome: query.split(' ') } // Busca tosca por keyword
-            }
-        })
-
-        if (article) {
-            responseText = `Encontrei algo sobre isso: ${article.content}`
-        } else {
-            responseText = "Ainda estou aprendendo sobre esse tópico. Tente perguntar sobre 'ganhos', 'clientes' ou consulte o FAQ."
-        }
+        responseText = `Olá ${artist.user.name?.split(' ')[0]}! Sou KAI. Ainda estou aprendendo a analisar dados complexos deste workspace, mas posso te passar seus ganhos ou agenda.`
     }
 
     // Log Interaction
     await prisma.agentLog.create({
         data: {
             userId: session.user.id,
+            workspaceId: session.activeWorkspaceId,
             query: userQuery,
             response: responseText,
-            intent: 'MVP_RULE_BASED'
+            intent: 'WORKSPACE_QUERY'
         }
     })
 

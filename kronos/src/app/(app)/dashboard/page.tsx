@@ -26,7 +26,23 @@ export default function AgendaPage() {
 
     useEffect(() => {
         fetchSlots()
+        fetchArtistProfile()
     }, [])
+
+    const fetchArtistProfile = async () => {
+        try {
+            const response = await fetch('/api/artist/profile')
+            const data = await response.json()
+            if (data.artist?.user?.phone) {
+                const pin = data.artist.user.phone.slice(-4)
+                localStorage.setItem('artistPin', pin)
+                // Force a re-render for the header if needed, but since it reads from localStorage on render, it should work next tick.
+                // For immediate update, we could use state.
+            }
+        } catch (error) {
+            console.error('Error fetching artist profile:', error)
+        }
+    }
 
     const fetchSlots = async () => {
         try {
@@ -68,8 +84,18 @@ export default function AgendaPage() {
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <BrandLogo size={48} />
-                        <div className="hidden md:block text-sm font-mono text-primary/70 uppercase tracking-wider">
-                            Sistema de Agendamento Avançado
+                        <div className="flex items-center space-x-6">
+                            {/* Artist PIN Badge */}
+                            <div className="bg-secondary/10 border border-secondary/20 px-4 py-2 rounded-xl flex flex-col items-center">
+                                <span className="text-[8px] font-mono text-secondary uppercase tracking-widest">PIN KIOSK</span>
+                                <span className="text-lg font-bold font-orbitron text-white mt-1">
+                                    {/* Will be fetched or obtained from session */}
+                                    {typeof window !== 'undefined' ? localStorage.getItem('artistPin') : '....'}
+                                </span>
+                            </div>
+                            <div className="hidden md:block text-sm font-mono text-primary/70 uppercase tracking-wider">
+                                Sistema de Agendamento Avançado
+                            </div>
                         </div>
                     </div>
 

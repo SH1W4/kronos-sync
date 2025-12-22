@@ -22,16 +22,16 @@ export async function createInvite(options: {
     durationDays?: number,
     customCode?: string
 }) {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions) as any
 
-    if (!session?.user?.email) {
-        return { success: false, error: "Não autorizado" }
+    if (!session?.user?.id || !session?.activeWorkspaceId) {
+        return { success: false, error: "Não autorizado ou sem workspace ativo" }
     }
 
     const { role, targetPlan, maxUses = 1, durationDays, customCode } = options
 
     const creator = await prisma.user.findUnique({
-        where: { email: session.user.email },
+        where: { id: session.user.id },
         include: { artist: true }
     })
 
@@ -59,6 +59,7 @@ export async function createInvite(options: {
                 maxUses,
                 durationDays,
                 creatorId: creator.id,
+                workspaceId: session.activeWorkspaceId,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 dias
             }
         })
@@ -72,27 +73,59 @@ export async function createInvite(options: {
 }
 
 export async function getInvites() {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) return []
-
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } })
-    if (!user) return []
+    const session = await getServerSession(authOptions) as any
+    if (!session?.activeWorkspaceId) return []
 
     return await prisma.inviteCode.findMany({
-        where: { creatorId: user.id },
+        where: { workspaceId: session.activeWorkspaceId },
         orderBy: { createdAt: 'desc' }
     })
 }
 
 export async function revokeInvite(id: string) {
+    const session = await getServerSession(authOptions) as any
+    if (!session?.activeWorkspaceId) return { success: false, error: "Não autorizado" }
+
     try {
         await prisma.inviteCode.update({
-            where: { id },
+            where: { id, workspaceId: session.activeWorkspaceId },
             data: { isActive: false }
         })
         revalidatePath('/artist/invites')
         return { success: true }
     } catch (error) {
         return { success: false, error: "Erro ao revogar" }
+    }
+}
+
+/**
+ * Busca detalhes de um convite pelo código
+ */
+export async function getInviteByCode(code: string) {
+    try {
+        const invite = await prisma.inviteCode.findUnique({
+            where: { code: code.toUpperCase() },
+            include: {
+                workspace: {
+                    select: {
+                        name: true,
+                        primaryColor: true,
+                        logoUrl: true
+                    }
+                }
+            }
+        })
+
+        if (!invite || !invite.isActive) {
+            return { error: 'Convite inválido ou expirado.' }
+        }
+
+        if (invite.maxUses && invite.currentUses >= invite.maxUses) {
+            return { error: 'Este convite já atingiu o limite de usos.' }
+        }
+
+        return { success: true, invite }
+    } catch (e) {
+        return { error: 'Erro ao validar convite.' }
     }
 }

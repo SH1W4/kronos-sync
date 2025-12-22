@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 
 export interface ThemeConfig {
   // Color Palette
@@ -110,26 +111,42 @@ export const useTheme = () => {
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<ThemeConfig>(defaultTheme)
+  const { data: session } = useSession()
 
-  // Load theme from localStorage on mount
+  // Load theme from localStorage or Session on mount/change
   useEffect(() => {
     const savedTheme = localStorage.getItem('kronos-theme')
+    let baseTheme = defaultTheme
+
     if (savedTheme) {
       try {
-        const parsedTheme = JSON.parse(savedTheme)
-        setThemeState({ ...defaultTheme, ...parsedTheme })
-      } catch (error) {
-        console.error('Error loading saved theme:', error)
+        baseTheme = { ...defaultTheme, ...JSON.parse(savedTheme) }
+      } catch (e) {
+        console.error('Error parsing saved theme')
       }
     }
-  }, [])
+
+    // Session Override (Stronger than localStorage for identity-linked theme)
+    if ((session?.user as any)?.customColor) {
+      baseTheme = { ...baseTheme, primaryColor: (session.user as any).customColor }
+    }
+
+    setThemeState(baseTheme)
+  }, [session])
 
   // Apply theme to CSS variables
   useEffect(() => {
     const root = document.documentElement
 
+    // Helper to extract RGB from hex
+    const hexToRgb = (hex: string) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '139, 92, 246'
+    }
+
     // Color variables
     root.style.setProperty('--cyber-green', theme.primaryColor)
+    root.style.setProperty('--primary-rgb', hexToRgb(theme.primaryColor))
     root.style.setProperty('--cyber-blue', theme.accentColor)
     root.style.setProperty('--cyber-purple', theme.secondaryColor)
     root.style.setProperty('--background', theme.backgroundColor)

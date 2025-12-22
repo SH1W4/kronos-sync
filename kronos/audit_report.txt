@@ -1,0 +1,20 @@
+[dotenv@17.2.3] injecting env (2) from .env.local -- tip: Ô£à audit secrets and track compliance: https://dotenvx.com/ops
+­ƒºÉ Auditando C├ílculos de Comiss├úo...
+­ƒæñ Artista: Dev Artist
+­ƒôè Taxa de Comiss├úo (Config): 30%
+
+­ƒôà Detalhes dos Agendamentos:
+[1] Cliente: Gabriel
+    Valor Total: R$ 1400
+    Artist Share (Banco): R$ 420
+    Artist Share (Esperado @ 30%): R$ 420
+    Diferen├ºa: R$ 0
+[2] Cliente: Gabriel
+    Valor Total: R$ 400
+    Artist Share (Banco): R$ 120
+    Artist Share (Esperado @ 30%): R$ 120
+    Diferen├ºa: R$ 0
+
+­ƒôê TOTAIS:
+   Faturamento Bruto: R$ 1800
+   Total Artist Share: R$ 540

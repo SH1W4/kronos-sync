@@ -21,6 +21,10 @@
 - [x] **Google Calendar Sync (Setup)**
   - Obtenção de Credenciais Cloud Console.
   - Configuração de Refresh Tokens (Offline Access).
+- [x] **SaaS Multi-Tenant Architecture**
+  - Isolamento Atômico de Dados por **Workspace**.
+  - Modelo de Permissionamento (Dono, Admin, Artista, Staff).
+  - Vínculo Permanente via Chave de Acesso (Linkage Lock).
 
 ## Fase 3: Infraestrutura & Deploy (Concluído ✅)
 - [x] **Docker Local**
@@ -37,7 +41,7 @@
 
 ## Fase 4: Experiência do Artista (Em Andamento 🚧)
 - [x] **Dashboard do Artista**
-  - [x] Isolamento de Dados (Cada artista vê apenas o seu).
+  - [x] **Silo de Dados:** Isolamento total (Artistas operam apenas em seus estúdios designados).
   - [x] Métricas em Tempo Real (Faturamento, Sessões).
   - [x] Visualização de Agenda do Dia.
 - [x] **Segurança & Acesso**
@@ -46,14 +50,24 @@
 - [x] **Módulo 1: Dashboard Inicial** (KPIS, Agendamentos Hoje)
 - [x] **Módulo 2: Agenda** (Visualização, Novo Agendamento, Google Sync)
 - [x] **Módulo 3: Ficha de Anamnese** (Link Público, Assinatura Digital, Persistência)
+  - [x] **Upgrade KRONØS:** Conformidade total com campos do CSV Standard.
+  - [x] **Triagem Inteligente:** Sistema de Alertas Clínicos para o artista.
 - [x] **Módulo 4: Financeiro** (Extrato, Comissões, Totais)
-- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca).
-  
-## Fase 5: Expansão (Planejado 🔮)
-- [ ] **Visão Master/Admin**
-  - Resumo de toda equipe.
-  - Gestão de Comissões.
-- [ ] **Kiosk Mode (Recepção)**
-  - Auto-checkin do cliente.
-- [ ] **Marketplace & Integrações**
+  - [x] **Liquidação Digital:** Fluxo de acerto manual via PIX com upload de comprovante.
+  - [x] **IA Vision (Alpha):** Agente de validação automática de recibos com OCR.
+  - [x] **Sync Glyphs:** Sistema de tokenização digital para liquidações aprovadas.
+- [x] **Módulo 5: Clientes** (Lista, Histórico, Busca)
+- [x] **Módulo 6: KRONOS Kiosk** (Recepção & Vendas)
+  - [x] **Conversion Hub:** Landing page com UX otimizada e foco em Dual Core.
+  - [x] **Soul Sync:** Gamificação de captura de leads com progressão visual e marca d'água branding.
+  - [x] **Ink Pass:** Geração de cupons com **QR Code de recompensa** imediata.
+- [x] **Estabilidade & Recovery** (Turbopack optimization, Prisma Windows bypass, Component hydration fix)
+- [x] **Inteligência Artificial Autônoma** (THE VAULT)
+  - [x] **Digital Identity Sync:** Adição do campo Instagram ao modelo Artist.
+  - [x] **Studio-First Validation:** Algoritmo de IA que valida o PIX para o estúdio (Workspace) com 99% de confiança.
 
+## Fase 5: Ecossistema & Escala (Em Foco 🔮)
+- [ ] **Dashboards de Performance Avançados**
+- [ ] **Automação de Marketing** (Re-engagement de Leads)
+- [ ] **Integração com Gateways de Pagamento** (Direto)
+- [ ] **KAI Advanced Portfólio:** Análise de visão computacional real para qualidade técnica.
