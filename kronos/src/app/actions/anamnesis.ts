@@ -2,27 +2,44 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 
-export type AnamnesisData = {
-    fullName?: string
-    whatsapp?: string
-    birthDate?: string
-    medicalConditionsTattoo?: string
-    medicalConditionsHealing?: string
-    medicalConditionsHealingDetails?: string
-    knownAllergies?: string
-    artistHandle?: string
-    artDescription?: string
-    agreedValue?: string
-    understandPermanence: boolean
-    followInstructions: boolean
-    acceptedTerms: boolean
-    signatureData?: string
-}
+// Schema de validação para anamnese (compatível com CSV)
+const anamnesisDataSchema = z.object({
+    fullName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').optional(),
+    whatsapp: z.string().regex(/^\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}$/, 'Formato esperado: (11) 99999-9999').optional(),
+    birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida').optional(),
+    medicalConditionsTattoo: z.string().max(500).optional(),
+    medicalConditionsHealing: z.string().max(500).optional(),
+    medicalConditionsHealingDetails: z.string().max(500).optional(),
+    knownAllergies: z.string().max(500).optional(),
+    artistHandle: z.string().optional(),
+    artDescription: z.string().max(1000).optional(),
+    agreedValue: z.string().optional(),
+    understandPermanence: z.boolean(),
+    followInstructions: z.boolean(),
+    acceptedTerms: z.boolean().refine((val) => val === true, 'Termos devem ser aceitos'),
+    signatureData: z.string().min(100, 'Assinatura obrigatória').optional()
+})
 
-export async function saveAnamnesis(bookingId: string, data: AnamnesisData) {
+export type AnamnesisData = z.infer<typeof anamnesisDataSchema>
+
+export async function saveAnamnesis(bookingId: string, data: unknown) {
     try {
+        // Validar dados de entrada
+        const validated = anamnesisDataSchema.safeParse(data)
+        if (!validated.success) {
+            const firstError = validated.error.errors[0]
+            return {
+                success: false,
+                error: firstError.message,
+                field: firstError.path[0]
+            }
+        }
+
         console.log(`💾 Salvando anamnese (CSV Flow) para Booking: ${bookingId}`)
+
+        const validData = validated.data
 
         // 1. Validar se o agendamento existe
         const booking = await prisma.booking.findUnique({
@@ -40,40 +57,40 @@ export async function saveAnamnesis(bookingId: string, data: AnamnesisData) {
                 bookingId: bookingId
             },
             update: {
-                fullName: data.fullName,
-                whatsapp: data.whatsapp,
-                birthDate: data.birthDate,
-                medicalConditionsTattoo: data.medicalConditionsTattoo,
-                medicalConditionsHealing: data.medicalConditionsHealing,
-                medicalConditionsHealingDetails: data.medicalConditionsHealingDetails,
-                knownAllergies: data.knownAllergies,
-                artistHandle: data.artistHandle,
-                artDescription: data.artDescription,
-                agreedValue: data.agreedValue,
-                understandPermanence: data.understandPermanence,
-                followInstructions: data.followInstructions,
-                acceptedTerms: data.acceptedTerms,
-                signatureData: data.signatureData,
+                fullName: validData.fullName,
+                whatsapp: validData.whatsapp,
+                birthDate: validData.birthDate,
+                medicalConditionsTattoo: validData.medicalConditionsTattoo,
+                medicalConditionsHealing: validData.medicalConditionsHealing,
+                medicalConditionsHealingDetails: validData.medicalConditionsHealingDetails,
+                knownAllergies: validData.knownAllergies,
+                artistHandle: validData.artistHandle,
+                artDescription: validData.artDescription,
+                agreedValue: validData.agreedValue,
+                understandPermanence: validData.understandPermanence,
+                followInstructions: validData.followInstructions,
+                acceptedTerms: validData.acceptedTerms,
+                signatureData: validData.signatureData,
                 updatedAt: new Date()
             },
             create: {
                 bookingId: bookingId,
                 clientId: booking.clientId,
                 workspaceId: booking.workspaceId,
-                fullName: data.fullName,
-                whatsapp: data.whatsapp,
-                birthDate: data.birthDate,
-                medicalConditionsTattoo: data.medicalConditionsTattoo,
-                medicalConditionsHealing: data.medicalConditionsHealing,
-                medicalConditionsHealingDetails: data.medicalConditionsHealingDetails,
-                knownAllergies: data.knownAllergies,
-                artistHandle: data.artistHandle,
-                artDescription: data.artDescription,
-                agreedValue: data.agreedValue,
-                understandPermanence: data.understandPermanence,
-                followInstructions: data.followInstructions,
-                acceptedTerms: data.acceptedTerms,
-                signatureData: data.signatureData,
+                fullName: validData.fullName,
+                whatsapp: validData.whatsapp,
+                birthDate: validData.birthDate,
+                medicalConditionsTattoo: validData.medicalConditionsTattoo,
+                medicalConditionsHealing: validData.medicalConditionsHealing,
+                medicalConditionsHealingDetails: validData.medicalConditionsHealingDetails,
+                knownAllergies: validData.knownAllergies,
+                artistHandle: validData.artistHandle,
+                artDescription: validData.artDescription,
+                agreedValue: validData.agreedValue,
+                understandPermanence: validData.understandPermanence,
+                followInstructions: validData.followInstructions,
+                acceptedTerms: validData.acceptedTerms,
+                signatureData: validData.signatureData,
             }
         })
 

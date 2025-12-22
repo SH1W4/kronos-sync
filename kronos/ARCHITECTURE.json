@@ -1,0 +1,340 @@
+{
+    "project": {
+        "name": "KRONØS SYNC",
+        "version": "2.0.0",
+        "description": "Operating System for the Artistic Elite - Complete management platform for tattoo studios",
+        "repository": "SH1W4/kronos-sync",
+        "license": "PROPRIETARY",
+        "completeness": "75%",
+        "status": "MVP_IN_PROGRESS"
+    },
+    "architecture": {
+        "pattern": "Full-Stack Next.js with Server Actions",
+        "rendering": "Server-Side Rendering (SSR) + Client Components",
+        "routing": "App Router (Next.js 16)",
+        "state_management": "React Server Components + Client State",
+        "styling": "Tailwind CSS v4 + Custom Cyber Y2K Theme"
+    },
+    "stack": {
+        "frontend": {
+            "framework": "Next.js 16",
+            "library": "React 19",
+            "styling": "Tailwind CSS v4",
+            "ui_components": "Custom + shadcn/ui",
+            "fonts": [
+                "Orbitron",
+                "JetBrains Mono",
+                "Inter"
+            ],
+            "icons": "Lucide React"
+        },
+        "backend": {
+            "runtime": "Next.js Server Actions",
+            "orm": "Prisma ORM v5.22.0",
+            "database": "PostgreSQL (Neon/Vercel)",
+            "auth": "NextAuth.js (Magic Link)",
+            "validation": "Zod (in progress)"
+        },
+        "integrations": {
+            "calendar": "Google Calendar API",
+            "ai": "OpenAI GPT-4 (KAI Assistant + Vision)",
+            "instagram": "Instagram Basic Display API",
+            "email": "Resend (planned)",
+            "pwa": "Service Worker + Manifest"
+        }
+    },
+    "directory_structure": {
+        "src/app": "Next.js App Router pages and layouts",
+        "src/app/actions": "Server Actions (business logic)",
+        "src/app/api": "API routes (auth, webhooks)",
+        "src/components": "React components (UI, features)",
+        "src/lib": "Utilities, helpers, and shared logic",
+        "src/contexts": "React contexts (theme, session)",
+        "prisma": "Database schema and migrations",
+        "public": "Static assets (images, icons, manifest)",
+        "docs": "User-facing documentation (CODEX)"
+    },
+    "core_features": {
+        "authentication": {
+            "status": "COMPLETE",
+            "type": "Magic Link (NextAuth.js)",
+            "files": [
+                "src/app/api/auth/[...nextauth]/route.ts",
+                "src/lib/auth.ts"
+            ]
+        },
+        "multi_tenancy": {
+            "status": "COMPLETE",
+            "description": "Workspace isolation (silos)",
+            "files": [
+                "prisma/schema.prisma (Workspace model)",
+                "src/app/actions/workspaces.ts"
+            ]
+        },
+        "scheduling": {
+            "status": "COMPLETE",
+            "description": "Booking system with slots and Google Sync",
+            "files": [
+                "src/app/actions/bookings.ts",
+                "src/app/artist/agenda/page.tsx",
+                "src/components/agenda/*"
+            ]
+        },
+        "anamnesis": {
+            "status": "COMPLETE",
+            "description": "Digital medical form with signature",
+            "files": [
+                "src/app/actions/anamnesis.ts",
+                "src/app/artist/anamnese/[bookingId]/page.tsx",
+                "src/components/anamnese/SignatureCanvas.tsx"
+            ],
+            "validation": "Zod (in progress)"
+        },
+        "kiosk": {
+            "status": "COMPLETE",
+            "description": "Lead capture with gamification",
+            "files": [
+                "src/app/actions/kiosk.ts",
+                "src/app/kiosk/page.tsx",
+                "src/app/kiosk/success/page.tsx"
+            ]
+        },
+        "financial": {
+            "status": "COMPLETE",
+            "description": "Auto-settle with AI OCR",
+            "files": [
+                "src/app/actions/finance.ts",
+                "src/app/artist/financeiro/page.tsx",
+                "src/lib/vision.ts (AI OCR mock)"
+            ]
+        },
+        "marketplace": {
+            "status": "COMPLETE",
+            "description": "Physical and digital products",
+            "files": [
+                "src/app/actions/marketplace.ts",
+                "src/app/artist/marketplace/page.tsx"
+            ]
+        },
+        "ink_pass": {
+            "status": "COMPLETE",
+            "description": "Premium invite system",
+            "files": [
+                "src/app/actions/invites.ts",
+                "src/app/invite/[code]/page.tsx",
+                "src/components/invites/InkPassCard.tsx"
+            ]
+        },
+        "codex": {
+            "status": "COMPLETE",
+            "description": "Knowledge base with role-based access",
+            "files": [
+                "src/app/actions/docs.ts",
+                "src/app/artist/codex/page.tsx",
+                "docs/* (training, governance, templates, dev)"
+            ]
+        },
+        "kai_assistant": {
+            "status": "COMPLETE",
+            "description": "AI branding assistant via Instagram",
+            "files": [
+                "src/app/actions/kai.ts",
+                "src/components/kai/AnalysisModal.tsx"
+            ]
+        }
+    },
+    "pending_features": {
+        "validations": {
+            "status": "IN_PROGRESS",
+            "priority": "CRITICAL",
+            "description": "Robust data validation with Zod",
+            "files": [
+                "src/lib/validations.ts (created)",
+                "src/app/actions/*.ts (partially applied)"
+            ],
+            "completion": "40%"
+        },
+        "notifications": {
+            "status": "NOT_STARTED",
+            "priority": "CRITICAL",
+            "description": "Email notifications via Resend",
+            "files": [
+                "src/lib/email.ts (planned)",
+                "src/app/actions/bookings.ts (integration planned)"
+            ],
+            "completion": "0%"
+        },
+        "analytics": {
+            "status": "NOT_STARTED",
+            "priority": "HIGH",
+            "description": "Basic event tracking and metrics",
+            "files": [
+                "prisma/schema.prisma (AnalyticsEvent model planned)",
+                "src/lib/analytics.ts (planned)",
+                "src/app/artist/analytics/page.tsx (planned)"
+            ],
+            "completion": "0%"
+        },
+        "ux_improvements": {
+            "status": "NOT_STARTED",
+            "priority": "HIGH",
+            "description": "Loading states, toasts, error boundaries",
+            "files": [
+                "src/app/error.tsx (planned)",
+                "src/components/ui/toast.tsx (planned)"
+            ],
+            "completion": "0%"
+        },
+        "billing": {
+            "status": "NOT_STARTED",
+            "priority": "CRITICAL_FOR_LAUNCH",
+            "description": "Stripe integration for SaaS billing",
+            "files": [
+                "src/lib/stripe.ts (planned)",
+                "src/app/api/webhooks/stripe/route.ts (planned)"
+            ],
+            "completion": "0%"
+        }
+    },
+    "database_schema": {
+        "core_models": [
+            "User",
+            "Workspace",
+            "WorkspaceMembership",
+            "Artist",
+            "Booking",
+            "Slot",
+            "Anamnesis",
+            "KioskEntry",
+            "InviteCode",
+            "Product",
+            "Order",
+            "OrderItem"
+        ],
+        "enums": [
+            "UserRole (CLIENT, ARTIST, ADMIN)",
+            "ArtistPlan (GUEST, RESIDENT, ASSOCIATED)",
+            "BookingStatus (OPEN, CONFIRMED, COMPLETED, CANCELLED)"
+        ]
+    },
+    "api_routes": {
+        "/api/auth/[...nextauth]": "NextAuth.js authentication",
+        "/api/google/callback": "Google Calendar OAuth callback",
+        "/api/webhooks/stripe": "Stripe webhooks (planned)"
+    },
+    "server_actions": {
+        "anamnesis.ts": "Save and retrieve anamnesis data",
+        "bookings.ts": "CRUD operations for bookings",
+        "docs.ts": "Fetch documentation with role filtering",
+        "finance.ts": "Financial operations and OCR validation",
+        "invites.ts": "Create and manage invite codes",
+        "kai.ts": "AI branding analysis",
+        "kiosk.ts": "Kiosk entry management",
+        "marketplace.ts": "Product and order management",
+        "settings.ts": "User and workspace settings",
+        "workspaces.ts": "Workspace CRUD and branding"
+    },
+    "documentation": {
+        "strategic": {
+            "EAP.md": "Execution and Architecture Plan",
+            "SESSION.md": "Current development session state",
+            "ARCHITECTURE.json": "This file - MCP map",
+            "README.md": "Project overview and setup"
+        },
+        "user_facing": {
+            "docs/training/artist-guide.md": "Artist onboarding and operations",
+            "docs/training/admin-guide.md": "Admin workspace governance",
+            "docs/training/growth-strategies.md": "ROI and growth strategies",
+            "docs/governance/data-sovereignty.md": "Security and data isolation",
+            "docs/governance/marketplace-commissions.md": "Commission strategies",
+            "docs/templates/booking-sop.md": "Standard operating procedure",
+            "docs/dev/infra-ops.md": "Infrastructure (dev-only)"
+        },
+        "planning": {
+            "monetization_strategy.md": "Complete monetization plan",
+            "final_checklist.md": "Pre-launch checklist",
+            "mvp_completion_plan.md": "75% → 100% implementation plan"
+        }
+    },
+    "security": {
+        "authentication": "Magic Link (passwordless)",
+        "authorization": "Role-based access control",
+        "data_isolation": "Multi-tenancy with workspace silos",
+        "validation": "Zod schemas (in progress)",
+        "rate_limiting": "Not implemented",
+        "cors": "Default Next.js configuration",
+        "headers": "Default Next.js security headers"
+    },
+    "deployment": {
+        "platform": "Vercel (planned)",
+        "database": "Neon PostgreSQL",
+        "cdn": "Vercel Edge Network",
+        "domain": "TBD",
+        "environment_variables": [
+            "POSTGRES_PRISMA_URL",
+            "POSTGRES_URL_NON_POOLING",
+            "NEXTAUTH_SECRET",
+            "NEXTAUTH_URL",
+            "GOOGLE_CLIENT_ID",
+            "GOOGLE_CLIENT_SECRET",
+            "OPENAI_API_KEY",
+            "RESEND_API_KEY (planned)"
+        ]
+    },
+    "monetization": {
+        "model": "SaaS + Marketplace Commission",
+        "tiers": {
+            "guest_spot": {
+                "price": "R$ 97/month",
+                "artists": "Up to 2",
+                "features": "Basic"
+            },
+            "resident_studio": {
+                "price": "R$ 297/month",
+                "artists": "Up to 5",
+                "features": "Complete"
+            },
+            "associated_elite": {
+                "price": "R$ 697/month",
+                "artists": "Unlimited",
+                "features": "Premium + White-label + API"
+            }
+        },
+        "additional_revenue": {
+            "marketplace_commission": "5% per sale",
+            "kai_branding": "R$ 497 one-time",
+            "consultancy": "R$ 1,997",
+            "affiliate_program": "20% recurring (12 months)"
+        },
+        "projections": {
+            "year_1_conservative": "R$ 175k ARR (50 workspaces)",
+            "year_1_optimistic": "R$ 603k ARR (150 workspaces)"
+        }
+    },
+    "development": {
+        "current_branch": "feat/kai-agent-rag",
+        "last_commit": "feat(settings): implement Studio and Appearance configuration sections",
+        "commits_ahead": 4,
+        "active_session": "Sprint Final para MVP 100%",
+        "next_milestone": "Complete Zod validations"
+    },
+    "metrics": {
+        "total_files": "~150",
+        "lines_of_code": "~15,000",
+        "components": "~50",
+        "server_actions": "~15",
+        "database_models": "~20",
+        "documentation_pages": "~15"
+    },
+    "team": {
+        "developer": "SH1W4",
+        "organization": "Symbeon Labs",
+        "ai_assistant": "Antigravity (Google Deepmind)",
+        "target_users": "Elite tattoo studios (R$ 30k+/month revenue)"
+    },
+    "roadmap": {
+        "current_sprint": "MVP Completion (75% → 100%)",
+        "next_sprint": "Beta Testing (5-10 studios)",
+        "future_sprint": "Public Launch + Stripe Billing"
+    }
+}
