@@ -134,3 +134,103 @@ export async function submitWorkspaceRequest(data: {
         return { error: 'Erro ao enviar solicitação. Tente novamente mais tarde.' }
     }
 }
+
+/**
+ * Atualiza os dados financeiros do Workspace.
+ * Apenas ADMINs do workspace podem modificar a chave PIX.
+ */
+export async function updateWorkspaceFinance(data: {
+    pixKey?: string,
+    pixRecipient?: string
+}) {
+    try {
+        const session = await getServerSession(authOptions)
+        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+
+        if (!session?.user || !activeWorkspaceId) {
+            return { error: 'Não autorizado ou nenhum estúdio ativo.' }
+        }
+
+        // Verificar permissão
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: activeWorkspaceId,
+                    userId: (session.user as any).id
+                }
+            }
+        })
+
+        if (!member || member.role !== 'ADMIN') {
+            return { error: 'Apenas administradores podem configurar o financeiro do estúdio.' }
+        }
+
+        await prisma.workspace.update({
+            where: { id: activeWorkspaceId },
+            data: {
+                pixKey: data.pixKey,
+                pixRecipient: data.pixRecipient
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        revalidatePath('/artist/finance')
+
+        return { success: true, message: 'Configurações financeiras atualizadas.' }
+
+    } catch (error) {
+        console.error('Error updating workspace finance:', error)
+        return { error: 'Erro ao salvar configurações de PIX.' }
+    }
+}
+
+/**
+ * Atualiza o branding visual do Workspace.
+ * Apenas ADMINs do workspace podem modificar.
+ */
+export async function updateWorkspaceBranding(data: {
+    name?: string,
+    primaryColor?: string,
+    logoUrl?: string
+}) {
+    try {
+        const session = await getServerSession(authOptions)
+        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+
+        if (!session?.user || !activeWorkspaceId) {
+            return { error: 'Não autorizado ou nenhum estúdio ativo.' }
+        }
+
+        // Verificar permissão
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: activeWorkspaceId,
+                    userId: (session.user as any).id
+                }
+            }
+        })
+
+        if (!member || member.role !== 'ADMIN') {
+            return { error: 'Apenas administradores podem configurar o branding do estúdio.' }
+        }
+
+        const workspace = await prisma.workspace.update({
+            where: { id: activeWorkspaceId },
+            data: {
+                name: data.name,
+                primaryColor: data.primaryColor,
+                logoUrl: data.logoUrl
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        revalidatePath('/kiosk')
+
+        return { success: true, message: 'Branding do estúdio atualizado.', workspace }
+
+    } catch (error) {
+        console.error('Error updating workspace branding:', error)
+        return { error: 'Erro ao salvar branding.' }
+    }
+}

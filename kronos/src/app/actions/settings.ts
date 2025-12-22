@@ -52,3 +52,31 @@ export async function updateArtistSettings(data: {
         return { error: 'Erro ao salvar configurações' }
     }
 }
+
+/**
+ * Atualiza o tema (cor) do usuário.
+ */
+export async function updateUserTheme(data: {
+    customColor: string
+}) {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.id) {
+            return { error: 'Não autorizado' }
+        }
+
+        await prisma.user.update({
+            where: { id: (session.user as any).id },
+            data: {
+                customColor: data.customColor
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true, message: 'Tema pessoal atualizado.' }
+
+    } catch (error) {
+        console.error('Error updating user theme:', error)
+        return { error: 'Erro ao salvar tema' }
+    }
+}

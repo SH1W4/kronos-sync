@@ -2,13 +2,17 @@
 
 import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { Settings, User, Shield, Calendar, CreditCard, Bell, Link as LinkIcon, Copy, Check, Instagram, Sparkles } from 'lucide-react'
+import { Settings, User, Shield, Calendar, CreditCard, Bell, Link as LinkIcon, Copy, Check, Instagram, Sparkles, Users, Landmark, Trash2, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { updateArtistSettings } from '@/app/actions/settings'
 import { analyzeInstagramProfile, applyKaiBranding } from '@/app/actions/kai'
 import { KaiAnalysisModal } from '@/components/kai/AnalysisModal'
+import { createInvite, getInvites, revokeInvite } from '@/app/actions/invites'
+import { updateWorkspaceFinance, updateWorkspaceBranding } from '@/app/actions/workspaces'
+import { updateUserTheme } from '@/app/actions/settings'
+import { InkPassCard } from '@/components/invites/InkPassCard'
 
 export default function SettingsPage() {
     const { data: session, update: updateSession } = useSession()
@@ -25,6 +29,26 @@ export default function SettingsPage() {
     const [isKaiLoading, setIsKaiLoading] = useState(false)
     const [kaiSuggestions, setKaiSuggestions] = useState<any>(undefined)
 
+    // PIX State
+    const [pixKey, setPixKey] = useState('')
+    const [pixRecipient, setPixRecipient] = useState('')
+    const [isPixLoading, setIsPixLoading] = useState(false)
+
+    // Workspace Stats
+    const [studioName, setStudioName] = useState('')
+    const [studioColor, setStudioColor] = useState('#8B5CF6')
+
+    // Personal State
+    const [personalColor, setPersonalColor] = useState('#8B5CF6')
+
+    // Invite/Team State
+    const [invites, setInvites] = useState<any[]>([])
+    const [isInvitesLoading, setIsInvitesLoading] = useState(false)
+    const [newInviteType, setNewInviteType] = useState<'RESIDENT' | 'GUEST'>('RESIDENT')
+    const [newInviteCode, setNewInviteCode] = useState('')
+    const [selectedInvite, setSelectedInvite] = useState<any>(null)
+    const [activeTab, setActiveTab] = useState<'profile' | 'link' | 'sync' | 'plan' | 'security' | 'payments' | 'team' | 'studio' | 'appearance'>('profile')
+
     // Initialize values when session is available
     useEffect(() => {
         if (session?.user) {
@@ -32,8 +56,40 @@ export default function SettingsPage() {
             if ((session.user as any).commissionRate !== undefined) {
                 setCommission(String((session.user as any).commissionRate * 100))
             }
+
+            // Initialize PIX if available
+            const activeWsid = (session as any).activeWorkspaceId || (session?.user as any).activeWorkspaceId
+            const currentWorkspace = (session as any)?.workspaces?.find((w: any) => w.id === activeWsid)
+            if (currentWorkspace) {
+                setPixKey(currentWorkspace.pixKey || '')
+                setPixRecipient(currentWorkspace.pixRecipient || '')
+                setStudioName(currentWorkspace.name || '')
+                setStudioColor(currentWorkspace.primaryColor || '#8B5CF6')
+            }
+
+            if ((session?.user as any).customColor) {
+                setPersonalColor((session.user as any).customColor)
+            }
         }
     }, [session])
+
+    const fetchInvites = async () => {
+        setIsInvitesLoading(true)
+        try {
+            const data = await getInvites()
+            setInvites(data)
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setIsInvitesLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        if (activeTab === 'team') {
+            fetchInvites()
+        }
+    }, [activeTab])
 
     const handleSave = async () => {
         setLoading(true)
@@ -107,6 +163,101 @@ export default function SettingsPage() {
         setTimeout(() => setCopied(false), 2000)
     }
 
+
+    const handleCreateInvite = async () => {
+        setLoading(true)
+        try {
+            const result = await createInvite({
+                role: 'ARTIST',
+                targetPlan: newInviteType,
+                customCode: newInviteCode || undefined
+            })
+            if (result.success) {
+                alert('Chave gerada com sucesso!')
+                setNewInviteCode('')
+                fetchInvites()
+            } else {
+                alert(result.error)
+            }
+        } catch (e) {
+            alert('Erro ao gerar chave')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleRevokeInvite = async (id: string) => {
+        if (!confirm('Deseja realmente revogar esta chave?')) return
+        try {
+            const result = await revokeInvite(id)
+            if (result.success) {
+                fetchInvites()
+            } else {
+                alert(result.error)
+            }
+        } catch (e) {
+            alert('Erro ao revogar')
+        }
+    }
+
+    const handleSaveStudio = async () => {
+        setLoading(true)
+        try {
+            const result = await updateWorkspaceBranding({
+                name: studioName,
+                primaryColor: studioColor
+            })
+            if (result.success) {
+                alert('Branding do estúdio atualizado!')
+                await updateSession()
+            } else {
+                alert(result.error)
+            }
+        } catch (e) {
+            alert('Erro ao salvar branding')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleSavePersonalTheme = async () => {
+        setLoading(true)
+        try {
+            const result = await updateUserTheme({
+                customColor: personalColor
+            })
+            if (result.success) {
+                alert('Tema pessoal atualizado!')
+                await updateSession()
+            } else {
+                alert(result.error)
+            }
+        } catch (e) {
+            alert('Erro ao salvar tema')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleSavePix = async () => {
+        setIsPixLoading(true)
+        try {
+            const result = await updateWorkspaceFinance({ pixKey, pixRecipient })
+            if (result.success) {
+                alert('Dados PIX atualizados!')
+                await updateSession()
+            } else {
+                alert(result.error)
+            }
+        } catch (e) {
+            alert('Erro ao salvar PIX')
+        } finally {
+            setIsPixLoading(false)
+        }
+    }
+
+    const isAdmin = (session?.user as any)?.role === 'ADMIN'
+
     return (
         <div className="min-h-screen bg-black text-white p-6 md:p-12 relative overflow-hidden data-pattern-grid">
             {/* Cyber Y2K Effects */}
@@ -126,154 +277,412 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Navigation Sidebar */}
                     <aside className="space-y-2">
-                        <SidebarLink icon={<User size={18} />} label="Perfil do Artista" active />
-                        <SidebarLink icon={<LinkIcon size={18} />} label="Link do Cliente" />
-                        <SidebarLink icon={<Calendar size={18} />} label="Sincronização" />
-                        <SidebarLink icon={<CreditCard size={18} />} label="Assinatura & Plano" />
-                        <SidebarLink icon={<Shield size={18} />} label="Segurança" />
+                        <SidebarLink
+                            icon={<User size={18} />}
+                            label="Perfil do Artista"
+                            active={activeTab === 'profile'}
+                            onClick={() => setActiveTab('profile')}
+                        />
+                        <SidebarLink
+                            icon={<LinkIcon size={18} />}
+                            label="Link do Cliente"
+                            active={activeTab === 'link'}
+                            onClick={() => setActiveTab('link')}
+                        />
+                        <SidebarLink
+                            icon={<Calendar size={18} />}
+                            label="Sincronização"
+                            active={activeTab === 'sync'}
+                            onClick={() => setActiveTab('sync')}
+                        />
+                        <SidebarLink
+                            icon={<CreditCard size={18} />}
+                            label="Assinatura & Plano"
+                            active={activeTab === 'plan'}
+                            onClick={() => setActiveTab('plan')}
+                        />
+                        <SidebarLink
+                            icon={<Shield size={18} />}
+                            label="Segurança"
+                            active={activeTab === 'security'}
+                            onClick={() => setActiveTab('security')}
+                        />
+                        {isAdmin && (
+                            <>
+                                <SidebarLink
+                                    icon={<Users size={18} />}
+                                    label="Equipe"
+                                    active={activeTab === 'team'}
+                                    onClick={() => setActiveTab('team')}
+                                />
+                                <SidebarLink
+                                    icon={<Settings size={18} />}
+                                    label="Estúdio"
+                                    active={activeTab === 'studio'}
+                                    onClick={() => setActiveTab('studio')}
+                                />
+                                <SidebarLink
+                                    icon={<Landmark size={18} />}
+                                    label="Pagamentos"
+                                    active={activeTab === 'payments'}
+                                    onClick={() => setActiveTab('payments')}
+                                />
+                            </>
+                        )}
+                        <SidebarLink
+                            icon={<Palette size={18} />}
+                            label="Aparência"
+                            active={activeTab === 'appearance'}
+                            onClick={() => setActiveTab('appearance')}
+                        />
                     </aside>
 
                     {/* Content */}
-                    <div className="md:col-span-2 space-y-8">
-                        {/* Workspace Link (Locked) */}
-                        <div className="space-y-4 mb-8">
-                            <label className="text-[10px] font-mono text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <Shield className="w-3 h-3 text-purple-500" />
-                                Vínculo de Workspace
-                            </label>
-                            <div className="bg-purple-500/5 border border-purple-500/20 p-4 rounded-xl flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                                    <span className="font-mono text-xs text-white font-bold uppercase tracking-widest">
-                                        {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name || 'ESTÚDIO KRONØS'}
-                                    </span>
-                                </div>
-                                <span className="text-[8px] font-black font-mono text-purple-500/60 uppercase tracking-widest border border-purple-500/30 px-2 py-1 rounded">VÍNCULO ATIVO</span>
-                            </div>
-                            <p className="text-[9px] font-mono text-gray-500 italic opacity-60">Status: Account bound to this studio. Deployment locked.</p>
-                        </div>
-
-                        {/* Profile Section */}
-                        <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <User className="text-purple-400" size={20} />
-                                <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Informações Pessoais</h2>
-                            </div>
-
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-mono text-gray-500 uppercase">Nome de Exibição</label>
-                                    <Input
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="bg-black/50 border-white/10"
-                                    />
+                    <div className="md:col-span-2 space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
+                        {activeTab === 'profile' && (
+                            <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <User className="text-purple-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Informações Pessoais</h2>
                                 </div>
 
-                                {/* Instagram & KAI Section */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-mono text-gray-500 uppercase">Instagram Business (@)</label>
-                                    <div className="flex gap-2">
-                                        <div className="relative flex-1">
-                                            <Instagram size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                                            <Input
-                                                placeholder="@seu_perfil"
-                                                value={instagram}
-                                                onChange={(e) => setInstagram(e.target.value)}
-                                                className="bg-black/50 border-white/10 pl-9"
-                                            />
+                                <div className="grid gap-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Nome de Exibição</label>
+                                        <Input
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="bg-black/50 border-white/10"
+                                        />
+                                    </div>
+
+                                    {/* Instagram & KAI Section */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Instagram Business (@)</label>
+                                        <div className="flex gap-2">
+                                            <div className="relative flex-1">
+                                                <Instagram size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                                <Input
+                                                    placeholder="@seu_perfil"
+                                                    value={instagram}
+                                                    onChange={(e) => setInstagram(e.target.value)}
+                                                    className="bg-black/50 border-white/10 pl-9"
+                                                />
+                                            </div>
+                                            <Button
+                                                onClick={handleKaiAnalysis}
+                                                disabled={isKaiLoading}
+                                                className="bg-purple-600/10 border border-purple-500/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all gap-2 text-xs font-bold"
+                                            >
+                                                <Sparkles size={14} className={isKaiLoading ? 'animate-spin' : ''} />
+                                                ANALISAR KAI
+                                            </Button>
                                         </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Comissão Padrão (%)</label>
+                                        <Input
+                                            type="number"
+                                            value={commission}
+                                            onChange={(e) => setCommission(e.target.value)}
+                                            className="bg-black/50 border-white/10"
+                                        />
+                                    </div>
+
+                                    <div className="flex justify-end pt-4 border-t border-white/5">
                                         <Button
-                                            onClick={handleKaiAnalysis}
-                                            disabled={isKaiLoading}
-                                            className="bg-purple-600/10 border border-purple-500/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all gap-2 text-xs font-bold"
+                                            onClick={handleSave}
+                                            disabled={loading}
+                                            className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-10 rounded-xl transition-all"
                                         >
-                                            <Sparkles size={14} className={isKaiLoading ? 'animate-spin' : ''} />
-                                            ANALISAR KAI
+                                            {loading ? 'SALVANDO...' : 'SALVAR PERFIL'}
                                         </Button>
                                     </div>
-                                    <p className="text-[10px] text-gray-500 leading-relaxed italic">
-                                        DICA: Usamos IA para analisar seu feed e sugerir automaticamente bio, cores e tags de estilo para o seu perfil.
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'link' && (
+                            <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <LinkIcon className="text-purple-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm">Jornada do Cliente</h2>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <p className="text-xs text-gray-400 leading-relaxed">
+                                        Compartilhe este link com seus clientes ou gere um QR Code para que eles iniciem o processo de agendamento e anamnese.
                                     </p>
-                                </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-mono text-gray-500 uppercase">Comissão Padrão (%)</label>
-                                    <Input
-                                        type="number"
-                                        value={commission}
-                                        onChange={(e) => setCommission(e.target.value)}
-                                        className="bg-black/50 border-white/10"
-                                    />
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Client Link Section */}
-                        <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <LinkIcon className="text-purple-400" size={20} />
-                                <h2 className="font-bold uppercase tracking-wider text-sm">Jornada do Cliente</h2>
-                            </div>
-
-                            <div className="space-y-4">
-                                <p className="text-xs text-gray-400 leading-relaxed">
-                                    Compartilhe este link com seus clientes ou gere um QR Code para que eles iniciem o processo de agendamento e anamnese.
-                                </p>
-
-                                <div className="flex gap-2">
-                                    <div className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 h-12 flex items-center overflow-hidden">
-                                        <code className="text-xs text-purple-400 truncate">{clientLink}</code>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 h-12 flex items-center overflow-hidden">
+                                            <code className="text-xs text-purple-400 truncate">{clientLink}</code>
+                                        </div>
+                                        <Button
+                                            onClick={copyToClipboard}
+                                            variant="outline"
+                                            className="h-12 w-12 border-white/10 p-0 flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                                        >
+                                            {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
+                                        </Button>
                                     </div>
-                                    <Button
-                                        onClick={copyToClipboard}
-                                        variant="outline"
-                                        className="h-12 w-12 border-white/10 p-0 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-                                    >
-                                        {copied ? <Check size={18} className="text-green-500" /> : <Copy size={18} />}
-                                    </Button>
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'sync' && (
+                            <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Calendar className="text-purple-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm">Sincronização</h2>
                                 </div>
 
-                                <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
-                                    <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest text-center">
-                                        DICA: Este link levará o cliente diretamente para o fluxo de triagem do seu estúdio.
+                                <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-4">
+                                    <p className="text-xs text-gray-400 leading-relaxed">
+                                        Conecte sua conta Google para sincronizar automaticamente seus agendamentos no KRONØS com sua agenda pessoal.
                                     </p>
+                                    <div className="flex justify-start">
+                                        <GoogleSyncStatus />
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
+                            </section>
+                        )}
 
-                        {/* Integration Section */}
-                        <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
-                            <div className="flex items-center gap-2 mb-4">
-                                <Calendar className="text-purple-400" size={20} />
-                                <h2 className="font-bold uppercase tracking-wider text-sm">Integrações Externas</h2>
-                            </div>
-
-                            <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-4">
-                                <p className="text-xs text-gray-400 leading-relaxed">
-                                    Conecte sua conta Google para sincronizar automaticamente seus agendamentos no KRONØS com sua agenda pessoal.
-                                </p>
-                                <div className="flex justify-start">
-                                    <GoogleSyncStatus />
+                        {activeTab === 'plan' && (
+                            <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <CreditCard className="text-purple-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm text-purple-400">Assinatura & Plano</h2>
                                 </div>
-                            </div>
-                        </section>
 
-                        {/* Save Button */}
-                        <div className="flex justify-end pt-4">
-                            <Button
-                                onClick={handleSave}
-                                disabled={loading}
-                                className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-12 rounded-xl transition-all hover:scale-105 active:scale-95"
-                            >
-                                {loading ? 'SALVANDO...' : 'SALVAR ALTERAÇÕES'}
-                            </Button>
-                        </div>
+                                <div className="border border-purple-500/20 bg-purple-500/5 p-8 rounded-2xl text-center space-y-4">
+                                    <h3 className="text-xl font-orbitron font-bold">PLANO RESIDENTE</h3>
+                                    <p className="text-xs text-gray-500 font-mono uppercase tracking-widest">Status: Ativo até 2026</p>
+                                    <div className="h-px bg-white/5 w-full" />
+                                    <p className="text-[10px] text-gray-400 leading-relaxed">Seu plano atual permite acesso ilimitado ao Kiosk, Financeiro Avançado e Assistente KAI.</p>
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'security' && (
+                            <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Shield className="text-red-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm text-red-400">Segurança de Workspace</h2>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <p className="text-xs text-gray-400 leading-relaxed">
+                                        Este dispositivo e conta estão vinculados permanentemente ao workspace abaixo. Esta trava garante a integridade dos dados e o isolamento de silo.
+                                    </p>
+                                    <div className="bg-red-500/5 border border-red-500/20 p-4 rounded-xl flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                            <span className="font-mono text-xs text-white font-bold uppercase tracking-widest">
+                                                {(session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.name || 'ESTÚDIO KRONØS'}
+                                            </span>
+                                        </div>
+                                        <span className="text-[8px] font-black font-mono text-red-500/60 uppercase tracking-widest border border-red-500/30 px-2 py-1 rounded">VÍNCULO ATIVO</span>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'payments' && isAdmin && (
+                            <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Landmark className="text-green-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Configuração de Recebimento</h2>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-green-500/5 border border-green-500/10 rounded-xl mb-6">
+                                        <p className="text-[10px] font-mono text-green-400 uppercase tracking-widest leading-relaxed">
+                                            ATENÇÃO: Este PIX será utilizado para todos os recebimentos do estúdio através do Kiosk e links de pagamento.
+                                        </p>
+                                    </div>
+
+                                    <div className="grid gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Chave PIX do Estúdio</label>
+                                            <Input
+                                                placeholder="CPF, CNPJ, E-mail ou Chave Aleatória"
+                                                value={pixKey}
+                                                onChange={(e) => setPixKey(e.target.value)}
+                                                className="bg-black/50 border-white/10 font-mono text-green-400"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Nome do Recebedor (Titular)</label>
+                                            <Input
+                                                placeholder="Nome completo ou Razão Social"
+                                                value={pixRecipient}
+                                                onChange={(e) => setPixRecipient(e.target.value)}
+                                                className="bg-black/50 border-white/10"
+                                            />
+                                        </div>
+
+                                        <div className="flex justify-end pt-4 border-t border-white/5">
+                                            <Button
+                                                onClick={handleSavePix}
+                                                disabled={isPixLoading}
+                                                className="bg-green-600 hover:bg-green-500 font-bold px-8 h-10 rounded-xl transition-all"
+                                            >
+                                                {isPixLoading ? 'PROCESSANDO...' : 'SALVAR CHAVE PIX'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'team' && isAdmin && (
+                            <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                                    <div className="flex items-center gap-2">
+                                        <Users className="text-purple-400" size={20} />
+                                        <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Portal de Recrutamento</h2>
+                                    </div>
+                                    <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded text-[10px] font-mono text-purple-400 animate-pulse">
+                                        ADMIN ACCESS ENABLED
+                                    </div>
+                                </div>
+
+                                {/* Generate Section */}
+                                <div className="space-y-4">
+                                    <h3 className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Gerar Nova Chave</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-mono text-gray-500 uppercase">Tipo de Plano</label>
+                                            <select
+                                                value={newInviteType}
+                                                onChange={(e: any) => setNewInviteType(e.target.value)}
+                                                className="w-full bg-black/50 border border-white/10 h-10 px-3 rounded-lg text-xs font-mono text-purple-400 focus:outline-none focus:border-purple-500/50"
+                                            >
+                                                <option value="ASSOCIATED">ASSOCIATED (PREMIUM)</option>
+                                                <option value="RESIDENT">RESIDENT (FIXO)</option>
+                                                <option value="GUEST">GUEST (TEMPORÁRIO)</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-mono text-gray-500 uppercase">Código (Opcional)</label>
+                                            <Input
+                                                placeholder="EX: KRONOS-TEAM"
+                                                value={newInviteCode}
+                                                onChange={(e) => setNewInviteCode(e.target.value)}
+                                                className="bg-black/50 border-white/10 h-10 text-xs font-mono"
+                                            />
+                                        </div>
+                                        <div className="flex items-end">
+                                            <Button
+                                                onClick={handleCreateInvite}
+                                                disabled={loading}
+                                                className="w-full bg-purple-600 hover:bg-purple-500 font-bold h-10 rounded-lg text-[10px] uppercase tracking-tighter transition-all"
+                                            >
+                                                {loading ? 'GERANDO...' : 'EXECUTAR PROTOCOLO'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Preview Section */}
+                                {selectedInvite && (
+                                    <div className="flex flex-col items-center gap-6 p-8 bg-purple-500/5 border border-purple-500/20 rounded-3xl animate-in zoom-in-95 duration-500">
+                                        <div className="flex justify-between w-full items-center mb-2">
+                                            <h3 className="text-[10px] font-mono text-purple-400 uppercase tracking-widest font-bold">Visualização da Credencial</h3>
+                                            <button
+                                                onClick={() => setSelectedInvite(null)}
+                                                className="text-[10px] font-mono text-gray-500 hover:text-white uppercase"
+                                            >
+                                                [ Fechar ]
+                                            </button>
+                                        </div>
+                                        <InkPassCard
+                                            code={selectedInvite.code}
+                                            type={selectedInvite.targetPlan}
+                                            studioName={(session as any)?.workspaces?.find((w: any) => w.id === selectedInvite.workspaceId)?.name || 'KRONØS'}
+                                            primaryColor={(session as any)?.workspaces?.find((w: any) => w.id === selectedInvite.workspaceId)?.primaryColor || '#8B5CF6'}
+                                        />
+                                        <div className="flex gap-4">
+                                            <Button
+                                                variant="outline"
+                                                className="text-[10px] font-bold border-white/10 h-10 px-6 rounded-xl"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(`${window.location.origin}/invite/${selectedInvite.code}`)
+                                                    alert('Link do convite copiado!')
+                                                }}
+                                            >
+                                                COPIAR LINK DE RESGATE
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* List Section */}
+                                <div className="space-y-4 pt-4">
+                                    <h3 className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Chaves Ativas no Silo</h3>
+                                    <div className="border border-white/5 rounded-xl overflow-hidden">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead className="bg-white/5 text-[9px] font-mono uppercase text-gray-400 tracking-widest">
+                                                <tr>
+                                                    <th className="p-3">Código</th>
+                                                    <th className="p-3">Plano</th>
+                                                    <th className="p-3 text-center">Usos</th>
+                                                    <th className="p-3 text-right">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-white/5">
+                                                {invites.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="p-8 text-center text-xs text-gray-600 font-mono italic">
+                                                            Nenhuma chave ativa encontrada no workspace.
+                                                        </td>
+                                                    </tr>
+                                                ) : (
+                                                    invites.map((invite) => (
+                                                        <tr
+                                                            key={invite.id}
+                                                            className={`hover:bg-white/[0.02] transition-colors group cursor-pointer ${selectedInvite?.id === invite.id ? 'bg-white/5' : ''}`}
+                                                            onClick={() => setSelectedInvite(invite)}
+                                                        >
+                                                            <td className="p-3 font-mono text-xs text-purple-400 font-bold">{invite.code}</td>
+                                                            <td className="p-3">
+                                                                <span className={`text-[9px] px-2 py-0.5 rounded border font-mono ${invite.targetPlan === 'ASSOCIATED'
+                                                                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                                                                    : invite.targetPlan === 'RESIDENT'
+                                                                        ? 'border-purple-500/30 bg-purple-500/10 text-purple-400'
+                                                                        : 'border-blue-500/30 bg-blue-500/10 text-blue-400'
+                                                                    }`}>
+                                                                    {invite.targetPlan}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-3 text-center text-[10px] font-mono text-gray-500">
+                                                                {invite.currentUses} / {invite.maxUses}
+                                                            </td>
+                                                            <td className="p-3 text-right">
+                                                                <button
+                                                                    onClick={() => handleRevokeInvite(invite.id)}
+                                                                    className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-all group-hover:scale-110"
+                                                                    title="REVOGAR ACESSO"
+                                                                >
+                                                                    <Trash2 size={14} />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* KAI MODAL */}
             <KaiAnalysisModal
                 isOpen={isKaiModalOpen}
                 isLoading={isKaiLoading}
@@ -285,12 +694,15 @@ export default function SettingsPage() {
     )
 }
 
-function SidebarLink({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) {
+function SidebarLink({ icon, label, active = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, onClick: () => void }) {
     return (
-        <button className={`
-            w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-all
-            ${active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'text-gray-500 hover:bg-white/5 hover:text-white'}
-        `}>
+        <button
+            onClick={onClick}
+            className={`
+                w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-all
+                ${active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-white'}
+            `}
+        >
             {icon}
             <span>{label}</span>
         </button>

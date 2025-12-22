@@ -97,3 +97,35 @@ export async function revokeInvite(id: string) {
         return { success: false, error: "Erro ao revogar" }
     }
 }
+
+/**
+ * Busca detalhes de um convite pelo código
+ */
+export async function getInviteByCode(code: string) {
+    try {
+        const invite = await prisma.inviteCode.findUnique({
+            where: { code: code.toUpperCase() },
+            include: {
+                workspace: {
+                    select: {
+                        name: true,
+                        primaryColor: true,
+                        logoUrl: true
+                    }
+                }
+            }
+        })
+
+        if (!invite || !invite.isActive) {
+            return { error: 'Convite inválido ou expirado.' }
+        }
+
+        if (invite.maxUses && invite.currentUses >= invite.maxUses) {
+            return { error: 'Este convite já atingiu o limite de usos.' }
+        }
+
+        return { success: true, invite }
+    } catch (e) {
+        return { error: 'Erro ao validar convite.' }
+    }
+}

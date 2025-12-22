@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield } from 'lucide-react'
+import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
 import { ThemeCustomizer } from '@/components/theme/theme-customizer'
@@ -24,7 +24,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
         }
 
         const userRole = (session?.user as any)?.role
-        const activeWorkspaceId = (session as any)?.activeWorkspaceId
+        const activeWorkspaceId = (session?.user as any)?.activeWorkspaceId
 
         if (userRole !== 'ARTIST' && userRole !== 'ADMIN') {
             router.push('/dashboard')
@@ -65,13 +65,14 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                         {session?.user?.role === 'ADMIN' && (
                             <NavItem href="/artist/team" icon={<Shield size={20} />} label="EQUIPE" active={pathname === '/artist/team'} />
                         )}
+                        <NavItem href="/artist/codex" icon={<BookOpen size={20} />} label="CODEX" active={pathname?.startsWith('/artist/codex')} />
                         <NavItem href="/artist/settings" icon={<Settings size={20} />} label="SISTEMA" active={pathname === '/artist/settings'} />
                     </nav>
                 </div>
 
                 <div className="p-6 border-t border-white/5 space-y-4">
                     {/* Workspace Switcher / Display */}
-                    {(session as any)?.activeWorkspaceId && (
+                    {(session?.user as any)?.activeWorkspaceId && (
                         <div className="relative group">
                             {(session?.user as any)?.role === 'ADMIN' ? (
                                 <>
@@ -82,10 +83,10 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                                         <div className="flex items-center gap-2 overflow-hidden">
                                             <div
                                                 className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor] flex-shrink-0"
-                                                style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
+                                                style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
                                             />
                                             <span className="text-[10px] font-bold text-white truncate uppercase tracking-tighter">
-                                                {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name}
+                                                {(session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.name}
                                             </span>
                                         </div>
                                         <ChevronDown size={14} className="text-gray-500 group-hover:text-purple-400 transition-colors" />
@@ -97,12 +98,12 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                                             <button
                                                 key={w.id}
                                                 onClick={() => {
-                                                    (session as any).activeWorkspaceId !== w.id && updateSession({ activeWorkspaceId: w.id })
+                                                    (session?.user as any).activeWorkspaceId !== w.id && updateSession({ activeWorkspaceId: w.id })
                                                 }}
-                                                className={`w-full p-3 text-left hover:bg-white/5 flex items-center gap-2 transition-all ${w.id === (session as any).activeWorkspaceId ? 'bg-purple-500/10' : ''}`}
+                                                className={`w-full p-3 text-left hover:bg-white/5 flex items-center gap-2 transition-all ${w.id === (session?.user as any).activeWorkspaceId ? 'bg-purple-500/10' : ''}`}
                                             >
                                                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: w.primaryColor }} />
-                                                <span className={`text-[10px] font-bold uppercase tracking-tighter ${w.id === (session as any).activeWorkspaceId ? 'text-purple-400' : 'text-gray-400'}`}>
+                                                <span className={`text-[10px] font-bold uppercase tracking-tighter ${w.id === (session?.user as any).activeWorkspaceId ? 'text-purple-400' : 'text-gray-400'}`}>
                                                     {w.name}
                                                 </span>
                                             </button>
@@ -114,12 +115,12 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                                 <div className="w-full flex items-center gap-2 p-3 bg-white/2 rounded-xl border border-white/5 cursor-default">
                                     <div
                                         className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]"
-                                        style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
+                                        style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
                                     />
                                     <div className="overflow-hidden">
                                         <p className="text-[7px] font-mono text-gray-500 uppercase tracking-widest leading-none mb-1">CONECTADO_A</p>
                                         <p className="text-[10px] font-bold text-gray-300 truncate uppercase tracking-tighter">
-                                            {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name}
+                                            {(session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.name}
                                         </p>
                                     </div>
                                 </div>
@@ -127,16 +128,26 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                         </div>
                     )}
 
-                    <div className="flex items-center gap-3 mb-4 overflow-hidden">
-                        <div className="w-8 h-8 rounded bg-gradient-to-tr from-purple-500 to-blue-500 flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
-                            {session?.user?.name?.charAt(0)}
+                    <div className="flex items-center justify-between mb-4 overflow-hidden group/user">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded bg-gradient-to-tr from-purple-500 to-blue-500 flex-shrink-0 flex items-center justify-center text-[10px] font-bold shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                                {session?.user?.name?.charAt(0)}
+                            </div>
+                            <div className="hidden md:block">
+                                <p className="text-sm font-bold truncate max-w-[100px]">{session?.user?.name}</p>
+                                <p className="text-xs text-gray-500 font-mono uppercase tracking-tighter">
+                                    {(session?.user as any)?.role}
+                                </p>
+                            </div>
                         </div>
-                        <div className="hidden md:block">
-                            <p className="text-sm font-bold truncate max-w-[120px]">{session?.user?.name}</p>
-                            <p className="text-xs text-gray-500 font-mono uppercase">
-                                {(session?.user as any)?.role}
-                            </p>
-                        </div>
+
+                        <button
+                            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                            className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group/logout"
+                            title="ENCERRAR SESSÃO"
+                        >
+                            <LogOut size={18} className="group-hover/logout:scale-110 transition-transform" />
+                        </button>
                     </div>
                 </div>
             </aside>

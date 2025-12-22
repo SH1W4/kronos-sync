@@ -215,6 +215,7 @@ export const authOptions: NextAuthOptions = {
 
                     if (dbUser) {
                         token.role = dbUser.role
+                        token.customColor = dbUser.customColor
                         if (dbUser.artist) {
                             token.isArtist = true
                             token.commissionRate = dbUser.artist.commissionRate
@@ -232,7 +233,9 @@ export const authOptions: NextAuthOptions = {
                             name: m.workspace?.name || "Sem Nome",
                             slug: m.workspace?.slug || "",
                             role: m.role,
-                            primaryColor: m.workspace?.primaryColor || "#8B5CF6"
+                            primaryColor: m.workspace?.primaryColor || "#8B5CF6",
+                            pixKey: m.workspace?.pixKey || "",
+                            pixRecipient: m.workspace?.pixRecipient || ""
                         }))
 
                         // Define o workspace ativo
@@ -266,7 +269,13 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).activeWorkspaceId = token.activeWorkspaceId;
                 (session.user as any).commissionRate = token.commissionRate;
                 (session.user as any).isArtist = token.isArtist;
+                (session.user as any).customColor = token.customColor;
             }
+
+            // Map to session root as well for compatibility with legacy components
+            (session as any).activeWorkspaceId = token.activeWorkspaceId;
+            (session as any).role = token.role;
+
             return session
         }
     },
