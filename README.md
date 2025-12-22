@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/kiosk_landing.png" width="100%" alt="KRONOS SYNC BANNER">
+  <img src="docs/assets/hero_banner_v2.png" width="100%" alt="KRONOS SYNC BANNER">
   <br/>
   <br/>
   <h1 align="center">K R O N Ø S _ S Y N C</h1>
@@ -47,7 +47,7 @@ KRONØS captures the essence of clinical safety with elegance. Biometric signatu
 **Gamification & Lead Conversion**
 
 The reception is the first contact with the sacred. **THE LINK** gamifies the companion's journey, converting curiosity into clients via **Soul Sync**.
-![Soul Sync](docs/assets/soul_sync.png)
+![Soul Sync](docs/assets/soul_sync_v2.png)
 *The "INK PASS" is not a discount; it is an invitation to synchronization.*
 
 ---
