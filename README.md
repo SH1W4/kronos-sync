@@ -1,13 +1,19 @@
 <div align="center">
-  <img src="docs/assets/kiosk_landing.png" width="900" alt="KRONOS SYNC">
+  <img src="docs/assets/kiosk_landing.png" width="100%" alt="KRONOS SYNC BANNER">
   <br/>
   <br/>
-  <h1 align="center">K R O N O S _ S Y N C</h1>
+  <h1 align="center">K R O N Ø S _ S Y N C</h1>
+  <p align="center">
+      <a href="https://nextjs.org"><img src="https://img.shields.io/badge/ENGINE-NEXT.JS_16-000000?style=for-the-badge&logo=next.js&logoColor=white"/></a>
+      <a href="https://www.postgresql.org"><img src="https://img.shields.io/badge/MEMORY-POSTGRESQL-336791?style=for-the-badge&logo=postgresql&logoColor=white"/></a>
+      <a href="https://www.prisma.io"><img src="https://img.shields.io/badge/ORM-PRISMA_V5-2D3748?style=for-the-badge&logo=prisma&logoColor=white"/></a>
+      <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/SKIN-TAILWIND_V4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white"/></a>
+  </p>
   <p align="center">
     <strong>OPERATING SYSTEM FOR THE ARTISTIC ELITE</strong>
   </p>
   <br/>
-  <img src="docs/assets/arrival_symbols.png" width="120" alt="Sync Glyph">
+  <img src="docs/assets/arrival_symbols.png" width="80" alt="Sync Glyph">
 </div>
 
 <br/>
@@ -16,86 +22,89 @@
 
 ---
 
-## 🔒 ACESSO RESTRITO & LICENCIAMENTO
-**Este software é proprietário e protegido por direitos autorais.**
-O código-fonte disponível neste repositório é destinado exclusivamente para fins de **auditoria, desenvolvimento interno e demonstração de portfólio**. A reprodução, distribuição ou uso comercial sem autorização expressa do **Kronos Tattoo Studio** é estritamente proibida.
+## 🔒 RESTRICTED ACCESS // PROPRIETARY SOFTWARE
+**Copyright © 2025 Kronos Tech Division.**
+This source code is available exclusively for **auditing, internal development, and portfolio demonstration**. Reproduction, distribution, or commercial use without express authorization from **Symbeon Labs** is strictly prohibited.
 
 ---
 
-## 💎 VISÃO DO PRODUTO
-O **KRONOS SYNC** não é apenas um agendador; é um sistema operacional completo para estúdios que tratam tatuagem como arte e negócio de alto nível. Ele elimina a fricção administrativa, permitindo que artistas foquem unicamente em criar, enquanto o sistema orquestra a logística, financeiro e experiência do cliente com precisão cirúrgica.
+## 💎 THE VISION
+**KRONØS SYNC** is not just a scheduler; it is a complete operating system for studios that treat tattoo as high-level art and business. It eliminates administrative friction, allowing artists to focus solely on creating, while the system orchestrates logistics, finance, and customer experience with surgical precision.
 
 ---
 
-## [ 01 ] THE IDENTITY
-**Digital Anamnese & Legal Safety**
+## [ 01 ] THE IDENTITY // ANAMNESIS
+**Digital Safety & Biometric Flow**
 
-O KRONOS SYNC captura a essência da segurança clínica com elegância. Assinaturas biométricas e triagem inteligente transformam burocracia em um snapshot de identidade.
-- **Biometric Flow:** Assinatura digital fluida.
-- **Clinical Insight:** Alertas automáticos de condições médicas (KRONØS Standard).
+KRONØS captures the essence of clinical safety with elegance. Biometric signatures and intelligent screening transform bureaucracy into an identity snapshot.
+- **Biometric Canvas:** Fluid digital signature capturing pressure and stroke.
+- **Clinical Intelligence:** Automated alerts for medical conditions.
+- **Data Sovereignty:** Full LGPD/GDPR compliance with siloed workspaces.
 
 ---
 
-## [ 02 ] THE LINK
-**Kiosk, Conversion & Lead Magnet**
+## [ 02 ] THE LINK // KIOSK
+**Gamification & Lead Conversion**
 
-A recepção é o primeiro contato com o sagrado. O **THE LINK** gamifica a jornada do acompanhante, convertendo curiosos em clientes via **Soul Sync**.
+The reception is the first contact with the sacred. **THE LINK** gamifies the companion's journey, converting curiosity into clients via **Soul Sync**.
 ![Soul Sync](docs/assets/soul_sync.png)
-*O "INK PASS" não é um desconto; é um convite para a sincronização.*
+*The "INK PASS" is not a discount; it is an invitation to synchronization.*
 
 ---
 
-## [ 03 ] THE VAULT
-**Settle, AI Vision & Tokenization**
+## [ 03 ] THE VAULT // FINANCE
+**Auto-Settle & AI Vision**
 
-Transparência financeira absoluta. O **THE VAULT** utiliza Visão Computacional para validar liquidações e premiar o profissionalismo com glifos digitais.
+Absolute financial transparency. **THE VAULT** uses Computer Vision to validate settlements and reward professionalism with digital glyphs.
 ![Artist Pin](docs/assets/artist_pin.png)
-- **AI Vision Agent:** Validação OCR instantânea de comprovantes.
-- **Sync Glyphs:** Tokens de prestígio gerados por algoritmos de sincronia.
+- **AI Vision Agent:** Instant OCR validation of payment proofs.
+- **Revenue Split:** Automated calculation (100% Artist -> Studio Commission).
+- **Sync Glyphs:** Prestige tokens generated by synchronization algorithms.
 
 ---
 
-## [ EVOLUTION ] THE FLOW
+## [ 04 ] THE CODEX // KNOWLEDGE
+**Role-Based Documentation System**
 
-| JOURNEY | SETTLEMENT |
-| :---: | :---: |
-| ![Kiosk Demo](docs/assets/kiosk_demo.webp) | ![Finance Demo](docs/assets/finance_demo.webp) |
+The **CODEX** is the tactical knowledge library of KRONØS. It is not just documentation; it is a living training and governance system.
 
----
+- **Role-Based Access:** Automatic curation by hierarchy (Artist / Admin / Dev).
+- **Premium UI:** Tactical terminal interface with dynamic Markdown rendering.
+- **Agent-Ready:** Semantic metadata for AI interoperability (DocSync).
 
-## [ 04 ] THE CODEX
-**Knowledge Sovereignty & Agent-Ready Documentation**
-
-O **CODEX** é a biblioteca de conhecimento tático do KRONØS. Não é apenas documentação; é um sistema vivo de treinamento e governança.
-
-- **Role-Based Access:** Curadoria automática por hierarquia (Artist/Admin/Dev)
-- **DocSync Integration:** Metadados semânticos para interoperabilidade com agentes de IA
-- **Dev Layer:** Trava de identidade para documentos de infraestrutura sensíveis
-- **Premium UI:** Interface de terminal tático com renderização Markdown dinâmica
-
-**Documentação Disponível:**
-- 📘 Guias de Treinamento (Artista & Administrador)
-- 🛡️ Manifesto de Soberania de Dados
-- 📋 SOPs (Standard Operating Procedures)
-- 📈 Estratégias de Crescimento & ROI
-- 🔐 Documentação Root (Dev-Only)
+### 📚 Available Documentation
+| Category | Access | Description |
+| :--- | :---: | :--- |
+| **📘 Training** | ARTIST | [Artist Guide](kronos/docs/training/artist-guide.md), [Growth Strategies](kronos/docs/training/growth-strategies.md) |
+| **🛡️ Governance** | ADMIN | [Admin Guide](kronos/docs/training/admin-guide.md), [Data Sovereignty](kronos/docs/governance/data-sovereignty.md) |
+| **💰 Finance** | ADMIN | [Marketplace Commissions](kronos/docs/governance/marketplace-commissions.md) |
+| **🏗️ Engineering** | DEV | [Architecture Map](kronos/ARCHITECTURE.json), [Roadmap (EAP)](kronos/EAP.md) |
 
 ---
 
-## 🛠️ ENGENHARIA (THE STACK)
+## 🛠️ THE STACK // ENGINEERING
 
-Construído sob o silêncio da noite, utilizando as camadas mais profundas de performance:
-- **Engine:** Next.js 16 (Turbopack) // React 19 // Tailwind CSS v4
-- **Persistence:** Prisma ORM v5.22.0 // PostgreSQL (Neon/Vercel)
-- **Intelligence:** Google Calendar API Sync // AI Vision (OCR)
-- **Connectivity:** PWA (Progressive Web App) para Experiência Mobile Nativa
+Built under the silence of the night, utilizing the deepest layers of performance:
+
+### Core Architecture
+- **Engine:** Next.js 16 (Turbopack)
+- **Interface:** React 19 + Tailwind CSS v4 (Cyber Y2K Theme)
+- **Persistence:** Prisma ORM v5.22.0 + PostgreSQL (Neon)
+- **Intelligence:** OpenAI GPT-4 (KAI) + Google Calendar Sync
+
+### Advanced Features
+- **PWA:** Native mobile experience with offline capabilities.
+- **Magic Link:** Passwordless authentication flow.
+- **Zod Validation:** Robust type-safe data validation.
+- **Multi-Tenancy:** Complete workspace isolation.
 
 ---
 
 <div align="center">
   <p align="center">
-    <strong>KRONOS TECH DIVISION</strong><br/>
-    Developed by SH1W4 // Architecture by Antigravity
+    <strong>KRONØS TECH DIVISION</strong><br/>
+    Developed by SH1W4 // Architecture by Antigravity<br/>
+    Powered by Symbeon Labs
   </p>
-  <img src="docs/assets/arrival_symbols.png" width="60" opacity="0.5">
+  <img src="docs/assets/arrival_symbols.png" width="40" style="opacity: 0.5">
 </div>
