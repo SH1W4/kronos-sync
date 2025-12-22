@@ -200,6 +200,43 @@ export default function SettingsPage() {
         }
     }
 
+    const handleStudioSave = async () => {
+        setLoading(true)
+        try {
+            const result = await updateWorkspaceBranding({
+                name: studioName,
+                primaryColor: studioColor
+            })
+            if (result.success) {
+                alert('Configurações do estúdio salvas com sucesso!')
+                await updateSession()
+            } else {
+                alert(result.error || 'Erro ao salvar')
+            }
+        } catch (e) {
+            alert('Erro ao salvar configurações do estúdio')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleThemeSave = async () => {
+        setLoading(true)
+        try {
+            const result = await updateUserTheme({ customColor: personalColor })
+            if (result.success) {
+                alert('Tema aplicado com sucesso!')
+                await updateSession()
+            } else {
+                alert(result.error || 'Erro ao aplicar tema')
+            }
+        } catch (e) {
+            alert('Erro ao aplicar tema')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const handleSaveStudio = async () => {
         setLoading(true)
         try {
@@ -675,6 +712,125 @@ export default function SettingsPage() {
                                                 )}
                                             </tbody>
                                         </table>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'studio' && isAdmin && (
+                            <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Settings className="text-purple-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Configuração do Estúdio</h2>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+                                        <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-2">Soberania de Workspace</p>
+                                        <p className="text-xs text-gray-400 leading-relaxed">
+                                            Configure a identidade visual global do seu estúdio. Estas configurações afetam todos os artistas e clientes do seu silo.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Nome do Estúdio</label>
+                                        <Input
+                                            value={studioName}
+                                            onChange={(e) => setStudioName(e.target.value)}
+                                            className="bg-black/50 border-white/10"
+                                            placeholder="KRONØS STUDIO"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Cor Primária do Workspace</label>
+                                        <div className="flex gap-4 items-center">
+                                            <input
+                                                type="color"
+                                                value={studioColor}
+                                                onChange={(e) => setStudioColor(e.target.value)}
+                                                className="w-16 h-16 rounded-xl border-2 border-white/10 cursor-pointer bg-transparent"
+                                            />
+                                            <div className="flex-1 space-y-1">
+                                                <code className="text-xs text-purple-400 font-mono">{studioColor}</code>
+                                                <p className="text-[10px] text-gray-500">Esta cor será aplicada globalmente no HUD de todos os membros do workspace.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <Button
+                                            onClick={handleStudioSave}
+                                            disabled={loading}
+                                            className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-10 rounded-xl transition-all"
+                                        >
+                                            {loading ? 'SALVANDO...' : 'SALVAR CONFIGURAÇÕES'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </section>
+                        )}
+
+                        {activeTab === 'appearance' && (
+                            <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Palette className="text-purple-400" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Personalização do HUD</h2>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+                                        <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-2">Identidade Visual Pessoal</p>
+                                        <p className="text-xs text-gray-400 leading-relaxed">
+                                            Customize a cor do seu HUD pessoal. Esta configuração afeta apenas a sua visualização e não impacta outros membros do workspace.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Cor Primária Pessoal</label>
+                                        <div className="flex gap-4 items-center">
+                                            <input
+                                                type="color"
+                                                value={personalColor}
+                                                onChange={(e) => setPersonalColor(e.target.value)}
+                                                className="w-16 h-16 rounded-xl border-2 border-white/10 cursor-pointer bg-transparent"
+                                            />
+                                            <div className="flex-1 space-y-1">
+                                                <code className="text-xs text-purple-400 font-mono">{personalColor}</code>
+                                                <p className="text-[10px] text-gray-500">Painéis, botões, brilhos e scanlines se adaptarão à sua assinatura cromática.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                                        <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-3">Preview do HUD</p>
+                                        <div
+                                            className="h-32 rounded-xl border-2 transition-all duration-300"
+                                            style={{
+                                                borderColor: personalColor,
+                                                background: `linear-gradient(135deg, ${personalColor}10, transparent)`,
+                                                boxShadow: `0 0 20px ${personalColor}20`
+                                            }}
+                                        >
+                                            <div className="p-4 flex items-center justify-center h-full">
+                                                <span
+                                                    className="text-sm font-orbitron font-bold tracking-wider"
+                                                    style={{ color: personalColor }}
+                                                >
+                                                    KRONØS SYNC
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <Button
+                                            onClick={handleThemeSave}
+                                            disabled={loading}
+                                            className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-10 rounded-xl transition-all"
+                                        >
+                                            {loading ? 'APLICANDO...' : 'APLICAR TEMA'}
+                                        </Button>
                                     </div>
                                 </div>
                             </section>
