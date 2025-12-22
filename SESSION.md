@@ -6,6 +6,7 @@
 - **IA Vision (THE VAULT):** Lógica ajustada para validar se o PIX foi para o **Estúdio/Workspace** (Acerto de Comissão), não para o artista.
 - **Database Architecture:** Implementado campo `instagram` no modelo `Artist` e sincronizado via `db push` após interrupção forçada do servidor.
 - **Branding:** Glifo `arrival_symbols` integrado como marca d'água no modal do Kiosk.
+- **Strategic Lock:** Implementado o vínculo permanente Artista-Workspace. Artistas ficam restritos ao seu estúdio via chave de acesso, impedindo migração autônoma (Isolamento de Negócio).
 
 ### 📝 Notas Técnicas
 - Resolvido o conflito de `EPERM` no Prisma Windows através de `Stop-Process` no servidor de dev antes do `generate`.

@@ -87,7 +87,11 @@ A monetização ocorre em camadas, permitindo que você valide o valor antes de 
 
 ---
 
-### Próximos Passos Técnicos
-- [ ] Criar a tabela `Workspace` no Prisma.
-- [ ] Adicionar `workspaceId` em `Booking`, `Artist` e `Order`.
-- [ ] Implementar seletor de estúdio no Dashboard Admin.
+### Próximos Passos Técnicos & Status
+- [x] Criar a tabela `Workspace` no Prisma (Concluído).
+- [x] Adicionar `workspaceId` em `Booking`, `Artist` e `Order` (Silo de Dados implementado).
+- [x] Implementar seletor de estúdio no Dashboard Admin (Exclusivo para Gestão).
+- [x] **Linkage Lock:** Implementado o vínculo permanente artista-workspace via chave de acesso (Proteção de Silo).
+
+---
+*Documento atualizado em 21/12/2025: A infraestrutura base para SaaS Multi-Tenant está operacional e blindada.*

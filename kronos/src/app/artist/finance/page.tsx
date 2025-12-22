@@ -33,12 +33,20 @@ export default async function FinancePage() {
     // Fetch Bookings ready for settlement (COMPLETED and not already settled)
     let bookings: any[] = []
     try {
+        const now = new Date()
         bookings = await prisma.booking.findMany({
             where: {
                 artistId: artist.id,
-                status: 'COMPLETED',
-                // @ts-ignore - This might fail if the Prisma client hasn't been re-generated due to file locks
-                settlementId: null
+                settlementId: null,
+                OR: [
+                    { status: 'COMPLETED' },
+                    {
+                        AND: [
+                            { status: { not: 'CANCELLED' } },
+                            { slot: { endTime: { lt: now } } }
+                        ]
+                    }
+                ]
             },
             include: {
                 client: true,

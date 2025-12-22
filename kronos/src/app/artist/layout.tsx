@@ -7,9 +7,12 @@ import Link from 'next/link'
 import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
+import { ThemeCustomizer } from '@/components/theme/theme-customizer'
+import { ChevronDown } from 'lucide-react'
+import { signOut } from 'next-auth/react'
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
-    const { data: session, status } = useSession()
+    const { data: session, status, update: updateSession } = useSession()
     const router = useRouter()
     const pathname = usePathname()
 
@@ -21,8 +24,15 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
         }
 
         const userRole = (session?.user as any)?.role
+        const activeWorkspaceId = (session as any)?.activeWorkspaceId
+
         if (userRole !== 'ARTIST' && userRole !== 'ADMIN') {
             router.push('/dashboard')
+            return
+        }
+
+        if (userRole === 'ARTIST' && !activeWorkspaceId) {
+            router.push('/onboarding')
         }
     }, [session, status, router])
 
@@ -59,20 +69,61 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                     </nav>
                 </div>
 
-                <div className="p-6 border-t border-white/5">
-                    {/* Workspace Switcher Lite (Display only for now) */}
+                <div className="p-6 border-t border-white/5 space-y-4">
+                    {/* Workspace Switcher / Display */}
                     {(session as any)?.activeWorkspaceId && (
-                        <div className="mb-6 p-3 bg-white/5 rounded-xl border border-white/10 hidden md:block group cursor-pointer hover:border-purple-500/50 transition-all">
-                            <p className="text-[10px] text-gray-500 font-mono mb-1 text-purple-400/50">WORKSPACE ATIVO</p>
-                            <div className="flex items-center gap-2">
-                                <div
-                                    className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor]"
-                                    style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
-                                />
-                                <span className="text-xs font-bold text-white truncate uppercase tracking-tighter">
-                                    {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name}
-                                </span>
-                            </div>
+                        <div className="relative group">
+                            {(session?.user as any)?.role === 'ADMIN' ? (
+                                <>
+                                    <button
+                                        onClick={() => router.push('/auth/select')}
+                                        className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10 hover:border-purple-500/50 transition-all text-left"
+                                    >
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <div
+                                                className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor] flex-shrink-0"
+                                                style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
+                                            />
+                                            <span className="text-[10px] font-bold text-white truncate uppercase tracking-tighter">
+                                                {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name}
+                                            </span>
+                                        </div>
+                                        <ChevronDown size={14} className="text-gray-500 group-hover:text-purple-400 transition-colors" />
+                                    </button>
+
+                                    <div className="absolute bottom-full left-0 w-full mb-2 bg-gray-900 border border-white/10 rounded-xl overflow-hidden hidden group-hover:block z-50 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
+                                        <p className="p-3 text-[8px] font-mono text-gray-500 uppercase border-b border-white/5">Trocar Estúdio</p>
+                                        {(session as any).workspaces?.map((w: any) => (
+                                            <button
+                                                key={w.id}
+                                                onClick={() => {
+                                                    (session as any).activeWorkspaceId !== w.id && updateSession({ activeWorkspaceId: w.id })
+                                                }}
+                                                className={`w-full p-3 text-left hover:bg-white/5 flex items-center gap-2 transition-all ${w.id === (session as any).activeWorkspaceId ? 'bg-purple-500/10' : ''}`}
+                                            >
+                                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: w.primaryColor }} />
+                                                <span className={`text-[10px] font-bold uppercase tracking-tighter ${w.id === (session as any).activeWorkspaceId ? 'text-purple-400' : 'text-gray-400'}`}>
+                                                    {w.name}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                /* ARTIST DISPLAY: Static Vínculo Permanente */
+                                <div className="w-full flex items-center gap-2 p-3 bg-white/2 rounded-xl border border-white/5 cursor-default">
+                                    <div
+                                        className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]"
+                                        style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
+                                    />
+                                    <div className="overflow-hidden">
+                                        <p className="text-[7px] font-mono text-gray-500 uppercase tracking-widest leading-none mb-1">CONECTADO_A</p>
+                                        <p className="text-[10px] font-bold text-gray-300 truncate uppercase tracking-tighter">
+                                            {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -95,6 +146,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none fixed"></div>
                 {children}
                 <McpWidget />
+                <ThemeCustomizer />
             </main>
         </div>
     )

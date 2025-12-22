@@ -1,0 +1,53 @@
+{
+  "success": true,
+  "columns": [
+    {
+      "column_name": "plan"
+    },
+    {
+      "column_name": "calendarSyncEnabled"
+    },
+    {
+      "column_name": "commissionRate"
+    },
+    {
+      "column_name": "monthlyEarnings"
+    },
+    {
+      "column_name": "lastSyncedAt"
+    },
+    {
+      "column_name": "commissionThreshold"
+    },
+    {
+      "column_name": "isActive"
+    },
+    {
+      "column_name": "createdAt"
+    },
+    {
+      "column_name": "updatedAt"
+    },
+    {
+      "column_name": "validUntil"
+    },
+    {
+      "column_name": "instagram"
+    },
+    {
+      "column_name": "userId"
+    },
+    {
+      "column_name": "workspaceId"
+    },
+    {
+      "column_name": "googleCalendarId"
+    },
+    {
+      "column_name": "googleRefreshToken"
+    },
+    {
+      "column_name": "id"
+    }
+  ]
+}

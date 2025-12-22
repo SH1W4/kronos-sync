@@ -1,0 +1,5 @@
+[dotenv@17.2.3] injecting env (2) from .env.local -- tip: ­ƒùé´©Å backup and recover secrets: https://dotenvx.com/ops
+­ƒºÉ Verificando Estrutura Final...
+­ƒÄ¿ Colunas Artist: plan, calendarSyncEnabled, commissionRate, monthlyEarnings, lastSyncedAt, commissionThreshold, isActive, createdAt, updatedAt, validUntil, instagram, userId, workspaceId, googleCalendarId, googleRefreshToken, id
+­ƒôà Colunas Booking: discountValue, finalValue, createdAt, updatedAt, studioShare, duration, scheduledFor, syncedToGoogle, artistShare, status, value, fichaStatus, confirmationSent, settlementId, artistId, clientId, slotId, fichaUrl, googleEventId, couponId, workspaceId, notes, id
+Ô£à TUDO OK! Banco sincronizado.

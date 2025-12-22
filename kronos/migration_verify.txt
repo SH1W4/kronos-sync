@@ -1,0 +1,10 @@
+[dotenv@17.2.3] injecting env (2) from .env.local -- tip: ÔÜÖ´©Å  load multiple .env files with { path: ['.env.local', '.env'] }
+­ƒºÉ Listando Detalhes Financeiros de TODOS os Agendamentos...
+­ƒôè Total: 2 agendamentos.
+[1] Gabriel | Total: R$ 1400 | Artista: R$ 979.9999999999999 | Est├║dio: R$ 420 | Status: COMPLETED
+[2] Gabriel | Total: R$ 400 | Artista: R$ 280 | Est├║dio: R$ 120 | Status: COMPLETED
+
+­ƒôê SOMAT├ôRIA:
+   Bruto: R$ 1800
+   LUCRO ARTISTA: R$ 1260
+   PARTE EST├ÜDIO: R$ 540

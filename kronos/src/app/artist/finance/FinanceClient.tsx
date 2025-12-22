@@ -80,11 +80,13 @@ export default function FinanceClient({ artist, workspace, bookings, metrics }: 
     }
 
     return (
-        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 text-white min-h-screen">
+        <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 text-white min-h-screen relative overflow-hidden data-pattern-grid">
+            {/* Cyber Y2K Effects */}
+            <div className="scanline" />
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-6 gap-4">
                 <div>
-                    <h1 className="text-3xl font-orbitron font-bold">FINANCEIRO</h1>
+                    <h1 className="text-3xl font-orbitron font-bold pixel-text text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">FINANCEIRO</h1>
                     <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">Digital Settle & Gamification</p>
                 </div>
 
@@ -95,7 +97,7 @@ export default function FinanceClient({ artist, workspace, bookings, metrics }: 
                     </div>
                     <div className="flex-1 md:flex-none bg-green-500/10 border border-green-500/20 px-6 py-3 rounded-xl text-right">
                         <p className="text-[10px] text-green-400 font-mono uppercase tracking-widest mb-1">SALDO DISPONÍVEL</p>
-                        <p className="text-3xl font-bold font-orbitron text-white">
+                        <p className="text-3xl font-bold font-orbitron text-white pixel-text">
                             {formatCurrency(metrics.totalEarnings)}
                         </p>
                     </div>
@@ -162,10 +164,17 @@ export default function FinanceClient({ artist, workspace, bookings, metrics }: 
                                     <td className="p-6 text-right text-gray-400 font-mono">{formatCurrency(booking.studioShare)}</td>
                                     <td className="p-6 text-right font-bold text-green-400 font-orbitron">{formatCurrency(booking.artistShare)}</td>
                                     <td className="p-6 text-center">
-                                        <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-full inline-flex items-center space-x-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-                                            <span className="text-[8px] font-mono uppercase tracking-widest">Pendente</span>
-                                        </div>
+                                        {booking.status === 'COMPLETED' ? (
+                                            <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full inline-flex items-center space-x-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                                                <span className="text-[8px] font-mono uppercase tracking-widest text-green-400">Concluído</span>
+                                            </div>
+                                        ) : (
+                                            <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full inline-flex items-center space-x-2" title="Sessão passada sem cancelamento. Disponível para acerto.">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
+                                                <span className="text-[8px] font-mono uppercase tracking-widest text-purple-400">Auto-Confirmado</span>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

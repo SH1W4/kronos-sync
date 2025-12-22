@@ -1,0 +1,10 @@
+[dotenv@17.2.3] injecting env (2) from .env.local -- tip: ­ƒöä add secrets lifecycle management: https://dotenvx.com/ops
+­ƒºÉ Listando Detalhes Financeiros de TODOS os Agendamentos...
+­ƒôè Total: 2 agendamentos.
+[1] Gabriel | Total: R$ 1400 | Artista: R$ 420 | Est├║dio: R$ 979.9999999999999 | Status: COMPLETED
+[2] Gabriel | Total: R$ 400 | Artista: R$ 120 | Est├║dio: R$ 280 | Status: COMPLETED
+
+­ƒôê SOMAT├ôRIA:
+   Bruto: R$ 1800
+   LUCRO ARTISTA: R$ 540
+   PARTE EST├ÜDIO: R$ 1260

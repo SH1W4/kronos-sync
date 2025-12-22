@@ -1,0 +1,17 @@
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database
+
+Error: Prisma schema validation - (get-config wasm)
+Error code: P1012
+error: Environment variable not found: POSTGRES_URL_NON_POOLING.
+  -->  prisma\schema.prisma:8
+   | 
+ 7 |   url       = env("POSTGRES_PRISMA_URL")
+ 8 |   directUrl = env("POSTGRES_URL_NON_POOLING")
+   | 
+
+Validation Error Count: 1
+[Context: getConfig]
+
+Prisma CLI Version : 5.22.0

@@ -21,6 +21,10 @@
 - [x] **Google Calendar Sync (Setup)**
   - Obtenção de Credenciais Cloud Console.
   - Configuração de Refresh Tokens (Offline Access).
+- [x] **SaaS Multi-Tenant Architecture**
+  - Isolamento Atômico de Dados por **Workspace**.
+  - Modelo de Permissionamento (Dono, Admin, Artista, Staff).
+  - Vínculo Permanente via Chave de Acesso (Linkage Lock).
 
 ## Fase 3: Infraestrutura & Deploy (Concluído ✅)
 - [x] **Docker Local**
@@ -37,7 +41,7 @@
 
 ## Fase 4: Experiência do Artista (Em Andamento 🚧)
 - [x] **Dashboard do Artista**
-  - [x] Isolamento de Dados (Cada artista vê apenas o seu).
+  - [x] **Silo de Dados:** Isolamento total (Artistas operam apenas em seus estúdios designados).
   - [x] Métricas em Tempo Real (Faturamento, Sessões).
   - [x] Visualização de Agenda do Dia.
 - [x] **Segurança & Acesso**

@@ -88,7 +88,19 @@ export default function KioskPage() {
     const progress = calculateSyncProgress()
 
     return (
-        <div className="min-h-screen bg-black flex flex-col items-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-black flex flex-col items-center p-6 relative overflow-hidden data-pattern-grid">
+            {/* Cyber Y2K Effects */}
+            <div className="scanline" />
+
+            {/* Visual HUD Decorative Elements (Top Corners) */}
+            <div className="absolute top-4 left-4 font-mono text-[8px] text-gray-700 uppercase tracking-[0.4em] hidden md:block">
+                SYS_STATUS: OPERATIONAL<br />
+                LINK: NEURAL_ACTIVE
+            </div>
+            <div className="absolute top-4 right-4 font-mono text-[8px] text-gray-700 uppercase tracking-[0.4em] text-right hidden md:block">
+                UP_TIME: 99.9%<br />
+                AUTH_ENCRYPTED: YES
+            </div>
 
             {/* Background "Ink Flow" Effects (Deep & Artistic) */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.08]">
@@ -142,7 +154,7 @@ export default function KioskPage() {
                                 <div className="p-2 bg-black/5 rounded-full group-hover:bg-black/10 transition-colors">
                                     <ShoppingBag className="w-5 h-5 text-black" />
                                 </div>
-                                <span className="tracking-[0.3em] font-black uppercase">VISITAR LOJA</span>
+                                <span className="tracking-[0.3em] font-black uppercase pixel-text">VISITAR LOJA</span>
                             </Button>
                         </Link>
                     </div>
@@ -198,7 +210,8 @@ export default function KioskPage() {
 
             {/* Companion Capture Modal (INK PASS) */}
             {showCompanionModal && (
-                <div className="fixed inset-0 z-50 bg-black/98 backdrop-blur-3xl flex items-center justify-center p-4 overflow-y-auto">
+                <div className="fixed inset-0 z-50 bg-black/98 backdrop-blur-3xl flex items-center justify-center p-4 overflow-y-auto relative">
+                    <div className="scanline" />
 
                     {/* Artistic Watermarks for Modal - Integration of arrival_symbols */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.05] grayscale invert flex items-center justify-center">
@@ -240,7 +253,7 @@ export default function KioskPage() {
                                         </div>
 
                                         <div className="text-center">
-                                            <h2 className="text-4xl font-orbitron font-black tracking-tighter text-white uppercase italic">INK PASS</h2>
+                                            <h2 className="text-4xl font-orbitron font-black tracking-tighter text-white uppercase italic pixel-text">INK PASS</h2>
                                             <p className="text-[11px] font-mono text-gray-300 uppercase tracking-widest mt-2 font-bold">
                                                 ATIVE SEU CUPOM DE <span className="text-primary tracking-normal">10% OFF</span>
                                             </p>

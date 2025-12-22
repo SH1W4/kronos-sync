@@ -108,7 +108,9 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 md:p-12">
+        <div className="min-h-screen bg-black text-white p-6 md:p-12 relative overflow-hidden data-pattern-grid">
+            {/* Cyber Y2K Effects */}
+            <div className="scanline" />
             <div className="max-w-4xl mx-auto space-y-12 pb-20">
                 {/* Header */}
                 <div className="flex items-center gap-4 border-b border-white/5 pb-8">
@@ -116,7 +118,7 @@ export default function SettingsPage() {
                         <Settings className="text-purple-400" size={32} />
                     </div>
                     <div>
-                        <h1 className="text-3xl font-orbitron font-black tracking-tighter uppercase">Configurações</h1>
+                        <h1 className="text-3xl font-orbitron font-black tracking-tighter uppercase pixel-text">Configurações</h1>
                         <p className="text-sm text-gray-500 font-mono uppercase tracking-widest">Painel de Controle do Sistema</p>
                     </div>
                 </div>
@@ -133,11 +135,29 @@ export default function SettingsPage() {
 
                     {/* Content */}
                     <div className="md:col-span-2 space-y-8">
+                        {/* Workspace Link (Locked) */}
+                        <div className="space-y-4 mb-8">
+                            <label className="text-[10px] font-mono text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                <Shield className="w-3 h-3 text-purple-500" />
+                                Vínculo de Workspace
+                            </label>
+                            <div className="bg-purple-500/5 border border-purple-500/20 p-4 rounded-xl flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                                    <span className="font-mono text-xs text-white font-bold uppercase tracking-widest">
+                                        {(session as any)?.workspaces?.find((w: any) => w.id === (session as any).activeWorkspaceId)?.name || 'ESTÚDIO KRONØS'}
+                                    </span>
+                                </div>
+                                <span className="text-[8px] font-black font-mono text-purple-500/60 uppercase tracking-widest border border-purple-500/30 px-2 py-1 rounded">VÍNCULO ATIVO</span>
+                            </div>
+                            <p className="text-[9px] font-mono text-gray-500 italic opacity-60">Status: Account bound to this studio. Deployment locked.</p>
+                        </div>
+
                         {/* Profile Section */}
-                        <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
+                        <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
                             <div className="flex items-center gap-2 mb-4">
                                 <User className="text-purple-400" size={20} />
-                                <h2 className="font-bold uppercase tracking-wider text-sm">Informações Pessoais</h2>
+                                <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Informações Pessoais</h2>
                             </div>
 
                             <div className="grid gap-4">
