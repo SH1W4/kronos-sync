@@ -63,6 +63,25 @@ Transparência financeira absoluta. O **THE VAULT** utiliza Visão Computacional
 
 ---
 
+## [ 04 ] THE CODEX
+**Knowledge Sovereignty & Agent-Ready Documentation**
+
+O **CODEX** é a biblioteca de conhecimento tático do KRONØS. Não é apenas documentação; é um sistema vivo de treinamento e governança.
+
+- **Role-Based Access:** Curadoria automática por hierarquia (Artist/Admin/Dev)
+- **DocSync Integration:** Metadados semânticos para interoperabilidade com agentes de IA
+- **Dev Layer:** Trava de identidade para documentos de infraestrutura sensíveis
+- **Premium UI:** Interface de terminal tático com renderização Markdown dinâmica
+
+**Documentação Disponível:**
+- 📘 Guias de Treinamento (Artista & Administrador)
+- 🛡️ Manifesto de Soberania de Dados
+- 📋 SOPs (Standard Operating Procedures)
+- 📈 Estratégias de Crescimento & ROI
+- 🔐 Documentação Root (Dev-Only)
+
+---
+
 ## 🛠️ ENGENHARIA (THE STACK)
 
 Construído sob o silêncio da noite, utilizando as camadas mais profundas de performance:
