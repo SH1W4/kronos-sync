@@ -24,9 +24,11 @@ Você controla quem entra na sua equipe.
 - Reclame a soberania copiando o link de resgate e enviando ao seu novo talento.
 
 ## 3. Governança Financeira
-Configuração do motor de recebimento.
-- **Configurações > PIX**: Insira sua chave e o nome do recebedor (Estúdio). 
-- **Comissões**: O sistema aplica automaticamente a regra de 70/30 (ou personalizada por artista) no momento da liquidação.
+Configuração do motor de recebimento e comissões.
+- **Configurações > PIX**: Insira sua chave PIX do estúdio e o nome do recebedor. 
+- **Modelo de Comissão**: Os artistas recebem 100% do pagamento dos clientes. Eles repassam a comissão do estúdio (configurável por artista, geralmente 20-30%) via PIX.
+- **Marketplace**: Para produtos vendidos (Flash Tattoos, Artes Digitais), defina a porcentagem de comissão do estúdio. O sistema calcula automaticamente sobre o valor final da venda.
+- **Validação IA**: O sistema utiliza OCR para validar comprovantes de repasse enviados pelos artistas, garantindo transparência total.
 
 ## 4. O Sistema de Monitoramento
 Utilize o Dashboard para ter uma visão tática de todos os agendamentos, produtividade e conversão de lances do Kiosk.

@@ -23,7 +23,9 @@ Acompanhe os dados de "Barreiras" coletados no Kiosk.
 ## 3. Gestão de Equipe & INK PASS
 Use o sistema de convites para atrair talentos sob demanda.
 - **Guest Spots**: Traga artistas influentes usando chaves `GUEST`. Isso aumenta o tráfego orgânico no seu Kiosk e Marketplace.
-- **Monitoramento de ROI**: Analise quais artistas geram maior volume de agendamentos e ajuste as comissões estrategicamente.
+- **Modelo de Comissão**: Configure a porcentagem de comissão que cada artista deve repassar ao estúdio (geralmente 20-30%). Artistas mais experientes podem negociar taxas menores.
+- **Marketplace**: Defina comissões específicas para produtos vendidos. Flash Tattoos podem ter comissões diferentes de Artes Digitais, permitindo estratégias de precificação flexíveis.
+- **Monitoramento de ROI**: Analise quais artistas geram maior volume de agendamentos e vendas no Marketplace. Ajuste as comissões estrategicamente para reter talentos de alto desempenho.
 
 ## 4. Branding de Elite
 Um estúdio que opera sob um HUD personalizado e moderno transmite autoridade.

@@ -21,10 +21,12 @@ Não utilizamos senhas. O acesso é feito via e-mail corporativo.
 - Você receberá um código de 6 dígitos.
 - Insira o código no HUD para entrar no seu silo.
 
-## 3. Finanças & Auto-Settle
-Seu faturamento é sagrado. O sistema cuida da liquidação automática.
+## 3. Finanças & Modelo de Comissão
+Você é o dono do seu faturamento. O sistema facilita a gestão transparente.
 - **Configurações > Financeiro**: Certifique-se de que sua chave PIX está correta.
-- **Liquidação**: Ao concluir um projeto, envie o comprovante. O sistema utiliza IA para validar o valor e realizar o split automático da comissão (70/30).
+- **Modelo de Pagamento**: Você recebe 100% do valor do cliente diretamente. Após a conclusão, você repassa a comissão do estúdio (geralmente 20-30%) via PIX.
+- **Liquidação**: Ao concluir um projeto, envie o comprovante de repasse da comissão. O sistema utiliza IA para validar o valor e confirmar o settlement.
+- **Marketplace**: Para produtos vendidos (Flash Tattoos, Artes Digitais), a comissão do estúdio é calculada automaticamente sobre o valor final da venda.
 
 ## 4. Agenda & Google Sync
 Sua agenda é sincronizada em tempo real.
