@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { submitWorkspaceRequest } from '@/app/actions/workspaces'
 
 export const dynamic = 'force-dynamic'
 
-export default function OnboardingPage() {
+function OnboardingContent() {
     const { data: session, update, status } = useSession()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -27,8 +27,9 @@ export default function OnboardingPage() {
     }, [session, status, router])
 
     const initialRole = searchParams.get('role')
+    const initialMode = searchParams.get('mode')
     const [mode, setMode] = useState<'SELECT' | 'CODE' | 'REQUEST' | 'SUCCESS'>(
-        initialRole === 'artist' ? 'CODE' : 'SELECT'
+        (initialMode as any) || (initialRole === 'artist' ? 'CODE' : 'SELECT') || 'SELECT'
     )
     const [inviteCode, setInviteCode] = useState('')
     const [studioName, setStudioName] = useState('')
@@ -39,7 +40,6 @@ export default function OnboardingPage() {
     const [successMessage, setSuccessMessage] = useState('')
 
     const handleClientAccess = async () => {
-        // Para clientes, redirecionamos para o Kiosk (Experiência Principal)
         router.push('/kiosk')
     }
 
@@ -60,10 +60,7 @@ export default function OnboardingPage() {
             const data = await response.json()
 
             if (response.ok) {
-                // Força atualização da sessão no front para pegar a nova role
                 await update()
-
-                // Redireciona baseado na role
                 if (data.role === 'ARTIST' || data.role === 'ADMIN') {
                     router.push('/artist/dashboard')
                 } else {
@@ -143,7 +140,13 @@ export default function OnboardingPage() {
 
                         {/* PROFISSIONAL CARD */}
                         <button
-                            onClick={() => setMode('CODE')}
+                            onClick={() => {
+                                if (status === 'unauthenticated') {
+                                    router.push('/auth/signin?callbackUrl=/onboarding?mode=CODE')
+                                } else {
+                                    setMode('CODE')
+                                }
+                            }}
                             className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-[#8B5CF6]/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
                         >
                             <div className="absolute top-4 right-4 text-gray-600 group-hover:text-[#8B5CF6] transition-colors">
@@ -302,3 +305,12 @@ export default function OnboardingPage() {
         </div>
     )
 }
+
+export default function OnboardingPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="animate-spin text-purple-500" /></div>}>
+            <OnboardingContent />
+        </Suspense>
+    )
+}
+

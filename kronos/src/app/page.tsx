@@ -78,7 +78,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <BrandLogo size={32} animated={false} />
                     <div className="flex items-center gap-8">
-                        <Link href="/auth/select">
+                        <Link href="/onboarding">
                             <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-medium tracking-wide text-xs h-9 px-6 uppercase transition-all">
                                 Login
                             </Button>
@@ -120,7 +120,7 @@ export default function LandingPage() {
                     </p>
 
                     <div className="flex gap-4">
-                        <Link href="/auth/select">
+                        <Link href="/onboarding">
                             <Button className="h-12 px-8 bg-white text-black hover:bg-zinc-200 text-xs font-bold font-orbitron tracking-widest uppercase rounded flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
                                 ACESSAR FLOW
                             </Button>
