@@ -24,8 +24,8 @@ export default function OnboardingPage() {
     const [successMessage, setSuccessMessage] = useState('')
 
     const handleClientAccess = async () => {
-        // Para clientes, redirecionamos para a loja/trilha especializada
-        router.push('/marketplace')
+        // Para clientes, redirecionamos para o Kiosk (Experiência Principal)
+        router.push('/kiosk')
     }
 
     const handleArtistAccess = async (e: React.FormEvent) => {

@@ -18,9 +18,9 @@ export async function middleware(request: NextRequest) {
             if (token.role === 'ARTIST' || token.role === 'ADMIN') {
                 return NextResponse.redirect(new URL('/artist/dashboard', request.url))
             }
-            // Se for Cliente, vai para o dashboard de cliente
+            // Se for Cliente, vai para o Kiosk principal
             if (token.role === 'CLIENT') {
-                return NextResponse.redirect(new URL('/marketplace', request.url))
+                return NextResponse.redirect(new URL('/kiosk', request.url))
             }
         }
     }

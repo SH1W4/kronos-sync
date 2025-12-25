@@ -85,6 +85,11 @@
     text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
     animation: glitch-anim2 1s infinite linear alternate-reverse;
   }
+
+  .glass-card {
+    background: rgba(14, 14, 14, 0.7);
+    backdrop-filter: blur(20px);
+  }
 }
 
 @keyframes glitch-anim {
