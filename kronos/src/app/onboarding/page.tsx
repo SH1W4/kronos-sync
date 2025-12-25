@@ -28,16 +28,50 @@ function OnboardingContent() {
 
     const initialRole = searchParams.get('role')
     const initialMode = searchParams.get('mode')
+    const urlCode = searchParams.get('inviteCode')
+
     const [mode, setMode] = useState<'SELECT' | 'CODE' | 'REQUEST' | 'SUCCESS'>(
-        (initialMode as any) || (initialRole === 'artist' ? 'CODE' : 'SELECT') || 'SELECT'
+        (urlCode || initialMode === 'CODE') ? 'CODE' : (initialRole === 'artist' ? 'CODE' : 'SELECT')
     )
-    const [inviteCode, setInviteCode] = useState('')
+    const [inviteCode, setInviteCode] = useState(urlCode || '')
     const [studioName, setStudioName] = useState('')
     const [motivation, setMotivation] = useState('')
     const [teamDetails, setTeamDetails] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
+
+    // Auto-validate if code is in URL and user just logged in
+    React.useEffect(() => {
+        if (urlCode && status === 'authenticated' && !loading && !successMessage && !error) {
+            const autoValidate = async () => {
+                setLoading(true)
+                try {
+                    const response = await fetch('/api/auth/validate-invite', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: urlCode })
+                    })
+                    const data = await response.json()
+                    if (response.ok) {
+                        await update()
+                        if (data.role === 'ARTIST' || data.role === 'ADMIN') {
+                            router.push('/artist/dashboard')
+                        } else {
+                            router.push('/dashboard')
+                        }
+                    } else {
+                        setError(data.error || 'Código expirado ou inválido')
+                    }
+                } catch (err) {
+                    setError('Erro na auto-validação.')
+                } finally {
+                    setLoading(false)
+                }
+            }
+            autoValidate()
+        }
+    }, [urlCode, status])
 
     const handleClientAccess = async () => {
         router.push('/kiosk')
@@ -46,6 +80,11 @@ function OnboardingContent() {
     const handleArtistAccess = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!inviteCode) return
+
+        if (status === 'unauthenticated') {
+            router.push(`/auth/signin?callbackUrl=/onboarding?inviteCode=${inviteCode}`)
+            return
+        }
 
         setLoading(true)
         setError('')
@@ -140,13 +179,7 @@ function OnboardingContent() {
 
                         {/* PROFISSIONAL CARD */}
                         <button
-                            onClick={() => {
-                                if (status === 'unauthenticated') {
-                                    router.push('/auth/signin?callbackUrl=/onboarding?mode=CODE')
-                                } else {
-                                    setMode('CODE')
-                                }
-                            }}
+                            onClick={() => setMode('CODE')}
                             className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-[#8B5CF6]/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
                         >
                             <div className="absolute top-4 right-4 text-gray-600 group-hover:text-[#8B5CF6] transition-colors">

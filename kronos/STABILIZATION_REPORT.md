@@ -4,11 +4,11 @@ Implementei as correções necessárias para alinhar o ambiente com sua visão d
 
 ## Mudanças Realizadas
 
-### 1. Trilha do Cliente & Onboarding (Simplificado)
-- **Escolha Única:** O usuário agora escolhe seu papel (Cliente ou Profissional) uma vez na `/auth/select`.
-- **Atalho Profissional:** Profissionais saltam telas de boas-vindas redundantes e caem direto na validação de código após o login.
-- **Redirecionamento Inteligente:** Artistas e Admins já cadastrados são detectados via sessão e levados diretamente ao dashboard.
-- **Onboarding Cliente:** Clientes clicando em "ACESSAR PAINEL" agora pulam o onboarding e vão direto para o `/kiosk`.
+### 1. Hub Estratégico & Onboarding (Restaurado)
+- **Tela de Boas-Vindas:** Restauramos a `/onboarding` como ponto de entrada principal, mantendo sua função estratégica para captação de novos estúdios e entrada de convites.
+- **Validação Inteligente:** Profissionais podem inserir códigos *antes* ou *depois* do login. Caso insiram antes, o sistema agora os autentica e finaliza a validação automaticamente.
+- **Auto-Redirecionamento:** Artistas e Admins já configurados são detectados via sessão e levados diretamente ao dashboard, preservando a agilidade.
+- **Trilha do Cliente:** Mantida a separação clara, enviando clientes diretamente para o `/kiosk`.
 
 ### 2. Correções Técnicas (Produção & Sincronia)
 - **Vercel Build:** Estabilizado com correções de tipagem em scripts, regras de negócio e validações Zod.
