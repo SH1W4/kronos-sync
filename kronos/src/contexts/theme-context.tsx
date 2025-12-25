@@ -127,8 +127,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     // Session Override (Stronger than localStorage for identity-linked theme)
-    if ((session?.user as any)?.customColor) {
-      baseTheme = { ...baseTheme, primaryColor: (session.user as any).customColor }
+    const customColor = (session?.user as any)?.customColor
+    if (customColor) {
+      baseTheme = { ...baseTheme, primaryColor: customColor }
     }
 
     setThemeState(baseTheme)
