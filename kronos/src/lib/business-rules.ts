@@ -9,10 +9,10 @@ export const BUSINESS_RULES = {
 }
 
 export function calculateCommission(
-  artistPlan: 'GUEST' | 'RESIDENT',
+  artistPlan: 'GUEST' | 'RESIDENT' | 'ASSOCIATED',
   monthlyEarnings: number
 ): number {
-  if (artistPlan === 'GUEST') {
+  if (artistPlan === 'GUEST' || artistPlan === 'ASSOCIATED') {
     return BUSINESS_RULES.GUEST_COMMISSION_RATE
   }
 
