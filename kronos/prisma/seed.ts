@@ -1,3 +1,10 @@
+import * as dotenv from 'dotenv'
+import * as path from 'path'
+
+// Load .env.local first (Vercel convention), then .env
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') })
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
+
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -315,7 +322,7 @@ async function main() {
     // Para cada maca (1, 2, 3)
     for (let maca = 1; maca <= 3; maca++) {
       // Horários: 9h, 14h, 18h
-      const times = ['09:00', '14:00', '18:00']
+      const times = ['09:00', '13:00', '16:30', '20:00']
 
       for (const time of times) {
         const [hours, minutes] = time.split(':')

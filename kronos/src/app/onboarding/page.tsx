@@ -24,9 +24,8 @@ export default function OnboardingPage() {
     const [successMessage, setSuccessMessage] = useState('')
 
     const handleClientAccess = async () => {
-        // Para clientes, apenas redirecionamos.
-        // Futuramente podemos pedir telefone/CPF aqui.
-        router.push('/dashboard')
+        // Para clientes, redirecionamos para a loja/trilha especializada
+        router.push('/marketplace')
     }
 
     const handleArtistAccess = async (e: React.FormEvent) => {

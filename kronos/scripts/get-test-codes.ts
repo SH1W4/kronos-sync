@@ -10,7 +10,7 @@ const prisma = new PrismaClient()
 async function main() {
     const codes = await prisma.inviteCode.findMany({
         where: {
-            used: false,
+            isActive: true,
             expiresAt: { gt: new Date() }
         },
         take: 5
@@ -24,6 +24,7 @@ async function main() {
                 role: 'ARTIST',
                 expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
                 workspaceId: (await prisma.workspace.findFirst())?.id || '',
+                creatorId: (await prisma.user.findFirst())?.id || '',
             }
         })
         console.log(`CÓDIGO GERADO: ${newCode.code}`)

@@ -46,7 +46,7 @@ export default function AgendaPage() {
 
     const fetchSlots = async () => {
         try {
-            const response = await fetch('/api/bookings')
+            const response = await fetch('/api/slots')
             const data = await response.json()
             setSlots(data.slots || [])
         } catch (error) {
