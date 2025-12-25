@@ -53,7 +53,7 @@ export async function registerCompanionLead(data: {
         }
 
         // 3. Salvar o Lead no KioskEntry
-        const lead = await (prisma.kioskEntry as any).create({
+        const lead = await prisma.kioskEntry.create({
             data: {
                 name: data.name,
                 phone: data.phone,

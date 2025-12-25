@@ -29,7 +29,7 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
         // Validar dados de entrada
         const validated = anamnesisDataSchema.safeParse(data)
         if (!validated.success) {
-            const firstError = validated.error.errors[0]
+            const firstError = validated.error.issues[0]
             return {
                 success: false,
                 error: firstError.message,
