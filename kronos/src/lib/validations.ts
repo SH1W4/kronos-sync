@@ -128,7 +128,7 @@ export const kioskEntrySchema = z.object({
     email: emailSchema.optional(),
     phone: phoneSchema,
     type: z.enum(['CLIENT', 'COMPANION'], {
-        errorMap: () => ({ message: 'Tipo inválido' })
+        message: 'Tipo inválido'
     }),
     tattooDesire: z.string().max(500, 'Texto muito longo').optional(),
     barriers: z.array(z.string()).optional(),
@@ -137,10 +137,10 @@ export const kioskEntrySchema = z.object({
 
 export const inviteSchema = z.object({
     role: z.enum(['ARTIST', 'ADMIN'], {
-        errorMap: () => ({ message: 'Cargo inválido' })
+        message: 'Cargo inválido'
     }),
     targetPlan: z.enum(['GUEST', 'RESIDENT', 'ASSOCIATED'], {
-        errorMap: () => ({ message: 'Plano inválido' })
+        message: 'Plano inválido'
     }).optional(),
     customCode: z.string()
         .min(6, 'Código deve ter pelo menos 6 caracteres')
@@ -155,7 +155,7 @@ export const productSchema = z.object({
     basePrice: moneySchema.min(10, 'Preço mínimo: R$ 10'),
     finalPrice: moneySchema.min(10, 'Preço mínimo: R$ 10'),
     type: z.enum(['PHYSICAL', 'DIGITAL'], {
-        errorMap: () => ({ message: 'Tipo de produto inválido' })
+        message: 'Tipo de produto inválido'
     }),
     imageUrl: z.string().url('URL de imagem inválida').optional()
 })
