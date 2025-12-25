@@ -31,7 +31,7 @@ export default function AuthSelectPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* CLIENTE CARD */}
                     <button
-                        onClick={() => router.push('/onboarding')}
+                        onClick={() => router.push('/kiosk')}
                         className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-[#00FF88]/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
                     >
                         <div className="absolute top-4 right-4 text-gray-600 group-hover:text-[#00FF88] transition-colors">
@@ -48,7 +48,7 @@ export default function AuthSelectPage() {
 
                     {/* PROFISSIONAL CARD */}
                     <button
-                        onClick={() => router.push('/auth/signin')}
+                        onClick={() => router.push('/auth/signin?callbackUrl=/onboarding?role=artist')}
                         className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-[#8B5CF6]/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
                     >
                         <div className="absolute top-4 right-4 text-gray-600 group-hover:text-[#8B5CF6] transition-colors">

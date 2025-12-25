@@ -4,16 +4,17 @@ Implementei as correções necessárias para alinhar o ambiente com sua visão d
 
 ## Mudanças Realizadas
 
-### 1. Trilha do Cliente (Kiosk)
-- **Onboarding:** Ajustado para redirecionar usuários `CLIENT` diretamente para o `/kiosk`, em vez do dashboard de agenda. Isso garante que o cliente não veja a agenda interna por engano.
-- **Middleware:** Sincronizado para garantir que qualquer acesso direto de cliente a rotas de entrada redirecione para o `/kiosk`.
+### 1. Trilha do Cliente & Onboarding (Simplificado)
+- **Escolha Única:** O usuário agora escolhe seu papel (Cliente ou Profissional) uma vez na `/auth/select`.
+- **Atalho Profissional:** Profissionais saltam telas de boas-vindas redundantes e caem direto na validação de código após o login.
+- **Redirecionamento Inteligente:** Artistas e Admins já cadastrados são detectados via sessão e levados diretamente ao dashboard.
+- **Onboarding Cliente:** Clientes clicando em "ACESSAR PAINEL" agora pulam o onboarding e vão direto para o `/kiosk`.
 
-### 2. Correções Técnicas (Agenda & Vercel)
-- **Agenda:** O componente `dashboard` agora consome a nova API `/api/slots`, que calcula corretamente quais horários estão disponíveis, reservados ou ocupados.
-- **Vercel Build:** Corrigi erros de tipagem críticos em scripts, server actions, regras de negócio, contextos e validações Zod. O build de produção está agora estabilizado.
-- **Estabilização de API:** Criei a rota faltante `/api/artist/profile` para eliminar erros de parsing de JSON no dashboard.
-- **Isolamento de Trilha:** Atualizei o `middleware.ts` para garantir que clientes autenticados sejam redirecionados do `/dashboard` (agenda) diretamente para o `/kiosk`.
-- **Seed do Banco:** Atualizei o script de seed para bater com os horários esperados pela interface (09:00, 13:00, 16:30, 20:00).
+### 2. Correções Técnicas (Produção & Sincronia)
+- **Vercel Build:** Estabilizado com correções de tipagem em scripts, regras de negócio e validações Zod.
+- **Estabilização de API:** Rota `/api/artist/profile` criada para fornecer o PIN do Kiosk sem erros.
+- **Seed do Banco:** Scripts atualizados com os horários de macas oficiais (09:00, 13:00, 16:30, 20:00).
+- **Consolidação:** Limpeza total de arquivos obsoletos (`extracted` folder) e remoção de redundâncias de UI.
 
 ### 3. Verificação em Produção
 Acesse: [kronos-sync.vercel.app](https://kronos-sync.vercel.app) (Trilha especializada `/kiosk` verificada)

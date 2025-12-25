@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,9 +12,24 @@ import { submitWorkspaceRequest } from '@/app/actions/workspaces'
 export const dynamic = 'force-dynamic'
 
 export default function OnboardingPage() {
-    const { data: session, update } = useSession()
+    const { data: session, update, status } = useSession()
     const router = useRouter()
-    const [mode, setMode] = useState<'SELECT' | 'CODE' | 'REQUEST' | 'SUCCESS'>('SELECT')
+    const searchParams = useSearchParams()
+
+    // Check if user is already an artist/admin to bypass onboarding
+    React.useEffect(() => {
+        if (status === 'authenticated' && session?.user) {
+            const role = (session.user as any).role
+            if (role === 'ARTIST' || role === 'ADMIN') {
+                router.replace('/artist/dashboard')
+            }
+        }
+    }, [session, status, router])
+
+    const initialRole = searchParams.get('role')
+    const [mode, setMode] = useState<'SELECT' | 'CODE' | 'REQUEST' | 'SUCCESS'>(
+        initialRole === 'artist' ? 'CODE' : 'SELECT'
+    )
     const [inviteCode, setInviteCode] = useState('')
     const [studioName, setStudioName] = useState('')
     const [motivation, setMotivation] = useState('')
