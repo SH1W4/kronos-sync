@@ -197,6 +197,11 @@ export default async function AnamnesePage({ params }: { params: Promise<{ booki
                     </Link>
                 </div>
             </div>
+
+            <style jsx global>{`
+                .glass-card { background: rgba(14, 14, 14, 0.7); backdrop-filter: blur(20px); }
+                .font-orbitron { font-family: var(--font-orbitron, sans-serif); }
+            `}</style>
         </div>
     )
 }
