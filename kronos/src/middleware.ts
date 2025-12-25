@@ -11,14 +11,17 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // 1. Redirection for Authenticated Users (Sticky Route Persistence)
-    // Se o usuário já está logado e tenta acessar a Home ou Seleção de Auth
+    // Se o usuário já está logado e tenta acessar rotas de entrada ou a agenda
     if (token) {
-        if (pathname === '/' || pathname === '/auth/select' || pathname === '/auth/signin') {
+        if (pathname === '/' || pathname === '/auth/select' || pathname === '/auth/signin' || pathname === '/dashboard') {
             // Se for Arquiteto/Artista, vai direto para o dashboard dele
             if (token.role === 'ARTIST' || token.role === 'ADMIN') {
-                return NextResponse.redirect(new URL('/artist/dashboard', request.url))
+                // Se ele estiver na Home, vai pro dashboard. Se estiver no /dashboard, deixa ele ver.
+                if (pathname !== '/dashboard') {
+                    return NextResponse.redirect(new URL('/artist/dashboard', request.url))
+                }
             }
-            // Se for Cliente, vai para o Kiosk principal
+            // Se for Cliente, NUNCA vê a agenda, vai para o Kiosk principal
             if (token.role === 'CLIENT') {
                 return NextResponse.redirect(new URL('/kiosk', request.url))
             }
@@ -30,5 +33,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ['/', '/auth/select', '/auth/signin'],
+    matcher: ['/', '/auth/select', '/auth/signin', '/dashboard'],
 }
