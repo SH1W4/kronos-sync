@@ -85,13 +85,11 @@ export async function updateArtistSettings(data: any) {
         const userId = (session.user as any).id
         if (!userId) return { error: 'Usuário não encontrado' }
 
-        // Update user profile
+        // Update user profile (only name for now, as bio/instagram aren't in User model)
         await prisma.user.update({
             where: { id: userId },
             data: {
-                name: data.name,
-                bio: data.bio,
-                instagram: data.instagram
+                name: data.name
             }
         })
 
