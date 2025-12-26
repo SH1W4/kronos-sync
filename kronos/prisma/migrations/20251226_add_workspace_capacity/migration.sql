@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "workspaces" ADD COLUMN IF NOT EXISTS "capacity" INTEGER NOT NULL DEFAULT 5;
