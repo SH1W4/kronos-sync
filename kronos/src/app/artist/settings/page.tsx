@@ -230,7 +230,7 @@ export default function SettingsPage() {
     const handleThemeSave = async () => {
         setLoading(true)
         try {
-            const result = await updateUserTheme({ customColor: personalColor })
+            const result = await updateUserTheme(personalColor)
             if (result.success) {
                 alert('Tema aplicado com sucesso!')
                 await updateSession()
