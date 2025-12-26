@@ -41,31 +41,55 @@ export async function createBooking(data: {
             return { error: 'Workspace não encontrado' }
         }
 
-        // Check for time conflicts
-        const conflictingBooking = await prisma.booking.findFirst({
-            where: {
-                artistId: user.artist.id,
-                scheduledFor: {
-                    gte: data.scheduledFor,
-                    lt: new Date(data.scheduledFor.getTime() + data.duration * 60000)
-                },
-                status: {
-                    not: 'CANCELLED'
-                }
-            }
+        // Fetch Workspace Settings (Capacity)
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            select: { capacity: true }
         })
 
-        if (conflictingBooking) {
-            return { error: 'Já existe um agendamento neste horário' }
+        if (!workspace) return { error: 'Workspace inválido' }
+
+        // Check for time conflicts across ALL Macas
+        const TOTAL_MACAS = workspace.capacity
+        let availableMacaId = null
+
+        // Format dates for query
+        const start = data.scheduledFor
+        const end = new Date(data.scheduledFor.getTime() + data.duration * 60000)
+
+        for (let i = 1; i <= TOTAL_MACAS; i++) {
+            // Check conflicts for this specific Maca
+            const conflict = await prisma.slot.findFirst({
+                where: {
+                    workspaceId,
+                    macaId: i,
+                    isActive: true,
+                    OR: [
+                        {
+                            startTime: { lt: end },
+                            endTime: { gt: start }
+                        }
+                    ]
+                }
+            })
+
+            if (!conflict) {
+                availableMacaId = i
+                break // Found a free maca!
+            }
         }
 
-        // Create Slot first (needed as it's a required related model)
+        if (!availableMacaId) {
+            return { error: 'Sem disponibilidade: Todas as macas estão ocupadas neste horário.' }
+        }
+
+        // Create Slot linked to the found Maca
         const slot = await prisma.slot.create({
             data: {
                 workspaceId,
-                macaId: 1, // Defaulting to table 1 for demo
-                startTime: data.scheduledFor,
-                endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000),
+                macaId: availableMacaId,
+                startTime: start,
+                endTime: end,
                 isActive: true
             }
         })

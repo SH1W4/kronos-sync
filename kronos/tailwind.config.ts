@@ -17,7 +17,7 @@ export default {
         background: "#050505", // Black Hole
         foreground: "#FFFFFF", // Pure Light
         primary: {
-          DEFAULT: "#FFFFFF",
+          DEFAULT: "var(--primary-color)", // Dynamic
           foreground: "#000000",
         },
         secondary: {
@@ -29,12 +29,12 @@ export default {
           foreground: "#666666",
         },
         accent: {
-          DEFAULT: "#F0F0F0",
+          DEFAULT: "var(--primary-color)", // Reuse primary for accent for now
           foreground: "#000000",
         },
         border: "#222222",
         input: "#111111",
-        ring: "#FFFFFF",
+        ring: "var(--primary-color)",
       },
       borderRadius: {
         lg: "0px", // Brutalist

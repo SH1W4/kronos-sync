@@ -11,7 +11,7 @@ import { analyzeInstagramProfile, applyKaiBranding } from '@/app/actions/kai'
 import { KaiAnalysisModal } from '@/components/kai/AnalysisModal'
 import { createInvite, getInvites, revokeInvite } from '@/app/actions/invites'
 import { updateWorkspaceFinance, updateWorkspaceBranding } from '@/app/actions/workspaces'
-import { updateUserTheme } from '@/app/actions/settings'
+import { updateUserTheme, updateWorkspaceCapacity } from '@/app/actions/settings'
 import { InkPassCard } from '@/components/invites/InkPassCard'
 
 export default function SettingsPage() {
@@ -37,6 +37,7 @@ export default function SettingsPage() {
     // Workspace Stats
     const [studioName, setStudioName] = useState('')
     const [studioColor, setStudioColor] = useState('#8B5CF6')
+    const [studioCapacity, setStudioCapacity] = useState(5)
 
     // Personal State
     const [personalColor, setPersonalColor] = useState('#8B5CF6')
@@ -65,6 +66,7 @@ export default function SettingsPage() {
                 setPixRecipient(currentWorkspace.pixRecipient || '')
                 setStudioName(currentWorkspace.name || '')
                 setStudioColor(currentWorkspace.primaryColor || '#8B5CF6')
+                setStudioCapacity(currentWorkspace.capacity || 5)
             }
 
             if ((session?.user as any).customColor) {
@@ -203,15 +205,20 @@ export default function SettingsPage() {
     const handleStudioSave = async () => {
         setLoading(true)
         try {
-            const result = await updateWorkspaceBranding({
+            // Update Branding
+            const brandingResult = await updateWorkspaceBranding({
                 name: studioName,
                 primaryColor: studioColor
             })
-            if (result.success) {
+
+            // Update Capacity
+            const capacityResult = await updateWorkspaceCapacity(studioCapacity)
+
+            if (brandingResult.success && capacityResult.success) {
                 alert('Configurações do estúdio salvas com sucesso!')
                 await updateSession()
             } else {
-                alert(result.error || 'Erro ao salvar')
+                alert(brandingResult.error || capacityResult.error || 'Erro ao salvar')
             }
         } catch (e) {
             alert('Erro ao salvar configurações do estúdio')
@@ -728,18 +735,33 @@ export default function SettingsPage() {
                                     <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
                                         <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-2">Soberania de Workspace</p>
                                         <p className="text-xs text-gray-400 leading-relaxed">
-                                            Configure a identidade visual global do seu estúdio. Estas configurações afetam todos os artistas e clientes do seu silo.
+                                            Configure a identidade visual global e a capacidade operacional do seu estúdio.
                                         </p>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Nome do Estúdio</label>
-                                        <Input
-                                            value={studioName}
-                                            onChange={(e) => setStudioName(e.target.value)}
-                                            className="bg-black/50 border-white/10"
-                                            placeholder="KRONØS STUDIO"
-                                        />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Nome do Estúdio</label>
+                                            <Input
+                                                value={studioName}
+                                                onChange={(e) => setStudioName(e.target.value)}
+                                                className="bg-black/50 border-white/10"
+                                                placeholder="KRONØS STUDIO"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Capacidade (Macas)</label>
+                                            <Input
+                                                type="number"
+                                                min={1}
+                                                max={20}
+                                                value={studioCapacity}
+                                                onChange={(e) => setStudioCapacity(parseInt(e.target.value))}
+                                                className="bg-black/50 border-white/10"
+                                            />
+                                            <p className="text-[9px] text-gray-600">Quantos atendimentos simultâneos o estúdio suporta.</p>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2">

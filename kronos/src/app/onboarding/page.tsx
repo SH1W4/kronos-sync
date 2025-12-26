@@ -74,7 +74,9 @@ function OnboardingContent() {
     }, [urlCode, status])
 
     const handleClientAccess = async () => {
-        router.push('/kiosk')
+        // Para clientes, apenas redirecionamos.
+        // Futuramente podemos pedir telefone/CPF aqui.
+        router.push('/marketplace')
     }
 
     const handleArtistAccess = async (e: React.FormEvent) => {

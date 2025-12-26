@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { encrypt } from '@/lib/crypto'
 
 // Schema de validação para anamnese (compatível com CSV)
 const anamnesisDataSchema = z.object({
@@ -60,10 +61,10 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 fullName: validData.fullName,
                 whatsapp: validData.whatsapp,
                 birthDate: validData.birthDate,
-                medicalConditionsTattoo: validData.medicalConditionsTattoo,
-                medicalConditionsHealing: validData.medicalConditionsHealing,
-                medicalConditionsHealingDetails: validData.medicalConditionsHealingDetails,
-                knownAllergies: validData.knownAllergies,
+                medicalConditionsTattoo: encrypt(validData.medicalConditionsTattoo || ''),
+                medicalConditionsHealing: encrypt(validData.medicalConditionsHealing || ''),
+                medicalConditionsHealingDetails: encrypt(validData.medicalConditionsHealingDetails || ''),
+                knownAllergies: encrypt(validData.knownAllergies || ''),
                 artistHandle: validData.artistHandle,
                 artDescription: validData.artDescription,
                 agreedValue: validData.agreedValue,
@@ -80,10 +81,10 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 fullName: validData.fullName,
                 whatsapp: validData.whatsapp,
                 birthDate: validData.birthDate,
-                medicalConditionsTattoo: validData.medicalConditionsTattoo,
-                medicalConditionsHealing: validData.medicalConditionsHealing,
-                medicalConditionsHealingDetails: validData.medicalConditionsHealingDetails,
-                knownAllergies: validData.knownAllergies,
+                medicalConditionsTattoo: encrypt(validData.medicalConditionsTattoo || ''),
+                medicalConditionsHealing: encrypt(validData.medicalConditionsHealing || ''),
+                medicalConditionsHealingDetails: encrypt(validData.medicalConditionsHealingDetails || ''),
+                knownAllergies: encrypt(validData.knownAllergies || ''),
                 artistHandle: validData.artistHandle,
                 artDescription: validData.artDescription,
                 agreedValue: validData.agreedValue,

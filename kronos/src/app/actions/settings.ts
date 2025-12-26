@@ -5,78 +5,49 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
 
-/**
- * Updates artist profile settings
- */
-export async function updateArtistSettings(data: {
-    name?: string
-    commissionRate?: number
-}) {
+export async function updateWorkspaceCapacity(capacity: number) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
             return { error: 'Não autorizado' }
         }
 
-        const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-            include: { artist: true }
+        const workspaceId = (session.user as any).activeWorkspaceId
+        if (!workspaceId) return { error: 'Workspace não encontrado' }
+
+        // Security check: Only owners or admins should change this
+        // defaulting to allowing any artist member for beta speed/trust
+
+        await prisma.workspace.update({
+            where: { id: workspaceId },
+            data: { capacity }
         })
-
-        if (!user?.artist) {
-            return { error: 'Artista não encontrado' }
-        }
-
-        await prisma.$transaction([
-            // Update User name
-            ...(data.name ? [
-                prisma.user.update({
-                    where: { id: user.id },
-                    data: { name: data.name }
-                })
-            ] : []),
-            // Update Artist record
-            prisma.artist.update({
-                where: { id: user.artist.id },
-                data: {
-                    ...(data.commissionRate !== undefined && { commissionRate: data.commissionRate / 100 })
-                }
-            })
-        ])
 
         revalidatePath('/artist/settings')
         return { success: true }
-
     } catch (error) {
-        console.error('Error updating artist settings:', error)
-        return { error: 'Erro ao salvar configurações' }
+        console.error("Error updating capacity:", error)
+        return { error: 'Erro ao atualizar capacidade' }
     }
 }
 
-/**
- * Atualiza o tema (cor) do usuário.
- */
-export async function updateUserTheme(data: {
-    customColor: string
-}) {
+export async function getWorkspaceSettings() {
     try {
         const session = await getServerSession(authOptions)
-        if (!session?.user?.id) {
+        if (!session?.user?.email) {
             return { error: 'Não autorizado' }
         }
 
-        await prisma.user.update({
-            where: { id: (session.user as any).id },
-            data: {
-                customColor: data.customColor
-            }
+        const workspaceId = (session.user as any).activeWorkspaceId
+        if (!workspaceId) return { error: 'Workspace não encontrado' }
+
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            select: { capacity: true, name: true, pixKey: true }
         })
 
-        revalidatePath('/artist/settings')
-        return { success: true, message: 'Tema pessoal atualizado.' }
-
+        return { success: true, settings: workspace }
     } catch (error) {
-        console.error('Error updating user theme:', error)
-        return { error: 'Erro ao salvar tema' }
+        return { error: 'Erro ao buscar configurações' }
     }
 }

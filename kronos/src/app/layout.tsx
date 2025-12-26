@@ -40,19 +40,23 @@ export const metadata: Metadata = {
   },
 };
 
+import { DynamicThemeProvider } from "@/providers/dynamic-theme-provider"
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
           <InstallPWABanner />
-          {children}
+          <DynamicThemeProvider>
+            {children}
+          </DynamicThemeProvider>
         </Providers>
       </body>
     </html>

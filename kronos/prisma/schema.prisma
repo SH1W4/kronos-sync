@@ -123,6 +123,9 @@ model Workspace {
   pixKey        String? 
   pixRecipient  String?
   
+  // Settings
+  capacity      Int       @default(5) // Número de macas/cadeiras
+
   members       WorkspaceMember[]
   artists       Artist[]
   bookings      Booking[]

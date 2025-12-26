@@ -52,43 +52,26 @@ function MarketplaceContent() {
     }
   }, [searchParams])
 
+  /*
+  // MOCK DATA REMOVED - CONNECTED TO DB
+  */
+
   const fetchProducts = async () => {
     try {
-      // Mock data for Alpha
-      const mockProducts: Product[] = [
-        {
-          id: 'prod-1',
-          title: 'Print: Cyber Skull',
-          description: 'High-quality print on metallic paper.',
-          basePrice: 150,
-          finalPrice: 150,
-          type: 'PRINT',
-          artist: { user: { name: 'KRONØS Resident' } }
-        },
-        {
-          id: 'prod-2',
-          title: 'Aftercare Kit Deluxe',
-          description: 'Everything you need for perfect healing.',
-          basePrice: 85,
-          finalPrice: 85,
-          type: 'PHYSICAL',
-          artist: { user: { name: 'Studio Staff' } }
-        },
-        {
-          id: 'prod-3',
-          title: 'Flash: Neotrad Dragon',
-          description: 'One-off design for immediate booking.',
-          basePrice: 600,
-          finalPrice: 600,
-          type: 'ORIGINAL',
-          artist: { user: { name: 'Artisan One' } }
-        }
-      ]
-      setProducts(mockProducts)
+      const { getProducts } = await import('@/app/actions/store')
+      const res = await getProducts(typeFilter || undefined)
+      if (res.success) {
+        setProducts(res.products as any)
+      }
     } finally {
       setLoading(false)
     }
   }
+
+  // Reload when filter changes
+  useEffect(() => {
+    fetchProducts()
+  }, [typeFilter])
 
   const handleApplyCoupon = async (code: string) => {
     const { validateCoupon } = await import('@/app/actions/coupons')
@@ -300,7 +283,26 @@ function MarketplaceContent() {
                     />
                     <Button variant="outline" onClick={() => handleApplyCoupon(couponCode)}>APLICAR</Button>
                   </div>
-                  <Button className="w-full h-16 bg-primary hover:bg-primary-dark text-black font-black font-orbitron text-base rounded-2xl shadow-[0_0_30px_rgba(0,255,136,0.2)]">
+                  <Button
+                    onClick={async () => {
+                      const { createOrder } = await import('@/app/actions/store')
+                      const res = await createOrder({
+                        items: cart.map(i => ({ productId: i.productId, quantity: i.quantity })),
+                        total: getCartTotal(),
+                        discountValue: getDiscountValue(),
+                        finalTotal: getFinalTotal(),
+                        couponCode: couponCode || undefined
+                      })
+                      if (res.success) {
+                        alert(`Pedido #${res.orderId} criado com sucesso! Aguarde o contato do Staff.`)
+                        setCart([])
+                        setIsCartOpen(false)
+                      } else {
+                        alert('Erro: ' + res.error)
+                      }
+                    }}
+                    className="w-full h-16 bg-primary hover:bg-primary-dark text-black font-black font-orbitron text-base rounded-2xl shadow-[0_0_30px_rgba(0,255,136,0.2)]"
+                  >
                     FINALIZAR PEDIDO
                   </Button>
                 </div>
