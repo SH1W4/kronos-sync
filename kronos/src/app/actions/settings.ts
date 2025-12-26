@@ -51,3 +51,54 @@ export async function getWorkspaceSettings() {
         return { error: 'Erro ao buscar configurações' }
     }
 }
+
+export async function updateUserTheme(color: string) {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.email) {
+            return { error: 'Não autorizado' }
+        }
+
+        const userId = (session.user as any).id
+        if (!userId) return { error: 'Usuário não encontrado' }
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: { customColor: color }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true }
+    } catch (error) {
+        console.error("Error updating user theme:", error)
+        return { error: 'Erro ao atualizar tema' }
+    }
+}
+
+export async function updateArtistSettings(data: any) {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.email) {
+            return { error: 'Não autorizado' }
+        }
+
+        const userId = (session.user as any).id
+        if (!userId) return { error: 'Usuário não encontrado' }
+
+        // Update user profile
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                name: data.name,
+                bio: data.bio,
+                instagram: data.instagram
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true }
+    } catch (error) {
+        console.error("Error updating artist settings:", error)
+        return { error: 'Erro ao atualizar configurações' }
+    }
+}
