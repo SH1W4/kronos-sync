@@ -239,6 +239,18 @@ function OnboardingContent() {
                                     >
                                         QUERO CRIAR MEU ESTÚDIO <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                     </Button>
+
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        className="text-gray-600 hover:text-white text-[10px] uppercase tracking-widest mt-2"
+                                        onClick={async () => {
+                                            const { signIn } = await import('next-auth/react')
+                                            signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })
+                                        }}
+                                    >
+                                        🐛 DEV MODE
+                                    </Button>
                                 </div>
                             </form>
                         </div>
