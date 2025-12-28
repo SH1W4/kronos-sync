@@ -50,7 +50,7 @@ export async function createBooking(data: {
         if (!workspace) return { error: 'Workspace inválido' }
 
         // Check for time conflicts across ALL Macas
-        const TOTAL_MACAS = workspace.capacity
+        const TOTAL_MACAS = workspace.capacity || 5
         let availableMacaId = null
 
         // Format dates for query
@@ -58,7 +58,6 @@ export async function createBooking(data: {
         const end = new Date(data.scheduledFor.getTime() + data.duration * 60000)
 
         for (let i = 1; i <= TOTAL_MACAS; i++) {
-            // Check conflicts for this specific Maca
             const conflict = await prisma.slot.findFirst({
                 where: {
                     workspaceId,
@@ -75,7 +74,7 @@ export async function createBooking(data: {
 
             if (!conflict) {
                 availableMacaId = i
-                break // Found a free maca!
+                break
             }
         }
 

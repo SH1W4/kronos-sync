@@ -25,6 +25,88 @@ export default async function ArtistDashboard() {
 
     // Se não for artista, mostra erro (ou poderia redirecionar)
     if (!artist) {
+        // Auto-fix: Se o usuário tem role ARTIST mas não tem registro, criar automaticamente
+        if ((session.user as any).role === 'ARTIST') {
+            console.log('🔧 Auto-criando perfil de artista para:', session.user.email)
+
+            try {
+                // Verificar se o usuário existe no banco
+                const userExists = await prisma.user.findUnique({
+                    where: { id: session.user.id }
+                })
+
+                if (!userExists) {
+                    console.error('❌ Usuário não encontrado no banco:', session.user.id)
+                    return (
+                        <div className="p-10 text-center min-h-[50vh] flex flex-col items-center justify-center">
+                            <h1 className="text-xl text-red-500 font-mono mb-4">ERRO: SESSÃO INVÁLIDA</h1>
+                            <p className="text-gray-500 text-sm max-w-md">
+                                Sua sessão está corrompida. Faça logout e login novamente.
+                            </p>
+                        </div>
+                    )
+                }
+
+                // Buscar ou criar workspace
+                let workspace = await prisma.workspace.findFirst()
+                if (!workspace) {
+                    workspace = await prisma.workspace.create({
+                        data: {
+                            name: "Kronus Demo Studio",
+                            slug: "demo-studio",
+                            primaryColor: "#8B5CF6",
+                            ownerId: session.user.id
+                        }
+                    })
+                }
+
+                // Criar perfil de artista
+                await prisma.artist.create({
+                    data: {
+                        userId: session.user.id,
+                        workspaceId: workspace.id,
+                        plan: "RESIDENT",
+                        commissionRate: 0.30,
+                        isActive: true
+                    }
+                })
+
+                // Criar membership
+                await prisma.workspaceMember.upsert({
+                    where: {
+                        workspaceId_userId: {
+                            workspaceId: workspace.id,
+                            userId: session.user.id
+                        }
+                    },
+                    create: {
+                        workspaceId: workspace.id,
+                        userId: session.user.id,
+                        role: "ADMIN"
+                    },
+                    update: {}
+                })
+
+                console.log('✅ Perfil de artista criado com sucesso!')
+            } catch (error) {
+                console.error('❌ Erro ao criar perfil:', error)
+                return (
+                    <div className="p-10 text-center min-h-[50vh] flex flex-col items-center justify-center">
+                        <h1 className="text-xl text-red-500 font-mono mb-4">ERRO AO CRIAR PERFIL</h1>
+                        <p className="text-gray-500 text-sm max-w-md mb-4">
+                            {error instanceof Error ? error.message : 'Erro desconhecido'}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                            Tente fazer logout e login novamente.
+                        </p>
+                    </div>
+                )
+            }
+
+            // Recarregar a página para pegar os novos dados
+            redirect('/artist/dashboard')
+        }
+
         return (
             <div className="p-10 text-center min-h-[50vh] flex flex-col items-center justify-center">
                 <h1 className="text-xl text-red-500 font-mono mb-4">ERRO: PERFIL DE ARTISTA NÃO ENCONTRADO</h1>
