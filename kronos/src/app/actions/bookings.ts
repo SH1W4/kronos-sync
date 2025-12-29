@@ -54,7 +54,8 @@ export async function createBooking(data: {
         let availableMacaId = null
 
         // Format dates for query
-        const end = new Date(data.scheduledFor.getTime() + data.duration * 60000)
+        const start = data.scheduledFor
+        const end = new Date(start.getTime() + data.duration * 60000)
 
         // 0. Pre-flight Check: Google Calendar Availability (Hybrid: Unit + Tower)
         try {
