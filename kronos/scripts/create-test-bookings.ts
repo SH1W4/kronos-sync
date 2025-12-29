@@ -120,9 +120,12 @@ async function createTestBookings() {
                     artistId: artist.id,
                     workspaceId: artist.workspaceId,
                     status: bookingData.status as BookingStatus,
-                    totalPrice: bookingData.price,
+                    value: bookingData.price,
+                    finalValue: bookingData.price,
                     artistShare: artistShare,
                     studioShare: bookingData.price - artistShare,
+                    scheduledFor: bookingData.date,
+                    duration: bookingData.duration * 60, // Convierte horas a minutos
                     description: bookingData.description
                 }
             })
