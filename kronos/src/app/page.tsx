@@ -115,7 +115,7 @@ export default function LandingPage() {
                     </h1>
 
                     <p className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10">
-                        Soberania financeira, gestão de fluxo e inteligência de dados. 
+                        Soberania financeira, gestão de fluxo e inteligência de dados.
                         <br />A tecnologia que remove o ruído para você focar no seu legado.
                     </p>
 
@@ -132,15 +132,16 @@ export default function LandingPage() {
             {/* Elegant Features Grid */}
             <section id="features" className="py-24 px-6 bg-zinc-900/80 border-t border-white/10 backdrop-blur-sm">
                 <div className="container mx-auto max-w-6xl">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                         {FEATURES.map((feature) => (
                             <div
                                 key={feature.id}
                                 onClick={() => setActiveFeature(feature)}
                                 className={`
                                     ${feature.colSpan} 
-                                    group relative h-80 overflow-hidden rounded-lg bg-black border border-white/10 cursor-pointer 
-                                    transition-all duration-500 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10
+                                    group relative h-[22rem] md:h-80 lg:h-96 overflow-hidden rounded-2xl bg-black border border-white/5 cursor-pointer 
+                                    transition-all duration-700 hover:border-primary/40 hover:shadow-[0_0_50px_rgba(var(--primary-rgb),0.1)]
+                                    active:scale-[0.98] active:border-primary/60
                                 `}
                             >
                                 {/* Image Background (B&W -> Color on Hover) */}
@@ -156,12 +157,12 @@ export default function LandingPage() {
                                 </div>
 
                                 {/* Text Content */}
-                                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                                    <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                        <p className="text-[10px] tracking-[0.2em] font-bold text-zinc-400 mb-2 uppercase font-mono">Módulo</p>
-                                        <h3 className="text-2xl font-orbitron font-bold tracking-tight text-white mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
-                                        <div className="w-8 h-[1px] bg-white/30 mb-4 group-hover:w-16 group-hover:bg-primary transition-all duration-500"></div>
-                                        <p className="text-sm text-zinc-300 font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 italic">
+                                <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-end z-10">
+                                    <div className="transform translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 transition-transform duration-700 ease-out">
+                                        <p className="text-[9px] tracking-[0.3em] font-black text-primary/70 mb-3 uppercase font-mono drop-shadow-md">Módulo</p>
+                                        <h3 className="text-2xl md:text-3xl font-orbitron font-black tracking-tighter text-white mb-3 group-hover:text-primary transition-colors text-glow">{feature.title}</h3>
+                                        <div className="w-10 h-[2px] bg-white/20 mb-5 group-hover:w-20 group-hover:bg-primary transition-all duration-700"></div>
+                                        <p className="text-xs md:text-sm text-zinc-400 font-mono tracking-wide opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-all duration-700 delay-100">
                                             {feature.subtitle}
                                         </p>
                                     </div>
@@ -185,7 +186,7 @@ export default function LandingPage() {
                                 src={activeFeature.image}
                                 alt={activeFeature.title}
                                 fill
-                                className="object-cover opacity-60 grayscale"
+                                className="object-cover opacity-80"
                             />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
