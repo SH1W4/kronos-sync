@@ -126,7 +126,7 @@ async function createTestBookings() {
                     studioShare: bookingData.price - artistShare,
                     scheduledFor: bookingData.date,
                     duration: bookingData.duration * 60, // Convierte horas a minutos
-                    description: bookingData.description
+                    notes: bookingData.description
                 }
             })
 
