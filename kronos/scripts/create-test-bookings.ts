@@ -146,20 +146,17 @@ async function createTestBookings() {
         const coupons = [
             {
                 code: 'PRIMEIRATAT',
-                discount: 50.00,
-                type: 'FIXED',
+                discount: 50,
                 description: 'Desconto de R$ 50 para primeira tatuagem'
             },
             {
                 code: 'VERÃO2025',
                 discount: 15,
-                type: 'PERCENTAGE',
                 description: 'Desconto de 15% para sessões no verão'
             },
             {
                 code: 'CLIENTE-VIP',
-                discount: 100.00,
-                type: 'FIXED',
+                discount: 10,
                 description: 'Desconto especial para clientes VIP'
             }
         ]
@@ -168,12 +165,8 @@ async function createTestBookings() {
             const coupon = await prisma.coupon.create({
                 data: {
                     code: couponData.code,
-                    discount: couponData.discount,
-                    type: couponData.type,
+                    discountPercent: couponData.discount,
                     workspaceId: artist.workspaceId,
-                    isActive: true,
-                    maxUses: 10,
-                    usedCount: 0,
                     expiresAt: new Date('2025-12-31')
                 }
             })
