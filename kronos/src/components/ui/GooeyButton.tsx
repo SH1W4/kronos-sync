@@ -28,8 +28,9 @@ export function GooeyButton({ children, className, ...props }: GooeyButtonProps)
         mouseY.set(e.clientY - rect.top)
     }
 
-    // Filter ID must be unique
-    const filterId = "gooey-filter"
+    // Filter ID must be unique per instance
+    const id = React.useId()
+    const filterId = `gooey-filter-${id.replace(/:/g, '')}`
 
     return (
         <div className="relative group">
