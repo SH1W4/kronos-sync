@@ -78,7 +78,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <BrandLogo size={32} animated={false} />
                     <div className="flex items-center gap-8">
-                        <Link href="/onboarding">
+                        <Link href="/auth/signin">
                             <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-medium tracking-wide text-xs h-9 px-6 uppercase transition-all">
                                 Login
                             </Button>
@@ -110,13 +110,13 @@ export default function LandingPage() {
                     </div>
 
                     <h1 className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight">
-                        Gestão inteligente para <br />
-                        <span className="font-orbitron font-light text-zinc-400">estúdios de alto padrão.</span>
+                        Inteligência operacional para <br />
+                        <span className="font-orbitron font-light text-zinc-400">estúdios de alto desempenho.</span>
                     </h1>
 
                     <p className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10">
-                        Centralize agenda, contratos jurídicos e performance financeira.
-                        <br />O fim da burocracia, o início da arte pura.
+                        Soberania financeira, gestão de fluxo e inteligência de dados. 
+                        <br />A tecnologia que remove o ruído para você focar no seu legado.
                     </p>
 
                     <div className="flex gap-4">

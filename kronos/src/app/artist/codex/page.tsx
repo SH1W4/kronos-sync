@@ -46,7 +46,7 @@ export default function CodexPage() {
                 <div className="flex flex-col items-center gap-4">
                     <Cpu className="w-8 h-8 text-purple-500 animate-spin" />
                     <span className="font-mono text-[10px] text-purple-400 animate-pulse uppercase tracking-[0.3em]">
-                        Descriptografando Codex...
+                        Carregando Manuais...
                     </span>
                 </div>
             </div>
@@ -62,10 +62,10 @@ export default function CodexPage() {
                         <div className="w-10 h-10 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.2)]">
                             <Terminal size={20} className="text-purple-400" />
                         </div>
-                        <span className="text-[10px] font-mono text-purple-500 uppercase tracking-[0.4em] font-bold">Protocolo de Inteligência</span>
+                        <span className="text-[10px] font-mono text-purple-500 uppercase tracking-[0.4em] font-bold">Base de Conhecimento</span>
                     </div>
                     <h1 className="text-4xl font-orbitron font-black tracking-tight text-white italic">
-                        C O D E X
+                        M A N U A I S
                     </h1>
                 </div>
 
@@ -123,7 +123,7 @@ export default function CodexPage() {
                             <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                                 <div className="h-full bg-purple-500/40 w-3/4"></div>
                             </div>
-                            <p className="text-[8px] font-mono text-gray-600 uppercase">Neural Link Integrity: 88%</p>
+                            <p className="text-[8px] font-mono text-gray-600 uppercase">Sistema Operacional: 100%</p>
                         </div>
                     </div>
                 </div>

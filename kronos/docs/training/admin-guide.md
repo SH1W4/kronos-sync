@@ -1,37 +1,39 @@
 ---
 docsync:
-  version: 1.0.0
+  version: 2.0.0
   audience: admin
   priority: critical
   intent: governance
 ---
-# Guia do Arquiteto de Estúdio: KRONØS SYNC
+# Guia do Administrador
 
-Como Head Artist e Administrador, você detém a chave do silo. Este sistema foi construído para escala, segurança e soberania de dados.
+Este documento orienta o Administrador (Head Artist ou Gerente) na configuração e manutenção do ambiente KRONØS.
 
-## 1. Gestão de Workspace (O Silo)
-Cada estúdio opera em um silo isolado. Nada escapa, nada entra sem sua permissão.
-- **Configurações > Estúdio**: Aqui você define o Nome do Estúdio e a Identidade Visual Global.
-- **Branding**: A cor escolhida aqui será o padrão para todos os novos artistas e clientes do seu ecossistema.
+## 1. Configurando seu Estúdio
+O KRONØS opera como um hub central. Sua primeira tarefa é deixá-lo com a cara da sua marca.
+- **Configurações > Estúdio**: Insira o nome oficial e prepare a identidade visual.
+- **Cor da Marca**: A cor definida aqui será usada em todos os terminais (Kiosk) e no acesso dos clientes.
 
-## 2. Portal de Recrutamento (INK PASS)
-Você controla quem entra na sua equipe.
-- **Configurações > Equipe**: Gere chaves de acesso únicas.
-- **Hierarquia de Elite**:
-    - **ASSOCIADO**: Nível premium com privilégios estendidos.
-    - **RESIDENT**: Artista fixo do estúdio.
-    - **GUEST**: Perfil temporário (Guest Spot).
-- Reclame a soberania copiando o link de resgate e enviando ao seu novo talento.
+## 2. Montando a Equipe
+Você tem controle total sobre quem acessa os dados do seu estúdio.
+- **Convites**: Gere links em **Configurações > Equipe** e envie para os tatuadores.
+- **Hierarquia**:
+    - **ADMIN**: Acesso total (Financeiro Global, Configurações).
+    - **ARTIST**: Acesso à própria agenda, financeiro pessoal e clientes.
+    - **GUEST**: Acesso temporário, ideal para Guest Spots. O sistema revoga o acesso automaticamente após a data definida.
 
 ## 3. Governança Financeira
-Configuração do motor de recebimento e comissões.
-- **Configurações > PIX**: Insira sua chave PIX do estúdio e o nome do recebedor. 
-- **Modelo de Comissão**: Os artistas recebem 100% do pagamento dos clientes. Eles repassam a comissão do estúdio (configurável por artista, geralmente 20-30%) via PIX.
-- **Marketplace**: Para produtos vendidos (Flash Tattoos, Artes Digitais), defina a porcentagem de comissão do estúdio. O sistema calcula automaticamente sobre o valor final da venda.
-- **Validação IA**: O sistema utiliza OCR para validar comprovantes de repasse enviados pelos artistas, garantindo transparência total.
+Defina as regras do jogo para evitar conflitos futuros.
+- **Chave PIX do Estúdio**: Cadastre onde os artistas devem depositar a parte do estúdio.
+- **Comissões**: Configure a porcentagem padrão. O sistema calculará automaticamente o split (Divisão) a cada agendamento concluído.
+    - *Exemplo*: Se a comissão é 30%, num trabalho de R$ 1.000, o artista vê que deve R$ 300 ao estúdio.
+- **Validação**: O sistema usa IA para ler os comprovantes enviados pelos artistas. Seu papel é apenas conferir se o "check" verde apareceu no painel financeiro.
 
-## 4. O Sistema de Monitoramento
-Utilize o Dashboard para ter uma visão tática de todos os agendamentos, produtividade e conversão de lances do Kiosk.
+## 4. Monitoramento
+Use o Dashboard principal para acompanhar:
+- **Faturamento**: Receita total vs. Projetada.
+- **Ocupação**: Qual artista está com a agenda mais cheia.
+- **Funil de Vendas**: Quantos leads do Kiosk viraram agendamentos reais.
 
 ---
-*KRONØS // Global Workspace Sovereignty*
+*KRONØS // Gestão Profissional*

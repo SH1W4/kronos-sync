@@ -161,40 +161,53 @@ function OnboardingContent() {
                 </div>
 
                 {mode === 'SELECT' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* CLIENTE CARD */}
-                        <button
-                            onClick={handleClientAccess}
-                            className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-accent/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
-                        >
-                            <div className="absolute top-4 right-4 text-gray-600 group-hover:text-accent transition-colors">
-                                <User size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-accent">CLIENTE</h3>
-                            <p className="text-sm text-gray-500 font-mono leading-relaxed">
-                                Quero agendar sessões, acompanhar meus projetos e ver meu histórico.
-                            </p>
-                            <div className="mt-6 flex items-center text-sm font-bold text-gray-500 group-hover:text-white transition-colors">
-                                ACESSAR PAINEL <ArrowRight size={16} className="ml-2" />
-                            </div>
-                        </button>
+                    <div className="flex flex-col gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* CLIENTE CARD */}
+                            <button
+                                onClick={handleClientAccess}
+                                className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-accent/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
+                            >
+                                <div className="absolute top-4 right-4 text-gray-600 group-hover:text-accent transition-colors">
+                                    <User size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-accent">CLIENTE</h3>
+                                <p className="text-sm text-gray-500 font-mono leading-relaxed">
+                                    Quero agendar sessões, acompanhar meus projetos e ver meu histórico.
+                                </p>
+                                <div className="mt-6 flex items-center text-sm font-bold text-gray-500 group-hover:text-white transition-colors">
+                                    ACESSAR PAINEL <ArrowRight size={16} className="ml-2" />
+                                </div>
+                            </button>
 
-                        {/* PROFISSIONAL CARD */}
-                        <button
-                            onClick={() => setMode('CODE')}
-                            className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-primary/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
-                        >
-                            <div className="absolute top-4 right-4 text-gray-600 group-hover:text-primary transition-colors">
-                                <ShieldCheck size={24} />
-                            </div>
-                            <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-primary">PROFISSIONAL</h3>
-                            <p className="text-sm text-gray-500 font-mono leading-relaxed">
-                                Sou tatuador, guest ou staff. Tenho um código de acesso ou convite.
-                            </p>
-                            <div className="mt-6 flex items-center text-sm font-bold text-gray-500 group-hover:text-white transition-colors">
-                                INSERIR CÓDIGO <ArrowRight size={16} className="ml-2" />
-                            </div>
-                        </button>
+                            {/* PROFISSIONAL CARD */}
+                            <button
+                                onClick={() => setMode('CODE')}
+                                className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-primary/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
+                            >
+                                <div className="absolute top-4 right-4 text-gray-600 group-hover:text-primary transition-colors">
+                                    <ShieldCheck size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-primary">PROFISSIONAL</h3>
+                                <p className="text-sm text-gray-500 font-mono leading-relaxed">
+                                    Sou tatuador, guest ou staff. Tenho um código de acesso ou convite.
+                                </p>
+                                <div className="mt-6 flex items-center text-sm font-bold text-gray-500 group-hover:text-white transition-colors">
+                                    INSERIR CÓDIGO <ArrowRight size={16} className="ml-2" />
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="mt-6 text-center">
+                            <p className="text-xs font-mono text-gray-600 uppercase tracking-widest mb-4">Já é da casa?</p>
+                            <Button
+                                onClick={() => router.push('/auth/signin')}
+                                variant="outline"
+                                className="border-white/10 text-white hover:bg-white/10 h-10 px-8 rounded-xl font-bold font-orbitron text-[10px] tracking-widest uppercase"
+                            >
+                                Ir direto para o Login (E-mail)
+                            </Button>
+                        </div>
                     </div>
                 ) : mode === 'CODE' ? (
                     <div className="max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">

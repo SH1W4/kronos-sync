@@ -1,36 +1,33 @@
 ---
 docsync:
-  version: 1.0.0
+  version: 2.0.0
   audience: admin
   priority: medium
   intent: expansion
 ---
-# Estratégias de Crescimento & ROI: KRONØS Ecosystem
+# Estratégias de Crescimento
 
-O KRONØS não apenas gerencia seu estúdio; ele opera como um multiplicador de receita. Este guia explora como utilizar as ferramentas de "Digital Soul" para escalar seu faturamento.
+O KRONØS coleta dados em cada etapa da jornada do cliente. Este guia ensina como usar essas informações para aumentar o faturamento do estúdio de forma prática.
 
-## 1. O Kiosk como Captador de Leads
-Toda pessoa que entra no seu estúdio (seja cliente ou acompanhante) é um lead potencial.
-- **Protocolo de Entrada**: Peça que todos se registrem no Kiosk.
-- **Perfilamento Estratégico**: Use os campos de "Desejo de Tatuagem" para identificar intenções de compra imediatas.
-- **Retenção**: Use os dados coletados para campanhas de remarketing (Exportação de Leads).
+## 1. O Kiosk como Ferramenta de Vendas
+O tablet na recepção não serve apenas para cadastro; ele é sua primeira barreira de venda.
+- **Dica**: Peça para *todos* (até acompanhantes) fazerem check-in.
+- **Por que**: O sistema pergunta "Você tem vontade de fazer uma tattoo?". Se a resposta for SIM, você acabou de ganhar um lead qualificado para trabalhar depois.
 
-## 2. Incertezas do Cliente (Barrier Analysis)
-Acompanhe os dados de "Barreiras" coletados no Kiosk.
-- Se muitos clientes marcam "Preço" como barreira, considere lançar uma coleção de Flash Tattoos no Marketplace com valores de entrada.
-- Se a barreira é "Design", promova seu portfolio de artes prontas.
+## 2. Entendendo "Por que não fecharam?" (Barreiras)
+No painel de Analytics, acompanhe os motivos de desistência.
+- **Barreira Preço**: Se alta, considere criar Flash Days ou produtos de entrada (Marketplace) para trazer esse cliente para dentro.
+- **Barreira Ideia**: Se o cliente "não sabe o que tatuar", promova o portfolio dos seus artistas residentes nas telas de espera.
 
-## 3. Gestão de Equipe & INK PASS
-Use o sistema de convites para atrair talentos sob demanda.
-- **Guest Spots**: Traga artistas influentes usando chaves `GUEST`. Isso aumenta o tráfego orgânico no seu Kiosk e Marketplace.
-- **Modelo de Comissão**: Configure a porcentagem de comissão que cada artista deve repassar ao estúdio (geralmente 20-30%). Artistas mais experientes podem negociar taxas menores.
-- **Marketplace**: Defina comissões específicas para produtos vendidos. Flash Tattoos podem ter comissões diferentes de Artes Digitais, permitindo estratégias de precificação flexíveis.
-- **Monitoramento de ROI**: Analise quais artistas geram maior volume de agendamentos e vendas no Marketplace. Ajuste as comissões estrategicamente para reter talentos de alto desempenho.
+## 3. Gestão de Talentos (Guests)
+Use a rotatividade a seu favor.
+- **Guest Spots**: Traga artistas de fora para movimentar o estúdio. O sistema permite criar acessos temporários (`Guest Mode`) que expiram sozinhos.
+- **Comissões Dinâmicas**: Você pode ajustar a taxa de comissão baseada na senioridade ou na demanda do artista, incentivando a performance.
 
-## 4. Branding de Elite
-Um estúdio que opera sob um HUD personalizado e moderno transmite autoridade.
-- Use a personalização global do Workspace para criar uma experiência imersiva para o cliente no tablet do Kiosk.
-- A consistência visual eleva o valor percebido do seu estúdio (Premium Fee).
+## 4. Imagem Profissional
+A percepção de valor começa na organização.
+- Um estúdio que usa um sistema próprio (com sua marca e cores) transmite seriedade.
+- Garanta que seu logo e cores estejam configurados corretamente em **Configurações > Workspace**. Isso aparece no celular do cliente quando ele acessa o Kiosk via QR Code.
 
 ---
-*KRONØS // Economic Intelligence Layer*
+*KRONØS // Inteligência de Negócio*

@@ -1,32 +1,30 @@
 ---
 docsync:
-  version: 1.0.0
+  version: 2.0.0
   audience: artist
   priority: high
   intent: operations
 ---
-# SOP: Fluxo de Agendamento Profissional
+# Checklist de Atendimento
 
-Este Procedimento Operacional Padrão (SOP) define o checklist tático para garantir que cada tatuagem seja executada sob os mais altos padrões do ecossistema KRONØS.
+Siga este passo-a-passo para garantir que todo agendamento ocorra sem imprevistos.
 
-## 1. Pré-Sessão (Identificação)
-- [ ] Validar o agendamento no **Dashboard**.
-- [ ] Verificar se o cliente preencheu a **Anamnese Digital**.
-- [ ] Caso negativo, fornecer o QR Code do Kiosk para preenchimento imediato.
+## 1. Antes da Sessão
+- [ ] **Confira o Dashboard**: Veja o horário exato e o nome do cliente.
+- [ ] **Ficha de Anamnese**: Pergunte se o cliente já preencheu. Se não, peça para ele escanear o QR Code no balcão (Kiosk).
 
-## 2. Acolhimento & Scan
-- [ ] Abrir a ficha do cliente.
-- [ ] Revisar condições médicas e alergias críticas.
-- [ ] Confirmar o valor final do projeto (Snapshot).
+## 2. Durante a Sessão
+- [ ] **Revise a Ficha**: Verifique alergias ou condições médicas antes de começar.
+- [ ] **Valor Combinado**: Confirme o preço final com o cliente antes de tatuar para evitar surpresas.
 
-## 3. Pós-Sessão (Execução Financeira)
-- [ ] Marcar o agendamento como **COMPLETO**.
-- [ ] **Importante**: Realizar o upload do comprovante de pagamento no sistema imediatamente.
-- [ ] Solicitar ao cliente que avalie ou assine a ficha final (se aplicável).
+## 3. Finalização & Pagamento
+- [ ] Receba o valor total do cliente (na sua conta ou maquininha).
+- [ ] No sistema, marque o agendamento como **CONCLUÍDO**.
+- [ ] **Importante**: Faça o upload do comprovante de repasse da comissão do estúdio imediatamente. Isso libera sua agenda para novos trabalhos.
 
-## 4. Liquidação (Settle)
-- [ ] Aguardar a validação da IA sobre o comprovante enviado.
-- [ ] Verificar se o seu **Saldo Disponível** foi atualizado no HUD.
+## 4. Pós-Atendimento
+- [ ] O sistema validará seu comprovante automaticamente.
+- [ ] Verifique se o status mudou para "Liquidado" no seu painel financeiro.
 
 ---
-*KRONØS // Standard Operating Procedure*
+*KRONØS // Procedimento Padrão*
