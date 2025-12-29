@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import FinanceClient from "./FinanceClient"
+import FinanceAdminClient from "./FinanceAdminClient"
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,45 @@ export default async function FinancePage() {
         redirect('/auth/signin')
     }
 
+    // ADMIN VIEW: Fetch all settlements for the Active Workspace
+    if ((session.user as any).role === 'ADMIN') {
+        const workspaceId = (session.user as any).activeWorkspaceId
+
+        if (!workspaceId) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Selecione um Estúdio</div>
+
+        const adminSettlements = await prisma.settlement.findMany({
+            where: {
+                workspaceId: workspaceId
+            },
+            include: {
+                artist: {
+                    include: { user: true }
+                },
+                _count: {
+                    select: { bookings: true }
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        })
+
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            select: { name: true }
+        })
+
+        return (
+            <div className="relative">
+                <FinanceAdminClient
+                    workspaceName={workspace?.name || 'Estúdio'}
+                    settlements={adminSettlements as any}
+                />
+            </div>
+        )
+    }
+
+    // ARTIST VIEW (Existing Logic)
     const artist = await prisma.artist.findUnique({
         where: { userId: session.user.id },
         include: {
@@ -25,54 +65,49 @@ export default async function FinancePage() {
 
     // Fetch Workspace settings (PIX Key)
     const workspace = artist.workspace || await prisma.workspace.findFirst({
-        where: { ownerId: session.user.id } // Fallback to workspace owned by user if not linked as artist member
+        where: { ownerId: session.user.id } // Fallback
     })
 
     if (!workspace) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Workspace não configurado</div>
 
     // Fetch Bookings ready for settlement (COMPLETED and not already settled)
-    let bookings: any[] = []
-    try {
-        const now = new Date()
-        bookings = await prisma.booking.findMany({
-            where: {
-                artistId: artist.id,
-                settlementId: null,
-                OR: [
-                    { status: 'COMPLETED' },
-                    {
-                        AND: [
-                            { status: { not: 'CANCELLED' } },
-                            { slot: { endTime: { lt: now } } }
-                        ]
-                    }
-                ]
-            },
-            include: {
-                client: true,
-                slot: true
-            },
-            orderBy: {
-                slot: { startTime: 'desc' }
+    const bookings = await prisma.booking.findMany({
+        where: {
+            artistId: artist.id,
+            settlementId: null, // Only fetch those NOT in a settlement
+            OR: [
+                { status: 'COMPLETED' },
+                {
+                    AND: [
+                        { status: { not: 'CANCELLED' } },
+                        { slot: { endTime: { lt: new Date() } } } // Auto-confirm passed slots
+                    ]
+                }
+            ]
+        },
+        include: {
+            client: true,
+            slot: true
+        },
+        orderBy: {
+            slot: { startTime: 'desc' }
+        }
+    })
+
+    // Fetch Settlement History
+    const settlements = await prisma.settlement.findMany({
+        where: {
+            artistId: artist.id
+        },
+        include: {
+            _count: {
+                select: { bookings: true }
             }
-        })
-    } catch (error) {
-        // Silently fallback if Prisma schema is out of sync (common on Windows file locks)
-        // Fallback to fetching without the new settlementId filter if the schema isn't synced yet
-        bookings = await prisma.booking.findMany({
-            where: {
-                artistId: artist.id,
-                status: 'COMPLETED'
-            },
-            include: {
-                client: true,
-                slot: true
-            },
-            orderBy: {
-                slot: { startTime: 'desc' }
-            }
-        })
-    }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    })
 
     // Calculate Metrics
     const totalEarnings = bookings.reduce((acc, b) => acc + (b.artistShare || 0), 0)
@@ -88,7 +123,7 @@ export default async function FinancePage() {
         id: b.id,
         value: b.value,
         artistShare: b.artistShare,
-        studioShare: (b.value - b.artistShare), // Calculate studio share
+        studioShare: (b.value - b.artistShare),
         status: b.status,
         client: { name: b.client.name },
         slot: { startTime: b.slot.startTime }
@@ -106,6 +141,7 @@ export default async function FinancePage() {
                 pixRecipient: workspace.pixRecipient
             }}
             bookings={mappedBookings}
+            settlements={settlements}
             metrics={{
                 totalEarnings,
                 totalRevenue,

@@ -135,3 +135,17 @@ export async function getArtistPendingBookings(artistId: string) {
         return []
     }
 }
+
+export async function approveSettlement(settlementId: string, status: 'APPROVED' | 'REJECTED') {
+    try {
+        await prisma.settlement.update({
+            where: { id: settlementId },
+            data: { status }
+        })
+        revalidatePath('/artist/finance')
+        return { success: true }
+    } catch (error) {
+        console.error("Error approving settlement:", error)
+        return { success: false, message: "Erro ao atualizar status." }
+    }
+}
