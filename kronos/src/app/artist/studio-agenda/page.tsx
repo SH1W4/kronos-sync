@@ -76,7 +76,7 @@ export default function StudioAgendaPage() {
                         </Button>
                         <div className="w-px h-6 bg-white/10 mx-1" />
                         <Button
-                            variant="default"
+                            variant="primary"
                             size="sm"
                             onClick={handleToday}
                             className="bg-purple-600 hover:bg-purple-500 h-8 text-xs font-bold"
