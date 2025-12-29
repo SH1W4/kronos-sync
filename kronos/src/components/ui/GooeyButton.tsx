@@ -1,11 +1,10 @@
 'use client'
 
 import React, { useRef, useState, useEffect } from 'react'
-import { motion, useSpring, useTransform, useMotionValue } from 'framer-motion'
+import { motion, useSpring, useTransform, useMotionValue, HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-interface GooeyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    children: React.ReactNode
+interface GooeyButtonProps extends HTMLMotionProps<"button"> {
     className?: string
 }
 
