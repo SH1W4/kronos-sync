@@ -58,7 +58,8 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
 
                     <nav className="space-y-2">
                         <NavItem href="/artist/dashboard" icon={<LayoutDashboard size={20} />} label="VISÃO GERAL" active={pathname === '/artist/dashboard'} />
-                        <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="AGENDA" active={pathname === '/artist/agenda'} />
+                        <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
+                        <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
                         <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
                         <NavItem href="/artist/clients" icon={<Users size={20} />} label="CLIENTES" active={pathname === '/artist/clients'} />
                         {/* @ts-ignore */}

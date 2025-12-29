@@ -96,7 +96,7 @@ export const authOptions: NextAuthOptions = {
                 try {
                     // MESTRE / ADMIN BYPASS
                     if (credentials?.username === "master") {
-                        console.log("👑 ACESSO MESTRE: Iniciando Sessão Administrativa...")
+                        console.log("👑 ACESSO STUDIO: Iniciando Sessão Administrativa...")
 
                         // 1. Vincula ao Workspace Principal do Seed
                         let workspace = await prisma.workspace.findFirst({

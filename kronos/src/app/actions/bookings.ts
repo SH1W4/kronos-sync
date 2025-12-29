@@ -44,7 +44,7 @@ export async function createBooking(data: {
         // Fetch Workspace Settings (Capacity)
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId },
-            select: { capacity: true }
+            select: { capacity: true, ownerId: true }
         })
 
         if (!workspace) return { error: 'Workspace inválido' }
@@ -54,8 +54,39 @@ export async function createBooking(data: {
         let availableMacaId = null
 
         // Format dates for query
-        const start = data.scheduledFor
         const end = new Date(data.scheduledFor.getTime() + data.duration * 60000)
+
+        // 0. Pre-flight Check: Google Calendar Availability (Hybrid: Unit + Tower)
+        try {
+            const { checkGoogleAvailability } = await import('@/app/actions/calendar')
+
+            // Check Unit (Artist)
+            const isArtistAvailable = await checkGoogleAvailability(user.id, start, end)
+            if (!isArtistAvailable) {
+                return { error: 'Seu Google Agenda está ocupado neste horário.' }
+            }
+
+            // Check Tower (Studio Owner) - if different person
+            if (user.id !== workspace.ownerId) {
+                const isStudioAvailable = await checkGoogleAvailability(workspace.ownerId, start, end)
+                if (!isStudioAvailable) {
+                    return { error: 'Agenda do Estúdio está bloqueada neste horário.' }
+                }
+            }
+
+        } catch (err) {
+            console.warn('⚠️ Google Availability Check Failed (Fail Open)', err)
+        }
+        try {
+            const { checkGoogleAvailability } = await import('@/app/actions/calendar')
+            const isAvailableOnGoogle = await checkGoogleAvailability(user.id, start, end)
+
+            if (!isAvailableOnGoogle) {
+                return { error: 'Horário indisponível: Existe um conflito no seu Google Calendar.' }
+            }
+        } catch (err) {
+            console.warn('⚠️ Google Availability Check Failed (Fail Open)', err)
+        }
 
         for (let i = 1; i <= TOTAL_MACAS; i++) {
             const conflict = await prisma.slot.findFirst({
@@ -141,6 +172,17 @@ export async function createBooking(data: {
                         }
                     })
                 }
+
+                // 4. Mirror Sync to Studio Owner (Tower)
+                if (user.id !== workspace.ownerId) {
+                    await createCalendarEvent(workspace.ownerId, {
+                        summary: `[KRONØS] ${(booking as any).artist.user.name} - ${(booking as any).client.name}`,
+                        description: `Espelho de Agendamento\nArtista: ${(booking as any).artist.user.name}\nCliente: ${(booking as any).client.name}\nValor: R$ ${data.estimatedPrice}`,
+                        startTime: data.scheduledFor,
+                        endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000)
+                    })
+                }
+
             } catch (syncError) {
                 console.warn('⚠️ Falha no sync inicial com Google:', syncError)
             }
@@ -374,5 +416,51 @@ export async function deleteBooking(bookingId: string) {
     } catch (error) {
         console.error('Error deleting booking:', error)
         return { error: 'Erro ao deletar agendamento' }
+    }
+}
+
+/**
+ * Get ALL bookings for the current workspace (Studio Master View)
+ */
+export async function getWorkspaceBookings(data: {
+    startDate: Date
+    endDate: Date
+}) {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.email) return { error: 'Não autorizado' }
+
+        const workspaceId = (session.user as any).activeWorkspaceId
+        if (!workspaceId) return { error: 'Workspace não selecionado' }
+
+        // Fetch all bookings for this, regardless of artist
+        const bookings = await prisma.booking.findMany({
+            where: {
+                workspaceId,
+                scheduledFor: {
+                    gte: data.startDate,
+                    lte: data.endDate
+                },
+                status: { not: 'CANCELLED' }
+            },
+            include: {
+                client: {
+                    select: { name: true } // Minimal info for transparency
+                },
+                artist: {
+                    include: { user: { select: { name: true, image: true, customColor: true } } }
+                },
+                slot: true // Crucial for Maca ID
+            },
+            orderBy: {
+                scheduledFor: 'asc'
+            }
+        })
+
+        return { success: true, bookings }
+
+    } catch (error) {
+        console.error('Error fetching workspace bookings:', error)
+        return { error: 'Erro ao buscar agenda do estúdio' }
     }
 }

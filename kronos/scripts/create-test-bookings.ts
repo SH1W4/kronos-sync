@@ -21,7 +21,7 @@ async function createTestBookings() {
         }
 
         console.log(`✅ Artista encontrado: ${artist.user.name}`)
-        console.log(`🏢 Workspace: ${artist.workspace.name}\n`)
+        console.log(`🏢 Workspace: ${artist.workspace?.name}\n`)
 
         // 2. Criar 5 clientes diferentes
         const clients = [

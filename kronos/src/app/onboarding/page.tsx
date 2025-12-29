@@ -230,15 +230,6 @@ function OnboardingContent() {
                                 </div>
 
                                 <div className="mt-6 pt-6 border-t border-white/5 text-center">
-                                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-3">Não tem um convite?</p>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        className="text-white hover:text-primary group"
-                                        onClick={() => setMode('REQUEST')}
-                                    >
-                                        QUERO CRIAR MEU ESTÚDIO <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                    </Button>
 
                                     <Button
                                         type="button"
