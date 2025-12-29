@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, AlertTriangle, ShieldCheck, HeartPulse, PenTool, CheckCircle2, DollarSign, Instagram, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AnamnesisActions } from '@/components/anamnese/AnamnesisActions'
+import { headers } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,19 +23,45 @@ export default async function AnamnesePage({ params }: { params: Promise<{ booki
     })
 
     if (!anamnesis) {
+        // Se a anamnese não existe, buscamos o agendamento para poder reenviar o link
+        const booking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: { client: true }
+        })
+
+        if (!booking) return notFound()
+
+        const headersList = await headers()
+        const protocol = headersList.get('x-forwarded-proto') || 'http'
+        const host = headersList.get('host')
+        const accessLink = `${protocol}://${host}/fichas/${bookingId}`
+
         return (
             <div className="min-h-screen bg-black text-white p-6 md:p-12 relative flex items-center justify-center">
-                <div className="max-w-md w-full text-center space-y-6">
-                    <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto border border-yellow-500/20">
-                        <AlertTriangle className="text-yellow-500" size={40} />
+                <div className="max-w-md w-full text-center space-y-8">
+                    <div className="space-y-6">
+                        <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto border border-yellow-500/20">
+                            <AlertTriangle className="text-yellow-500" size={40} />
+                        </div>
+                        <div className="space-y-2">
+                            <h1 className="text-2xl font-orbitron font-black text-white uppercase italic">Anamnese Pendente</h1>
+                            <p className="text-gray-500 font-mono text-xs uppercase tracking-widest leading-relaxed">
+                                O cliente <span className="text-white">{booking.client.name}</span> ainda não preencheu o formulário de anamnese para este agendamento.
+                            </p>
+                        </div>
                     </div>
-                    <h1 className="text-2xl font-orbitron font-black text-white uppercase italic">Anamnese Pendente</h1>
-                    <p className="text-gray-500 font-mono text-xs uppercase tracking-widest leading-relaxed">
-                        O cliente ainda não preencheu o formulário de anamnese para este agendamento.
-                    </p>
+
+                    <div className="p-1 bg-white/5 rounded-2xl border border-white/5">
+                        <AnamnesisActions
+                            link={accessLink}
+                            clientPhone={booking.client.phone || undefined}
+                            clientName={booking.client.name || undefined}
+                        />
+                    </div>
+
                     <div className="pt-4">
                         <Link href="/artist/dashboard">
-                            <Button variant="outline" className="border-white/10 text-white hover:bg-white/5 font-bold uppercase tracking-widest text-[10px]">
+                            <Button variant="ghost" className="text-gray-500 hover:text-white font-bold uppercase tracking-widest text-[10px]">
                                 <ArrowLeft size={14} className="mr-2" /> Voltar ao Painel
                             </Button>
                         </Link>

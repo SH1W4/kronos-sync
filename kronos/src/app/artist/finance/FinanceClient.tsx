@@ -133,14 +133,15 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
             {/* Settlement Bar (Pinned if selected) */}
             {selectedBookings.length > 0 && activeTab === 'pending' && (
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 animate-in slide-in-from-bottom-8 duration-500">
-                    <div className="bg-gray-950 border border-primary/30 rounded-3xl p-6 shadow-[0_0_50px_rgba(0,255,136,0.1)] flex items-center justify-between backdrop-blur-xl">
-                        <div>
-                            <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-1">Total a Transferir</p>
-                            <p className="text-2xl font-black font-orbitron">{formatCurrency(calculateSelectedTotal())}</p>
+                    <div className="bg-black/90 border border-primary/30 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.3)] flex items-center justify-between backdrop-blur-2xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
+                        <div className="relative z-10">
+                            <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-1 animate-pulse">Total Selecionado para Acerto</p>
+                            <p className="text-3xl font-black font-orbitron text-white text-glow">{formatCurrency(calculateSelectedTotal())}</p>
                         </div>
                         <Button
                             onClick={() => setShowProofModal(true)}
-                            className="bg-primary hover:bg-primary/90 text-black font-bold font-orbitron tracking-widest px-8 h-12 rounded-2xl"
+                            className="bg-primary hover:bg-white text-black font-black font-orbitron tracking-widest px-10 h-14 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.5)] active:scale-95 transition-all text-xs"
                         >
                             ENVIAR COMPROVANTE
                         </Button>
@@ -177,7 +178,7 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                                         <tr
                                             key={booking.id}
                                             onClick={() => toggleBooking(booking.id)}
-                                            className={`cursor-pointer transition-all hover:bg-white/[0.02] ${selectedBookings.includes(booking.id) ? 'bg-primary/5' : ''}`}
+                                            className={`cursor-pointer transition-all hover:bg-white/[0.02] border-l-4 ${selectedBookings.includes(booking.id) ? 'bg-primary/10 border-l-primary shadow-[inset_10px_0_20px_rgba(139,92,246,0.05)]' : 'border-l-transparent'}`}
                                         >
                                             <td className="p-6">
                                                 <div className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${selectedBookings.includes(booking.id) ? 'bg-primary border-primary' : 'border-white/20'}`}>
@@ -189,9 +190,9 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                                             <td className="p-6 text-right text-gray-400 font-mono">{formatCurrency(booking.studioShare)}</td>
                                             <td className="p-6 text-right font-bold text-green-400 font-orbitron">{formatCurrency(booking.artistShare)}</td>
                                             <td className="p-6 text-center">
-                                                <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full inline-flex items-center space-x-2" title="Sessão passada sem cancelamento. Disponível para acerto.">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></div>
-                                                    <span className="text-[8px] font-mono uppercase tracking-widest text-purple-400">Auto-Confirmado</span>
+                                                <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full inline-flex items-center space-x-2 shadow-[0_0_10px_rgba(139,92,246,0.1)]">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+                                                    <span className="text-[8px] font-mono uppercase tracking-widest text-primary font-bold">REALIZE O ACERTO</span>
                                                 </div>
                                             </td>
                                         </tr>
@@ -306,14 +307,16 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
 
 function MetricCard({ title, value, icon, prefix = "R$ " }: any) {
     return (
-        <div className="bg-gray-900/60 border border-white/5 p-8 rounded-[2rem] hover:border-primary/30 transition-all group">
-            <div className="flex justify-between items-start mb-6">
-                <div className="p-4 bg-white/5 rounded-2xl group-hover:bg-primary/10 transition-all text-gray-400 group-hover:text-primary">
-                    {icon}
+        <div className="bg-gray-950/40 border border-white/5 p-8 rounded-[2rem] hover:border-primary/50 transition-all group relative overflow-hidden backdrop-blur-sm">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <div className="scanline opacity-[0.03]" />
+            <div className="flex justify-between items-start mb-6 relative z-10">
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 group-hover:bg-primary/20 group-hover:border-primary/30 transition-all text-primary shadow-[0_0_20px_rgba(139,92,246,0.05)]">
+                    {React.cloneElement(icon, { size: 24 })}
                 </div>
                 <div className="text-right">
                     <h3 className="text-gray-500 text-[10px] font-mono uppercase tracking-[0.2em] mb-1">{title}</h3>
-                    <p className="text-3xl font-black font-orbitron text-white tracking-tighter">
+                    <p className="text-3xl font-black font-orbitron text-white tracking-tighter text-glow group-hover:scale-105 transition-transform duration-500">
                         {prefix}{value.toLocaleString('pt-BR')}
                     </p>
                 </div>

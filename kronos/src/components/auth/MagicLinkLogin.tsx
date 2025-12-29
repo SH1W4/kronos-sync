@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { GooeyButton } from '@/components/ui/GooeyButton'
 import { Input } from '@/components/ui/input'
 import { Mail, Loader2, ArrowRight } from 'lucide-react'
 
@@ -65,9 +66,9 @@ export default function MagicLinkLogin({ onSuccess }: MagicLinkLoginProps) {
                 </div>
             )}
 
-            <Button
+            <GooeyButton
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold"
+                className="w-full"
                 disabled={loading}
             >
                 {loading ? (
@@ -81,7 +82,7 @@ export default function MagicLinkLogin({ onSuccess }: MagicLinkLoginProps) {
                         <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                 )}
-            </Button>
+            </GooeyButton>
 
             <p className="text-xs text-gray-500 text-center">
                 Enviaremos um código de 6 dígitos para seu email
