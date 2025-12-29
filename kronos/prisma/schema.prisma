@@ -49,6 +49,12 @@ enum SettlementStatus {
   REJECTED
 }
 
+enum QrType {
+  INVITE
+  COUPON
+  KIOSK
+}
+
 
 model User {
   id            String    @id @default(cuid())
@@ -100,6 +106,7 @@ model InviteCode {
   expiresAt   DateTime?
   durationDays Int?       // Para convites GUEST, define quantos dias o perfil será válido
   isActive    Boolean     @default(true)
+  viewCount   Int         @default(0)
   
   creator     User        @relation("Creator", fields: [creatorId], references: [id])
   workspace   Workspace?  @relation(fields: [workspaceId], references: [id])
@@ -347,6 +354,7 @@ model Coupon {
   
   createdAt      DateTime @default(now())
   expiresAt      DateTime?
+  viewCount      Int      @default(0)
   updatedAt      DateTime @updatedAt // Adicionado para manter compatibilidade
   
   // Relations preserved/updated
@@ -560,5 +568,16 @@ enum RequestStatus {
   bookings        Booking[]
 
   @@map("settlements")
+}
+
+model QrScan {
+  id          String   @id @default(cuid())
+  type        QrType
+  targetId    String   // ID do convite, cupom ou workspace
+  code        String?  // O código real escaneado
+  userAgent   String?  // Informações do navegador
+  createdAt   DateTime @default(now())
+
+  @@map("qr_scans")
 }
 

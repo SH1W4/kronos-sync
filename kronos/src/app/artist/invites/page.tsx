@@ -1,182 +1,161 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { createInvite, getInvites, revokeInvite } from '@/app/actions/invites'
+import { useRouter } from 'next/navigation'
+import { createInvite } from '@/app/actions/invites'
+import { Button } from '@/components/ui/button'
+import { Ticket, Sparkles, Clock, ShieldCheck, ArrowLeft, Zap, Target } from 'lucide-react'
 
 export default function InvitesPage() {
-    const [invites, setInvites] = useState<any[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [isCreating, setIsCreating] = useState(false)
+    const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
+    const [plan, setPlan] = useState<'RESIDENT' | 'GUEST'>('RESIDENT')
+    const [duration, setDuration] = useState(30)
+    const [customCode, setCustomCode] = useState('')
 
-    useEffect(() => {
-        loadInvites()
-    }, [])
+    async function handleGenerate() {
+        setIsLoading(true)
+        const res = await createInvite({
+            role: "ARTIST",
+            targetPlan: plan,
+            durationDays: plan === 'GUEST' ? duration : undefined,
+            customCode: customCode || undefined,
+            maxUses: 1
+        })
 
-    async function loadInvites() {
-        const data = await getInvites()
-        setInvites(data)
-        setIsLoading(false)
-    }
-
-
-
-    async function handleRevoke(id: string) {
-        if (!confirm("Tem certeza que deseja inativar este código?")) return;
-        await revokeInvite(id)
-        loadInvites()
+        if (res.success) {
+            // Redirect back to Team page where the new key will be visible
+            router.push('/artist/team')
+        } else {
+            alert(res.error || "Falha ao gerar protocolo.")
+            setIsLoading(false)
+        }
     }
 
     return (
-        <div className="min-h-screen bg-black text-white p-8">
-            <div className="max-w-4xl mx-auto space-y-8">
+        <div className="min-h-screen bg-black text-white p-6 md:p-12 data-pattern-grid relative overflow-hidden">
+            <div className="scanline" />
 
+            <div className="max-w-3xl mx-auto space-y-12 relative z-10">
                 {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-                            Gestão de Convites
-                        </h1>
-                        <p className="text-gray-400 mt-2">Gere códigos para novos artistas e staff.</p>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-white/5 pb-8">
+                    <div className="space-y-1 text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                            <Sparkles size={14} className="text-primary animate-pulse" />
+                            <span className="text-[10px] font-mono text-primary uppercase tracking-[0.3em] font-black">Recruitment Protocol v2.1</span>
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tighter uppercase italic">Gerar Credencial</h1>
+                        <p className="text-gray-500 font-mono text-xs uppercase tracking-widest">Configuração de Novo Membro do Silo</p>
                     </div>
-                    <Link href="/artist/dashboard" className="text-sm text-gray-500 hover:text-white transition-colors">
-                        ← Voltar ao Dashboard
+                    <Link href="/artist/team">
+                        <Button variant="ghost" className="text-gray-500 hover:text-white gap-2 font-mono text-[10px] tracking-widest">
+                            <ArrowLeft size={14} /> CANCELAR_OPERACAO
+                        </Button>
                     </Link>
                 </div>
 
-                {/* Actions */}
-                <div className="bg-gray-900/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm space-y-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="space-y-1">
-                            <h3 className="text-xl font-semibold text-white font-orbitron">GERAR CONVITE</h3>
-                            <p className="text-sm text-gray-400 font-mono">Convide novos membros para o workspace.</p>
+                {/* Form Console */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-8">
+                        {/* Selector: Plan Type */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Target size={16} className="text-primary" />
+                                <label className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black">Tipo de Acesso</label>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => setPlan('RESIDENT')}
+                                    className={`p-4 rounded-2xl border transition-all text-left space-y-2 ${plan === 'RESIDENT' ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.1)]' : 'bg-white/2 border-white/5 hover:border-white/20'}`}
+                                >
+                                    <ShieldCheck size={18} className={plan === 'RESIDENT' ? 'text-primary' : 'text-gray-500'} />
+                                    <div>
+                                        <p className={`font-bold text-xs ${plan === 'RESIDENT' ? 'text-white' : 'text-gray-400'}`}>RESIDENTE</p>
+                                        <p className="text-[9px] text-gray-600 font-mono uppercase">Vínculo Permanente</p>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => setPlan('GUEST')}
+                                    className={`p-4 rounded-2xl border transition-all text-left space-y-2 ${plan === 'GUEST' ? 'bg-secondary/10 border-secondary shadow-[0_0_20px_rgba(var(--secondary-rgb),0.1)]' : 'bg-white/2 border-white/5 hover:border-white/20'}`}
+                                >
+                                    <Clock size={18} className={plan === 'GUEST' ? 'text-secondary' : 'text-gray-500'} />
+                                    <div>
+                                        <p className={`font-bold text-xs ${plan === 'GUEST' ? 'text-white' : 'text-gray-400'}`}>GUEST</p>
+                                        <p className="text-[9px] text-gray-600 font-mono uppercase text-orange-500/50">Auto-Revogação</p>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-4 items-end">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Tipo de Plano</label>
-                                <select
-                                    className="bg-black border border-white/10 rounded px-3 py-2 text-sm text-gray-300 focus:border-purple-500 outline-none"
-                                    id="planSelect"
-                                >
-                                    <option value="RESIDENT">RESIDENTE (Fixo)</option>
-                                    <option value="GUEST">GUEST (Temporário)</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2" id="durationContainer">
-                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Duração (Dias)</label>
+                        {/* Input: Duration (Conditional) */}
+                        {plan === 'GUEST' && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="space-y-4"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Clock size={16} className="text-orange-500" />
+                                    <label className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black">Janela de Acesso (Dias)</label>
+                                </div>
                                 <input
                                     type="number"
-                                    defaultValue={30}
-                                    className="w-20 bg-black border border-white/10 rounded px-3 py-2 text-sm text-gray-300 focus:border-purple-500 outline-none"
-                                    id="durationInput"
+                                    value={duration}
+                                    onChange={(e) => setDuration(Number(e.target.value))}
+                                    className="w-full bg-orange-500/5 border border-orange-500/20 rounded-xl px-4 h-12 text-sm font-mono text-orange-400 focus:outline-none focus:border-orange-500/50"
                                 />
+                                <p className="text-[9px] text-gray-600 font-mono italic">O acesso será encerrado automaticamente após este período.</p>
+                            </motion.div>
+                        )}
+
+                        {/* Input: Custom Code */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Zap size={16} className="text-yellow-500" />
+                                <label className="text-[10px] font-mono text-gray-400 uppercase tracking-widest font-black">Sufixo da Chave (Opcional)</label>
                             </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Código Custom (Opcional)</label>
-                                <input
-                                    type="text"
-                                    placeholder="EX: GUEST-ART"
-                                    className="w-32 bg-black border border-white/10 rounded px-3 py-2 text-sm text-gray-300 focus:border-purple-500 outline-none uppercase font-mono"
-                                    id="customCodeInput"
-                                />
-                            </div>
-
-                            <button
-                                onClick={async () => {
-                                    const planSelect = document.getElementById('planSelect') as HTMLSelectElement;
-                                    const durationInput = document.getElementById('durationInput') as HTMLInputElement;
-                                    const customCodeInput = document.getElementById('customCodeInput') as HTMLInputElement;
-
-                                    setIsCreating(true)
-                                    const res = await createInvite({
-                                        role: "ARTIST",
-                                        targetPlan: planSelect.value as any,
-                                        durationDays: planSelect.value === 'GUEST' ? Number(durationInput.value) : undefined,
-                                        customCode: customCodeInput.value || undefined,
-                                        maxUses: 1
-                                    })
-                                    if (res.success) {
-                                        customCodeInput.value = '';
-                                        await loadInvites()
-                                    } else {
-                                        alert(res.error || "Erro ao criar convite")
-                                    }
-                                    setIsCreating(false)
-                                }}
-                                disabled={isCreating}
-                                className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-2 rounded-lg font-bold transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center gap-2"
-                            >
-                                {isCreating ? "GERANDO..." : "✨ GERAR"}
-                            </button>
+                            <input
+                                type="text"
+                                placeholder="EX: GUEST-JULHO"
+                                value={customCode}
+                                onChange={(e) => setCustomCode(e.target.value.toUpperCase())}
+                                className="w-full bg-white/2 border border-white/10 rounded-xl px-4 h-12 text-sm font-mono text-white focus:outline-none focus:border-primary/50 placeholder:text-gray-700"
+                            />
                         </div>
+                    </div>
+
+                    {/* Preview / Action */}
+                    <div className="bg-gray-900/40 border border-white/5 p-8 rounded-3xl flex flex-col justify-between items-center text-center space-y-8 backdrop-blur-md">
+                        <div className="space-y-4">
+                            <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto border border-primary/20 shadow-[0_0_30px_rgba(var(--primary-rgb),0.1)]">
+                                <Ticket size={40} className="text-primary" />
+                            </div>
+                            <h3 className="text-xl font-bold uppercase tracking-tight">Pronto para Gerar</h3>
+                            <p className="text-xs text-gray-500 leading-relaxed font-mono px-4">
+                                Esta credencial dará acesso imediato ao seu estúdio. <br />
+                                <span className="text-white">Uso único por integrante.</span>
+                            </p>
+                        </div>
+
+                        <Button
+                            onClick={handleGenerate}
+                            disabled={isLoading}
+                            className="w-full bg-white text-black hover:bg-primary hover:text-black font-black h-14 rounded-2xl text-lg flex items-center justify-center gap-4 transition-all group scale-100 hover:scale-[1.02] active:scale-95 shadow-xl shadow-white/5"
+                        >
+                            {isLoading ? "PROCESANDO..." : "EXECUTAR PROTOCOLO"}
+                            <Zap size={20} className="group-hover:fill-current" />
+                        </Button>
                     </div>
                 </div>
 
-                {/* List */}
-                <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-300">Histórico de Códigos</h3>
-
-                    {isLoading ? (
-                        <div className="text-center py-10 text-gray-500">Carregando...</div>
-                    ) : invites.length === 0 ? (
-                        <div className="text-center py-10 text-gray-600 border border-dashed border-gray-800 rounded-xl">
-                            Nenhum convite gerado ainda.
-                        </div>
-                    ) : (
-                        <div className="grid gap-3">
-                            {invites.map((invite) => (
-                                <motion.div
-                                    key={invite.id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className={`p-4 rounded-xl border flex items-center justify-between ${invite.isActive
-                                        ? 'bg-gray-900/30 border-white/5'
-                                        : 'bg-red-900/10 border-red-500/10 opacity-60'
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={`text-2xl font-mono font-bold ${invite.isActive ? 'text-purple-400' : 'text-gray-500 line-through'}`}>
-                                            {invite.code}
-                                        </div>
-                                        <div className="space-y-1">
-                                            <div className="flex gap-2">
-                                                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                                    {invite.role}
-                                                </span>
-                                                {invite.targetPlan && (
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full border ${invite.targetPlan === 'RESIDENT' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-orange-500/10 text-orange-400 border-orange-500/20'}`}>
-                                                        {invite.targetPlan} {invite.targetPlan === 'GUEST' && invite.durationDays ? `(${invite.durationDays} dias)` : ''}
-                                                    </span>
-                                                )}
-                                                <span className={`text-xs px-2 py-0.5 rounded-full border ${invite.currentUses < invite.maxUses
-                                                    ? 'bg-green-500/10 text-green-400 border-green-500/20'
-                                                    : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                                                    }`}>
-                                                    {invite.currentUses} / {invite.maxUses} Usos
-                                                </span>
-                                            </div>
-                                            <p className="text-xs text-gray-500">
-                                                Criado em {new Date(invite.createdAt).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {invite.isActive && (
-                                        <button
-                                            onClick={() => handleRevoke(invite.id)}
-                                            className="text-xs text-red-500 hover:text-red-400 hover:underline px-3 py-1"
-                                        >
-                                            Revogar
-                                        </button>
-                                    )}
-                                </motion.div>
-                            ))}
-                        </div>
-                    )}
+                {/* Warning Hud */}
+                <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl flex items-center gap-4">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <p className="text-[9px] font-mono text-red-500/70 uppercase tracking-widest">
+                        Ação Crítica: A geração de chaves deve ser feita apenas sob supervisão do mestre administrador.
+                    </p>
                 </div>
             </div>
         </div>

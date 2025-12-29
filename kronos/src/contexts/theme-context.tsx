@@ -127,9 +127,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     // Session Override (Stronger than localStorage for identity-linked theme)
-    const customColor = (session?.user as any)?.customColor
-    if (customColor) {
-      baseTheme = { ...baseTheme, primaryColor: customColor }
+    // 1. Check workspace color (Enterprise/Studio focus)
+    const userData = session?.user as any
+    const activeWorkspaceId = userData?.activeWorkspaceId
+    const workspaces = userData?.workspaces as any[]
+    const activeWorkspace = workspaces?.find(w => w.id === activeWorkspaceId)
+
+    if (activeWorkspace?.primaryColor) {
+      baseTheme = { ...baseTheme, primaryColor: activeWorkspace.primaryColor }
+    } else {
+      // 2. Check personal custom color (Artist focus)
+      const customColor = (session?.user as any)?.customColor
+      if (customColor) {
+        baseTheme = { ...baseTheme, primaryColor: customColor }
+      }
     }
 
     setThemeState(baseTheme)
@@ -146,11 +157,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     // Color variables
-    root.style.setProperty('--cyber-green', theme.primaryColor)
+    root.style.setProperty('--primary', theme.primaryColor)
     root.style.setProperty('--primary-rgb', hexToRgb(theme.primaryColor))
-    root.style.setProperty('--cyber-blue', theme.accentColor)
-    root.style.setProperty('--cyber-purple', theme.secondaryColor)
-    root.style.setProperty('--background', theme.backgroundColor)
+    root.style.setProperty('--secondary', theme.secondaryColor)
+    root.style.setProperty('--accent', theme.accentColor)
+    root.style.setProperty('--background-color', theme.backgroundColor)
 
     // Grid opacity
     root.style.setProperty('--grid-opacity', theme.gridOpacity.toString())

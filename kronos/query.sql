@@ -1,0 +1,1 @@
+SELECT u.email, u.role, a.id as artist_id, w.id as workspace_id, wm.role as member_role FROM users u LEFT JOIN artists a ON u.id = a.userId LEFT JOIN workspace_members wm ON u.id = wm.userId LEFT JOIN workspaces w ON wm.workspaceId = w.id WHERE u.email = 'dev@kronos.com';

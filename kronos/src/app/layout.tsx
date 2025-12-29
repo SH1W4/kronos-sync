@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { DynamicThemeProvider } from "@/providers/dynamic-theme-provider"
+
 
 export default function RootLayout({
   children,
@@ -54,9 +54,7 @@ export default function RootLayout({
       >
         <Providers>
           <InstallPWABanner />
-          <DynamicThemeProvider>
-            {children}
-          </DynamicThemeProvider>
+          {children}
         </Providers>
       </body>
     </html>

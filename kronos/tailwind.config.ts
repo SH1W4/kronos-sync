@@ -17,24 +17,19 @@ export default {
         background: "#050505", // Black Hole
         foreground: "#FFFFFF", // Pure Light
         primary: {
-          DEFAULT: "var(--primary-color)", // Dynamic
+          DEFAULT: "var(--primary)",
+          rgb: "var(--primary-rgb)",
           foreground: "#000000",
         },
         secondary: {
-          DEFAULT: "#333333",
+          DEFAULT: "var(--secondary)",
           foreground: "#FFFFFF",
         },
-        muted: {
-          DEFAULT: "#111111",
-          foreground: "#666666",
-        },
         accent: {
-          DEFAULT: "var(--primary-color)", // Reuse primary for accent for now
+          DEFAULT: "var(--accent)",
           foreground: "#000000",
         },
-        border: "#222222",
-        input: "#111111",
-        ring: "var(--primary-color)",
+        ring: "var(--primary)",
       },
       borderRadius: {
         lg: "0px", // Brutalist

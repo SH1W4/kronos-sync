@@ -1,10 +1,29 @@
 @import "tailwindcss";
 
-@layer theme {
-  :root {
-    --background: 5 5 5;
-    --foreground: 255 255 255;
-  }
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-rgb: var(--primary-rgb);
+  --color-primary-foreground: var(--primary-foreground, #000);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+
+  --font-mono: var(--font-family, "JetBrains Mono", monospace);
+  --font-brand: "Orbitron", sans-serif;
+
+  --radius-lg: var(--border-radius, 0px);
+  --radius-md: calc(var(--border-radius, 0px) - 2px);
+  --radius-sm: calc(var(--border-radius, 0px) - 4px);
+}
+
+:root {
+  --background: #050505;
+  --foreground: #ffffff;
+  --primary: #00FF88;
+  --primary-rgb: 0, 255, 136;
+  --secondary: #8B5CF6;
+  --accent: #00BFFF;
 }
 
 /* Custom Utilities that might be missing */

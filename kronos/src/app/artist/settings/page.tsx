@@ -7,15 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { updateArtistSettings } from '@/app/actions/settings'
-import { analyzeInstagramProfile, applyKaiBranding } from '@/app/actions/kai'
-import { KaiAnalysisModal } from '@/components/kai/AnalysisModal'
-import { createInvite, getInvites, revokeInvite } from '@/app/actions/invites'
 import { updateWorkspaceFinance, updateWorkspaceBranding } from '@/app/actions/workspaces'
 import { updateUserTheme, updateWorkspaceCapacity } from '@/app/actions/settings'
+import { useRouter } from 'next/navigation'
 import { InkPassCard } from '@/components/invites/InkPassCard'
 
 export default function SettingsPage() {
     const { data: session, update: updateSession } = useSession()
+    const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [copied, setCopied] = useState(false)
 
@@ -24,9 +23,6 @@ export default function SettingsPage() {
     const [commission, setCommission] = useState('')
     const [instagram, setInstagram] = useState('')
 
-    // KAI State
-    const [isKaiModalOpen, setIsKaiModalOpen] = useState(false)
-    const [isKaiLoading, setIsKaiLoading] = useState(false)
     const [kaiSuggestions, setKaiSuggestions] = useState<any>(undefined)
 
     // PIX State
@@ -48,7 +44,7 @@ export default function SettingsPage() {
     const [newInviteType, setNewInviteType] = useState<'RESIDENT' | 'GUEST'>('RESIDENT')
     const [newInviteCode, setNewInviteCode] = useState('')
     const [selectedInvite, setSelectedInvite] = useState<any>(null)
-    const [activeTab, setActiveTab] = useState<'profile' | 'link' | 'sync' | 'plan' | 'security' | 'payments' | 'team' | 'studio' | 'appearance'>('profile')
+    const [activeTab, setActiveTab] = useState<'profile' | 'link' | 'sync' | 'plan' | 'security' | 'payments' | 'studio' | 'appearance'>('profile')
 
     // Initialize values when session is available
     useEffect(() => {
@@ -56,6 +52,9 @@ export default function SettingsPage() {
             setName(session.user.name || '')
             if ((session.user as any).commissionRate !== undefined) {
                 setCommission(String((session.user as any).commissionRate * 100))
+            }
+            if ((session.user as any).instagram) {
+                setInstagram((session.user as any).instagram)
             }
 
             // Initialize PIX if available
@@ -87,18 +86,15 @@ export default function SettingsPage() {
         }
     }
 
-    useEffect(() => {
-        if (activeTab === 'team') {
-            fetchInvites()
-        }
-    }, [activeTab])
+    /* Removing automatic fetch of invites in settings as it moved to /team */
 
     const handleSave = async () => {
         setLoading(true)
         try {
             const result = await updateArtistSettings({
                 name,
-                commissionRate: parseFloat(commission)
+                commissionRate: parseFloat(commission),
+                instagram
             })
 
             if (result.success) {
@@ -115,47 +111,6 @@ export default function SettingsPage() {
         }
     }
 
-    const handleKaiAnalysis = async () => {
-        if (!instagram) {
-            alert('Por favor, insira o seu arroba do Instagram primeiro.')
-            return
-        }
-        setIsKaiModalOpen(true)
-        setIsKaiLoading(true)
-        try {
-            const result = await analyzeInstagramProfile(instagram)
-            if (result.success) {
-                setKaiSuggestions(result.suggestions)
-            } else {
-                alert(result.error || 'Falha na análise KAI')
-                setIsKaiModalOpen(false)
-            }
-        } catch (error) {
-            console.error('KAI Error:', error)
-            alert('Erro ao processar análise KAI')
-            setIsKaiModalOpen(false)
-        } finally {
-            setIsKaiLoading(false)
-        }
-    }
-
-    const handleApplyKaiBranding = async (data: any) => {
-        setLoading(true)
-        try {
-            const result = await applyKaiBranding(data)
-            if (result.success) {
-                // Mock update local status
-                alert('Branding aplicado com sucesso!')
-                setIsKaiModalOpen(false)
-            } else {
-                alert(result.error || 'Erro ao aplicar')
-            }
-        } catch (e) {
-            alert('Erro ao aplicar branding')
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const clientLink = session?.user ? `${window.location.protocol}//${window.location.host}/onboarding` : '#'
 
@@ -353,9 +308,9 @@ export default function SettingsPage() {
                             <>
                                 <SidebarLink
                                     icon={<Users size={18} />}
-                                    label="Equipe"
-                                    active={activeTab === 'team'}
-                                    onClick={() => setActiveTab('team')}
+                                    label="Ir para Equipe"
+                                    active={false}
+                                    onClick={() => router.push('/artist/team')}
                                 />
                                 <SidebarLink
                                     icon={<Settings size={18} />}
@@ -401,24 +356,14 @@ export default function SettingsPage() {
                                     {/* Instagram & KAI Section */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-mono text-gray-500 uppercase">Instagram Business (@)</label>
-                                        <div className="flex gap-2">
-                                            <div className="relative flex-1">
-                                                <Instagram size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-                                                <Input
-                                                    placeholder="@seu_perfil"
-                                                    value={instagram}
-                                                    onChange={(e) => setInstagram(e.target.value)}
-                                                    className="bg-black/50 border-white/10 pl-9"
-                                                />
-                                            </div>
-                                            <Button
-                                                onClick={handleKaiAnalysis}
-                                                disabled={isKaiLoading}
-                                                className="bg-purple-600/10 border border-purple-500/20 text-purple-400 hover:bg-purple-600 hover:text-white transition-all gap-2 text-xs font-bold"
-                                            >
-                                                <Sparkles size={14} className={isKaiLoading ? 'animate-spin' : ''} />
-                                                ANALISAR KAI
-                                            </Button>
+                                        <div className="relative">
+                                            <Instagram size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                                            <Input
+                                                placeholder="@seu_perfil"
+                                                value={instagram}
+                                                onChange={(e) => setInstagram(e.target.value)}
+                                                className="bg-black/50 border-white/10 pl-9"
+                                            />
                                         </div>
                                     </div>
 
@@ -580,147 +525,6 @@ export default function SettingsPage() {
                             </section>
                         )}
 
-                        {activeTab === 'team' && isAdmin && (
-                            <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                                    <div className="flex items-center gap-2">
-                                        <Users className="text-purple-400" size={20} />
-                                        <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Portal de Recrutamento</h2>
-                                    </div>
-                                    <div className="px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded text-[10px] font-mono text-purple-400 animate-pulse">
-                                        ADMIN ACCESS ENABLED
-                                    </div>
-                                </div>
-
-                                {/* Generate Section */}
-                                <div className="space-y-4">
-                                    <h3 className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Gerar Nova Chave</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-mono text-gray-500 uppercase">Tipo de Plano</label>
-                                            <select
-                                                value={newInviteType}
-                                                onChange={(e: any) => setNewInviteType(e.target.value)}
-                                                className="w-full bg-black/50 border border-white/10 h-10 px-3 rounded-lg text-xs font-mono text-purple-400 focus:outline-none focus:border-purple-500/50"
-                                            >
-                                                <option value="ASSOCIATED">ASSOCIATED (PREMIUM)</option>
-                                                <option value="RESIDENT">RESIDENT (FIXO)</option>
-                                                <option value="GUEST">GUEST (TEMPORÁRIO)</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[9px] font-mono text-gray-500 uppercase">Código (Opcional)</label>
-                                            <Input
-                                                placeholder="EX: KRONOS-TEAM"
-                                                value={newInviteCode}
-                                                onChange={(e) => setNewInviteCode(e.target.value)}
-                                                className="bg-black/50 border-white/10 h-10 text-xs font-mono"
-                                            />
-                                        </div>
-                                        <div className="flex items-end">
-                                            <Button
-                                                onClick={handleCreateInvite}
-                                                disabled={loading}
-                                                className="w-full bg-purple-600 hover:bg-purple-500 font-bold h-10 rounded-lg text-[10px] uppercase tracking-tighter transition-all"
-                                            >
-                                                {loading ? 'GERANDO...' : 'EXECUTAR PROTOCOLO'}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Preview Section */}
-                                {selectedInvite && (
-                                    <div className="flex flex-col items-center gap-6 p-8 bg-purple-500/5 border border-purple-500/20 rounded-3xl animate-in zoom-in-95 duration-500">
-                                        <div className="flex justify-between w-full items-center mb-2">
-                                            <h3 className="text-[10px] font-mono text-purple-400 uppercase tracking-widest font-bold">Visualização da Credencial</h3>
-                                            <button
-                                                onClick={() => setSelectedInvite(null)}
-                                                className="text-[10px] font-mono text-gray-500 hover:text-white uppercase"
-                                            >
-                                                [ Fechar ]
-                                            </button>
-                                        </div>
-                                        <InkPassCard
-                                            code={selectedInvite.code}
-                                            type={selectedInvite.targetPlan}
-                                            studioName={(session as any)?.workspaces?.find((w: any) => w.id === selectedInvite.workspaceId)?.name || 'KRONØS'}
-                                            primaryColor={(session as any)?.workspaces?.find((w: any) => w.id === selectedInvite.workspaceId)?.primaryColor || '#8B5CF6'}
-                                        />
-                                        <div className="flex gap-4">
-                                            <Button
-                                                variant="outline"
-                                                className="text-[10px] font-bold border-white/10 h-10 px-6 rounded-xl"
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(`${window.location.origin}/invite/${selectedInvite.code}`)
-                                                    alert('Link do convite copiado!')
-                                                }}
-                                            >
-                                                COPIAR LINK DE RESGATE
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* List Section */}
-                                <div className="space-y-4 pt-4">
-                                    <h3 className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Chaves Ativas no Silo</h3>
-                                    <div className="border border-white/5 rounded-xl overflow-hidden">
-                                        <table className="w-full text-left border-collapse">
-                                            <thead className="bg-white/5 text-[9px] font-mono uppercase text-gray-400 tracking-widest">
-                                                <tr>
-                                                    <th className="p-3">Código</th>
-                                                    <th className="p-3">Plano</th>
-                                                    <th className="p-3 text-center">Usos</th>
-                                                    <th className="p-3 text-right">Ação</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5">
-                                                {invites.length === 0 ? (
-                                                    <tr>
-                                                        <td colSpan={4} className="p-8 text-center text-xs text-gray-600 font-mono italic">
-                                                            Nenhuma chave ativa encontrada no workspace.
-                                                        </td>
-                                                    </tr>
-                                                ) : (
-                                                    invites.map((invite) => (
-                                                        <tr
-                                                            key={invite.id}
-                                                            className={`hover:bg-white/[0.02] transition-colors group cursor-pointer ${selectedInvite?.id === invite.id ? 'bg-white/5' : ''}`}
-                                                            onClick={() => setSelectedInvite(invite)}
-                                                        >
-                                                            <td className="p-3 font-mono text-xs text-purple-400 font-bold">{invite.code}</td>
-                                                            <td className="p-3">
-                                                                <span className={`text-[9px] px-2 py-0.5 rounded border font-mono ${invite.targetPlan === 'ASSOCIATED'
-                                                                    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
-                                                                    : invite.targetPlan === 'RESIDENT'
-                                                                        ? 'border-purple-500/30 bg-purple-500/10 text-purple-400'
-                                                                        : 'border-blue-500/30 bg-blue-500/10 text-blue-400'
-                                                                    }`}>
-                                                                    {invite.targetPlan}
-                                                                </span>
-                                                            </td>
-                                                            <td className="p-3 text-center text-[10px] font-mono text-gray-500">
-                                                                {invite.currentUses} / {invite.maxUses}
-                                                            </td>
-                                                            <td className="p-3 text-right">
-                                                                <button
-                                                                    onClick={() => handleRevokeInvite(invite.id)}
-                                                                    className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-all group-hover:scale-110"
-                                                                    title="REVOGAR ACESSO"
-                                                                >
-                                                                    <Trash2 size={14} />
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </section>
-                        )}
 
                         {activeTab === 'studio' && isAdmin && (
                             <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
@@ -859,13 +663,6 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            <KaiAnalysisModal
-                isOpen={isKaiModalOpen}
-                isLoading={isKaiLoading}
-                suggestions={kaiSuggestions}
-                onClose={() => setIsKaiModalOpen(false)}
-                onApply={handleApplyKaiBranding}
-            />
         </div>
     )
 }

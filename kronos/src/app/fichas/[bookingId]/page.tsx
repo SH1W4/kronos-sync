@@ -88,8 +88,8 @@ export default function FichaAnamnesePage() {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center p-4">
                 <div className="max-w-md w-full text-center space-y-6 animate-in fade-in zoom-in duration-500">
-                    <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto border border-purple-500/30">
-                        <CheckCircle2 className="text-purple-500 w-10 h-10" />
+                    <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto border border-primary/30">
+                        <CheckCircle2 className="text-primary w-10 h-10" />
                     </div>
                     <h1 className="text-3xl font-orbitron text-white italic font-black uppercase tracking-tighter">Ficha Finalizada</h1>
                     <p className="text-zinc-400 font-mono text-sm uppercase tracking-widest">Seu prontuário foi criptografado e enviado ao seu artista com sucesso.</p>
@@ -99,16 +99,16 @@ export default function FichaAnamnesePage() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white py-12 px-4 selection:bg-purple-500/30">
+        <div className="min-h-screen bg-black text-white py-12 px-4 selection:bg-primary/30">
             {/* Background Effects */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
             </div>
 
             <div className="max-w-2xl mx-auto relative z-10 space-y-8">
                 <header className="text-center space-y-4 mb-12">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-mono mb-2 tracking-widest uppercase">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-mono mb-2 tracking-widest uppercase">
                         <ShieldCheck size={12} />
                         KRONØS DATA ARMOR PROTOCØL
                     </div>
@@ -122,7 +122,7 @@ export default function FichaAnamnesePage() {
                     {/* Section 0: Personal Data */}
                     <div className="glass-card p-6 md:p-8 rounded-3xl border border-white/5 space-y-6">
                         <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                            <PenTool className="text-purple-500" size={20} />
+                            <PenTool className="text-primary" size={20} />
                             <h2 className="text-lg font-orbitron font-bold uppercase tracking-wider italic">Identificação</h2>
                         </div>
 
@@ -130,7 +130,7 @@ export default function FichaAnamnesePage() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest ml-1">Nome Completo</label>
                                 <Input
-                                    className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-purple-500/50"
+                                    className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-primary/50"
                                     value={formData.fullName}
                                     onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                                     placeholder="Como no seu documento"
@@ -141,7 +141,7 @@ export default function FichaAnamnesePage() {
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest ml-1">WhatsApp</label>
                                     <Input
-                                        className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-purple-500/50"
+                                        className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-primary/50"
                                         value={formData.whatsapp}
                                         onChange={e => setFormData({ ...formData, whatsapp: e.target.value })}
                                         placeholder="(00) 00000-0000"
@@ -152,7 +152,7 @@ export default function FichaAnamnesePage() {
                                     <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest ml-1">Data de Nascimento</label>
                                     <Input
                                         type="date"
-                                        className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-purple-500/50"
+                                        className="bg-white/5 border-white/10 rounded-xl h-12 focus:ring-primary/50"
                                         value={formData.birthDate || ''}
                                         onChange={e => setFormData({ ...formData, birthDate: e.target.value })}
                                         required
@@ -164,7 +164,7 @@ export default function FichaAnamnesePage() {
                     {/* Section 1: Medical History */}
                     <div className="glass-card p-6 md:p-8 rounded-3xl border border-white/5 space-y-6">
                         <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                            <HeartPulse className="text-purple-500" size={20} />
+                            <HeartPulse className="text-primary" size={20} />
                             <h2 className="text-lg font-orbitron font-bold uppercase tracking-wider italic">Histórico Clínico</h2>
                         </div>
 
@@ -177,7 +177,7 @@ export default function FichaAnamnesePage() {
                                     placeholder="Descreva aqui ou digite 'Nenhuma'..."
                                     value={formData.medicalConditionsTattoo}
                                     onChange={(e) => setFormData(prev => ({ ...prev, medicalConditionsTattoo: e.target.value }))}
-                                    className="bg-zinc-900/50 border-white/5 focus:border-purple-500/50 min-h-[80px] rounded-2xl text-sm"
+                                    className="bg-zinc-900/50 border-white/5 focus:border-primary/50 min-h-[80px] rounded-2xl text-sm"
                                 />
                             </div>
 
@@ -205,7 +205,7 @@ export default function FichaAnamnesePage() {
                                         placeholder="Se sim, qual?"
                                         value={formData.medicalConditionsHealingDetails}
                                         onChange={(e) => setFormData(prev => ({ ...prev, medicalConditionsHealingDetails: e.target.value }))}
-                                        className="bg-zinc-900/50 border-white/5 focus:border-purple-500/50 rounded-xl text-sm animate-in slide-in-from-top-2 duration-300"
+                                        className="bg-zinc-900/50 border-white/5 focus:border-primary/50 rounded-xl text-sm animate-in slide-in-from-top-2 duration-300"
                                     />
                                 )}
                             </div>
@@ -218,7 +218,7 @@ export default function FichaAnamnesePage() {
                                     placeholder="Ex: Pigmento vermelho, Iodo, Látex..."
                                     value={formData.knownAllergies}
                                     onChange={(e) => setFormData(prev => ({ ...prev, knownAllergies: e.target.value }))}
-                                    className="bg-zinc-900/50 border-white/5 focus:border-purple-500/50 h-12 rounded-2xl text-sm"
+                                    className="bg-zinc-900/50 border-white/5 focus:border-primary/50 h-12 rounded-2xl text-sm"
                                 />
                             </div>
                         </div>
@@ -269,9 +269,9 @@ export default function FichaAnamnesePage() {
                     </div>
 
                     {/* Section 3: Legal & Signature */}
-                    <div className="glass-card p-6 md:p-8 rounded-3xl border border-white/5 space-y-6 bg-gradient-to-br from-purple-500/5 to-transparent">
+                    <div className="glass-card p-6 md:p-8 rounded-3xl border border-white/5 space-y-6 bg-gradient-to-br from-primary/5 to-transparent">
                         <div className="flex items-center gap-3 border-b border-white/5 pb-4">
-                            <ShieldCheck className="text-purple-500" size={20} />
+                            <ShieldCheck className="text-primary" size={20} />
                             <h2 className="text-lg font-orbitron font-bold uppercase tracking-wider italic">Consentimento & Assinatura</h2>
                         </div>
 
@@ -281,7 +281,7 @@ export default function FichaAnamnesePage() {
                                 onClick={() => toggleBoolean('understandPermanence')}
                                 className="flex items-start gap-3 w-full text-left group"
                             >
-                                <div className={`mt-1 w-5 h-5 rounded border transition-all flex-shrink-0 flex items-center justify-center ${formData.understandPermanence ? 'bg-purple-500 border-purple-400' : 'bg-white/5 border-white/20 group-hover:border-white/40'
+                                <div className={`mt-1 w-5 h-5 rounded border transition-all flex-shrink-0 flex items-center justify-center ${formData.understandPermanence ? 'bg-primary border-primary' : 'bg-white/5 border-white/20 group-hover:border-white/40'
                                     }`}>
                                     {formData.understandPermanence && <CheckCircle2 size={14} className="text-white" />}
                                 </div>
@@ -293,7 +293,7 @@ export default function FichaAnamnesePage() {
                                 onClick={() => toggleBoolean('followInstructions')}
                                 className="flex items-start gap-3 w-full text-left group"
                             >
-                                <div className={`mt-1 w-5 h-5 rounded border transition-all flex-shrink-0 flex items-center justify-center ${formData.followInstructions ? 'bg-purple-500 border-purple-400' : 'bg-white/5 border-white/20 group-hover:border-white/40'
+                                <div className={`mt-1 w-5 h-5 rounded border transition-all flex-shrink-0 flex items-center justify-center ${formData.followInstructions ? 'bg-primary border-primary' : 'bg-white/5 border-white/20 group-hover:border-white/40'
                                     }`}>
                                     {formData.followInstructions && <CheckCircle2 size={14} className="text-white" />}
                                 </div>
@@ -317,7 +317,7 @@ export default function FichaAnamnesePage() {
                                     type="button"
                                     onClick={() => toggleBoolean('acceptedTerms')}
                                     className={`w-full py-4 rounded-xl font-orbitron font-black text-sm transition-all border ${formData.acceptedTerms
-                                        ? 'bg-purple-500/20 border-purple-500 text-purple-400'
+                                        ? 'bg-primary/20 border-primary text-primary'
                                         : 'bg-white/5 border-white/10 text-zinc-600'
                                         }`}
                                 >

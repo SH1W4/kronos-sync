@@ -234,3 +234,75 @@ export async function updateWorkspaceBranding(data: {
         return { error: 'Erro ao salvar branding.' }
     }
 }
+
+/**
+ * Remove um artista do workspace (Revoga acesso).
+ * Apenas ADMINs podem realizar esta ação.
+ */
+export async function revokeArtistAccess(artistId: string) {
+    try {
+        const session = await getServerSession(authOptions)
+        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+
+        if (!session?.user || !activeWorkspaceId) {
+            return { error: 'Não autorizado ou nenhum estúdio ativo.' }
+        }
+
+        // 1. Verificar se quem está pedindo é ADMIN do workspace
+        const currentMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: activeWorkspaceId,
+                    userId: (session.user as any).id
+                }
+            }
+        })
+
+        if (!currentMember || currentMember.role !== 'ADMIN') {
+            return { error: 'Permissão negada. Apenas mestres podem revogar acesso.' }
+        }
+
+        // 2. Buscar o artista para garantir que ele pertence a este workspace
+        const targetArtist = await prisma.artist.findUnique({
+            where: { id: artistId },
+            include: { user: true }
+        })
+
+        if (!targetArtist || targetArtist.workspaceId !== activeWorkspaceId) {
+            return { error: 'Artista não encontrado neste estúdio.' }
+        }
+
+        // 3. Impedir que o mestre remova a si mesmo (precisa ser feito via outra lógica se necessário)
+        if (targetArtist.userId === (session.user as any).id) {
+            return { error: 'Você não pode revogar seu próprio acesso de mestre.' }
+        }
+
+        // 4. Executar revogação (Desconectar do workspace e inativar perfil)
+        await prisma.$transaction([
+            // Desconecta da tabela de membros do workspace
+            prisma.workspaceMember.delete({
+                where: {
+                    workspaceId_userId: {
+                        workspaceId: activeWorkspaceId,
+                        userId: targetArtist.userId
+                    }
+                }
+            }),
+            // Inativa o perfil de artista e desconecta do workspace
+            prisma.artist.update({
+                where: { id: artistId },
+                data: {
+                    workspaceId: null,
+                    isActive: false
+                }
+            })
+        ])
+
+        revalidatePath('/artist/team')
+        return { success: true, message: `Acesso de ${targetArtist.user.name} revogado com sucesso.` }
+
+    } catch (error) {
+        console.error('Error revoking artist access:', error)
+        return { error: 'Erro ao revogar acesso do artista.' }
+    }
+}

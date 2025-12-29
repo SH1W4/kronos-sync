@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { QRCodeSVG } from 'qrcode.react'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { trackQrScan } from '@/app/actions/analytics'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,11 @@ export default async function GiftCardPage({ params }: { params: Promise<{ code:
         where: { code },
         include: { originClient: true }
     })
+
+    // Track Scan (Analytics)
+    if (coupon) {
+        await trackQrScan('COUPON', coupon.id, code)
+    }
 
     if (!coupon) {
         return (

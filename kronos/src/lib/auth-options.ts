@@ -94,6 +94,195 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 try {
+                    // MESTRE / ADMIN BYPASS
+                    if (credentials?.username === "master") {
+                        console.log("👑 ACESSO MESTRE: Iniciando Sessão Administrativa...")
+
+                        // 1. Vincula ao Workspace Principal do Seed
+                        let workspace = await prisma.workspace.findFirst({
+                            where: { OR: [{ slug: 'kronos-studio' }, { slug: 'demo-studio' }] }
+                        })
+
+                        if (!workspace) {
+                            workspace = await prisma.workspace.create({
+                                data: {
+                                    name: "Kronus Master Studio",
+                                    slug: "kronos-studio",
+                                    primaryColor: "#00FF88",
+                                    owner: {
+                                        create: {
+                                            email: "admin@kronosync.com",
+                                            name: "Mestre Supremo",
+                                            role: "ADMIN"
+                                        }
+                                    }
+                                }
+                            })
+                        }
+
+                        // 2. Garante Usuário Master
+                        let masterUser = await prisma.user.findUnique({
+                            where: { email: "admin@kronosync.com" }
+                        })
+
+                        if (!masterUser) {
+                            masterUser = await prisma.user.create({
+                                data: {
+                                    email: "admin@kronosync.com",
+                                    name: "Mestre Supremo",
+                                    role: "ADMIN",
+                                    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mestre",
+                                }
+                            })
+                        }
+
+                        // 3. Garante Perfis (Membro e Artista)
+                        await prisma.workspaceMember.upsert({
+                            where: { workspaceId_userId: { workspaceId: workspace.id, userId: masterUser.id } },
+                            create: { workspaceId: workspace.id, userId: masterUser.id, role: "ADMIN" },
+                            update: { role: "ADMIN" }
+                        })
+
+                        const artist = await prisma.artist.upsert({
+                            where: { userId: masterUser.id },
+                            create: {
+                                userId: masterUser.id,
+                                workspaceId: workspace.id,
+                                plan: "RESIDENT",
+                                commissionRate: 0.10,
+                                isActive: true
+                            },
+                            update: { workspaceId: workspace.id, isActive: true }
+                        })
+
+                        // 4. GERA DADOS DE APRESENTAÇÃO (Cenários Reais)
+                        console.log("🎭 Preparando Cenários de Apresentação...")
+
+                        const scenarios = [
+                            {
+                                id: 'scenario-1',
+                                name: 'Ricardo Mautone',
+                                email: 'ricardo@kronos.com',
+                                time: 10, // 10:00
+                                anamnesis: {
+                                    medicalConditionsTattoo: 'Nenhuma condição reportada.',
+                                    medicalConditionsHealing: 'Nenhuma',
+                                    medicalConditionsHealingDetails: 'Cicatrizacão normal e rápida em tatuagens anteriores.',
+                                    knownAllergies: 'Nenhuma alergia conhecida.',
+                                    artDescription: 'Samurai Full Sleeve Blackwork',
+                                    artDescriptionDetails: 'Projeto grande com muito contraste.',
+                                    agreedValue: '4500.00',
+                                    understandPermanence: true,
+                                    followInstructions: true,
+                                    acceptedTerms: true
+                                }
+                            },
+                            {
+                                id: 'scenario-2',
+                                name: 'Lucas Mendonça',
+                                email: 'lucas@kronos.com',
+                                time: 14, // 14:00
+                                color: 'text-red-500', // Dica visual no log se necessário
+                                anamnesis: {
+                                    medicalConditionsTattoo: 'Portador de HEPATITE C (Em tratamento/Controlado).',
+                                    medicalConditionsHealing: 'Sim, uso contínuo de anticoagulantes.',
+                                    medicalConditionsHealingDetails: 'Sangramento pode ser mais persistente durante o procedimento.',
+                                    knownAllergies: 'ALERGIA SEVERA A IODO (Povidine).',
+                                    artDescription: 'Realismo de Leão no Antebraço',
+                                    agreedValue: '2800.00',
+                                    understandPermanence: true,
+                                    followInstructions: true,
+                                    acceptedTerms: true
+                                }
+                            },
+                            {
+                                id: 'scenario-3',
+                                name: 'Beatriz Oliveira',
+                                email: 'beatriz@kronos.com',
+                                time: 18, // 18:00
+                                anamnesis: {
+                                    medicalConditionsTattoo: 'DIABETES TIPO 1. Tendência a hipoglicemia em sessões longas.',
+                                    medicalConditionsHealing: 'Cicatrização periférica mais lenta.',
+                                    knownAllergies: 'ALERGIA A LÁTEX (Usar luvas de nitrilo).',
+                                    artDescription: 'Floral Fineline Minimalista',
+                                    agreedValue: '850.00',
+                                    understandPermanence: true,
+                                    followInstructions: true,
+                                    acceptedTerms: true
+                                }
+                            }
+                        ]
+
+                        for (const s of scenarios) {
+                            const user = await prisma.user.upsert({
+                                where: { email: s.email },
+                                create: { name: s.name, email: s.email, role: 'CLIENT', phone: '(11) 99999-0000' },
+                                update: { name: s.name }
+                            })
+
+                            const startTime = new Date()
+                            startTime.setHours(s.time, 0, 0, 0)
+                            const endTime = new Date(startTime)
+                            endTime.setHours(s.time + 3, 0, 0, 0)
+
+                            // Verifica se já existe agendamento hoje para este cenário
+                            const existingBooking = await prisma.booking.findFirst({
+                                where: {
+                                    artistId: artist.id,
+                                    clientId: user.id,
+                                    scheduledFor: {
+                                        gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                                        lte: new Date(new Date().setHours(23, 59, 59, 999))
+                                    }
+                                }
+                            })
+
+                            if (!existingBooking) {
+                                console.log(`📝 Criando cenário para ${s.name}...`)
+                                const slot = await prisma.slot.create({
+                                    data: { workspaceId: workspace.id, startTime, endTime, macaId: 1, isActive: true }
+                                })
+
+                                const booking = await prisma.booking.create({
+                                    data: {
+                                        workspaceId: workspace.id,
+                                        artistId: artist.id,
+                                        clientId: user.id,
+                                        slotId: slot.id,
+                                        status: 'CONFIRMED',
+                                        value: parseFloat(s.anamnesis.agreedValue),
+                                        finalValue: parseFloat(s.anamnesis.agreedValue),
+                                        studioShare: parseFloat(s.anamnesis.agreedValue) * 0.1,
+                                        artistShare: parseFloat(s.anamnesis.agreedValue) * 0.9,
+                                        scheduledFor: startTime,
+                                        duration: 180,
+                                        fichaStatus: 'COMPLETED'
+                                    }
+                                })
+
+                                await prisma.anamnesis.create({
+                                    data: {
+                                        clientId: user.id,
+                                        workspaceId: workspace.id,
+                                        bookingId: booking.id,
+                                        fullName: s.name,
+                                        whatsapp: user.phone,
+                                        ...s.anamnesis
+                                    }
+                                })
+                            }
+                        }
+
+                        return {
+                            id: masterUser.id,
+                            email: masterUser.email,
+                            name: masterUser.name,
+                            image: masterUser.image,
+                            role: masterUser.role
+                        }
+                    }
+
+                    // DEV / ARTIST BYPASS
                     if (credentials?.username === "dev") {
                         console.log("🔓 ACESSO DEV: Garantindo Perfil de Artista...")
 
@@ -214,11 +403,23 @@ export const authOptions: NextAuthOptions = {
                     })
 
                     if (dbUser) {
+                        token.name = dbUser.name // Sincroniza o nome
                         token.role = dbUser.role
                         token.customColor = dbUser.customColor
                         if (dbUser.artist) {
                             token.isArtist = true
+                            token.instagram = dbUser.artist.instagram // Sincroniza o instagram
                             token.commissionRate = dbUser.artist.commissionRate
+                            token.validUntil = dbUser.artist.validUntil?.toISOString() || null
+
+                            // VERIFICAÇÃO DE REVOGAÇÃO AUTOMÁTICA (GUEST EXPIRADO)
+                            if (dbUser.artist.validUntil && new Date(dbUser.artist.validUntil) < new Date()) {
+                                console.log(`⏳ ACESSO EXPIRADO para ${dbUser.name}. Revogando automaticamente...`)
+                                token.role = 'CLIENT'
+                                token.workspaces = []
+                                token.activeWorkspaceId = null
+                                token.isArtist = false
+                            }
                         }
                     }
 
@@ -269,7 +470,9 @@ export const authOptions: NextAuthOptions = {
                 (session.user as any).activeWorkspaceId = token.activeWorkspaceId;
                 (session.user as any).commissionRate = token.commissionRate;
                 (session.user as any).isArtist = token.isArtist;
+                (session.user as any).instagram = token.instagram;
                 (session.user as any).customColor = token.customColor;
+                (session.user as any).validUntil = token.validUntil;
             }
 
             // Map to session root as well for compatibility with legacy components

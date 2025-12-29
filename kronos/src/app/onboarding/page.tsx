@@ -165,12 +165,12 @@ function OnboardingContent() {
                         {/* CLIENTE CARD */}
                         <button
                             onClick={handleClientAccess}
-                            className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-[#00FF88]/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
+                            className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-accent/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
                         >
-                            <div className="absolute top-4 right-4 text-gray-600 group-hover:text-[#00FF88] transition-colors">
+                            <div className="absolute top-4 right-4 text-gray-600 group-hover:text-accent transition-colors">
                                 <User size={24} />
                             </div>
-                            <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-[#00FF88]">CLIENTE</h3>
+                            <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-accent">CLIENTE</h3>
                             <p className="text-sm text-gray-500 font-mono leading-relaxed">
                                 Quero agendar sessões, acompanhar meus projetos e ver meu histórico.
                             </p>
@@ -182,12 +182,12 @@ function OnboardingContent() {
                         {/* PROFISSIONAL CARD */}
                         <button
                             onClick={() => setMode('CODE')}
-                            className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-[#8B5CF6]/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
+                            className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-primary/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
                         >
-                            <div className="absolute top-4 right-4 text-gray-600 group-hover:text-[#8B5CF6] transition-colors">
+                            <div className="absolute top-4 right-4 text-gray-600 group-hover:text-primary transition-colors">
                                 <ShieldCheck size={24} />
                             </div>
-                            <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-[#8B5CF6]">PROFISSIONAL</h3>
+                            <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-primary">PROFISSIONAL</h3>
                             <p className="text-sm text-gray-500 font-mono leading-relaxed">
                                 Sou tatuador, guest ou staff. Tenho um código de acesso ou convite.
                             </p>
@@ -223,7 +223,7 @@ function OnboardingContent() {
                                     <Button type="button" variant="outline" onClick={() => setMode('SELECT')} className="flex-1">
                                         Voltar
                                     </Button>
-                                    <Button type="submit" disabled={loading} className="flex-1 bg-[#8B5CF6] hover:bg-[#7c4dff] text-white">
+                                    <Button type="submit" disabled={loading} className="flex-1 bg-primary hover:bg-primary/80 text-white">
                                         {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
                                         VALIDAR
                                     </Button>
@@ -234,7 +234,7 @@ function OnboardingContent() {
                                     <Button
                                         type="button"
                                         variant="ghost"
-                                        className="text-white hover:text-purple-400 group"
+                                        className="text-white hover:text-primary group"
                                         onClick={() => setMode('REQUEST')}
                                     >
                                         QUERO CRIAR MEU ESTÚDIO <ArrowRight size={14} className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -259,8 +259,8 @@ function OnboardingContent() {
                     <div className="max-w-md mx-auto animate-in fade-in slide-in-from-right-4 duration-500">
                         <div className="bg-gray-900/50 border border-purple-500/20 p-8 rounded-3xl backdrop-blur-md shadow-[0_0_50px_rgba(139,92,246,0.1)]">
                             <div className="flex justify-center mb-6">
-                                <div className="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
-                                    <Rocket className="text-purple-400 animate-bounce" size={32} />
+                                <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
+                                    <Rocket className="text-primary animate-bounce" size={32} />
                                 </div>
                             </div>
 
@@ -287,7 +287,7 @@ function OnboardingContent() {
                                         <UsersIcon size={12} /> Equipe (Artistas/Staff)
                                     </label>
                                     <textarea
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-purple-500 outline-none min-h-[80px] text-white"
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-primary outline-none min-h-[80px] text-white"
                                         placeholder="Ex: 3 artistas residentes, 1 recepcionista..."
                                         value={teamDetails}
                                         onChange={(e) => setTeamDetails(e.target.value)}
@@ -299,7 +299,7 @@ function OnboardingContent() {
                                         <MessageSquare size={12} /> Por que o KRONØS?
                                     </label>
                                     <textarea
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-purple-500 outline-none min-h-[100px] text-white"
+                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-primary outline-none min-h-[100px] text-white"
                                         placeholder="Como o KRONOS seria útil para sua equipe hoje?"
                                         value={motivation}
                                         onChange={(e) => setMotivation(e.target.value)}
@@ -320,7 +320,7 @@ function OnboardingContent() {
                                     <Button
                                         type="submit"
                                         disabled={loading || !studioName || !motivation}
-                                        className="flex-[2] bg-purple-600 hover:bg-purple-500 text-white rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.2)] font-bold transition-all hover:scale-[1.02]"
+                                        className="flex-[2] bg-primary hover:bg-primary/80 text-white rounded-xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)] font-bold transition-all hover:scale-[1.02]"
                                     >
                                         {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
                                         ENVIAR SOLICITAÇÃO
@@ -355,7 +355,7 @@ function OnboardingContent() {
 
 export default function OnboardingPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="animate-spin text-purple-500" /></div>}>
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>}>
             <OnboardingContent />
         </Suspense>
     )

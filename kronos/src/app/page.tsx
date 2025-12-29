@@ -140,7 +140,7 @@ export default function LandingPage() {
                                 className={`
                                     ${feature.colSpan} 
                                     group relative h-80 overflow-hidden rounded-lg bg-black border border-white/10 cursor-pointer 
-                                    transition-all duration-500 hover:border-purple-500/30 hover:shadow-2xl hover:shadow-purple-500/10
+                                    transition-all duration-500 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10
                                 `}
                             >
                                 {/* Image Background (B&W -> Color on Hover) */}
@@ -159,8 +159,8 @@ export default function LandingPage() {
                                 <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                     <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
                                         <p className="text-[10px] tracking-[0.2em] font-bold text-zinc-400 mb-2 uppercase font-mono">Módulo</p>
-                                        <h3 className="text-2xl font-orbitron font-bold tracking-tight text-white mb-2 group-hover:text-purple-200 transition-colors">{feature.title}</h3>
-                                        <div className="w-8 h-[1px] bg-white/30 mb-4 group-hover:w-16 group-hover:bg-purple-500 transition-all duration-500"></div>
+                                        <h3 className="text-2xl font-orbitron font-bold tracking-tight text-white mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
+                                        <div className="w-8 h-[1px] bg-white/30 mb-4 group-hover:w-16 group-hover:bg-primary transition-all duration-500"></div>
                                         <p className="text-sm text-zinc-300 font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 italic">
                                             {feature.subtitle}
                                         </p>

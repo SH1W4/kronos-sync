@@ -18,6 +18,7 @@ import {
     Smartphone
 } from 'lucide-react'
 import Link from 'next/link'
+import { trackQrScan } from '@/app/actions/analytics'
 
 // Custom Tattoo Machine Icon SVG (Refined & Elegant)
 const TattooMachineIcon = ({ className }: { className?: string }) => (
@@ -47,6 +48,9 @@ export default function KioskPage() {
     })
 
     useEffect(() => {
+        // Track Scan (Analytics)
+        trackQrScan('KIOSK', 'KIOSK_MAIN_TERMINAL')
+
         if (showCompanionModal) {
             setShowIntroArt(true)
             const timer = setTimeout(() => setShowIntroArt(false), 2200)

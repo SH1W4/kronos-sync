@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { Clock, AlertCircle, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
-// Garante que a página seja sempre renderizada dinamicamente no servidor
 export const dynamic = 'force-dynamic'
 
 export default async function ArtistDashboard() {
@@ -23,163 +23,75 @@ export default async function ArtistDashboard() {
         }
     })
 
-    // Se não for artista, mostra erro (ou poderia redirecionar)
+    // Se não for artista, mostra tela de dessincronização
     if (!artist) {
-        // Auto-fix: Se o usuário tem role ARTIST mas não tem registro, criar automaticamente
-        if ((session.user as any).role === 'ARTIST') {
-            console.log('🔧 Auto-criando perfil de artista para:', session.user.email)
-
-            try {
-                // Verificar se o usuário existe no banco
-                const userExists = await prisma.user.findUnique({
-                    where: { id: session.user.id }
-                })
-
-                if (!userExists) {
-                    console.error('❌ Usuário não encontrado no banco:', session.user.id)
-                    return (
-                        <div className="p-10 text-center min-h-[50vh] flex flex-col items-center justify-center">
-                            <h1 className="text-xl text-red-500 font-mono mb-4">ERRO: SESSÃO INVÁLIDA</h1>
-                            <p className="text-gray-500 text-sm max-w-md">
-                                Sua sessão está corrompida. Faça logout e login novamente.
-                            </p>
-                        </div>
-                    )
-                }
-
-                // Buscar ou criar workspace
-                let workspace = await prisma.workspace.findFirst()
-                if (!workspace) {
-                    workspace = await prisma.workspace.create({
-                        data: {
-                            name: "Kronus Demo Studio",
-                            slug: "demo-studio",
-                            primaryColor: "#8B5CF6",
-                            ownerId: session.user.id
-                        }
-                    })
-                }
-
-                // Criar perfil de artista
-                await prisma.artist.create({
-                    data: {
-                        userId: session.user.id,
-                        workspaceId: workspace.id,
-                        plan: "RESIDENT",
-                        commissionRate: 0.30,
-                        isActive: true
-                    }
-                })
-
-                // Criar membership
-                await prisma.workspaceMember.upsert({
-                    where: {
-                        workspaceId_userId: {
-                            workspaceId: workspace.id,
-                            userId: session.user.id
-                        }
-                    },
-                    create: {
-                        workspaceId: workspace.id,
-                        userId: session.user.id,
-                        role: "ADMIN"
-                    },
-                    update: {}
-                })
-
-                console.log('✅ Perfil de artista criado com sucesso!')
-            } catch (error) {
-                console.error('❌ Erro ao criar perfil:', error)
-                return (
-                    <div className="p-10 text-center min-h-[50vh] flex flex-col items-center justify-center">
-                        <h1 className="text-xl text-red-500 font-mono mb-4">ERRO AO CRIAR PERFIL</h1>
-                        <p className="text-gray-500 text-sm max-w-md mb-4">
-                            {error instanceof Error ? error.message : 'Erro desconhecido'}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                            Tente fazer logout e login novamente.
-                        </p>
-                    </div>
-                )
-            }
-
-            // Recarregar a página para pegar os novos dados
-            redirect('/artist/dashboard')
-        }
-
         return (
-            <div className="p-10 text-center min-h-[50vh] flex flex-col items-center justify-center">
-                <h1 className="text-xl text-red-500 font-mono mb-4">ERRO: PERFIL DE ARTISTA NÃO ENCONTRADO</h1>
-                <p className="text-gray-500 text-sm max-w-md">
-                    Seu usuário tem a role ARTIST, mas não existe na tabela de Artistas.
-                    Peça ao Admin para recriar seu perfil.
-                </p>
+            <div className="p-10 text-center min-h-[100vh] flex flex-col items-center justify-center bg-black text-white relative">
+                <div className="absolute inset-0 data-pattern-grid opacity-20 pointer-events-none" />
+                <div className="max-w-md w-full glass-card p-10 rounded-3xl border border-white/10 space-y-6 relative z-10 shadow-[0_0_50px_rgba(var(--primary-rgb),0.1)]">
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto border border-primary/20">
+                        <AlertCircle className="text-primary" size={40} />
+                    </div>
+                    <h1 className="text-2xl font-orbitron font-black text-white uppercase italic tracking-tighter">Sessão Dessincronizada</h1>
+                    <p className="text-gray-400 font-mono text-xs uppercase tracking-widest leading-relaxed">
+                        Seu login é válido, mas os dados do seu artista não foram encontrados (limpeza de banco ou reset).
+                        <br /><br />
+                        <span className="text-primary/70">DICA: Entre novamente como "Dev Artist" para restaurar o perfil de testes.</span>
+                    </p>
+                    <div className="pt-4 flex flex-col gap-3">
+                        <Link href="/api/auth/signout">
+                            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-orbitron font-black uppercase italic tracking-widest text-[10px] h-12 rounded-xl">
+                                RE-AUTENTICAR SISTEMA
+                            </Button>
+                        </Link>
+                        <Link href="/auth/signin">
+                            <Button variant="ghost" className="w-full text-gray-400 hover:text-white font-bold uppercase tracking-widest text-[10px]">
+                                IR PARA LOGIN
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
             </div>
         )
     }
 
-    // 2. Definir Range de "Hoje"
+    // 2. Definir Ranges
+    const now = new Date()
     const startOfDay = new Date()
     startOfDay.setHours(0, 0, 0, 0)
-
     const endOfDay = new Date()
     endOfDay.setHours(23, 59, 59, 999)
-
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
-    // 3. Buscar Dados em Paralelo
-    const now = new Date()
+    // 3. Buscar Dados
     const [todaysBookings, monthMetrics, totalSessionsCount] = await Promise.all([
-        // A. Agendamentos Hoje
         prisma.booking.findMany({
             where: {
                 artistId: artist.id,
-                slot: {
-                    startTime: {
-                        gte: startOfDay,
-                        lte: endOfDay
-                    }
-                },
+                slot: { startTime: { gte: startOfDay, lte: endOfDay } },
                 status: { not: 'CANCELLED' }
             },
-            include: {
-                client: true,
-                slot: true
-            },
-            orderBy: {
-                slot: { startTime: 'asc' }
-            }
+            include: { client: true, slot: true },
+            orderBy: { slot: { startTime: 'asc' } }
         }),
-        // B. Faturamento Mês (Sincronizado com Auto-Settle)
         prisma.booking.findMany({
             where: {
                 artistId: artist.id,
                 slot: { startTime: { gte: startOfMonth } },
                 OR: [
                     { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-                    {
-                        AND: [
-                            { status: { not: 'CANCELLED' } },
-                            { slot: { endTime: { lt: now } } }
-                        ]
-                    }
+                    { AND: [{ status: { not: 'CANCELLED' } }, { slot: { endTime: { lt: now } } }] }
                 ]
             }
         }),
-        // C. Total de Sessões (Sincronizado com Auto-Settle)
         prisma.booking.count({
             where: {
                 artistId: artist.id,
                 OR: [
                     { status: { in: ['CONFIRMED', 'COMPLETED'] } },
-                    {
-                        AND: [
-                            { status: { not: 'CANCELLED' } },
-                            { slot: { endTime: { lt: now } } }
-                        ]
-                    }
+                    { AND: [{ status: { not: 'CANCELLED' } }, { slot: { endTime: { lt: now } } }] }
                 ]
             }
         })
@@ -191,185 +103,102 @@ export default async function ArtistDashboard() {
 
     return (
         <div className="space-y-8 relative overflow-hidden min-h-screen p-4 md:p-8">
-            {/* Ambient FX */}
             <div className="scanline" />
             <div className="absolute inset-0 data-pattern-grid opacity-30 pointer-events-none" />
 
-            {/* HEADER */}
             <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/5 pb-6">
                 <div>
                     <h2 className="text-gray-400 font-mono text-xs uppercase tracking-widest mb-2">Painel de Controle</h2>
                     <h1 className="text-3xl font-orbitron font-bold tracking-tight pixel-text">
-                        BEM-VINDO, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 uppercase">{userName}</span>
+                        BEM-VINDO, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent uppercase">{userName}</span>
                     </h1>
-                    <p className="text-gray-500 font-mono text-xs uppercase tracking-widest mt-1">Status do Sistema: <span className="text-green-500 animate-pulse font-bold tracking-tighter">OPERACIONAL</span></p>
+                    <p className="text-gray-500 font-mono text-xs uppercase tracking-widest mt-1">Status do Sistema: <span className="text-accent animate-pulse font-bold tracking-tighter">OPERACIONAL</span></p>
                 </div>
                 <div className="flex gap-4">
-                    <div className="bg-gray-900/50 border border-white/5 px-4 py-2 rounded flex items-center gap-3 shadow-[0_0_10px_rgba(34,197,94,0.1)]">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-xs font-mono text-gray-400 tracking-widest">ONLINE</span>
+                    <div className="bg-gray-900/50 border border-white/5 px-4 py-2 rounded flex items-center gap-3 shadow-[0_0_10px_rgba(var(--primary-rgb),0.1)]">
+                        <div className="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
+                        <span className="text-xs font-mono text-gray-400 tracking-widest uppercase">Connected</span>
                     </div>
                     <div className="text-right">
-                        <p className="text-xs text-gray-500 font-mono">HOJE</p>
+                        <p className="text-xs text-gray-500 font-mono italic">REAL TIME</p>
                         <p className="text-xl font-bold font-orbitron uppercase text-white">{todayDate}</p>
                     </div>
                 </div>
             </div>
 
-            {/* METRICS ROW */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <MetricCard
-                    title="FATURAMENTO (MÊS)"
-                    value={`R$ ${monthlyEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                    trend="Tempo Real"
-                    icon={<TrendingUp size={16} />}
-                    color="purple"
-                />
-                <MetricCard
-                    title="AGENDADOS HOJE"
-                    value={todaysBookings.length.toString()}
-                    trend="Sessões"
-                    icon={<Clock size={16} />}
-                    color="blue"
-                />
-                <MetricCard
-                    title="TOTAL REALIZADO"
-                    value={totalSessionsCount.toString()}
-                    trend="Histórico"
-                    icon={<CheckCircle2 size={16} />}
-                    color="green"
-                />
-                <MetricCard
-                    title="ESTADO DO SISTEMA"
-                    value="100%"
-                    trend="Operacional"
-                    icon={<AlertCircle size={16} />}
-                    color="pink"
-                />
+                <MetricCard title="FATURAMENTO (MÊS)" value={`R$ ${monthlyEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} trend="Sincronizado" icon={<TrendingUp size={16} />} variant="primary" />
+                <MetricCard title="AGENDADOS HOJE" value={todaysBookings.length.toString()} trend="Sessões" icon={<Clock size={16} />} variant="secondary" />
+                <MetricCard title="TOTAL REALIZADO" value={totalSessionsCount.toString()} trend="Histórico" icon={<CheckCircle2 size={16} />} variant="accent" />
+                <MetricCard title="ESTADO DO SISTEMA" value="100%" trend="Operacional" icon={<AlertCircle size={16} />} variant="outline" />
             </div>
 
-            {/* MAIN CONTENT GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                {/* LEFT: TIMELINE */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="flex justify-between items-center">
-                        <h3 className="font-orbitron font-bold text-lg flex items-center gap-2 text-white">
-                            <Clock className="text-purple-500" size={20} /> AGENDA DO DIA
-                        </h3>
-                    </div>
-
+                    <h3 className="font-orbitron font-bold text-lg flex items-center gap-2 text-white italic tracking-widest">
+                        <Clock className="text-primary" size={20} /> AGENDA DO DIA
+                    </h3>
                     <div className="space-y-4">
                         {todaysBookings.length === 0 ? (
-                            <div className="p-12 border border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-500 bg-white/5 transition-all hover:border-white/20">
+                            <div className="p-12 border border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-500 bg-white/5">
                                 <Clock size={48} className="mb-4 opacity-20" />
-                                <p className="font-mono text-sm tracking-widest uppercase">Nenhum agendamento para hoje</p>
-                                <p className="text-xs mt-2 text-gray-600">Aproveite para criar flashes ou organizar seu estúdio.</p>
+                                <p className="font-mono text-sm tracking-widest uppercase">Vazio até o momento</p>
                             </div>
                         ) : (
                             todaysBookings.map((booking) => (
-                                <AppointmentCard
-                                    key={booking.id}
-                                    id={booking.id} // Passando ID para o link
-                                    time={`${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(booking.slot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
-                                    client={booking.client.name || 'Cliente Sem Nome'}
-                                    project={`Projeto ID: ${booking.id.slice(-6).toUpperCase()}`}
-                                    status={booking.status}
-                                />
+                                <AppointmentCard key={booking.id} id={booking.id} time={`${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} client={booking.client.name} project={`Projeto: ${booking.id.slice(-4).toUpperCase()}`} status={booking.status} />
                             ))
                         )}
-
-                        {/* Placeholder Action */}
-                        <div className="p-4 border border-white/5 bg-white/5 rounded-lg flex items-center justify-center border-dashed opacity-50 hover:opacity-100 hover:border-purple-500/50 transition-all cursor-pointer group">
-                            <p className="text-xs font-mono text-gray-500 group-hover:text-purple-400 uppercase tracking-widest">+ Bloquear Horário</p>
-                        </div>
                     </div>
                 </div>
-
-                {/* RIGHT: NOTIFICATIONS */}
                 <div className="space-y-6">
-                    <h3 className="font-orbitron font-bold text-lg flex items-center gap-2 text-white">
-                        <AlertCircle className="text-blue-500" size={20} /> LEMBRETES
+                    <h3 className="font-orbitron font-bold text-lg flex items-center gap-2 text-white italic tracking-widest">
+                        <AlertCircle className="text-accent" size={20} /> LEMBRETES
                     </h3>
-
-                    <div className="bg-gray-900/30 border border-white/5 rounded-xl p-6 min-h-[200px] flex items-center justify-center">
-                        <span className="text-xs font-mono text-gray-600 uppercase tracking-widest">Sem novas notificações</span>
+                    <div className="bg-gray-900/30 border border-white/5 rounded-xl p-6 min-h-[200px] flex items-center justify-center font-mono text-[10px] text-gray-600 uppercase tracking-widest">
+                        Sem pendências
                     </div>
                 </div>
             </div>
-
         </div>
     )
 }
 
-// --- UI COMPONENTS ---
-
-function MetricCard({ title, value, trend, icon, color }: any) {
-    const colors: any = {
-        purple: "border-purple-500/20 text-purple-400",
-        blue: "border-blue-500/20 text-blue-400",
-        green: "border-green-500/20 text-green-400",
-        pink: "border-pink-500/20 text-pink-400",
+function MetricCard({ title, value, trend, icon, variant }: any) {
+    const variants: any = {
+        primary: "border-primary/20 text-primary",
+        secondary: "border-secondary/20 text-secondary",
+        accent: "border-accent/20 text-accent",
+        outline: "border-white/10 text-white",
     }
-
     return (
-        <div className={`bg-gray-900/40 backdrop-blur-sm border ${colors[color].split(' ')[0]} p-5 rounded-xl transition-all hover:bg-gray-900/60`}>
+        <div className={`bg-gray-900/40 backdrop-blur-sm border ${variants[variant]?.split(' ')[0]} p-5 rounded-xl transition-all hover:bg-white/5`}>
             <div className="flex justify-between items-start mb-4">
                 <h4 className="text-[10px] font-mono text-gray-500 font-bold uppercase tracking-widest">{title}</h4>
-                <div className={`${colors[color].split(' ')[1]} opacity-50`}>{icon}</div>
+                <div className={`${variants[variant]?.split(' ')[1]} opacity-50`}>{icon}</div>
             </div>
             <div className="flex items-end justify-between">
                 <span className="text-2xl font-orbitron font-bold text-white tracking-tight">{value}</span>
-                <span className="text-[10px] font-mono text-gray-400 bg-white/5 px-2 py-1 rounded">{trend}</span>
+                <span className="text-[10px] font-mono text-white/20 uppercase tracking-tighter">{trend}</span>
             </div>
         </div>
     )
 }
 
 function AppointmentCard({ id, time, client, project, status }: any) {
-    // Styling based on status
-    const statusConfig: any = {
-        'OPEN': { label: 'ABERTO', classes: 'border-yellow-500/30 text-yellow-300' },
-        'CONFIRMED': { label: 'CONFIRMADO', classes: 'border-blue-500/30 text-blue-300' },
-        'IN_PROGRESS': { label: 'EM ANDAMENTO', classes: 'border-purple-500/30 text-purple-300 animate-pulse' },
-        'COMPLETED': { label: 'CONCLUÍDO', classes: 'border-green-500/30 text-green-300' },
-        'CANCELLED': { label: 'CANCELADO', classes: 'border-red-500/30 text-red-300' }
-    }
-
-    const currentStatus = statusConfig[status] || { label: status, classes: 'border-gray-700 text-gray-500' }
     const isLive = status === 'IN_PROGRESS' || status === 'CONFIRMED'
-
     return (
-        <div className={`
-            relative overflow-hidden rounded-xl p-6 border transition-all duration-300 group/card
-            ${isLive ? 'bg-purple-900/5 border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.05)]' : 'bg-gray-900/30 border-white/5 hover:border-white/10'}
-        `}>
-            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-                <div className="min-w-[140px]">
-                    <p className={`text-sm font-bold font-mono ${isLive ? 'text-purple-400' : 'text-gray-400'}`}>{time}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                        <span className={`text-[10px] px-2 py-0.5 rounded border uppercase tracking-wider font-bold ${currentStatus.classes}`}>
-                            {currentStatus.label}
-                        </span>
-                    </div>
+        <div className={`relative overflow-hidden rounded-xl p-6 border transition-all duration-300 ${isLive ? 'bg-primary/5 border-primary/30' : 'bg-gray-900/30 border-white/5 hover:border-white/10'}`}>
+            <div className="flex flex-col md:flex-row gap-6 items-center">
+                <div className="min-w-[100px]">
+                    <p className={`text-sm font-bold font-mono ${isLive ? 'text-primary' : 'text-gray-400'}`}>{time}</p>
+                    <span className="text-[9px] px-2 py-0.5 rounded border border-white/5 uppercase tracking-widest font-bold text-gray-500 mt-2 block w-fit">{status}</span>
                 </div>
-
                 <div className="flex-1">
-                    <h4 className="text-lg font-bold text-white mb-1 font-orbitron tracking-wide">{client}</h4>
-                    <p className="text-xs text-gray-500 font-mono uppercase tracking-wider flex items-center gap-2">
-                        <span className="w-1 h-1 rounded-full bg-gray-600"></span> {project}
-                    </p>
+                    <h4 className="text-lg font-bold text-white mb-1 font-orbitron tracking-wide uppercase italic">{client}</h4>
+                    <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">{project}</p>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                    <Link
-                        href={`/artist/anamnese/${id}`}
-                        className="px-4 py-2 bg-purple-600/10 border border-purple-500/50 text-purple-400 text-xs font-bold rounded hover:bg-purple-600 hover:text-white transition-all flex items-center gap-2 z-50 relative cursor-pointer"
-                    >
-                        📝 FICHA
-                    </Link>
-                </div>
+                <Link href={`/artist/anamnese/${id}`} className="px-4 py-2 bg-primary/10 border border-primary/40 text-xs font-brand tracking-widest text-primary font-black rounded hover:bg-primary hover:text-black transition-all">📝 FICHA</Link>
             </div>
         </div>
     )

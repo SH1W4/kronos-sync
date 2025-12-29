@@ -4,6 +4,7 @@ import { InkPassCard } from '@/components/invites/InkPassCard'
 import { ShieldAlert, ArrowRight, Sparkles, Zap, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { trackQrScan } from '@/app/actions/analytics'
 
 interface PageProps {
     params: { code: string }
@@ -12,6 +13,11 @@ interface PageProps {
 export default async function InvitePage({ params }: PageProps) {
     const { code } = params
     const result = await getInviteByCode(code)
+
+    // Track Scan (Analytics)
+    if (result.invite) {
+        await trackQrScan('INVITE', result.invite.id, code)
+    }
 
     if (result.error || !result.invite) {
         return (
