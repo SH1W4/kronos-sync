@@ -172,8 +172,7 @@ async function createTestBookings() {
             })
 
             console.log(`✅ Cupom criado: ${coupon.code}`)
-            console.log(`   Tipo: ${coupon.type}`)
-            console.log(`   Desconto: ${coupon.type === 'PERCENTAGE' ? coupon.discount + '%' : 'R$ ' + coupon.discount.toFixed(2)}`)
+            console.log(`   Desconto: ${coupon.discountPercent}%`)
             console.log(`   Descrição: ${couponData.description}\n`)
         }
 
