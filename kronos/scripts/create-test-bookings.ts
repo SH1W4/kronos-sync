@@ -1,7 +1,7 @@
 // Script para criar agendamentos de teste
 // Execute: npx ts-node scripts/create-test-bookings.ts
 
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, BookingStatus } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -119,7 +119,7 @@ async function createTestBookings() {
                     clientId: bookingData.client.id,
                     artistId: artist.id,
                     workspaceId: artist.workspaceId,
-                    status: bookingData.status,
+                    status: bookingData.status as BookingStatus,
                     totalPrice: bookingData.price,
                     artistShare: artistShare,
                     studioShare: bookingData.price - artistShare,
