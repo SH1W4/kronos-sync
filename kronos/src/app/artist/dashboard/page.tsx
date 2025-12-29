@@ -130,7 +130,7 @@ export default async function ArtistDashboard() {
                 <MetricCard title="FATURAMENTO (MÊS)" value={`R$ ${monthlyEarnings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} trend="Sincronizado" icon={<TrendingUp size={16} />} variant="primary" />
                 <MetricCard title="AGENDADOS HOJE" value={todaysBookings.length.toString()} trend="Sessões" icon={<Clock size={16} />} variant="secondary" />
                 <MetricCard title="TOTAL REALIZADO" value={totalSessionsCount.toString()} trend="Histórico" icon={<CheckCircle2 size={16} />} variant="accent" />
-                <MetricCard title="ESTADO DO SISTEMA" value="100%" trend="Operacional" icon={<AlertCircle size={16} />} variant="outline" />
+                <MetricCard title="ESTADO DO SISTEMA" value="100%" trend="Operacional" icon={<AlertCircle size={16} />} variant="ghost" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -166,20 +166,21 @@ export default async function ArtistDashboard() {
 
 function MetricCard({ title, value, trend, icon, variant }: any) {
     const variants: any = {
-        primary: "border-primary/20 text-primary",
-        secondary: "border-secondary/20 text-secondary",
-        accent: "border-accent/20 text-accent",
-        outline: "border-white/10 text-white",
+        primary: "border-primary/20 text-primary shadow-[0_0_20px_rgba(139,92,246,0.05)]",
+        secondary: "border-purple-400/20 text-purple-400 shadow-[0_0_20px_rgba(192,132,252,0.05)]",
+        accent: "border-accent/20 text-accent shadow-[0_0_20px_rgba(34,197,94,0.05)]",
+        ghost: "border-white/5 text-gray-500",
     }
     return (
-        <div className={`bg-gray-900/40 backdrop-blur-sm border ${variants[variant]?.split(' ')[0]} p-5 rounded-xl transition-all hover:bg-white/5`}>
-            <div className="flex justify-between items-start mb-4">
-                <h4 className="text-[10px] font-mono text-gray-500 font-bold uppercase tracking-widest">{title}</h4>
-                <div className={`${variants[variant]?.split(' ')[1]} opacity-50`}>{icon}</div>
+        <div className={`bg-black/40 backdrop-blur-sm border ${variants[variant]?.split(' ')[0]} p-6 rounded-2xl transition-all hover:bg-white/[0.03] group relative overflow-hidden`}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+            <div className="flex justify-between items-start mb-4 relative z-10">
+                <h4 className="text-[10px] font-mono text-gray-500 font-bold uppercase tracking-[0.2em]">{title}</h4>
+                <div className={`${variants[variant]?.split(' ')[1]} opacity-50 group-hover:opacity-100 transition-opacity`}>{icon}</div>
             </div>
-            <div className="flex items-end justify-between">
-                <span className="text-2xl font-orbitron font-bold text-white tracking-tight">{value}</span>
-                <span className="text-[10px] font-mono text-white/20 uppercase tracking-tighter">{trend}</span>
+            <div className="flex items-end justify-between relative z-10">
+                <span className="text-2xl font-orbitron font-black text-white tracking-tighter text-glow">{value}</span>
+                <span className="text-[9px] font-mono text-white/20 uppercase tracking-widest">{trend}</span>
             </div>
         </div>
     )
@@ -188,17 +189,22 @@ function MetricCard({ title, value, trend, icon, variant }: any) {
 function AppointmentCard({ id, time, client, project, status }: any) {
     const isLive = status === 'IN_PROGRESS' || status === 'CONFIRMED'
     return (
-        <div className={`relative overflow-hidden rounded-xl p-6 border transition-all duration-300 ${isLive ? 'bg-primary/5 border-primary/30' : 'bg-gray-900/30 border-white/5 hover:border-white/10'}`}>
-            <div className="flex flex-col md:flex-row gap-6 items-center">
-                <div className="min-w-[100px]">
-                    <p className={`text-sm font-bold font-mono ${isLive ? 'text-primary' : 'text-gray-400'}`}>{time}</p>
-                    <span className="text-[9px] px-2 py-0.5 rounded border border-white/5 uppercase tracking-widest font-bold text-gray-500 mt-2 block w-fit">{status}</span>
+        <div className={`relative overflow-hidden rounded-2xl p-6 border transition-all duration-500 group ${isLive ? 'bg-primary/10 border-primary/30 shadow-[0_0_30px_rgba(139,92,246,0.1)]' : 'bg-zinc-950/50 border-white/5 hover:border-white/20 hover:bg-zinc-900/50'}`}>
+            <div className="absolute inset-y-0 left-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
+            <div className="flex flex-col md:flex-row gap-6 items-center relative z-10">
+                <div className="min-w-[100px] text-center md:text-left">
+                    <p className={`text-sm font-black font-mono tracking-tighter ${isLive ? 'text-primary' : 'text-gray-400'}`}>{time}</p>
+                    <span className={`text-[8px] px-2 py-0.5 rounded-full border uppercase tracking-widest font-black mt-2 inline-block ${isLive ? 'bg-primary/20 border-primary/30 text-primary' : 'bg-white/5 border-white/10 text-gray-600'}`}>{status}</span>
                 </div>
                 <div className="flex-1">
-                    <h4 className="text-lg font-bold text-white mb-1 font-orbitron tracking-wide uppercase italic">{client}</h4>
-                    <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase">{project}</p>
+                    <h4 className="text-lg font-orbitron font-black text-white mb-1 uppercase italic tracking-tighter group-hover:text-primary transition-colors">{client}</h4>
+                    <p className="text-[10px] text-gray-500 font-mono tracking-[0.2em] uppercase opacity-60">{project}</p>
                 </div>
-                <Link href={`/artist/anamnese/${id}`} className="px-4 py-2 bg-primary/10 border border-primary/40 text-xs font-brand tracking-widest text-primary font-black rounded hover:bg-primary hover:text-black transition-all">📝 FICHA</Link>
+                <Link href={`/artist/anamnese/${id}`}>
+                    <Button variant="outline" className="h-10 px-6 border-primary/30 text-primary hover:bg-primary hover:text-black font-orbitron font-black uppercase italic tracking-widest text-[10px] rounded-xl transition-all shadow-[0_0_15px_rgba(139,92,246,0.1)]">
+                        📝 VER FICHA
+                    </Button>
+                </Link>
             </div>
         </div>
     )
