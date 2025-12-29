@@ -4,7 +4,8 @@ import React, { useRef, useState, useEffect } from 'react'
 import { motion, useSpring, useTransform, useMotionValue, HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-interface GooeyButtonProps extends HTMLMotionProps<"button"> {
+interface GooeyButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
+    children: React.ReactNode
     className?: string
 }
 
