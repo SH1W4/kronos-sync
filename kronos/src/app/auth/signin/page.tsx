@@ -55,10 +55,9 @@ export default function SignInPage() {
                                 🐛 ARTIST MODE (DEV)
                             </Button>
                         </div>
-                        </>
                     )}
+                </div>
             </div>
         </div>
-        </div >
     )
 }
