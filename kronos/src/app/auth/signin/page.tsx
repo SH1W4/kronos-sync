@@ -38,24 +38,6 @@ export default function SignInPage() {
                     )}
 
 
-                    {step === 'email' && (
-                        <div className="pt-4 flex flex-col gap-2">
-                            <Button
-                                className="w-full h-8 bg-transparent text-gray-500 hover:text-white text-[10px] uppercase tracking-widest"
-                                onClick={() => signIn('credentials', { username: 'master', password: '123', callbackUrl: '/artist/dashboard' })}
-                                variant="ghost"
-                            >
-                                👑 MASTER MODE (ADMIN)
-                            </Button>
-                            <Button
-                                className="w-full h-8 bg-transparent text-gray-700 hover:text-white text-[10px] uppercase tracking-widest"
-                                onClick={() => signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })}
-                                variant="ghost"
-                            >
-                                🐛 ARTIST MODE (DEV)
-                            </Button>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
