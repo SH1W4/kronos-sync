@@ -141,9 +141,9 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                         </div>
                         <Button
                             onClick={() => setShowProofModal(true)}
-                            className="bg-primary hover:bg-white text-black font-black font-orbitron tracking-widest px-10 h-14 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.5)] active:scale-95 transition-all text-xs"
+                            className="bg-white hover:bg-primary text-black font-black font-orbitron tracking-widest px-10 h-14 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] active:scale-95 transition-all text-xs border-2 border-transparent hover:border-white"
                         >
-                            ENVIAR COMPROVANTE
+                            PAGAR COMISSÃO ({selectedBookings.length})
                         </Button>
                     </div>
                 </div>
@@ -165,7 +165,7 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                                     <th className="p-6">Cliente</th>
                                     <th className="p-6 text-right">Comissão Estúdio</th>
                                     <th className="p-6 text-right">Sua Parte</th>
-                                    <th className="p-6 text-center">Status</th>
+                                    <th className="p-6 text-center">Ação</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -187,13 +187,20 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                                             </td>
                                             <td className="p-6 font-mono text-gray-400 text-xs">{formatDate(new Date(booking.slot.startTime))}</td>
                                             <td className="p-6 font-bold">{booking.client.name}</td>
-                                            <td className="p-6 text-right text-gray-400 font-mono">{formatCurrency(booking.studioShare)}</td>
-                                            <td className="p-6 text-right font-bold text-green-400 font-orbitron">{formatCurrency(booking.artistShare)}</td>
+                                            <td className="p-6 text-right text-white font-mono font-bold">{formatCurrency(booking.studioShare)}</td>
+                                            <td className="p-6 text-right font-black text-green-400 font-orbitron">{formatCurrency(booking.artistShare)}</td>
                                             <td className="p-6 text-center">
-                                                <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full inline-flex items-center space-x-2 shadow-[0_0_10px_rgba(139,92,246,0.1)]">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-                                                    <span className="text-[8px] font-mono uppercase tracking-widest text-primary font-bold">REALIZE O ACERTO</span>
-                                                </div>
+                                                <Button
+                                                    size="sm"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        setSelectedBookings([booking.id])
+                                                        setShowProofModal(true)
+                                                    }}
+                                                    className="bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/30 text-[10px] font-black font-orbitron tracking-tighter rounded-xl transition-all"
+                                                >
+                                                    LIQUIDAR AGORA
+                                                </Button>
                                             </td>
                                         </tr>
                                     ))

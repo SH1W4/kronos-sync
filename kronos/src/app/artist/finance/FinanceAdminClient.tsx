@@ -24,9 +24,10 @@ interface Settlement {
 interface FinanceAdminClientProps {
     workspaceName: string
     settlements: Settlement[]
+    projectedRevenue: number
 }
 
-export default function FinanceAdminClient({ workspaceName, settlements }: FinanceAdminClientProps) {
+export default function FinanceAdminClient({ workspaceName, settlements, projectedRevenue }: FinanceAdminClientProps) {
     const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REVIEW'>('PENDING')
     const [loadingId, setLoadingId] = useState<string | null>(null)
 
@@ -59,22 +60,37 @@ export default function FinanceAdminClient({ workspaceName, settlements }: Finan
             </div>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gray-900/60 border border-white/5 p-6 rounded-2xl">
-                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">A Receber (Pendente)</p>
-                    <p className="text-2xl font-black font-orbitron text-yellow-400">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="bg-gray-950/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-yellow-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest relative z-10">Projetado (Em Sessão)</p>
+                    <p className="text-2xl font-black font-orbitron text-white text-glow relative z-10">
+                        {formatCurrency(projectedRevenue)}
+                    </p>
+                    <p className="text-[8px] font-mono text-gray-600 mt-1 relative z-10">Money with artists</p>
+                </div>
+
+                <div className="bg-gray-950/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden group border-l-yellow-400/50">
+                    <div className="absolute inset-0 bg-yellow-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <p className="text-[10px] font-mono text-yellow-500 uppercase tracking-widest relative z-10">A Validar (Comprovantes)</p>
+                    <p className="text-2xl font-black font-orbitron text-yellow-400 text-glow relative z-10">
                         {formatCurrency(settlements.filter(s => s.status === 'PENDING' || s.status === 'REVIEW').reduce((acc, s) => acc + s.totalValue, 0))}
                     </p>
+                    <p className="text-[8px] font-mono text-gray-600 mt-1 relative z-10">Sent but not confirmed</p>
                 </div>
-                <div className="bg-gray-900/60 border border-white/5 p-6 rounded-2xl">
-                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Recebido (Total)</p>
-                    <p className="text-2xl font-black font-orbitron text-green-400">
+
+                <div className="bg-gray-950/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden group border-l-green-400/50">
+                    <div className="absolute inset-0 bg-green-400/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <p className="text-[10px] font-mono text-green-500 uppercase tracking-widest relative z-10">Recebido (Histórico)</p>
+                    <p className="text-2xl font-black font-orbitron text-green-400 text-glow relative z-10">
                         {formatCurrency(settlements.filter(s => s.status === 'APPROVED').reduce((acc, s) => acc + s.totalValue, 0))}
                     </p>
+                    <p className="text-[8px] font-mono text-gray-600 mt-1 relative z-10">Total life-time</p>
                 </div>
-                <div className="bg-gray-900/60 border border-white/5 p-6 rounded-2xl">
-                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Pedidos para Análise</p>
-                    <p className="text-2xl font-black font-orbitron text-white">
+
+                <div className="bg-gray-950/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden group">
+                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest relative z-10">Pendentes IA</p>
+                    <p className="text-2xl font-black font-orbitron text-white relative z-10">
                         {settlements.filter(s => s.status === 'PENDING' || s.status === 'REVIEW').length}
                     </p>
                 </div>
@@ -87,8 +103,8 @@ export default function FinanceAdminClient({ workspaceName, settlements }: Finan
                         key={status}
                         onClick={() => setFilter(status.toUpperCase() as any)}
                         className={`px-4 py-2 rounded-full text-[10px] font-mono uppercase tracking-widest transition-all border ${filter === status.toUpperCase()
-                                ? 'bg-primary/20 border-primary text-primary'
-                                : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                            ? 'bg-primary/20 border-primary text-primary'
+                            : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
                             }`}
                     >
                         {status === 'ALL' ? 'Todos' : status}
@@ -109,8 +125,8 @@ export default function FinanceAdminClient({ workspaceName, settlements }: Finan
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                     <div className={`px-2 py-0.5 rounded text-[8px] font-mono uppercase font-bold border ${settlement.status === 'APPROVED' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                            settlement.status === 'REJECTED' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                                                'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                        settlement.status === 'REJECTED' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                                            'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
                                         }`}>
                                         {settlement.status}
                                     </div>

@@ -42,11 +42,31 @@ export default async function FinancePage() {
             select: { name: true }
         })
 
+        // Fetch all pending bookings for the workspace to calculate "Projected Revenue"
+        const pendingBookings = await prisma.booking.findMany({
+            where: {
+                workspaceId: workspaceId,
+                settlementId: null,
+                OR: [
+                    { status: 'COMPLETED' },
+                    {
+                        AND: [
+                            { status: { not: 'CANCELLED' } },
+                            { slot: { endTime: { lt: new Date() } } }
+                        ]
+                    }
+                ]
+            }
+        })
+
+        const projectedRevenue = pendingBookings.reduce((acc, b) => acc + (b.studioShare || 0), 0)
+
         return (
             <div className="relative">
                 <FinanceAdminClient
                     workspaceName={workspace?.name || 'Estúdio'}
                     settlements={adminSettlements as any}
+                    projectedRevenue={projectedRevenue}
                 />
             </div>
         )
