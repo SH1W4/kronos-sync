@@ -216,7 +216,7 @@ export default function KioskPage() {
 
             {/* Companion Capture Modal (INK PASS) */}
             {showCompanionModal && (
-                <div className="fixed inset-0 z-50 bg-black/98 backdrop-blur-3xl flex items-center justify-center p-4 overflow-y-auto relative">
+                <div className="fixed inset-0 z-50 bg-black/98 backdrop-blur-3xl flex items-center justify-center p-4 overflow-y-auto">
                     <div className="scanline" />
 
                     {/* Artistic Watermarks for Modal - Integration of arrival_symbols */}
