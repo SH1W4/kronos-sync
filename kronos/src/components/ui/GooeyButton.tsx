@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils'
 interface GooeyButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
     children: React.ReactNode
     className?: string
+    variant?: 'primary' | 'secondary' | 'outline' | 'purple'
 }
 
-export function GooeyButton({ children, className, ...props }: GooeyButtonProps) {
+export function GooeyButton({ children, className, variant = 'purple', ...props }: GooeyButtonProps) {
     const buttonRef = useRef<HTMLButtonElement>(null)
     const [isHovered, setIsHovered] = useState(false)
 
@@ -32,8 +33,44 @@ export function GooeyButton({ children, className, ...props }: GooeyButtonProps)
     const id = React.useId()
     const filterId = `gooey-filter-${id.replace(/:/g, '')}`
 
+    const getColors = () => {
+        switch (variant) {
+            case 'primary':
+                return {
+                    bg: 'bg-primary',
+                    blob: 'bg-primary/60 blur-xl',
+                    glow: 'bg-primary/20',
+                    text: 'text-black font-black'
+                }
+            case 'secondary':
+                return {
+                    bg: 'bg-secondary',
+                    blob: 'bg-secondary/60 blur-xl',
+                    glow: 'bg-secondary/20',
+                    text: 'text-white'
+                }
+            case 'outline':
+                return {
+                    bg: 'bg-zinc-900 border border-white/10',
+                    blob: 'bg-white/10 blur-xl',
+                    glow: 'bg-white/5',
+                    text: 'text-white'
+                }
+            case 'purple':
+            default:
+                return {
+                    bg: 'bg-purple-600',
+                    blob: 'bg-purple-400 blur-md',
+                    glow: 'bg-purple-500/20',
+                    text: 'text-white'
+                }
+        }
+    }
+
+    const colors = getColors()
+
     return (
-        <div className="relative group">
+        <div className="relative group w-full">
             {/* SVG Filter for Gooey Effect */}
             <svg className="absolute w-0 h-0" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -56,7 +93,9 @@ export function GooeyButton({ children, className, ...props }: GooeyButtonProps)
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 className={cn(
-                    "relative overflow-hidden w-full px-8 py-4 bg-purple-600 text-white font-orbitron font-black uppercase italic tracking-widest rounded-2xl transition-all duration-300 active:scale-95 z-10",
+                    "relative overflow-hidden w-full px-8 py-4 font-orbitron uppercase italic tracking-widest rounded-2xl transition-all duration-300 active:scale-95 z-10",
+                    colors.bg,
+                    colors.text,
                     className
                 )}
                 {...props}
@@ -67,7 +106,7 @@ export function GooeyButton({ children, className, ...props }: GooeyButtonProps)
                     style={{ filter: `url(#${filterId})` }}
                 >
                     {/* Main Button Body (The Goo Source) */}
-                    <span className="absolute inset-0 bg-purple-600 rounded-2xl" />
+                    <span className={cn("absolute inset-0 rounded-2xl", colors.bg)} />
 
                     {/* The Slime Blob that follows mouse */}
                     <motion.span
@@ -81,7 +120,7 @@ export function GooeyButton({ children, className, ...props }: GooeyButtonProps)
                             scale: isHovered ? 1.5 : 0,
                             opacity: isHovered ? 0.8 : 0,
                         }}
-                        className="absolute w-24 h-24 bg-purple-400 rounded-full blur-md"
+                        className={cn("absolute w-32 h-32 rounded-full", colors.blob)}
                     />
                 </span>
 
@@ -93,7 +132,10 @@ export function GooeyButton({ children, className, ...props }: GooeyButtonProps)
 
             {/* Outer Glow Effect */}
             <div
-                className="absolute -inset-1 bg-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                className={cn(
+                    "absolute -inset-1 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none",
+                    colors.glow
+                )}
             />
         </div>
     )

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BrandLogo } from '@/components/ui/brand-logo'
+import { GooeyButton } from '@/components/ui/GooeyButton'
 import {
     ShoppingBag,
     Users,
@@ -130,20 +131,21 @@ export default function KioskPage() {
 
                     {/* Primary Action 1: Companion (INK PASS) */}
                     <div className="space-y-4">
-                        <Button
+                        <GooeyButton
                             onClick={() => setShowCompanionModal(true)}
-                            className="w-full h-28 text-sm font-orbitron border border-primary/20 bg-primary/5 hover:bg-primary/20 transition-all duration-500 flex flex-col items-center justify-center space-y-1 group relative overflow-hidden rounded-[2.5rem] shadow-[0_0_40px_rgba(0,255,136,0.08)]"
-                            variant="ghost"
+                            variant="primary"
+                            className="h-28 rounded-[2.5rem] shadow-[0_0_40px_rgba(0,255,136,0.15)] group relative"
                         >
-                            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity animate-pulse"></div>
-                            <div className="flex items-center space-x-3 z-10">
-                                <Users className="w-6 h-6 text-primary animate-pulse" />
-                                <span className="tracking-[0.2em] font-black uppercase text-lg">Sou Acompanhante</span>
+                            <div className="flex flex-col items-center justify-center space-y-1">
+                                <div className="flex items-center space-x-3 z-10">
+                                    <Users className="w-6 h-6 animate-pulse" />
+                                    <span className="tracking-[0.2em] font-black uppercase text-lg">Sou Acompanhante</span>
+                                </div>
+                                <span className="text-[10px] font-mono opacity-80 z-10 tracking-[0.3em] uppercase">
+                                    r e s g a t a r _ i n k _ p a s s
+                                </span>
                             </div>
-                            <span className="text-[10px] font-mono text-gray-300 z-10 tracking-[0.3em] uppercase opacity-80 group-hover:opacity-100 transition-opacity">
-                                r e s g a t a r _ i n k _ p a s s
-                            </span>
-                        </Button>
+                        </GooeyButton>
                         <p className="text-[9px] font-mono text-gray-500 text-center uppercase tracking-[0.2em] leading-relaxed px-6 opacity-60">
                             Solicite o PIN da sessão ao seu artista
                         </p>
@@ -247,13 +249,16 @@ export default function KioskPage() {
                                     {/* Sync Header */}
                                     <div className="space-y-6">
                                         <div className="flex items-center justify-between space-x-6">
-                                            <div className="flex-1 h-[2px] bg-gray-900 rounded-full overflow-hidden">
+                                            <div className="flex-1 h-3 bg-gray-900 rounded-full overflow-hidden border border-white/5 relative">
                                                 <div
-                                                    className="h-full bg-primary transition-all duration-1500 shadow-[0_0_20px_rgba(0,255,136,1)]"
+                                                    className="h-full bg-primary transition-all duration-1500 shadow-[0_0_20px_rgba(0,255,136,1)] relative z-10"
                                                     style={{ width: `${progress}%` }}
-                                                ></div>
+                                                >
+                                                    <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent)] animate-scanline-fast"></div>
+                                                </div>
+                                                <div className="absolute inset-0 bg-primary/5 pattern-grid opacity-20"></div>
                                             </div>
-                                            <span className="text-[10px] font-mono text-primary font-bold animate-pulse tracking-[0.1em] uppercase">{progress}% Sync</span>
+                                            <span className="text-[10px] font-mono text-primary font-black animate-pulse tracking-[0.1em] uppercase">{progress}% Sync</span>
                                         </div>
 
                                         <div className="text-center">
@@ -427,12 +432,13 @@ export default function KioskPage() {
                                     <p className="text-[10px] text-gray-500 font-mono uppercase tracking-[0.2em] max-w-[240px] mx-auto leading-relaxed font-bold">
                                         ESCANEIE OU APRESENTE ESTA INTERFACE AO ARTISTA
                                     </p>
-                                    <Button
+                                    <GooeyButton
                                         onClick={() => setShowCompanionModal(false)}
-                                        className="w-full h-16 bg-gray-900/50 border border-white/5 hover:bg-white/5 text-gray-600 font-orbitron text-[10px] tracking-[0.4em] rounded-2xl transition-all font-black uppercase"
+                                        variant="outline"
+                                        className="h-16 rounded-2xl opacity-60 hover:opacity-100"
                                     >
                                         TERMINATE SESSION
-                                    </Button>
+                                    </GooeyButton>
                                 </div>
                             </div>
                         )}

@@ -98,8 +98,9 @@ function MarketplaceContent() {
   const getFinalTotal = () => getCartTotal() - getDiscountValue()
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-primary selection:text-black">
-      {/* Premium Header */}
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-primary selection:text-black relative overflow-hidden data-pattern-grid">
+      {/* Cyber Y2K Effects */}
+      <div className="scanline" />
       <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/kiosk" className="flex items-center space-x-3 group">
@@ -175,15 +176,18 @@ function MarketplaceContent() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.filter(p => !typeFilter || p.type === typeFilter).map(product => (
-            <div key={product.id} className="group bg-gray-900/40 border border-white/5 rounded-[2.5rem] p-4 hover:border-primary/30 transition-all hover:bg-gray-900/60 flex flex-col">
-              <div className="aspect-[4/5] bg-black rounded-[2rem] overflow-hidden relative mb-6">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div key={product.id} className="group glass-card border border-white/5 rounded-[2.5rem] p-4 hover:border-primary/40 transition-all duration-500 hover:shadow-[0_0_50px_rgba(0,255,136,0.1)] flex flex-col relative overflow-hidden">
+              {/* Hover Glow Background */}
+              <div className="absolute inset-0 bg-primary/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+              <div className="aspect-[4/5] bg-black/40 rounded-[2rem] overflow-hidden relative mb-6 border border-white/5 group-hover:border-primary/20 transition-colors">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                 {/* Image placeholder */}
-                <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">
+                <div className="w-full h-full flex items-center justify-center text-6xl opacity-20 filter grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-700">
                   {product.type === 'PRINT' ? '🖼️' : product.type === 'PHYSICAL' ? '🧴' : '🎨'}
                 </div>
-                <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                  <span className="text-[8px] font-mono text-gray-400 uppercase tracking-widest">{product.type}</span>
+                <div className="absolute top-4 left-4 glass-card px-3 py-1 rounded-full border border-white/10">
+                  <span className="text-[8px] font-mono text-primary font-black uppercase tracking-widest">{product.type}</span>
                 </div>
               </div>
 
@@ -205,7 +209,7 @@ function MarketplaceContent() {
                 </div>
                 <Button
                   onClick={() => addToCart(product)}
-                  className="w-full h-14 bg-white/5 hover:bg-primary hover:text-black border border-white/10 hover:border-primary rounded-2xl transition-all font-orbitron font-bold tracking-widest text-xs"
+                  className="w-full h-14 bg-white/5 hover:bg-primary hover:text-black border border-white/10 hover:border-primary rounded-2xl transition-all font-orbitron font-black tracking-widest text-xs active:scale-95 shadow-sm hover:shadow-[0_0_20px_rgba(0,255,136,0.2)]"
                 >
                   ADICIONAR
                 </Button>
