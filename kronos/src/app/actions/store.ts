@@ -76,7 +76,7 @@ export async function saveProduct(data: {
 
         const user = await prisma.user.findUnique({
             where: { email: session.user.email },
-            include: { artist: true }
+            include: { artist: true, ownedWorkspaces: true }
         })
 
         if (!user?.artist && user?.role !== 'ADMIN') return { success: false, message: 'Apenas artistas podem postar produtos' }
