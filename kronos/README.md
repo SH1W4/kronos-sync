@@ -1,7 +1,13 @@
 # KRONØS SYNC
 
+<div align="center">
+
+![KRONØS SYNC](./public/brand/logo-neon.png)
+
 > **Enterprise-Grade Tattoo Studio Management Platform**  
 > Built with Next.js 15, Prisma, NextAuth, and cutting-edge UX design.
+
+</div>
 
 ---
 
@@ -84,6 +90,24 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 ---
 
 ## 🚀 Core Features
+
+<div align="center">
+
+### Professional Dashboard
+![Studio Management](./public/features/studio-management.png)
+
+### Kiosk Experience
+![Kiosk Interface](./public/features/kiosk.png)
+
+### Marketplace
+![Marketplace](./public/features/marketplace.png)
+
+### Scheduling System
+![Agenda](./public/features/agenda.png)
+
+</div>
+
+---
 
 ### 1. **Professional Dashboard**
 - 📊 Real-time studio metrics (revenue, bookings, settlements)
