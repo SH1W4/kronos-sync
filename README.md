@@ -1,106 +1,438 @@
+# KRONØS SYNC
+
 <div align="center">
-  <img src="docs/assets/logo-neon.png" width="400" alt="KRONØS LOGO">
-  <br/>
-  <img src="docs/assets/hero_banner_v2.png" width="100%" alt="KRONØS SYNC BANNER">
-  <br/>
-  <br/>
-  <p align="center">
-      <a href="https://nextjs.org"><img src="https://img.shields.io/badge/ENGINE-NEXT.JS_16-000000?style=for-the-badge&logo=next.js&logoColor=white"/></a>
-      <a href="https://www.postgresql.org"><img src="https://img.shields.io/badge/MEMORY-POSTGRESQL-336791?style=for-the-badge&logo=postgresql&logoColor=white"/></a>
-      <a href="https://www.prisma.io"><img src="https://img.shields.io/badge/ORM-PRISMA_V5-2D3748?style=for-the-badge&logo=prisma&logoColor=white"/></a>
-      <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/SKIN-TAILWIND_V4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white"/></a>
-  </p>
-  <p align="center">
-    <strong>OPERATING SYSTEM FOR THE ARTISTIC ELITE</strong>
-  </p>
-  <br/>
-  <img src="docs/assets/arrival_symbols.png" width="80" alt="Sync Glyph">
+
+![KRONØS SYNC](./public/brand/logo-neon.png)
+
+> **Enterprise-Grade Tattoo Studio Management Platform**  
+> Built with Next.js 15, Prisma, NextAuth, and cutting-edge UX design.
+
 </div>
 
-<br/>
+---
 
-> *"Where technology meets the soul of the ink. A seamless fusion between surgical management and pure artistic expression."*
+## 🎯 Vision
+
+KRONØS SYNC is a **professional-first SaaS platform** designed exclusively for tattoo studios, artists, and administrators. Unlike traditional booking systems, we've architected a **sovereign ecosystem** where:
+
+- **Professionals** (Artists & Admins) have full access to the management dashboard
+- **Clients** interact through frictionless, guest-first experiences (Kiosk, Marketplace, Forms)
+- **Data sovereignty** ensures each studio owns its client base without polluting the global user registry
 
 ---
 
-## 🔒 RESTRICTED ACCESS // PROPRIETARY SOFTWARE
-**Copyright © 2025 Kronos Tech Division.**
-This source code is available exclusively for **auditing, internal development, and portfolio demonstration**. Reproduction, distribution, or commercial use without express authorization from **Symbeon Labs** is strictly prohibited.
+## 🏗️ Architecture Philosophy
+
+### **The Professional Gate**
+
+KRONØS implements a **strict invite-only authentication system** for professional access:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AUTHENTICATION FLOW                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  👤 New User Attempts Login                                 │
+│         │                                                    │
+│         ├─► Has Invite Code? ──► YES ──► Create as ARTIST   │
+│         │                                                    │
+│         └─► No Invite Code? ──► REJECT ──► Error Message    │
+│                                                              │
+│  🎨 Existing Artist/Admin ──► Direct Access ──► Dashboard   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key Benefits:**
+- ✅ Zero spam or unauthorized access
+- ✅ Clean, focused user base (only team members)
+- ✅ Traceable onboarding (who invited whom)
+- ✅ Automatic role assignment based on invite type
+
+### **Client Flow: Guest-First Experience**
+
+Clients **never need to create an account** to interact with the studio:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      CLIENT JOURNEY                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  📱 Kiosk Check-In                                          │
+│     └─► Fill form (Name, Phone, Instagram)                  │
+│     └─► Select barrier (Price, Pain, Style)                 │
+│     └─► Enter Artist PIN                                    │
+│     └─► Receive 10% OFF Coupon                              │
+│     └─► Saved as KioskEntry (Studio's DB)                   │
+│                                                              │
+│  🛍️ Marketplace Shopping                                    │
+│     └─► Browse products                                     │
+│     └─► Add to cart                                         │
+│     └─► Checkout (Guest or Logged)                          │
+│     └─► Order saved to Studio's DB                          │
+│                                                              │
+│  📋 Anamnesis Form                                          │
+│     └─► Fill medical/tattoo questionnaire                   │
+│     └─► Linked to booking via QR code                       │
+│     └─► Stored in Booking context                           │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Data Storage Strategy:**
+- `KioskEntry` → Lead generation, first-time visitors
+- `Booking.client` → Confirmed appointments
+- `Order.client` → Marketplace purchases
+- `Anamnesis` → Medical/consent forms
+
+All client data is **scoped to the workspace**, ensuring studios maintain full ownership and LGPD compliance.
 
 ---
 
-## 💎 THE VISION
-**KRONØS SYNC** is not just a scheduler; it is a complete operating system for studios that treat tattoo as high-level art and business. It eliminates administrative friction, allowing artists to focus solely on creating, while the system orchestrates logistics, finance, and customer experience with surgical precision.
+## 🚀 Core Features
+
+<div align="center">
+
+### Professional Dashboard
+![Studio Management](./public/features/studio-management.png)
+
+### Kiosk Experience
+![Kiosk Interface](./public/features/kiosk.png)
+
+### Marketplace
+![Marketplace](./public/features/marketplace.png)
+
+### Scheduling System
+![Agenda](./public/features/agenda.png)
+
+</div>
 
 ---
 
-## [ 01 ] THE IDENTITY // ANAMNESIS
-**Digital Safety & Biometric Flow**
+### 1. **Professional Dashboard**
+- 📊 Real-time studio metrics (revenue, bookings, settlements)
+- 🎨 Artist portfolio management
+- 📅 Integrated Google Calendar sync
+- 💰 Financial settlement tracking with AI validation
+- 👥 Team management with invite system
 
-KRONØS captures the essence of clinical safety with elegance. Biometric signatures and intelligent screening transform bureaucracy into an identity snapshot.
-- **Biometric Canvas:** Fluid digital signature capturing pressure and stroke.
-- **Clinical Intelligence:** Automated alerts for medical conditions.
-- **Data Sovereignty:** Full LGPD/GDPR compliance with siloed workspaces.
+### 2. **Kiosk Experience**
+- 🎯 Lead capture with gamified "INK PASS" system
+- 📱 WhatsApp integration for instant communication
+- 🎁 Automatic coupon generation (10% off first tattoo)
+- 🔐 Artist PIN validation for fraud prevention
+- 📊 Real-time sync progress visualization
 
----
+### 3. **Marketplace**
+- 🛒 Product catalog (flash tattoos, merchandise)
+- 💳 Integrated payment processing
+- 📦 Order management with artist commission tracking
+- 🎨 Artist-specific product listings
 
-## [ 02 ] THE LINK // KIOSK
-**Gamification & Lead Conversion**
+### 4. **Financial System**
+- 💸 Unified settlement flow (tattoos + marketplace)
+- 🤖 AI-powered receipt validation
+- 📈 Revenue projections and analytics
+- 🏦 PIX integration for instant payments
+- 📊 Artist vs. Studio commission breakdown
 
-The reception is the first contact with the sacred. **THE LINK** gamifies the companion's journey, converting curiosity into clients via **Soul Sync**.
-![Soul Sync](docs/assets/soul_sync_v2.png)
-*The "INK PASS" is not a discount; it is an invitation to synchronization.*
-
----
-
-## [ 03 ] THE VAULT // FINANCE
-**Auto-Settle & AI Vision**
-
-Absolute financial transparency. **THE VAULT** uses Computer Vision to validate settlements and reward professionalism with digital glyphs.
-![Finance Vault](docs/assets/finance_vault_v2.png)
-- **AI Vision Agent:** Instant OCR validation of payment proofs.
-- **Revenue Split:** Automated calculation (100% Artist -> Studio Commission).
-- **Sync Glyphs:** Prestige tokens generated by synchronization algorithms.
-
----
-
-## [ 04 ] THE CODEX // KNOWLEDGE
-**Role-Based Documentation System**
-
-The **CODEX** is the tactical knowledge library of KRONØS. It is not just documentation; it is a living training and governance system.
-![Codex Terminal](docs/assets/codex_terminal_v2.png)
-
-- **Role-Based Access:** Automatic curation by hierarchy (Artist / Admin / Dev).
-- **Premium UI:** Tactical terminal interface with dynamic Markdown rendering.
-- **Agent-Ready:** Semantic metadata for AI interoperability (DocSync).
-
-### 📚 Available Documentation
-| Category | Access | Description |
-| :--- | :---: | :--- |
-| **📘 Training** | ARTIST | [Artist Guide](kronos/docs/training/artist-guide.md), [Growth Strategies](kronos/docs/training/growth-strategies.md) |
-| **🛡️ Governance** | ADMIN | [Admin Guide](kronos/docs/training/admin-guide.md), [Data Sovereignty](kronos/docs/governance/data-sovereignty.md) |
-| **💰 Finance** | ADMIN | [Marketplace Commissions](kronos/docs/governance/marketplace-commissions.md) |
-| **🏗️ Engineering** | DEV | [Architecture Map](kronos/ARCHITECTURE.json), [Roadmap (EAP)](kronos/EAP.md) |
+### 5. **Booking & Scheduling**
+- 📅 Multi-artist calendar management
+- ⏰ Slot-based scheduling with conflict prevention
+- 📋 Integrated anamnesis forms
+- 🔔 WhatsApp notifications (planned)
+- 🎫 QR code check-in system
 
 ---
 
-## 🛠️ THE STACK // ENGINEERING
+## 🛠️ Tech Stack
 
-Built under the silence of the night, utilizing the deepest layers of performance:
+### **Frontend**
+- **Next.js 15** (App Router, Server Components)
+- **TypeScript** (Strict mode)
+- **Tailwind CSS** (Custom design system)
+- **Framer Motion** (Animations)
+- **Lucide Icons** (UI icons)
 
-### Core Architecture
-- **Engine:** Next.js 16 (Turbopack)
-- **Interface:** React 19 + Tailwind CSS v4 (Cyber Y2K Theme)
-- **Persistence:** Prisma ORM v5.22.0 + PostgreSQL (Neon)
-- **Intelligence:** OpenAI GPT-4 (KAI) + Google Calendar Sync
+### **Backend**
+- **Prisma ORM** (PostgreSQL)
+- **NextAuth.js** (Authentication)
+- **Server Actions** (Type-safe API)
+- **Resend** (Email delivery)
+
+### **Infrastructure**
+- **Vercel** (Deployment & hosting)
+- **PostgreSQL** (Database)
+- **Google Calendar API** (Sync)
+- **WhatsApp Business API** (Notifications - planned)
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js 18+ 
+- PostgreSQL database
+- Google OAuth credentials (optional)
+- Resend API key (for emails)
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SH1W4/kronos-sync.git
+   cd kronos-sync/kronos
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+
+   Required variables:
+   ```env
+   DATABASE_URL="postgresql://..."
+   NEXTAUTH_SECRET="your-secret-key"
+   NEXTAUTH_URL="http://localhost:3000"
+   
+   # Email (Resend)
+   RESEND_API_KEY="re_..."
+   RESEND_FROM_EMAIL="KRONOS SYNC <acesso@yourdomain.com>"
+   
+   # Google OAuth (optional)
+   GOOGLE_CLIENT_ID="..."
+   GOOGLE_CLIENT_SECRET="..."
+   ```
+
+4. **Initialize database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. **Run development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Access the application**
+   - App: `http://localhost:3000`
+   - Kiosk: `http://localhost:3000/kiosk`
+   - Admin: Login with dev credentials or create invite
+
+---
+
+## 🔐 Authentication System
+
+### **Magic Link (Primary)**
+1. User enters email
+2. System sends 6-digit code
+3. User verifies code
+4. System checks:
+   - Is user an existing Artist/Admin? → **Grant access**
+   - Is there an invite code in URL? → **Create as Artist**
+   - Neither? → **Reject with error**
+
+### **Google OAuth (Optional)**
+- One-click login for team members
+- Automatically syncs with Google Calendar
+- Requires pre-existing account or invite
+
+### **Dev Mode (Development Only)**
+- Username: `dev` → Creates artist account
+- Username: `master` → Creates admin account with demo data
+
+---
+
+## 🎨 Design System
+
+### **Color Palette**
+```css
+--primary: #8B5CF6      /* Purple - Professional actions */
+--secondary: #FF64FF    /* Magenta - Artist highlights */
+--accent: #00FF88       /* Cyan - Client interactions */
+--background: #000000   /* Pure black */
+--foreground: #FFFFFF   /* Pure white */
+```
+
+### **Typography**
+- **Headings**: Orbitron (Futuristic, bold)
+- **Body**: Inter (Clean, readable)
+- **Mono**: JetBrains Mono (Code, data)
+
+### **UI Principles**
+- **Cyber-minimalism**: Clean interfaces with subtle neon accents
+- **Data-driven**: Real-time metrics and progress indicators
+- **Gesture-first**: Optimized for touch (Kiosk) and desktop
+- **Accessibility**: WCAG 2.1 AA compliant
+
+---
+
+## 📊 Database Schema Highlights
+
+### **Core Models**
+
+```prisma
+model User {
+  id       String   @id @default(cuid())
+  email    String   @unique
+  name     String
+  role     UserRole @default(CLIENT)
+  artist   Artist?
+  // ... relations
+}
+
+model Artist {
+  id           String      @id @default(cuid())
+  userId       String      @unique
+  workspaceId  String
+  plan         ArtistPlan  // RESIDENT | GUEST
+  validUntil   DateTime?   // For GUEST artists
+  // ... relations
+}
+
+model InviteCode {
+  id           String      @id @default(cuid())
+  code         String      @unique
+  role         UserRole    @default(CLIENT)
+  targetPlan   ArtistPlan? // For artist invites
+  workspaceId  String?
+  maxUses      Int         @default(1)
+  currentUses  Int         @default(0)
+  expiresAt    DateTime?
+  // ... relations
+}
+
+model KioskEntry {
+  id             String   @id @default(cuid())
+  name           String
+  phone          String
+  instagram      String?
+  barrier        String?  // PRECO | DOR | ESTILO
+  intent         String?  // Dream tattoo description
+  type           String   // COMPANION | WALK_IN
+  marketingOptIn Boolean  @default(false)
+  artistId       String
+  workspaceId    String
+  // ... relations
+}
+```
+
+---
+
+## 🔄 Workflows
+
+### **Invite New Artist**
+
+1. Admin generates invite code:
+   ```typescript
+   const invite = await prisma.inviteCode.create({
+     data: {
+       code: generateUniqueCode(),
+       role: 'ARTIST',
+       targetPlan: 'RESIDENT',
+       workspaceId: workspace.id,
+       creatorId: admin.id,
+       maxUses: 1,
+       expiresAt: addDays(new Date(), 7)
+     }
+   })
+   ```
+
+2. Share invite link:
+   ```
+   https://kronos-sync.vercel.app/auth/signin?invite=ABC123XYZ
+   ```
+
+3. New artist:
+   - Enters email
+   - Receives 6-digit code
+   - Verifies code
+   - System creates Artist account automatically
+   - Redirected to onboarding
+
+### **Client Check-In (Kiosk)**
+
+1. Client scans QR code → Lands on `/kiosk`
+2. Clicks "Sou Acompanhante" (I'm a companion)
+3. Fills form:
+   - Name, Phone, Instagram
+   - Barrier (Price, Pain, Style)
+   - Dream tattoo description
+   - Artist PIN (last 4 digits of artist's phone)
+4. System validates PIN
+5. Creates `KioskEntry` record
+6. Generates coupon: `TATTOO10_FIRSTNAME`
+7. Shows success screen with QR code
+
+### **Financial Settlement**
+
+1. Artist completes tattoos/sells products
+2. Views pending revenue in Finance page
+3. Selects items to settle
+4. Transfers commission to studio (PIX)
+5. Uploads receipt proof
+6. Admin validates in Finance Dashboard
+7. AI analyzes receipt for fraud
+8. Admin approves/rejects settlement
+9. Items marked as settled
+
+---
+
+## 🚧 Roadmap
+
+### **Q1 2025**
+- [x] Professional Gate implementation
+- [x] Kiosk lead capture system
+- [x] Unified financial settlement
+- [ ] WhatsApp notification system
+- [ ] Advanced BI dashboard
+
+### **Q2 2025**
+- [ ] Mobile app (React Native)
+- [ ] Multi-studio franchise mode
+- [ ] AI-powered scheduling optimization
+- [ ] Inventory management
+
+### **Q3 2025**
+- [ ] Client loyalty program
+- [ ] Automated marketing campaigns
+- [ ] Advanced analytics & reporting
+- [ ] API for third-party integrations
+
+---
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+---
+
+## 👥 Team
+
+**Built by [Symbeon Labs](https://github.com/SH1W4)**
+
+For inquiries: [Contact](mailto:contact@symbeon.dev)
+
+---
+
+## 🙏 Acknowledgments
+
+- Design inspiration: Arrival (2016), Cyberpunk 2077
+- UI/UX: Vercel, Linear, Stripe
+- Community: Next.js, Prisma, Tailwind CSS
 
 ---
 
 <div align="center">
-  <p align="center">
-    <strong>KRONØS TECH DIVISION</strong><br/>
-    Developed by SH1W4 // Architecture by Antigravity<br/>
-    Powered by Symbeon Labs
-  </p>
-  <img src="docs/assets/arrival_symbols.png" width="40" style="opacity: 0.5">
+
+**KRONØS SYNC** - *Where Art Meets Technology*
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SH1W4/kronos-sync)
+
 </div>
