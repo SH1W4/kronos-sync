@@ -41,6 +41,9 @@ export async function POST(req: NextRequest) {
         // Send email
         const emailResult = await sendVerificationCode(email, code)
 
+        // EMERGENCY LOG: Always log the code to Vercel/Terminal for manual intervention
+        console.log(`🔑 [AUTH] Código para ${email}: ${code}`)
+
         if (!emailResult.success) {
             return NextResponse.json({
                 error: 'Erro ao enviar email. Tente novamente.'

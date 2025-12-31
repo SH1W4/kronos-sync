@@ -13,7 +13,7 @@ export async function sendVerificationCode(email: string, code: string) {
 
   try {
     await resend.emails.send({
-      from: 'KRONOS SYNC <onboarding@resend.dev>', // Você vai trocar depois
+      from: process.env.RESEND_FROM_EMAIL || 'KRONOS SYNC <acesso@kronosync.com.br>',
       to: email,
       subject: 'Seu código de acesso - KRONOS SYNC',
       html: `
