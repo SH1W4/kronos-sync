@@ -1,3 +1,28 @@
+## [31/12/2025] - Soberania Profissional, Elite Gate & AI Context
+ 
+### 🛡️ Portão de Elite (Professional Gate)
+- **Lockdown Autêntico:** Implementada lógica restrita em `auth-options.ts`. Novos acessos exigem obrigatoriamente um `inviteCode`.
+- **User Base Lean:** Desacoplamento total de clientes da base de usuários do app. Clientes agora operam apenas como "Guests" (Leads/Check-ins), mantendo a DB focada apenas em profissionais.
+- **Auto-Promotion:** Sistema agora cria automaticamente perfis de `ARTIST` vinculados ao workspace do convite no primeiro login.
+
+### 📧 Estabilização de Comunicação
+- **Professional Domain:** Preparada a infraestrutura para domínios próprios no Resend (Variável `RESEND_FROM_EMAIL`).
+- **Emergency Logging:** Implementado log de segurança no terminal/Vercel Logs para captura manual de códigos de autenticação durante a fase de validação de domínio.
+
+### 📚 Documentação & IA
+- **Master AI Context:** Criação do `SYSTEM_CONTEXT.md`, um manual definitivo para que qualquer IA entenda a arquitetura e regras de negócio do Kronos Sync.
+- **README Visual:** Update completo do README com logo neon, diagramas de arquitetura e screenshots das principais funcionalidades.
+
+### 🛠️ Hotfixes de Estabilidade
+- **Finance Type Fix:** Resolvido erro de compilação em `store.ts` relacionado ao cálculo de `artistShare`.
+- **Middleware Redirect:** Corrigida lógica de redirecionamento para evitar loops e garantir que cada role (Admin/Artist/Client) caia na rota correta.
+
+### 🔜 Próximos Passos
+- Monitorar os primeiros convites enviados para artistas reais.
+- Iniciar a integração de notificações via WhatsApp para aviso de agendamentos.
+
+---
+
 ## [21/12/2025] - Otimização UX/UI & IA Autônoma (Studio-First)
 
 ### 🚀 Novas Conquistas
