@@ -42,24 +42,26 @@ export default async function FinancePage() {
             select: { name: true }
         })
 
-        // Fetch all pending bookings for the workspace to calculate "Projected Revenue"
+        // Fetch all pending bookings and orders for the workspace to calculate "Projected Revenue"
         const pendingBookings = await prisma.booking.findMany({
             where: {
                 workspaceId: workspaceId,
                 settlementId: null,
-                OR: [
-                    { status: 'COMPLETED' },
-                    {
-                        AND: [
-                            { status: { not: 'CANCELLED' } },
-                            { slot: { endTime: { lt: new Date() } } }
-                        ]
-                    }
-                ]
+                status: 'COMPLETED'
             }
         })
 
-        const projectedRevenue = pendingBookings.reduce((acc, b) => acc + (b.studioShare || 0), 0)
+        const pendingOrders = await prisma.order.findMany({
+            where: {
+                workspaceId: workspaceId,
+                settlementId: null,
+                status: 'PAID'
+            }
+        })
+
+        const projectedRevenue =
+            pendingBookings.reduce((acc, b) => acc + (b.studioShare || 0), 0) +
+            pendingOrders.reduce((acc, o) => acc + (o.studioShare || 0), 0)
 
         return (
             <div className="relative">
@@ -94,16 +96,8 @@ export default async function FinancePage() {
     const bookings = await prisma.booking.findMany({
         where: {
             artistId: artist.id,
-            settlementId: null, // Only fetch those NOT in a settlement
-            OR: [
-                { status: 'COMPLETED' },
-                {
-                    AND: [
-                        { status: { not: 'CANCELLED' } },
-                        { slot: { endTime: { lt: new Date() } } } // Auto-confirm passed slots
-                    ]
-                }
-            ]
+            settlementId: null,
+            status: 'COMPLETED'
         },
         include: {
             client: true,
@@ -113,6 +107,33 @@ export default async function FinancePage() {
             slot: { startTime: 'desc' }
         }
     })
+
+    // Fetch Orders ready for settlement (PAID and not already settled)
+    // As items can have different artists, we filter orders that have items from THIS artist
+    const orders = await prisma.order.findMany({
+        where: {
+            settlementId: null,
+            status: 'PAID',
+            items: {
+                some: {
+                    product: {
+                        artistId: artist.id
+                    }
+                }
+            }
+        },
+        include: {
+            client: true,
+            items: {
+                include: {
+                    product: true
+                }
+            }
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    }) as any
 
     // Fetch Settlement History
     const settlements = await prisma.settlement.findMany({
@@ -130,24 +151,50 @@ export default async function FinancePage() {
     })
 
     // Calculate Metrics
-    const totalEarnings = bookings.reduce((acc, b) => acc + (b.artistShare || 0), 0)
-    const totalRevenue = bookings.reduce((acc, b) => acc + (b.value || 0), 0)
+    const totalEarnings =
+        bookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) +
+        orders.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0)
+
+    const totalRevenue =
+        bookings.reduce((acc, b) => acc + (b.value || 0), 0) +
+        orders.reduce((acc: number, o: any) => acc + (o.finalTotal || 0), 0)
 
     const now = new Date()
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
+
     const monthlyBookings = bookings.filter(b => b.slot.startTime >= firstDay)
-    const monthlyEarnings = monthlyBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0)
+    const monthlyOrders = orders.filter((o: any) => o.createdAt >= firstDay)
+
+    const monthlyEarnings =
+        monthlyBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) +
+        monthlyOrders.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0)
 
     // Map data for Client Component
     const mappedBookings = bookings.map(b => ({
         id: b.id,
+        type: 'TATTOO' as const,
         value: b.value,
         artistShare: b.artistShare,
-        studioShare: (b.value - b.artistShare),
+        studioShare: (b.value - (b.artistShare || 0)),
         status: b.status,
         client: { name: b.client.name },
-        slot: { startTime: b.slot.startTime }
+        date: b.slot.startTime
     }))
+
+    const mappedOrders = orders.map((o: any) => ({
+        id: o.id,
+        type: 'PRODUCT' as const,
+        value: o.finalTotal,
+        artistShare: o.artistShare,
+        studioShare: o.studioShare,
+        status: o.status,
+        client: { name: o.client.name },
+        date: o.createdAt
+    }))
+
+    const allItems = [...mappedBookings, ...mappedOrders].sort((a, b) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+    )
 
     return (
         <FinanceClient
@@ -160,7 +207,7 @@ export default async function FinancePage() {
                 pixKey: workspace.pixKey,
                 pixRecipient: workspace.pixRecipient
             }}
-            bookings={mappedBookings}
+            items={allItems}
             settlements={settlements}
             metrics={{
                 totalEarnings,

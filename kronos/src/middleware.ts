@@ -15,6 +15,10 @@ export async function middleware(request: NextRequest) {
     if (token) {
         if (pathname === '/' || pathname === '/auth/select' || pathname === '/auth/signin' || pathname === '/dashboard') {
             // Se for Arquiteto/Artista, vai direto para o dashboard dele
+            if (token.role !== 'ARTIST' && token.role !== 'ADMIN') {
+                return NextResponse.redirect(new URL('/onboarding', request.url))
+            }
+            // Se for Arquiteto/Artista, vai direto para o dashboard dele
             if (token.role === 'ARTIST' || token.role === 'ADMIN') {
                 // Se ele estiver na Home, vai pro dashboard. Se estiver no /dashboard, deixa ele ver.
                 if (pathname !== '/dashboard') {
@@ -22,7 +26,8 @@ export async function middleware(request: NextRequest) {
                 }
             }
             // Se for Cliente, NUNCA vê a agenda, vai para o Kiosk principal
-            if (token.role === 'CLIENT') {
+            // Se for Cliente, redirecionamos para o Kiosk se ele tentar acessar áreas restritas
+            if (token.role === 'CLIENT' && (pathname === '/dashboard' || pathname === '/auth/select')) {
                 return NextResponse.redirect(new URL('/kiosk', request.url))
             }
         }

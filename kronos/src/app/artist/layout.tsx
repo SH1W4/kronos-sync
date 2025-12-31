@@ -4,11 +4,10 @@ import { useSession } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen } from 'lucide-react'
+import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen, ShoppingBag, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
 import { ThemeCustomizer } from '@/components/theme/theme-customizer'
-import { ChevronDown } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
@@ -61,6 +60,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                         <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
                         <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
                         <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
+                        <NavItem href="/artist/inventory" icon={<ShoppingBag size={20} />} label="INVENTÁRIO" active={pathname === '/artist/inventory'} />
                         <NavItem href="/artist/clients" icon={<Users size={20} />} label="CLIENTES" active={pathname === '/artist/clients'} />
                         {/* @ts-ignore */}
                         {session?.user?.role === 'ADMIN' && (
@@ -177,4 +177,3 @@ function NavItem({ href, icon, label, active = false }: { href: string, icon: Re
         </Link>
     )
 }
-

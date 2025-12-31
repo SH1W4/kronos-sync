@@ -122,7 +122,9 @@ export default function KioskPage() {
 
                 {/* Simplified Brand Identity */}
                 <div className="flex flex-col items-center space-y-6">
-                    <BrandLogo size={120} animated={true} />
+                    <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
+                        <BrandLogo size={120} animated={true} />
+                    </Link>
                     <div className="h-[2px] w-12 bg-primary/40 rounded-full"></div>
                 </div>
 

@@ -325,6 +325,7 @@ model Product {
   type        ProductType
   imageUrl    String?
   isActive    Boolean     @default(true)
+  isSold      Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -373,10 +374,15 @@ model Order {
   total         Float
   discountValue Float    @default(0)
   finalTotal    Float
+  studioShare   Float    @default(0)
+  artistShare   Float    @default(0)
   couponId      String?
   status        String   @default("PENDING")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  settlementId  String?
+  settlement    Settlement? @relation(fields: [settlementId], references: [id])
 
   // Relations
   client    User        @relation(fields: [clientId], references: [id])
@@ -566,6 +572,7 @@ enum RequestStatus {
   artist          Artist           @relation(fields: [artistId], references: [id])
   workspace       Workspace        @relation(fields: [workspaceId], references: [id])
   bookings        Booking[]
+  orders          Order[]
 
   @@map("settlements")
 }

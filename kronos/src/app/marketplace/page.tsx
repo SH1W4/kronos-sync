@@ -22,6 +22,7 @@ interface Product {
       name: string
     }
   }
+  isSold?: boolean
 }
 
 interface CartItem {
@@ -103,7 +104,7 @@ function MarketplaceContent() {
       <div className="scanline" />
       <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/kiosk" className="flex items-center space-x-3 group">
+          <Link href={searchParams.get('from') === 'onboarding' ? '/onboarding' : '/kiosk'} className="flex items-center space-x-3 group">
             <div className="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center group-hover:border-primary/50 transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-400 group-hover:text-primary" />
             </div>
@@ -189,6 +190,13 @@ function MarketplaceContent() {
                 <div className="absolute top-4 left-4 glass-card px-3 py-1 rounded-full border border-white/10">
                   <span className="text-[8px] font-mono text-primary font-black uppercase tracking-widest">{product.type}</span>
                 </div>
+                {product.isSold && (
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-10">
+                    <div className="bg-secondary text-white text-[10px] font-black px-6 py-2 rounded-full shadow-[0_0_20px_rgba(var(--secondary-rgb),0.5)] animate-pulse tracking-[0.3em]">
+                      SOLD OUT
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 px-2">
@@ -208,10 +216,15 @@ function MarketplaceContent() {
                   </button>
                 </div>
                 <Button
-                  onClick={() => addToCart(product)}
-                  className="w-full h-14 bg-white/5 hover:bg-primary hover:text-black border border-white/10 hover:border-primary rounded-2xl transition-all font-orbitron font-black tracking-widest text-xs active:scale-95 shadow-sm hover:shadow-[0_0_20px_rgba(0,255,136,0.2)]"
+                  onClick={() => !product.isSold && addToCart(product)}
+                  disabled={product.isSold}
+                  className={`w-full h-14 rounded-2xl transition-all font-orbitron font-black tracking-widest text-xs active:scale-95 shadow-sm 
+                    ${product.isSold
+                      ? 'bg-white/5 text-gray-700 border-white/5 cursor-not-allowed'
+                      : 'bg-white/5 hover:bg-primary hover:text-black border border-white/10 hover:border-primary hover:shadow-[0_0_20px_rgba(0,255,136,0.2)]'
+                    }`}
                 >
-                  ADICIONAR
+                  {product.isSold ? 'VENDIDO' : 'ADICIONAR'}
                 </Button>
               </div>
             </div>

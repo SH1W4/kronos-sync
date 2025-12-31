@@ -16,12 +16,14 @@ function OnboardingContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Check if user is already an artist/admin to bypass onboarding
+    // Check if user is already authenticated to bypass onboarding
     React.useEffect(() => {
         if (status === 'authenticated' && session?.user) {
             const role = (session.user as any).role
             if (role === 'ARTIST' || role === 'ADMIN') {
                 router.replace('/artist/dashboard')
+            } else if (role === 'CLIENT') {
+                router.replace('/kiosk')
             }
         }
     }, [session, status, router])
@@ -74,9 +76,8 @@ function OnboardingContent() {
     }, [urlCode, status])
 
     const handleClientAccess = async () => {
-        // Para clientes, apenas redirecionamos.
-        // Futuramente podemos pedir telefone/CPF aqui.
-        router.push('/marketplace')
+        // Para clientes, o HUB central é o Kiosk (Ficha, Acompanhante, Loja)
+        router.push('/kiosk')
     }
 
     const handleArtistAccess = async (e: React.FormEvent) => {

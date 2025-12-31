@@ -7,6 +7,7 @@ export async function createSettlement(data: {
     artistId: string
     workspaceId: string
     bookingIds: string[]
+    orderIds?: string[]
     totalValue: number
     proofUrl: string
 }) {
@@ -20,7 +21,10 @@ export async function createSettlement(data: {
                 status: "PENDING",
                 bookings: {
                     connect: data.bookingIds.map(id => ({ id }))
-                }
+                },
+                orders: {
+                    connect: (data.orderIds || []).map(id => ({ id }))
+                } as any
             }
         })
 
@@ -117,7 +121,7 @@ async function validateSettlementWithAI(settlementId: string) {
     }
 }
 
-export async function getArtistPendingBookings(artistId: string) {
+export async function getArtistPendingRevenue(artistId: string) {
     try {
         const bookings = await prisma.booking.findMany({
             where: {
@@ -129,10 +133,41 @@ export async function getArtistPendingBookings(artistId: string) {
                 scheduledFor: 'desc'
             }
         })
-        return bookings
+
+        const orders = await prisma.order.findMany({
+            where: {
+                // For now, assuming products sold by this artist. 
+                // We'd need to link order items to artist, but the order itself 
+                // in the new schema has artistShare and settlementId.
+                // Wait, the order model in schema has artistShare but not direct artistId.
+                // BUT the settlement has artistId.
+                // So we look for orders where items belong to this artist and settlementId is null.
+                // Or easier: we added settlementId to Order. We should filter by that.
+                // AND we need to know WHICH artist the order belongs to. 
+                // Since an order is for a user, and items have product -> artist.
+                items: {
+                    some: {
+                        product: {
+                            artistId
+                        }
+                    }
+                },
+                settlementId: null,
+                status: 'PAID' // Only Paid orders can be liquidated
+            },
+            include: {
+                items: {
+                    include: {
+                        product: true
+                    }
+                }
+            }
+        }) as any
+
+        return { bookings, orders }
     } catch (error) {
-        console.error("Error fetching pending bookings:", error)
-        return []
+        console.error("Error fetching pending revenue:", error)
+        return { bookings: [], orders: [] }
     }
 }
 

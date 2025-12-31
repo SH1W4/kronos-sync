@@ -1,20 +1,20 @@
 "use client"
 
 import React, { useState } from 'react'
-import { DollarSign, TrendingUp, CreditCard, Calendar, CheckCircle2, AlertCircle, FileText, Smartphone, Upload, X } from 'lucide-react'
+import { DollarSign, TrendingUp, CreditCard, CheckCircle2, Smartphone, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { createSettlement } from '@/app/actions/settlements'
 
-interface Booking {
+interface FinanceItem {
     id: string
+    type: 'TATTOO' | 'PRODUCT'
     value: number
     artistShare: number
     studioShare: number
     status: string
     client: { name: string | null }
-    slot: { startTime: Date }
+    date: Date
 }
 
 interface FinanceClientProps {
@@ -27,7 +27,7 @@ interface FinanceClientProps {
         pixKey: string | null
         pixRecipient: string | null
     }
-    bookings: Booking[]
+    items: FinanceItem[]
     settlements: any[]
     metrics: {
         totalEarnings: number
@@ -37,42 +37,47 @@ interface FinanceClientProps {
     }
 }
 
-export default function FinanceClient({ artist, workspace, bookings, settlements, metrics }: FinanceClientProps) {
+export default function FinanceClient({ artist, workspace, items, settlements, metrics }: FinanceClientProps) {
     const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending')
-    const [selectedBookings, setSelectedBookings] = useState<string[]>([])
+    const [selectedItems, setSelectedItems] = useState<string[]>([])
     const [proofUrl, setProofUrl] = useState('')
     const [showProofModal, setShowProofModal] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    const toggleBooking = (id: string) => {
-        setSelectedBookings(prev =>
-            prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]
+    const toggleItem = (id: string) => {
+        setSelectedItems(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         )
     }
 
     const calculateSelectedTotal = () => {
-        return bookings
-            .filter(b => selectedBookings.includes(b.id))
-            .reduce((acc, b) => acc + b.studioShare, 0)
+        return items
+            .filter(i => selectedItems.includes(i.id))
+            .reduce((acc, i) => acc + i.studioShare, 0)
     }
 
     const handleCreateSettlement = async () => {
-        if (selectedBookings.length === 0 || !proofUrl) return
+        if (selectedItems.length === 0 || !proofUrl) return
         setLoading(true)
         try {
+            const selectedObjects = items.filter(i => selectedItems.includes(i.id))
+            const bookingIds = selectedObjects.filter(i => i.type === 'TATTOO').map(i => i.id)
+            const orderIds = selectedObjects.filter(i => i.type === 'PRODUCT').map(i => i.id)
+
             const res = await createSettlement({
                 artistId: artist.id,
                 workspaceId: workspace.id,
-                bookingIds: selectedBookings,
+                bookingIds: bookingIds,
+                orderIds: orderIds,
                 totalValue: calculateSelectedTotal(),
                 proofUrl: proofUrl
             })
             if (res.success) {
                 alert("Liquidação enviada para análise da IA!")
-                setSelectedBookings([])
+                setSelectedItems([])
                 setProofUrl('')
                 setShowProofModal(false)
-                setActiveTab('history') // Switch to history to see the new item
+                setActiveTab('history')
             } else {
                 alert(res.message)
             }
@@ -83,8 +88,8 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
 
     return (
         <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 text-white min-h-screen relative overflow-hidden data-pattern-grid">
-            {/* Cyber Y2K Effects */}
             <div className="scanline" />
+
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-6 gap-4">
                 <div>
@@ -97,11 +102,10 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                         <p className="text-[8px] text-gray-400 font-mono uppercase tracking-[0.3em] mb-1">Chave PIX Estúdio</p>
                         <p className="text-sm font-bold font-mono text-primary tracking-wider">{workspace.pixKey || 'Não configurada'}</p>
                     </div>
-                    {/* Only show 'Debt' if there are pending bookings */}
                     <div className="flex-1 md:flex-none bg-red-500/10 border border-red-500/20 px-6 py-3 rounded-xl text-right">
-                        <p className="text-[10px] text-red-400 font-mono uppercase tracking-widest mb-1">COMISSÃO A PAGAR</p>
+                        <p className="text-[10px] text-red-400 font-mono uppercase tracking-widest mb-1">COMISSÃO A PAGAR (TOTAL)</p>
                         <p className="text-3xl font-bold font-orbitron text-white pixel-text">
-                            {formatCurrency(bookings.reduce((acc, b) => acc + b.studioShare, 0))}
+                            {formatCurrency(items.reduce((acc, i) => acc + i.studioShare, 0))}
                         </p>
                     </div>
                 </div>
@@ -111,7 +115,7 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <MetricCard title="FATURAMENTO BRUTO" value={metrics.totalRevenue} icon={<DollarSign className="text-purple-400" />} />
                 <MetricCard title="SEU LUCRO (MÊS)" value={metrics.monthlyEarnings} icon={<TrendingUp className="text-green-400" />} />
-                <MetricCard title="SESSÕES PARA ACERTO" value={bookings.length} icon={<CreditCard className="text-blue-400" />} prefix="" />
+                <MetricCard title="ACERTOS PENDENTES" value={items.length} icon={<CreditCard className="text-blue-400" />} prefix="" />
             </div>
 
             {/* Tabs */}
@@ -120,7 +124,7 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                     onClick={() => setActiveTab('pending')}
                     className={`pb-4 text-xs font-mono uppercase tracking-widest transition-all ${activeTab === 'pending' ? 'text-primary border-b-2 border-primary' : 'text-gray-500 hover:text-white'}`}
                 >
-                    A Pagar ({bookings.length})
+                    A Pagar ({items.length})
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
@@ -130,8 +134,8 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                 </button>
             </div>
 
-            {/* Settlement Bar (Pinned if selected) */}
-            {selectedBookings.length > 0 && activeTab === 'pending' && (
+            {/* Settlement Bar */}
+            {selectedItems.length > 0 && activeTab === 'pending' && (
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 animate-in slide-in-from-bottom-8 duration-500">
                     <div className="bg-black/90 border border-primary/30 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.3)] flex items-center justify-between backdrop-blur-2xl relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
@@ -141,26 +145,23 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                         </div>
                         <Button
                             onClick={() => setShowProofModal(true)}
-                            className="bg-white hover:bg-primary text-black font-black font-orbitron tracking-widest px-10 h-14 rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] active:scale-95 transition-all text-xs border-2 border-transparent hover:border-white"
+                            className="bg-white hover:bg-primary text-black font-black font-orbitron tracking-widest px-10 h-14 rounded-2xl transition-all text-xs"
                         >
-                            PAGAR COMISSÃO ({selectedBookings.length})
+                            PAGAR COMISSÃO ({selectedItems.length})
                         </Button>
                     </div>
                 </div>
             )}
 
-            {/* Content: Pending Bookings */}
-            {activeTab === 'pending' && (
-                <div className="bg-gray-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden animate-in fade-in duration-500">
-                    <div className="p-8 border-b border-white/5 flex justify-between items-center">
-                        <h3 className="font-orbitron font-bold text-lg tracking-widest">SESSÕES PARA ACERTO</h3>
-                    </div>
-
+            {/* Tables */}
+            {activeTab === 'pending' ? (
+                <div className="bg-gray-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-black/40 text-gray-500 font-mono uppercase text-[10px] tracking-widest">
                                 <tr>
                                     <th className="p-6 w-12"></th>
+                                    <th className="p-6">Tipo</th>
                                     <th className="p-6">Data</th>
                                     <th className="p-6">Cliente</th>
                                     <th className="p-6 text-right">Comissão Estúdio</th>
@@ -169,37 +170,34 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
-                                {bookings.length === 0 ? (
+                                {items.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="p-10 text-center text-gray-500 font-mono text-xs uppercase tracking-widest">Nenhuma sessão pendente.</td>
+                                        <td colSpan={7} className="p-10 text-center text-gray-500 font-mono text-xs uppercase tracking-widest">Nada pendente.</td>
                                     </tr>
                                 ) : (
-                                    bookings.map((booking) => (
+                                    items.map((item) => (
                                         <tr
-                                            key={booking.id}
-                                            onClick={() => toggleBooking(booking.id)}
-                                            className={`cursor-pointer transition-all hover:bg-white/[0.02] border-l-4 ${selectedBookings.includes(booking.id) ? 'bg-primary/10 border-l-primary shadow-[inset_10px_0_20px_rgba(139,92,246,0.05)]' : 'border-l-transparent'}`}
+                                            key={item.id}
+                                            onClick={() => toggleItem(item.id)}
+                                            className={`cursor-pointer transition-all hover:bg-white/[0.02] border-l-4 ${selectedItems.includes(item.id) ? 'bg-primary/10 border-l-primary' : 'border-l-transparent'}`}
                                         >
                                             <td className="p-6">
-                                                <div className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${selectedBookings.includes(booking.id) ? 'bg-primary border-primary' : 'border-white/20'}`}>
-                                                    {selectedBookings.includes(booking.id) && <CheckCircle2 className="w-4 h-4 text-black" />}
+                                                <div className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${selectedItems.includes(item.id) ? 'bg-primary border-primary' : 'border-white/20'}`}>
+                                                    {selectedItems.includes(item.id) && <CheckCircle2 className="w-4 h-4 text-black" />}
                                                 </div>
                                             </td>
-                                            <td className="p-6 font-mono text-gray-400 text-xs">{formatDate(new Date(booking.slot.startTime))}</td>
-                                            <td className="p-6 font-bold">{booking.client.name}</td>
-                                            <td className="p-6 text-right text-white font-mono font-bold">{formatCurrency(booking.studioShare)}</td>
-                                            <td className="p-6 text-right font-black text-green-400 font-orbitron">{formatCurrency(booking.artistShare)}</td>
+                                            <td className="p-6">
+                                                <span className={`text-[10px] px-2 py-1 rounded font-mono ${item.type === 'TATTOO' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                                    {item.type}
+                                                </span>
+                                            </td>
+                                            <td className="p-6 font-mono text-gray-400 text-xs">{formatDate(new Date(item.date))}</td>
+                                            <td className="p-6 font-bold">{item.client.name}</td>
+                                            <td className="p-6 text-right font-mono font-bold">{formatCurrency(item.studioShare)}</td>
+                                            <td className="p-6 text-right font-black text-green-400 font-orbitron">{formatCurrency(item.artistShare)}</td>
                                             <td className="p-6 text-center">
-                                                <Button
-                                                    size="sm"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        setSelectedBookings([booking.id])
-                                                        setShowProofModal(true)
-                                                    }}
-                                                    className="bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/30 text-[10px] font-black font-orbitron tracking-tighter rounded-xl transition-all"
-                                                >
-                                                    LIQUIDAR AGORA
+                                                <Button size="sm" onClick={(e) => { e.stopPropagation(); setSelectedItems([item.id]); setShowProofModal(true); }} className="bg-primary/20 hover:bg-primary text-primary hover:text-black rounded-xl text-[10px]">
+                                                    LIQUIDAR
                                                 </Button>
                                             </td>
                                         </tr>
@@ -209,53 +207,38 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                         </table>
                     </div>
                 </div>
-            )}
-
-            {/* Content: History */}
-            {activeTab === 'history' && (
-                <div className="bg-gray-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden animate-in fade-in duration-500">
-                    <div className="p-8 border-b border-white/5 flex justify-between items-center">
-                        <h3 className="font-orbitron font-bold text-lg tracking-widest">HISTÓRICO DE LIQUIDAÇÕES</h3>
-                    </div>
-
+            ) : (
+                <div className="bg-gray-900/40 border border-white/5 rounded-[2.5rem] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-black/40 text-gray-500 font-mono uppercase text-[10px] tracking-widest">
                                 <tr>
                                     <th className="p-6">Data</th>
                                     <th className="p-6">Valor Enviado</th>
-                                    <th className="p-6 text-center">Sessões</th>
-                                    <th className="p-6">Feedback IA</th>
-                                    <th className="p-6 text-center">Status</th>
+                                    <th className="p-6 text-center">Itens</th>
+                                    <th className="p-6">Status</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
-                                {settlements.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={5} className="p-10 text-center text-gray-500 font-mono text-xs uppercase tracking-widest">Nenhuma liquidação encontrada.</td>
+                                {settlements.map((s) => (
+                                    <tr key={s.id} className="hover:bg-white/[0.02]">
+                                        <td className="p-6 font-mono text-gray-400 text-xs">{formatDate(new Date(s.createdAt))}</td>
+                                        <td className="p-6 font-bold font-orbitron text-primary">{formatCurrency(s.totalValue)}</td>
+                                        <td className="p-6 text-center font-mono text-gray-500">{(s._count.bookings || 0) + (s._count.orders || 0)}</td>
+                                        <td className="p-6 status-cell">
+                                            <span className={`px-3 py-1 rounded-full text-[8px] font-mono border ${s.status === 'APPROVED' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'}`}>
+                                                {s.status}
+                                            </span>
+                                        </td>
                                     </tr>
-                                ) : (
-                                    settlements.map((settlement) => (
-                                        <tr key={settlement.id} className="hover:bg-white/[0.02]">
-                                            <td className="p-6 font-mono text-gray-400 text-xs">{formatDate(new Date(settlement.createdAt))}</td>
-                                            <td className="p-6 font-bold font-orbitron text-primary">{formatCurrency(settlement.totalValue)}</td>
-                                            <td className="p-6 text-center font-mono text-gray-500">{settlement._count.bookings}</td>
-                                            <td className="p-6 text-xs text-gray-400 max-w-xs truncate" title={settlement.aiFeedback}>{settlement.aiFeedback || '-'}</td>
-                                            <td className="p-6 text-center">
-                                                <div className={`px-3 py-1 rounded-full inline-flex items-center space-x-2 border ${settlement.status === 'APPROVED' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400'}`}>
-                                                    <span className="text-[8px] font-mono uppercase tracking-widest">{settlement.status === 'APPROVED' ? 'CONFIRMADO' : 'EM ANÁLISE'}</span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
+                                ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
             )}
 
-            {/* Proof Upload Modal - UPDATED */}
+            {/* Proof Modal */}
             {showProofModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setShowProofModal(false)}></div>
@@ -268,42 +251,30 @@ export default function FinanceClient({ artist, workspace, bookings, settlements
                             <button onClick={() => setShowProofModal(false)} className="text-gray-500 hover:text-white"><X /></button>
                         </div>
 
-                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6">
-                            <div className="flex flex-col items-center justify-center space-y-2 py-4">
-                                <p className="text-[10px] font-mono text-gray-500 uppercase">Valor a Transferir</p>
-                                <p className="text-4xl font-black font-orbitron text-primary">{formatCurrency(calculateSelectedTotal())}</p>
-                            </div>
+                        <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6 text-center">
+                            <p className="text-[10px] font-mono text-gray-500 uppercase">Valor a Transferir</p>
+                            <p className="text-4xl font-black font-orbitron text-primary">{formatCurrency(calculateSelectedTotal())}</p>
 
                             <div className="space-y-4">
-                                <div className="flex items-center space-x-4 bg-black p-4 rounded-2xl border border-white/10">
-                                    <div className="p-3 bg-white/5 rounded-xl"><Smartphone className="text-primary w-6 h-6" /></div>
-                                    <div className="flex-1">
-                                        <p className="text-[8px] font-mono text-gray-500 uppercase tracking-widest">Chave PIX (Manual)</p>
-                                        <p className="text-sm font-bold font-mono text-white">{workspace.pixKey}</p>
-                                    </div>
-                                    <Button variant="ghost" className="text-xs font-mono text-primary uppercase" onClick={() => navigator.clipboard.writeText(workspace.pixKey || '')}>Copiar</Button>
+                                <div className="bg-black p-4 rounded-2xl border border-white/10 text-left">
+                                    <p className="text-[8px] font-mono text-gray-500 uppercase tracking-widest">Chave PIX Estúdio</p>
+                                    <p className="text-sm font-bold font-mono text-white flex justify-between">
+                                        {workspace.pixKey}
+                                        <span className="text-primary cursor-pointer" onClick={() => navigator.clipboard.writeText(workspace.pixKey || '')}>Copiar</span>
+                                    </p>
                                 </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Link do Comprovante</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Cole o link do Drive/WeTransfer aqui..."
-                                        value={proofUrl}
-                                        onChange={(e) => setProofUrl(e.target.value)}
-                                        className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 transition-all font-mono"
-                                    />
-                                    <p className="text-[10px] text-gray-500">A IA irá acessar o link para validar o comprovante automaticamente.</p>
-                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Link do comprovante..."
+                                    value={proofUrl}
+                                    onChange={(e) => setProofUrl(e.target.value)}
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white"
+                                />
                             </div>
                         </div>
 
-                        <Button
-                            disabled={!proofUrl || loading}
-                            onClick={handleCreateSettlement}
-                            className="w-full h-16 bg-white hover:bg-primary text-black font-black font-orbitron tracking-[0.3em] rounded-2xl transition-all"
-                        >
-                            {loading ? 'ANALISANDO...' : 'ENVIAR COMPROVANTE'}
+                        <Button disabled={!proofUrl || loading} onClick={handleCreateSettlement} className="w-full h-16 bg-white hover:bg-primary text-black font-black font-orbitron tracking-widest rounded-2xl">
+                            {loading ? 'PROCESSANDO...' : 'ENVIAR COMPROVANTE'}
                         </Button>
                     </div>
                 </div>
