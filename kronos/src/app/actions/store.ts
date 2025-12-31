@@ -129,7 +129,7 @@ export async function toggleProductStatus(id: string, currentStatus: boolean) {
 
 export async function toggleProductSold(id: string, currentStatus: boolean) {
     try {
-        await prisma.product.update({
+        await (prisma.product as any).update({
             where: { id },
             data: { isSold: !currentStatus }
         })
@@ -189,7 +189,7 @@ export async function createOrder(data: {
         // Studio takes the markup. If there's a discount, it's subtracted from the studio's share for now.
         const studioShare = data.finalTotal - artistShare
 
-        const order = await prisma.order.create({
+        const order = await (prisma.order as any).create({
             data: {
                 clientId: user.id,
                 total: data.total,
