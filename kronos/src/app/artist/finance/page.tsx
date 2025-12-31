@@ -29,7 +29,7 @@ export default async function FinancePage() {
                     include: { user: true }
                 },
                 _count: {
-                    select: { bookings: true }
+                    select: { bookings: true, orders: true }
                 }
             },
             orderBy: {
@@ -142,7 +142,7 @@ export default async function FinancePage() {
         },
         include: {
             _count: {
-                select: { bookings: true }
+                select: { bookings: true, orders: true }
             }
         },
         orderBy: {
@@ -173,22 +173,22 @@ export default async function FinancePage() {
     const mappedBookings = bookings.map(b => ({
         id: b.id,
         type: 'TATTOO' as const,
-        value: b.value,
-        artistShare: b.artistShare,
-        studioShare: (b.value - (b.artistShare || 0)),
+        value: b.value || 0,
+        artistShare: b.artistShare || 0,
+        studioShare: (b.value || 0) - (b.artistShare || 0),
         status: b.status,
-        client: { name: b.client.name },
+        client: { name: b.client?.name || 'Cliente' },
         date: b.slot.startTime
     }))
 
     const mappedOrders = orders.map((o: any) => ({
         id: o.id,
         type: 'PRODUCT' as const,
-        value: o.finalTotal,
-        artistShare: o.artistShare,
-        studioShare: o.studioShare,
+        value: o.finalTotal || 0,
+        artistShare: o.artistShare || 0,
+        studioShare: o.studioShare || 0,
         status: o.status,
-        client: { name: o.client.name },
+        client: { name: o.client?.name || 'Cliente' },
         date: o.createdAt
     }))
 

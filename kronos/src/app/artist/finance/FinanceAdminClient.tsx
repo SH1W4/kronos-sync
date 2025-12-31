@@ -17,6 +17,7 @@ interface Settlement {
     }
     _count: {
         bookings: number
+        orders: number
     }
     aiFeedback: string | null
 }
@@ -136,7 +137,7 @@ export default function FinanceAdminClient({ workspaceName, settlements, project
                                     {settlement.artist.user.name}
                                 </h3>
                                 <p className="text-xs text-gray-400 font-mono mt-1">
-                                    Pagou <span className="text-white font-bold">{formatCurrency(settlement.totalValue)}</span> referente a {settlement._count.bookings} sessões.
+                                    Pagou <span className="text-white font-bold">{formatCurrency(settlement.totalValue)}</span> referente a {(settlement._count.bookings || 0) + (settlement._count.orders || 0)} itens.
                                 </p>
                                 {settlement.aiFeedback && (
                                     <div className="mt-3 p-3 bg-white/5 rounded-lg border border-white/5 text-[10px] text-gray-400 font-mono">
