@@ -5,6 +5,7 @@ import { Clock, AlertCircle, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import DashboardCharts from "./DashboardCharts"
 
 export const dynamic = 'force-dynamic'
 
@@ -65,8 +66,14 @@ export default async function ArtistDashboard() {
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
+    // Calculate 6-month range for historical data
+    const sixMonthsAgo = new Date()
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
+    sixMonthsAgo.setDate(1)
+    sixMonthsAgo.setHours(0, 0, 0, 0)
+
     // 3. Buscar Dados
-    const [todaysBookings, monthMetrics, totalSessionsCount] = await Promise.all([
+    const [todaysBookings, monthMetrics, totalSessionsCount, historicalBookings] = await Promise.all([
         prisma.booking.findMany({
             where: {
                 artistId: artist.id,
@@ -94,8 +101,47 @@ export default async function ArtistDashboard() {
                     { AND: [{ status: { not: 'CANCELLED' } }, { slot: { endTime: { lt: now } } }] }
                 ]
             }
+        }),
+        // Fetch historical data for the last 6 months
+        prisma.booking.findMany({
+            where: {
+                artistId: artist.id,
+                status: { in: ['CONFIRMED', 'COMPLETED'] },
+                slot: { startTime: { gte: sixMonthsAgo } }
+            },
+            include: { slot: true }
         })
     ])
+
+    // Aggregate historical data by month
+    const monthlyDataMap = new Map<string, { revenue: number; earnings: number }>()
+
+    // Initialize last 6 months with zeros
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date()
+        date.setMonth(date.getMonth() - i)
+        const key = date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase()
+        monthlyDataMap.set(key, { revenue: 0, earnings: 0 })
+    }
+
+    // Populate with actual data
+    historicalBookings.forEach(booking => {
+        if (booking.slot?.startTime) {
+            const monthKey = new Date(booking.slot.startTime).toLocaleString('pt-BR', { month: 'short' }).toUpperCase()
+            const current = monthlyDataMap.get(monthKey) || { revenue: 0, earnings: 0 }
+            monthlyDataMap.set(monthKey, {
+                revenue: current.revenue + (booking.value || 0),
+                earnings: current.earnings + (booking.artistShare || 0)
+            })
+        }
+    })
+
+    // Convert to array for chart
+    const historyData = Array.from(monthlyDataMap.entries()).map(([month, data]) => ({
+        month,
+        revenue: data.revenue,
+        earnings: data.earnings
+    }))
 
     const monthlyEarnings = monthMetrics.reduce((acc, b) => acc + (b.artistShare || 0), 0)
     const userName = session.user.name?.split(' ')[0] || 'Artista'
@@ -132,6 +178,9 @@ export default async function ArtistDashboard() {
                 <MetricCard title="TOTAL REALIZADO" value={totalSessionsCount.toString()} trend="Histórico" icon={<CheckCircle2 size={16} />} variant="accent" />
                 <MetricCard title="ESTADO DO SISTEMA" value="100%" trend="Operacional" icon={<AlertCircle size={16} />} variant="ghost" />
             </div>
+
+            {/* BI Charts */}
+            <DashboardCharts historyData={historyData} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
