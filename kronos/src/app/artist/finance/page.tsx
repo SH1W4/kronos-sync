@@ -7,7 +7,7 @@ import FinanceAdminClient from "./FinanceAdminClient"
 
 export const dynamic = 'force-dynamic'
 
-export default async function FinancePage() {
+export default async function FinancePage({ searchParams }: { searchParams: { date?: string } }) {
     try {
         const session = await getServerSession(authOptions)
 
@@ -22,6 +22,19 @@ export default async function FinancePage() {
             console.error("❌ FinancePage: Session user missing ID")
             redirect('/auth/signin')
         }
+
+        // Parse Date from Search Params (Default to Current Month)
+        const now = new Date()
+        let selectedDate = now
+        if (searchParams?.date) {
+            const [year, month] = searchParams.date.split('-').map(Number)
+            if (!isNaN(year) && !isNaN(month)) {
+                selectedDate = new Date(year, month - 1, 1)
+            }
+        }
+
+        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
+        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59)
 
         // ADMIN VIEW: Fetch all settlements for the Active Workspace
         if (user.role === 'ADMIN') {
@@ -117,9 +130,8 @@ export default async function FinancePage() {
 
         if (!workspace) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Workspace não configurado</div>
 
-        // Fetch Bookings ready for settlement (COMPLETED and not already settled)
-        // Defensive: Ensure we only fetch if we have an artist ID
-        const bookings = await prisma.booking.findMany({
+        // 1. PENDING ITEMS (A Pagar) - ALWAYS fetch ALL pending, regardless of date selection
+        const pendingBookings = await prisma.booking.findMany({
             where: {
                 artistId: artist.id,
                 settlementId: null,
@@ -134,9 +146,7 @@ export default async function FinancePage() {
             }
         })
 
-        // Fetch Orders ready for settlement (PAID and not already settled)
-        // As items can have different artists, we filter orders that have items from THIS artist
-        const orders = await prisma.order.findMany({
+        const pendingOrders = await prisma.order.findMany({
             where: {
                 settlementId: null,
                 status: 'PAID',
@@ -161,10 +171,53 @@ export default async function FinancePage() {
             }
         }) as any
 
-        // Fetch Settlement History
+        // 2. METRICS DATA - Content for the Selected Month (Settled OR Unsettled)
+        // We need to fetch ALL productive work in this timeframe to show "Earnings this Month"
+        const metricsBookings = await prisma.booking.findMany({
+            where: {
+                artistId: artist.id,
+                status: 'COMPLETED',
+                slot: {
+                    startTime: {
+                        gte: startOfMonth,
+                        lte: endOfMonth
+                    }
+                }
+            }
+        })
+
+        const metricsOrders = await prisma.order.findMany({
+            where: {
+                status: 'PAID',
+                createdAt: {
+                    gte: startOfMonth,
+                    lte: endOfMonth
+                },
+                items: {
+                    some: {
+                        product: {
+                            artistId: artist.id
+                        }
+                    }
+                }
+            },
+            include: {
+                items: {
+                    include: { product: true }
+                }
+            }
+        }) as any
+
+        // Fetch Settlement History (Filtered by Month if user wants history of settlements made in that month)
+        // OR should we show all? The user said "Back to see general of previous months".
+        // Let's filter settlements created in that month.
         const settlements = await prisma.settlement.findMany({
             where: {
-                artistId: artist.id
+                artistId: artist.id,
+                createdAt: {
+                    gte: startOfMonth,
+                    lte: endOfMonth
+                }
             },
             include: {
                 _count: {
@@ -183,27 +236,23 @@ export default async function FinancePage() {
             updatedAt: s.updatedAt.toISOString(),
         }))
 
-        // Calculate Metrics
-        const totalEarnings =
-            (bookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (orders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
-
-        const totalRevenue =
-            (bookings?.reduce((acc, b) => acc + (b.value || 0), 0) || 0) +
-            (orders?.reduce((acc: number, o: any) => acc + (o.finalTotal || 0), 0) || 0)
-
-        const now = new Date()
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
-
-        const monthlyBookings = bookings.filter(b => b.slot && b.slot.startTime >= firstDay)
-        const monthlyOrders = orders.filter((o: any) => o.createdAt >= firstDay)
-
+        // Calculate Metrics for SELECTED Month
         const monthlyEarnings =
-            (monthlyBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (monthlyOrders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+            (metricsBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
+            (metricsOrders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+
+        const monthlyRevenue =
+            (metricsBookings?.reduce((acc, b) => acc + (b.value || 0), 0) || 0) +
+            (metricsOrders?.reduce((acc: number, o: any) => acc + (o.finalTotal || 0), 0) || 0)
+
+        // Calculate Total Pending (Accumulated Debt)
+        const totalPendingEarnings =
+            (pendingBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
+            (pendingOrders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+
 
         // Map data for Client Component with Safe Date Serialization
-        const mappedBookings = bookings.map(b => ({
+        const mappedBookings = pendingBookings.map(b => ({
             id: b.id,
             type: 'TATTOO' as const,
             value: b.value || 0,
@@ -214,7 +263,7 @@ export default async function FinancePage() {
             date: b.slot?.startTime ? b.slot.startTime.toISOString() : new Date().toISOString()
         }))
 
-        const mappedOrders = orders.map((o: any) => ({
+        const mappedOrders = pendingOrders.map((o: any) => ({
             id: o.id,
             type: 'PRODUCT' as const,
             value: o.finalTotal || 0,
@@ -225,7 +274,7 @@ export default async function FinancePage() {
             date: o.createdAt ? o.createdAt.toISOString() : new Date().toISOString()
         }))
 
-        const allItems = [...mappedBookings, ...mappedOrders].sort((a, b) =>
+        const allPendingItems = [...mappedBookings, ...mappedOrders].sort((a, b) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()
         )
 
@@ -240,13 +289,14 @@ export default async function FinancePage() {
                     pixKey: workspace.pixKey,
                     pixRecipient: workspace.pixRecipient
                 }}
-                items={allItems}
+                items={allPendingItems}
                 settlements={safeSettlements}
+                selectedDate={selectedDate.toISOString()}
                 metrics={{
-                    totalEarnings,
-                    totalRevenue,
-                    monthlyBookings: monthlyBookings.length,
-                    monthlyEarnings
+                    monthlyRevenue, // Gross Revenue for selected month
+                    monthlyEarnings, // Artist Earnings for selected month
+                    monthlyBookings: metricsBookings.length + metricsOrders.length, // Count
+                    totalPendingEarnings // "Acertos Pendentes" (Total Debt)
                 }}
             />
         )

@@ -1,10 +1,11 @@
 "use client"
 
 import React, { useState } from 'react'
-import { DollarSign, TrendingUp, CreditCard, CheckCircle2, Smartphone, X } from 'lucide-react'
+import { DollarSign, TrendingUp, CreditCard, CheckCircle2, Smartphone, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { createSettlement } from '@/app/actions/settlements'
+import { useRouter } from 'next/navigation'
 
 interface FinanceItem {
     id: string
@@ -30,19 +31,32 @@ interface FinanceClientProps {
     items: FinanceItem[]
     settlements: any[]
     metrics: {
-        totalEarnings: number
-        totalRevenue: number
-        monthlyBookings: number
+        monthlyRevenue: number
         monthlyEarnings: number
+        monthlyBookings: number
+        totalPendingEarnings: number
     }
+    selectedDate?: string
 }
 
-export default function FinanceClient({ artist, workspace, items, settlements, metrics }: FinanceClientProps) {
+export default function FinanceClient({ artist, workspace, items, settlements, metrics, selectedDate }: FinanceClientProps) {
     const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending')
     const [selectedItems, setSelectedItems] = useState<string[]>([])
     const [proofUrl, setProofUrl] = useState('')
     const [showProofModal, setShowProofModal] = useState(false)
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
+
+    // Date Navigation Logic
+    const currentDate = selectedDate ? new Date(selectedDate) : new Date()
+    const monthName = currentDate.toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()
+
+    const changeMonth = (months: number) => {
+        const newDate = new Date(currentDate)
+        newDate.setMonth(newDate.getMonth() + months)
+        const dateString = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`
+        router.push(`?date=${dateString}`)
+    }
 
     const toggleItem = (id: string) => {
         setSelectedItems(prev =>
@@ -94,7 +108,13 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-white/10 pb-6 gap-4">
                 <div>
                     <h1 className="text-3xl font-orbitron font-bold pixel-text text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">FINANCEIRO</h1>
-                    <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">Digital Settle & Gamification</p>
+                    <div className="flex items-center gap-4 mt-2">
+                        <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-1">
+                            <Button variant="ghost" size="sm" onClick={() => changeMonth(-1)} className="text-gray-400 hover:text-white h-6 w-6 p-0"><ChevronLeft className="w-4 h-4" /></Button>
+                            <span className="font-mono text-xs uppercase w-32 text-center">{monthName}</span>
+                            <Button variant="ghost" size="sm" onClick={() => changeMonth(1)} className="text-gray-400 hover:text-white h-6 w-6 p-0"><ChevronRight className="w-4 h-4" /></Button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex gap-4 w-full md:w-auto">
@@ -105,7 +125,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                     <div className="flex-1 md:flex-none bg-red-500/10 border border-red-500/20 px-6 py-3 rounded-xl text-right">
                         <p className="text-[10px] text-red-400 font-mono uppercase tracking-widest mb-1">COMISSÃO A PAGAR (TOTAL)</p>
                         <p className="text-3xl font-bold font-orbitron text-white pixel-text">
-                            {formatCurrency(items.reduce((acc, i) => acc + i.studioShare, 0))}
+                            {formatCurrency(metrics.totalPendingEarnings || items.reduce((acc, i) => acc + i.studioShare, 0))}
                         </p>
                     </div>
                 </div>
@@ -113,7 +133,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
 
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MetricCard title="FATURAMENTO BRUTO" value={metrics.totalRevenue} icon={<DollarSign className="text-purple-400" />} />
+                <MetricCard title="FATURAMENTO BRUTO (MÊS)" value={metrics.monthlyRevenue || 0} icon={<DollarSign className="text-purple-400" />} />
                 <MetricCard title="SEU LUCRO (MÊS)" value={metrics.monthlyEarnings} icon={<TrendingUp className="text-green-400" />} />
                 <MetricCard title="ACERTOS PENDENTES" value={items.length} icon={<CreditCard className="text-blue-400" />} prefix="" />
             </div>
