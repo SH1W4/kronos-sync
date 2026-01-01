@@ -1,14 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import MagicLinkLogin from '@/components/auth/MagicLinkLogin'
 import VerifyCode from '@/components/auth/VerifyCode'
-import { Button } from '@/components/ui/button'
-import { signIn, useSession } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 
-export default function SignInPage() {
+function SignInContent() {
     const searchParams = useSearchParams()
     const inviteCode = searchParams.get('invite') || ''
 
@@ -40,10 +38,16 @@ export default function SignInPage() {
                     ) : (
                         <VerifyCode email={email} onBack={() => setStep('email')} inviteCode={inviteCode} />
                     )}
-
-
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function SignInPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black" />}>
+            <SignInContent />
+        </Suspense>
     )
 }
