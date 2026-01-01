@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
-const INPUT_FILE = path.join(process.cwd(), 'public/brand/logo_clean.svg');
+const INPUT_FILE = path.join(process.cwd(), 'public/brand/logo-neon.png');
 const OUTPUT_DIR = path.join(process.cwd(), 'public/icons');
 
 async function generateIcons() {
