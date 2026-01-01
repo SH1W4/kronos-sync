@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { updateArtistSettings } from '@/app/actions/settings'
-import { updateWorkspaceFinance, updateWorkspaceBranding } from '@/app/actions/workspaces'
+import { updateWorkspaceFinance, updateWorkspaceBranding, updateWorkspaceCalendar } from '@/app/actions/workspaces'
 import { updateUserTheme, updateWorkspaceCapacity } from '@/app/actions/settings'
 import { useRouter } from 'next/navigation'
 import { InkPassCard } from '@/components/invites/InkPassCard'
@@ -39,6 +39,9 @@ export default function SettingsPage() {
     // Personal State
     const [personalColor, setPersonalColor] = useState('#8B5CF6')
 
+    // Google Calendar State
+    const [googleCalendarId, setGoogleCalendarId] = useState('')
+
     // Invite/Team State
     const [invites, setInvites] = useState<any[]>([])
     const [isInvitesLoading, setIsInvitesLoading] = useState(false)
@@ -67,6 +70,7 @@ export default function SettingsPage() {
                 setStudioName(currentWorkspace.name || '')
                 setStudioColor(currentWorkspace.primaryColor || '#8B5CF6')
                 setStudioCapacity(currentWorkspace.capacity || 5)
+                setGoogleCalendarId(currentWorkspace.googleCalendarId || '')
             }
 
             if ((session?.user as any).customColor) {
@@ -170,11 +174,16 @@ export default function SettingsPage() {
             // Update Capacity
             const capacityResult = await updateWorkspaceCapacity(studioCapacity)
 
-            if (brandingResult.success && capacityResult.success) {
+            // Update Google Calendar
+            const calendarResult = await updateWorkspaceCalendar({
+                googleCalendarId: googleCalendarId || undefined
+            })
+
+            if (brandingResult.success && capacityResult.success && calendarResult.success) {
                 alert('Configurações do estúdio salvas com sucesso!')
                 await updateSession()
             } else {
-                alert(brandingResult.error || capacityResult.error || 'Erro ao salvar')
+                alert(brandingResult.error || capacityResult.error || calendarResult.error || 'Erro ao salvar')
             }
         } catch (e) {
             alert('Erro ao salvar configurações do estúdio')
@@ -581,6 +590,24 @@ export default function SettingsPage() {
                                                 <p className="text-[10px] text-gray-500">Esta cor será aplicada globalmente no HUD de todos os membros do workspace.</p>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    {/* Google Calendar Integration */}
+                                    <div className="space-y-2 border-t border-white/5 pt-6">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Calendar className="text-blue-400" size={16} />
+                                            <label className="text-[10px] font-mono text-blue-400 uppercase tracking-widest">Integração Google Calendar</label>
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 mb-3">
+                                            Cole o ID do calendário compartilhado do Google para sincronizar todos os agendamentos automaticamente.
+                                        </p>
+                                        <Input
+                                            placeholder="abc123@group.calendar.google.com"
+                                            value={googleCalendarId}
+                                            onChange={(e) => setGoogleCalendarId(e.target.value)}
+                                            className="bg-black/50 border-white/10 font-mono text-xs"
+                                        />
+                                        <p className="text-[9px] text-gray-600">Encontre o ID em: Google Agenda → Configurações do Calendário → Integrar calendário</p>
                                     </div>
 
                                     <div className="flex justify-end">

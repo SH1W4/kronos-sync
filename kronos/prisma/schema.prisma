@@ -132,6 +132,9 @@ model Workspace {
   
   // Settings
   capacity      Int       @default(5) // Número de macas/cadeiras
+  
+  // Google Calendar Integration (Shared Studio Calendar)
+  googleCalendarId String? // e.g., "abc123@group.calendar.google.com"
 
   members       WorkspaceMember[]
   artists       Artist[]

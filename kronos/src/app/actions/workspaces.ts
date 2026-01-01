@@ -236,6 +236,53 @@ export async function updateWorkspaceBranding(data: {
 }
 
 /**
+ * Atualiza a configuração do Google Calendar do Workspace.
+ * Apenas ADMINs do workspace podem modificar.
+ */
+export async function updateWorkspaceCalendar(data: {
+    googleCalendarId?: string
+}) {
+    try {
+        const session = await getServerSession(authOptions)
+        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+
+        if (!session?.user || !activeWorkspaceId) {
+            return { error: 'Não autorizado ou nenhum estúdio ativo.' }
+        }
+
+        // Verificar permissão
+        const member = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: activeWorkspaceId,
+                    userId: (session.user as any).id
+                }
+            }
+        })
+
+        if (!member || member.role !== 'ADMIN') {
+            return { error: 'Apenas administradores podem configurar a integração de calendário.' }
+        }
+
+        await prisma.workspace.update({
+            where: { id: activeWorkspaceId },
+            data: {
+                googleCalendarId: data.googleCalendarId || null
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        revalidatePath('/artist/agenda')
+
+        return { success: true, message: 'Google Calendar configurado com sucesso!' }
+
+    } catch (error) {
+        console.error('Error updating workspace calendar:', error)
+        return { error: 'Erro ao salvar configuração do calendário.' }
+    }
+}
+
+/**
  * Remove um artista do workspace (Revoga acesso).
  * Apenas ADMINs podem realizar esta ação.
  */
