@@ -120,6 +120,10 @@ export const authOptions: NextAuthOptions = {
                         })
                     }
 
+                    if (!user) {
+                        throw new Error("Falha crítica: Usuário não pôde ser autenticado.")
+                    }
+
                     return {
                         id: user.id,
                         email: user.email,
