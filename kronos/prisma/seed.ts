@@ -348,41 +348,69 @@ async function main() {
 
   console.log('⏰ Slots criados:', slots.length)
 
-  // Criar alguns agendamentos
-  const bookings = await Promise.all([
-    prisma.booking.create({
-      data: {
-        clientId: clients[0].id,
-        artistId: artists[0].id,
-        slotId: slots[0].id,
-        workspaceId: workspace.id,
-        value: 400,
-        finalValue: 400,
-        studioShare: 80,
-        artistShare: 320,
-        status: 'CONFIRMED',
-        scheduledFor: new Date('2025-01-15T14:00:00'),
-        duration: 120
-      }
-    }),
-    prisma.booking.create({
-      data: {
-        clientId: clients[1].id,
-        artistId: artists[1].id,
-        slotId: slots[3].id,
-        workspaceId: workspace.id,
-        value: 300,
-        finalValue: 300,
-        studioShare: 75,
-        artistShare: 225,
-        status: 'OPEN',
-        scheduledFor: new Date('2025-01-16T10:00:00'),
-        duration: 180
-      }
-    })
-  ])
+  // Criar alguns agendamentos históricos para validação financeira
+  // Criando dados para os últimos 6 meses
+  const historicalBookings = []
+  const artistList = [artists[0], artists[1], artists[2]]
+  const clientList = [clients[0], clients[1], clients[2], clients[3], clients[4]]
 
-  console.log('📅 Agendamentos criados:', bookings.length)
+  // Generate bookings for the past 6 months
+  for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
+    const bookingDate = new Date()
+    bookingDate.setMonth(bookingDate.getMonth() - monthsAgo)
+    bookingDate.setDate(15) // Mid-month
+
+    // Create 3-5 bookings per month per artist
+    for (let artistIdx = 0; artistIdx < 3; artistIdx++) {
+      const numBookings = 3 + Math.floor(Math.random() * 3) // 3-5 bookings
+
+      for (let i = 0; i < numBookings; i++) {
+        const bookingDay = new Date(bookingDate)
+        bookingDay.setDate(5 + i * 5) // Days 5, 10, 15, 20, 25
+
+        const value = 300 + Math.floor(Math.random() * 500) // R$ 300 - R$ 800
+        const commissionRate = artistList[artistIdx].commissionRate || 0.75
+        const artistShare = Math.round(value * commissionRate)
+        const studioShare = value - artistShare
+
+        // Create slot for historical booking
+        const slotStart = new Date(bookingDay)
+        slotStart.setHours(10 + i * 2, 0, 0, 0)
+        const slotEnd = new Date(slotStart)
+        slotEnd.setHours(slotStart.getHours() + 3)
+
+        const historicalSlot = await prisma.slot.create({
+          data: {
+            macaId: (i % 3) + 1,
+            startTime: slotStart,
+            endTime: slotEnd,
+            isActive: true,
+            workspaceId: workspace.id
+          }
+        })
+
+        const booking = await prisma.booking.create({
+          data: {
+            clientId: clientList[i % clientList.length].id,
+            artistId: artistList[artistIdx].id,
+            slotId: historicalSlot.id,
+            workspaceId: workspace.id,
+            value: value,
+            finalValue: value,
+            studioShare: studioShare,
+            artistShare: artistShare,
+            status: monthsAgo > 0 ? 'COMPLETED' : (i < 2 ? 'COMPLETED' : 'CONFIRMED'),
+            settlementId: null, // All unsettled for testing
+            scheduledFor: bookingDay,
+            duration: 180
+          }
+        })
+        historicalBookings.push(booking)
+      }
+    }
+  }
+
+  console.log('📅 Agendamentos históricos criados:', historicalBookings.length)
 
   // Criar assinantes
   const subscribers = await Promise.all([
@@ -416,7 +444,7 @@ async function main() {
 - ${products.length} produtos
 - ${offers.length} ofertas
 - ${slots.length} slots de horários
-- ${bookings.length} agendamentos
+- ${historicalBookings.length} agendamentos
 - ${subscribers.length} assinantes
   `)
 }
