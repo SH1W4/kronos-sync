@@ -30,13 +30,14 @@ export const authOptions: NextAuthOptions = {
             name: "Magic Link",
             credentials: {
                 email: { label: "Email", type: "email" },
-                code: { label: "Code", type: "text" }
+                code: { label: "Code", type: "text" },
+                inviteCode: { label: "Invite Code", type: "text" }
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.code) return null
 
                 try {
-                    // 1. Validate Code
+                    // 1. Validate Login Code
                     const verificationCode = await prisma.verificationCode.findFirst({
                         where: {
                             email: credentials.email.toLowerCase(),
@@ -57,18 +58,65 @@ export const authOptions: NextAuthOptions = {
                         data: { used: true }
                     })
 
-                    // 3. Find or Create User
+                    // 3. Find User
                     let user = await prisma.user.findUnique({
-                        where: { email: credentials.email.toLowerCase() }
+                        where: { email: credentials.email.toLowerCase() },
+                        include: { artist: true }
                     })
 
-                    if (!user) {
-                        user = await prisma.user.create({
-                            data: {
-                                email: credentials.email.toLowerCase(),
-                                name: credentials.email.split('@')[0],
-                                role: 'CLIENT'
-                            }
+                    // 4. Professional Gate Logic
+                    const isProfessional = user && (user.role === 'ARTIST' || user.role === 'ADMIN')
+                    const inviteCode = credentials.inviteCode
+
+                    if (!isProfessional) {
+                        // If not a pro, MUST have a valid invite code to enter
+                        if (!inviteCode) {
+                            throw new Error("Acesso restrito a profissionais. Utilize um link de convite.")
+                        }
+
+                        const invite = await prisma.inviteCode.findUnique({
+                            where: { code: inviteCode, isActive: true },
+                        })
+
+                        if (!invite || (invite.expiresAt && invite.expiresAt < new Date()) || (invite.maxUses > 0 && invite.currentUses >= invite.maxUses)) {
+                            throw new Error("Convite inválido ou expirado")
+                        }
+
+                        // Create/Upgrade User as Artist
+                        if (!user) {
+                            user = await prisma.user.create({
+                                data: {
+                                    email: credentials.email.toLowerCase(),
+                                    name: credentials.email.split('@')[0],
+                                    role: 'ARTIST'
+                                },
+                                include: { artist: true }
+                            })
+                        } else {
+                            // If they were a CLIENT, upgrade to ARTIST
+                            user = await prisma.user.update({
+                                where: { id: user.id },
+                                data: { role: 'ARTIST' },
+                                include: { artist: true }
+                            })
+                        }
+
+                        // Create Artist Profile linked to the invite's workspace
+                        if (!user.artist) {
+                            await prisma.artist.create({
+                                data: {
+                                    userId: user.id,
+                                    workspaceId: invite.workspaceId,
+                                    plan: invite.targetPlan || 'GUEST',
+                                    validUntil: invite.durationDays ? new Date(Date.now() + invite.durationDays * 24 * 60 * 60 * 1000) : null
+                                }
+                            })
+                        }
+
+                        // Increment invite uses
+                        await prisma.inviteCode.update({
+                            where: { id: invite.id },
+                            data: { currentUses: { increment: 1 } }
                         })
                     }
 
@@ -79,9 +127,9 @@ export const authOptions: NextAuthOptions = {
                         role: user.role,
                         image: user.image
                     }
-                } catch (error) {
+                } catch (error: any) {
                     console.error("❌ Magic Link Error:", error)
-                    return null
+                    throw new Error(error.message || "Erro na autenticação")
                 }
             }
         }),

@@ -9,9 +9,10 @@ import { signIn } from 'next-auth/react'
 interface VerifyCodeProps {
     email: string
     onBack: () => void
+    inviteCode?: string
 }
 
-export default function VerifyCode({ email, onBack }: VerifyCodeProps) {
+export default function VerifyCode({ email, onBack, inviteCode }: VerifyCodeProps) {
     const [code, setCode] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -40,6 +41,7 @@ export default function VerifyCode({ email, onBack }: VerifyCodeProps) {
             const result = await signIn('magic-link', {
                 email,
                 code,
+                inviteCode,
                 redirect: false
             })
 

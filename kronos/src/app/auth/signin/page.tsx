@@ -5,9 +5,13 @@ import { BrandLogo } from '@/components/ui/brand-logo'
 import MagicLinkLogin from '@/components/auth/MagicLinkLogin'
 import VerifyCode from '@/components/auth/VerifyCode'
 import { Button } from '@/components/ui/button'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 
 export default function SignInPage() {
+    const searchParams = useSearchParams()
+    const inviteCode = searchParams.get('invite') || ''
+
     const [step, setStep] = useState<'email' | 'code'>('email')
     const [email, setEmail] = useState('')
 
@@ -34,7 +38,7 @@ export default function SignInPage() {
                     {step === 'email' ? (
                         <MagicLinkLogin onSuccess={handleEmailSent} />
                     ) : (
-                        <VerifyCode email={email} onBack={() => setStep('email')} />
+                        <VerifyCode email={email} onBack={() => setStep('email')} inviteCode={inviteCode} />
                     )}
 
 

@@ -14,7 +14,7 @@ interface FinanceItem {
     studioShare: number
     status: string
     client: { name: string | null }
-    date: Date
+    date: string | Date
 }
 
 interface FinanceClientProps {
