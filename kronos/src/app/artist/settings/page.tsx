@@ -39,7 +39,7 @@ export default function SettingsPage() {
     const [studioName, setStudioName] = useState('')
     const [studioLogo, setStudioLogo] = useState('')
     const [studioColor, setStudioColor] = useState('#8B5CF6')
-    const [studioCapacity, setStudioCapacity] = useState(5)
+    const [studioCapacity, setStudioCapacity] = useState(3)
 
     // Personal State
     const [personalColor, setPersonalColor] = useState('#8B5CF6')
@@ -81,7 +81,7 @@ export default function SettingsPage() {
                 setStudioName(currentWorkspace.name || '')
                 setStudioLogo(currentWorkspace.logoUrl || '')
                 setStudioColor(currentWorkspace.primaryColor || '#8B5CF6')
-                setStudioCapacity(currentWorkspace.capacity || 5)
+                setStudioCapacity(currentWorkspace.capacity || 3)
                 setGoogleCalendarId(currentWorkspace.googleCalendarId || '')
             }
 

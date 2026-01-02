@@ -39,7 +39,8 @@ export async function createWorkspace(data: { name: string, primaryColor: string
                     name: data.name,
                     slug: finalSlug,
                     primaryColor: data.primaryColor || '#8B5CF6',
-                    ownerId: user.id
+                    ownerId: user.id,
+                    capacity: 3
                 }
             })
 
