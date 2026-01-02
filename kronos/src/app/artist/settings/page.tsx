@@ -56,9 +56,12 @@ export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<'profile' | 'link' | 'sync' | 'plan' | 'security' | 'payments' | 'studio' | 'appearance'>('profile')
 
     // Initialize values when session is available
+    const [isInitialized, setIsInitialized] = useState(false)
+
     useEffect(() => {
-        if (session?.user) {
+        if (session?.user && !isInitialized) {
             setName(session.user.name || '')
+            setIsInitialized(true)
             if ((session.user as any).commissionRate !== undefined) {
                 setCommission(String((session.user as any).commissionRate * 100))
             }

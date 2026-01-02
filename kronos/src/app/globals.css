@@ -44,6 +44,7 @@
     bottom: 100%;
     animation: scanline 6s linear infinite;
     pointer-events: none;
+    will-change: transform;
   }
 
   .data-pattern-grid {
@@ -73,6 +74,7 @@
     border: 1px solid rgba(var(--primary-rgb), 0.3);
     clip-path: inset(0 0 95% 0);
     animation: glitch-line 4s infinite;
+    will-change: clip-path;
   }
 
   /* Text Glitch Effect */
@@ -97,6 +99,7 @@
     text-shadow: -2px 0 #ff00c1;
     clip: rect(44px, 450px, 56px, 0);
     animation: glitch-anim 5s infinite linear alternate-reverse;
+    will-change: clip, transform;
   }
 
   .text-glitch::after {

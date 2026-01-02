@@ -149,7 +149,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [session])
 
   // Apply theme to CSS variables
+  const lastThemeRef = React.useRef<string>('')
+
   useEffect(() => {
+    const themeStr = JSON.stringify(theme)
+    if (lastThemeRef.current === themeStr) return
+    lastThemeRef.current = themeStr
+
     const root = document.documentElement
 
     // Helper to extract RGB from hex
