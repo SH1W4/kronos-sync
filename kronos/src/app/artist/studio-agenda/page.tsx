@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { startOfDay, endOfDay, addDays, subDays, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getWorkspaceBookings } from '@/app/actions/bookings'
+import { getWorkspaceSettings } from '@/app/actions/settings'
 import { StudioTimeline } from '@/components/agenda/StudioTimeline'
 import { Button } from '@/components/ui/button'
 import { Calendar, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
@@ -11,6 +12,7 @@ import { Calendar, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 export default function StudioAgendaPage() {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [bookings, setBookings] = useState<any[]>([])
+    const [capacity, setCapacity] = useState(3)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -23,12 +25,21 @@ export default function StudioAgendaPage() {
             const start = startOfDay(currentDate)
             const end = endOfDay(currentDate)
 
-            const result = await getWorkspaceBookings({ startDate: start, endDate: end })
-            if (result.success && result.bookings) {
-                setBookings(result.bookings)
+            // Load bookings and settings in parallel
+            const [bookingsResult, settingsResult] = await Promise.all([
+                getWorkspaceBookings({ startDate: start, endDate: end }),
+                getWorkspaceSettings()
+            ])
+
+            if (bookingsResult.success && bookingsResult.bookings) {
+                setBookings(bookingsResult.bookings)
+            }
+
+            if (settingsResult.success && settingsResult.settings) {
+                setCapacity(settingsResult.settings.capacity || 3)
             }
         } catch (error) {
-            console.error('Error loading studio bookings:', error)
+            console.error('Error loading studio data:', error)
         } finally {
             setLoading(false)
         }
@@ -97,7 +108,7 @@ export default function StudioAgendaPage() {
                 ) : (
                     <StudioTimeline
                         bookings={bookings}
-                        capacity={5} // TODO: Fetch dynamic capacity
+                        capacity={capacity}
                         currentDate={currentDate}
                     />
                 )}
