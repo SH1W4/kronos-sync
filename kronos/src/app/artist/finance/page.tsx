@@ -239,19 +239,34 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
 
         const realizedEarnings =
             (realizedBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (metricsOrders.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+            (metricsOrders.reduce((acc: number, o: any) => {
+                const artistPart = o.items
+                    .filter((item: any) => item.product.artistId === artist.id)
+                    .reduce((itemAcc: number, item: any) => itemAcc + (item.product.basePrice * (item.quantity || 1)), 0)
+                return acc + artistPart
+            }, 0) || 0)
 
         const projectionEarnings =
             (projectedBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0)
 
         const monthlyRevenue =
             (metricsBookings.reduce((acc, b) => acc + (b.value || 0), 0) || 0) +
-            (metricsOrders.reduce((acc: number, o: any) => acc + (o.finalTotal || 0), 0) || 0)
+            (metricsOrders.reduce((acc: number, o: any) => {
+                const artistPartTotal = o.items
+                    .filter((item: any) => item.product.artistId === artist.id)
+                    .reduce((itemAcc: number, item: any) => itemAcc + (item.price * (item.quantity || 1)), 0)
+                return acc + artistPartTotal
+            }, 0) || 0)
 
         // Calculate Total Pending (Accumulated Debt - EVERYTHING already COMPLETED but not settled)
         const totalPendingEarnings =
             (pendingBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (pendingOrders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+            (pendingOrders?.reduce((acc: number, o: any) => {
+                const artistPart = o.items
+                    .filter((item: any) => item.product.artistId === artist.id)
+                    .reduce((itemAcc: number, item: any) => itemAcc + (item.product.basePrice * (item.quantity || 1)), 0)
+                return acc + artistPart
+            }, 0) || 0)
 
 
         // Map data for Client Component with Safe Date Serialization
@@ -266,16 +281,22 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
             date: b.slot?.startTime ? b.slot.startTime.toISOString() : new Date().toISOString()
         }))
 
-        const mappedOrders = pendingOrders.map((o: any) => ({
-            id: o.id,
-            type: 'PRODUCT' as const,
-            value: o.finalTotal || 0,
-            artistShare: o.artistShare || 0,
-            studioShare: o.studioShare || 0,
-            status: o.status,
-            client: { name: o.client?.name || 'Cliente' },
-            date: o.createdAt ? o.createdAt.toISOString() : new Date().toISOString()
-        }))
+        const mappedOrders = pendingOrders.map((o: any) => {
+            const artistItems = o.items.filter((item: any) => item.product.artistId === artist.id)
+            const artistShare = artistItems.reduce((acc: number, i: any) => acc + (i.product.basePrice * (i.quantity || 1)), 0)
+            const totalItemsValue = artistItems.reduce((acc: number, i: any) => acc + (i.price * (i.quantity || 1)), 0)
+
+            return {
+                id: o.id,
+                type: 'PRODUCT' as const,
+                value: totalItemsValue,
+                artistShare: artistShare,
+                studioShare: totalItemsValue - artistShare,
+                status: o.status,
+                client: { name: o.client?.name || 'Cliente' },
+                date: o.createdAt ? o.createdAt.toISOString() : new Date().toISOString()
+            }
+        })
 
         const allPendingItems = [...mappedBookings, ...mappedOrders].sort((a, b) =>
             new Date(b.date).getTime() - new Date(a.date).getTime()

@@ -127,7 +127,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                         <div className="scanline opacity-[0.05]" />
                         <p className="text-[10px] text-primary font-mono uppercase tracking-widest mb-1">SALDO DISPONÍVEL (TOTAL)</p>
                         <p className="text-3xl font-bold font-orbitron text-white pixel-text text-glow">
-                            {formatCurrency(metrics.totalPendingEarnings)}
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 }).format(metrics.totalPendingEarnings)}
                         </p>
                     </div>
                 </div>
@@ -317,7 +317,7 @@ function MetricCard({ title, value, icon, prefix = "R$ ", trend }: any) {
                 <div className="text-right">
                     <h3 className="text-gray-500 text-[10px] font-mono uppercase tracking-[0.2em] mb-1">{title}</h3>
                     <p className="text-3xl font-black font-orbitron text-white tracking-tighter text-glow group-hover:scale-105 transition-transform duration-500">
-                        {prefix}{value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        {prefix}{value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </p>
                     {trend && <p className="text-[8px] font-mono text-blue-400 uppercase mt-1 tracking-widest">{trend}</p>}
                 </div>
