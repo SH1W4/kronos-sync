@@ -6,7 +6,7 @@
 ## 📊 Status do Projeto
 
 **Versão:** 2.1.0  
-**Completude:** 90% → Meta: 100% MVP  
+**Completude:** 91% → Meta: 100% MVP  
 **Última Atualização:** 02 de Janeiro de 2026  
 **Branch Ativa:** `main` (Production)
 
@@ -58,7 +58,8 @@ PWA:       Service Worker + Manifest
 - [x] **INK PASS** - Sistema de convites premium
 - [x] **Google Sync** - Sincronização bidirecional de calendário
 - [x] **PWA** - Manifest + Service Worker + ícones
-- [x] **Smart Anamnesis** - Reuso de fichas e links rápidos (Novo)
+- [x] **Smart Anamnesis** - Reuso de fichas e links rápidos
+- [x] **QR Scanner** - Validação de cupons cross-artista
 
 ### Features Avançadas (100%)
 - [x] **Assistente KAI** - Branding por IA via Instagram
@@ -161,8 +162,9 @@ PWA:       Service Worker + Manifest
 1. ✅ **Governança:** artist-terms.md + TermsGate Implementado
 2. ✅ **Branding:** Visual B&W e KAI Network.
 3. ✅ **Ativação KAI:** Agente com NLP e Feedback.
-4. ⏳ **Smart Anamnesis:** Otimização de fluxo recorrente.
-5. ⏳ **Notificações:** WhatsApp/Email.
+4. ✅ **Smart Anamnesis:** Otimização de fluxo recorrente.
+5. ✅ **QR Scanner:** Validação de cupons colaborativa.
+6. ⏳ **Notificações:** WhatsApp/Email.
 
 ### Próximo Sprint: Beta Testing (2-3 semanas)
 1. Recrutar 5-10 estúdios beta testers
