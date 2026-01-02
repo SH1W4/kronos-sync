@@ -24,7 +24,11 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
         }
 
         // Parse Date from Search Params (Default to Current Month)
-        const now = new Date()
+        // Parse Date with Brazil Timezone consideration
+        const options = { timeZone: 'America/Sao_Paulo' }
+        const nowStr = new Date().toLocaleString('en-US', options)
+        const now = new Date(nowStr)
+
         let selectedDate = now
         if (searchParams?.date) {
             const [year, month] = searchParams.date.split('-').map(Number)
@@ -171,12 +175,11 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
             }
         }) as any
 
-        // 2. METRICS DATA - Content for the Selected Month (Settled OR Unsettled)
-        // We need to fetch ALL productive work in this timeframe to show "Earnings this Month"
+        // 2. METRICS DATA - Get COMPLETED for Realized and CONFIRMED for Projection
         const metricsBookings = await prisma.booking.findMany({
             where: {
                 artistId: artist.id,
-                status: 'COMPLETED',
+                status: { in: ['COMPLETED', 'CONFIRMED'] },
                 slot: {
                     startTime: {
                         gte: startOfMonth,
@@ -194,17 +197,11 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
                     lte: endOfMonth
                 },
                 items: {
-                    some: {
-                        product: {
-                            artistId: artist.id
-                        }
-                    }
+                    some: { product: { artistId: artist.id } }
                 }
             },
             include: {
-                items: {
-                    include: { product: true }
-                }
+                items: { include: { product: true } }
             }
         }) as any
 
@@ -237,15 +234,21 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
         }))
 
         // Calculate Metrics for SELECTED Month
-        const monthlyEarnings =
-            (metricsBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (metricsOrders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+        const realizedBookings = metricsBookings.filter(b => b.status === 'COMPLETED')
+        const projectedBookings = metricsBookings.filter(b => b.status === 'CONFIRMED')
+
+        const realizedEarnings =
+            (realizedBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
+            (metricsOrders.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
+
+        const projectionEarnings =
+            (projectedBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0)
 
         const monthlyRevenue =
-            (metricsBookings?.reduce((acc, b) => acc + (b.value || 0), 0) || 0) +
-            (metricsOrders?.reduce((acc: number, o: any) => acc + (o.finalTotal || 0), 0) || 0)
+            (metricsBookings.reduce((acc, b) => acc + (b.value || 0), 0) || 0) +
+            (metricsOrders.reduce((acc: number, o: any) => acc + (o.finalTotal || 0), 0) || 0)
 
-        // Calculate Total Pending (Accumulated Debt)
+        // Calculate Total Pending (Accumulated Debt - EVERYTHING already COMPLETED but not settled)
         const totalPendingEarnings =
             (pendingBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
             (pendingOrders?.reduce((acc: number, o: any) => acc + (o.artistShare || 0), 0) || 0)
@@ -293,10 +296,11 @@ export default async function FinancePage({ searchParams }: { searchParams: { da
                 settlements={safeSettlements}
                 selectedDate={selectedDate.toISOString()}
                 metrics={{
-                    monthlyRevenue, // Gross Revenue for selected month
-                    monthlyEarnings, // Artist Earnings for selected month
-                    monthlyBookings: metricsBookings.length + metricsOrders.length, // Count
-                    totalPendingEarnings // "Acertos Pendentes" (Total Debt)
+                    monthlyRevenue,
+                    realizedEarnings,
+                    projectionEarnings,
+                    totalPendingEarnings,
+                    monthlyBookings: metricsBookings.length + metricsOrders.length
                 }}
             />
         )

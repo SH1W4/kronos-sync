@@ -32,7 +32,8 @@ interface FinanceClientProps {
     settlements: any[]
     metrics: {
         monthlyRevenue: number
-        monthlyEarnings: number
+        realizedEarnings: number
+        projectionEarnings: number
         monthlyBookings: number
         totalPendingEarnings: number
     }
@@ -122,10 +123,11 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                         <p className="text-[8px] text-gray-400 font-mono uppercase tracking-[0.3em] mb-1">Chave PIX Estúdio</p>
                         <p className="text-sm font-bold font-mono text-primary tracking-wider">{workspace.pixKey || 'Não configurada'}</p>
                     </div>
-                    <div className="flex-1 md:flex-none bg-red-500/10 border border-red-500/20 px-6 py-3 rounded-xl text-right">
-                        <p className="text-[10px] text-red-400 font-mono uppercase tracking-widest mb-1">COMISSÃO A PAGAR (TOTAL)</p>
-                        <p className="text-3xl font-bold font-orbitron text-white pixel-text">
-                            {formatCurrency(metrics.totalPendingEarnings || items.reduce((acc, i) => acc + i.studioShare, 0))}
+                    <div className="flex-1 md:flex-none bg-primary/10 border border-primary/20 px-6 py-3 rounded-xl text-right relative overflow-hidden group">
+                        <div className="scanline opacity-[0.05]" />
+                        <p className="text-[10px] text-primary font-mono uppercase tracking-widest mb-1">SALDO DISPONÍVEL (TOTAL)</p>
+                        <p className="text-3xl font-bold font-orbitron text-white pixel-text text-glow">
+                            {formatCurrency(metrics.totalPendingEarnings)}
                         </p>
                     </div>
                 </div>
@@ -133,9 +135,9 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
 
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MetricCard title="FATURAMENTO BRUTO (MÊS)" value={metrics.monthlyRevenue || 0} icon={<DollarSign className="text-purple-400" />} />
-                <MetricCard title="SEU LUCRO (MÊS)" value={metrics.monthlyEarnings} icon={<TrendingUp className="text-green-400" />} />
-                <MetricCard title="ACERTOS PENDENTES" value={items.length} icon={<CreditCard className="text-blue-400" />} prefix="" />
+                <MetricCard title="REALIZADO (MÊS)" value={metrics.realizedEarnings} icon={<CheckCircle2 className="text-green-400" />} />
+                <MetricCard title="PROJEÇÃO (MÊS)" value={metrics.realizedEarnings + metrics.projectionEarnings} icon={<TrendingUp className="text-blue-400" />} trend={`+ ${formatCurrency(metrics.projectionEarnings)} aguardando`} />
+                <MetricCard title="BRUTO (MÊS)" value={metrics.monthlyRevenue} icon={<DollarSign className="text-purple-400" />} />
             </div>
 
             {/* Tabs */}
@@ -303,7 +305,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
     )
 }
 
-function MetricCard({ title, value, icon, prefix = "R$ " }: any) {
+function MetricCard({ title, value, icon, prefix = "R$ ", trend }: any) {
     return (
         <div className="bg-gray-950/40 border border-white/5 p-8 rounded-[2rem] hover:border-primary/50 transition-all group relative overflow-hidden backdrop-blur-sm">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -315,8 +317,9 @@ function MetricCard({ title, value, icon, prefix = "R$ " }: any) {
                 <div className="text-right">
                     <h3 className="text-gray-500 text-[10px] font-mono uppercase tracking-[0.2em] mb-1">{title}</h3>
                     <p className="text-3xl font-black font-orbitron text-white tracking-tighter text-glow group-hover:scale-105 transition-transform duration-500">
-                        {prefix}{value.toLocaleString('pt-BR')}
+                        {prefix}{value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
+                    {trend && <p className="text-[8px] font-mono text-blue-400 uppercase mt-1 tracking-widest">{trend}</p>}
                 </div>
             </div>
         </div>
