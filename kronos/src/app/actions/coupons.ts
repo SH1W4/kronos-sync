@@ -97,7 +97,7 @@ export async function redeemCouponAction(code: string) {
             return { success: false, message: 'Este cupom expirou.' }
         }
 
-        // REDIMIR: Marcar como USED
+        // REDIMIR: Marcar como USED e Vincular quem usou
         await prisma.coupon.update({
             where: { id: coupon.id },
             data: {
@@ -105,6 +105,18 @@ export async function redeemCouponAction(code: string) {
                 usedByUserId: session.user.id // Artista que deu baixa
             }
         })
+
+        // ECONOMIA COLABORATIVA: Creditar comissão de indicação (Lead Bonus) ao artista criador
+        // Se houver um artista vinculado ao cupom, ele ganha um bônus fixo pela indicação/ativação
+        if (coupon.artistId) {
+            await prisma.artist.update({
+                where: { id: coupon.artistId },
+                data: {
+                    monthlyEarnings: { increment: 10.00 } // Bônus fixo de R$ 10,00 por ativação de cupom
+                }
+            })
+            console.log(`✅ Crédito de R$ 10,00 aplicado ao artista ${coupon.artistId} (Criador do Cupom)`)
+        }
 
         revalidatePath('/artist/scanner')
 

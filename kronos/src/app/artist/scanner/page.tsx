@@ -111,11 +111,20 @@ export default function ScannerPage() {
 
                                 <div className="grid grid-cols-1 gap-3 text-left">
                                     <div className="bg-black/40 border border-white/5 p-4 rounded-xl flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-green-400">
+                                            <Sparkles size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="text-[8px] font-mono text-gray-500 uppercase">Economia Colaborativa</p>
+                                            <p className="text-sm font-bold text-green-400">+ R$ 10,00 creditado ao criador</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-black/40 border border-white/5 p-4 rounded-xl flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-primary">
                                             <Tag size={20} />
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-mono text-gray-500 uppercase">Benefício</p>
+                                            <p className="text-[8px] font-mono text-gray-500 uppercase">Benefício Cliente</p>
                                             <p className="text-lg font-orbitron font-bold">{result?.discount}% OFF</p>
                                         </div>
                                     </div>
@@ -180,15 +189,15 @@ export default function ScannerPage() {
                             </li>
                             <li className="flex gap-3">
                                 <span className="text-primary font-bold">02.</span>
-                                <span>Ao validar, o cupom será marcado como **USADO** no sistema.</span>
+                                <span>Ao validar, o cupom é marcado como **USADO** e o desconto é garantido.</span>
                             </li>
                             <li className="flex gap-3">
                                 <span className="text-primary font-bold">03.</span>
-                                <span>Você pode ler cupons gerados por **qualquer artista** do estúdio.</span>
+                                <span>Você pode ler cupons de **qualquer artista** do ecossistema.</span>
                             </li>
                             <li className="flex gap-3">
                                 <span className="text-primary font-bold">04.</span>
-                                <span>A pontuação/comissão de quem gerou o cupom é processada automaticamente.</span>
+                                <span>O artista que gerou o cupom recebe **R$ 10,00 de comissão fixa** automaticamente pelo lead.</span>
                             </li>
                         </ul>
                     </div>
