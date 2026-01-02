@@ -30,6 +30,19 @@ export default function McpWidget() {
         }
     }
 
+    const handleQuickSend = async (text: string) => {
+        setMessages(prev => [...prev, { role: 'user', text }])
+        setIsTyping(true)
+        try {
+            const response = await queryAgent(text, [])
+            setMessages(prev => [...prev, { role: 'agent', text: response.text }])
+        } catch (e) {
+            setMessages(prev => [...prev, { role: 'agent', text: 'Erro de conexão com o núcleo.' }])
+        } finally {
+            setIsTyping(false)
+        }
+    }
+
     return (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
 
@@ -61,6 +74,22 @@ export default function McpWidget() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    {/* Quick Actions (FAQ) */}
+                    <div className="px-4 pb-2 flex gap-2 overflow-x-auto custom-scrollbar">
+                        <button onClick={() => handleQuickSend("Status")} className="whitespace-nowrap px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400 hover:text-white hover:border-primary/50 transition-all font-mono">
+                            System Status
+                        </button>
+                        <button onClick={() => handleQuickSend("Financeiro")} className="whitespace-nowrap px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400 hover:text-white hover:border-primary/50 transition-all font-mono">
+                            Meus Ganhos
+                        </button>
+                        <button onClick={() => handleQuickSend("Agenda")} className="whitespace-nowrap px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400 hover:text-white hover:border-primary/50 transition-all font-mono">
+                            Próx. Cliente
+                        </button>
+                        <button onClick={() => setInput("Sugestão: ")} className="whitespace-nowrap px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-gray-400 hover:text-white hover:border-primary/50 transition-all font-mono">
+                            Enviar Ideia
+                        </button>
                     </div>
 
                     {/* Input */}
