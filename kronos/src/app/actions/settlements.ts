@@ -8,7 +8,8 @@ export async function createSettlement(data: {
     workspaceId: string
     bookingIds: string[]
     orderIds?: string[]
-    totalValue: number
+    totalValue: number // Esse valor já vem deduzido no front-end para o artista
+    bonusDeduction?: number // Valor total de bônus abatidos nesta liquidação
     proofUrl: string
 }) {
     try {
@@ -24,7 +25,9 @@ export async function createSettlement(data: {
                 },
                 orders: {
                     connect: (data.orderIds || []).map(id => ({ id }))
-                } as any
+                } as any,
+                // Registramos o abatimento nos metadados da liquidação se houver
+                aiExtractedData: data.bonusDeduction ? { bonusDeducted: data.bonusDeduction } : undefined
             }
         })
 
@@ -129,6 +132,10 @@ export async function getArtistPendingRevenue(artistId: string) {
                 status: "COMPLETED",
                 settlementId: null
             },
+            include: {
+                client: true,
+                slot: true
+            },
             orderBy: {
                 scheduledFor: 'desc'
             }
@@ -136,26 +143,16 @@ export async function getArtistPendingRevenue(artistId: string) {
 
         const orders = await prisma.order.findMany({
             where: {
-                // For now, assuming products sold by this artist. 
-                // We'd need to link order items to artist, but the order itself 
-                // in the new schema has artistShare and settlementId.
-                // Wait, the order model in schema has artistShare but not direct artistId.
-                // BUT the settlement has artistId.
-                // So we look for orders where items belong to this artist and settlementId is null.
-                // Or easier: we added settlementId to Order. We should filter by that.
-                // AND we need to know WHICH artist the order belongs to. 
-                // Since an order is for a user, and items have product -> artist.
                 items: {
                     some: {
-                        product: {
-                            artistId
-                        }
+                        product: { artistId }
                     }
                 },
                 settlementId: null,
-                status: 'PAID' // Only Paid orders can be liquidated
+                status: 'PAID'
             },
             include: {
+                client: true,
                 items: {
                     include: {
                         product: true
@@ -164,19 +161,41 @@ export async function getArtistPendingRevenue(artistId: string) {
             }
         }) as any
 
-        return { bookings, orders }
+        // NEW: Fetch accumulated bonuses (monthlyEarnings) for this artist
+        const artist = await prisma.artist.findUnique({
+            where: { id: artistId },
+            select: { monthlyEarnings: true }
+        })
+
+        return { bookings, orders, availableBonus: artist?.monthlyEarnings || 0 }
     } catch (error) {
         console.error("Error fetching pending revenue:", error)
-        return { bookings: [], orders: [] }
+        return { bookings: [], orders: [], availableBonus: 0 }
     }
 }
 
 export async function approveSettlement(settlementId: string, status: 'APPROVED' | 'REJECTED') {
     try {
-        await prisma.settlement.update({
+        const settlement = await prisma.settlement.update({
             where: { id: settlementId },
-            data: { status }
+            data: { status },
+            include: { artist: true }
         })
+
+        // Se a liquidação for aprovada, e houver bônus abatidos, resetamos os ganhos do artista
+        // Note: Em um sistema mais complexo, faríamos um controle granular por transação.
+        // Aqui, como o bônus é "abatido" no ato da liquidação total, resetamos o saldo de comissões de indicação.
+        if (status === 'APPROVED' && settlement.aiExtractedData) {
+            const data = settlement.aiExtractedData as any
+            if (data.bonusDeducted > 0) {
+                await prisma.artist.update({
+                    where: { id: settlement.artistId },
+                    data: { monthlyEarnings: { decrement: data.bonusDeducted } }
+                })
+                console.log(`📉 Bônus de R$ ${data.bonusDeducted} formalmente abatido do saldo do artista ${settlement.artistId}`)
+            }
+        }
+
         revalidatePath('/artist/finance')
         return { success: true }
     } catch (error) {

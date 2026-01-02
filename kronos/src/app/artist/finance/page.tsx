@@ -135,46 +135,9 @@ export default async function FinancePage(props: { searchParams: Promise<{ date?
 
         if (!workspace) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Workspace não configurado</div>
 
-        // 1. PENDING ITEMS (A Pagar) - ALWAYS fetch ALL pending, regardless of date selection
-        const pendingBookings = await prisma.booking.findMany({
-            where: {
-                artistId: artist.id,
-                settlementId: null,
-                status: 'COMPLETED'
-            },
-            include: {
-                client: true,
-                slot: true
-            },
-            orderBy: {
-                slot: { startTime: 'desc' }
-            }
-        })
-
-        const pendingOrders = await prisma.order.findMany({
-            where: {
-                settlementId: null,
-                status: 'PAID',
-                items: {
-                    some: {
-                        product: {
-                            artistId: artist.id
-                        }
-                    }
-                }
-            },
-            include: {
-                client: true,
-                items: {
-                    include: {
-                        product: true
-                    }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        }) as any
+        // NEW: Fetch pending revenue from Action to reuse logic
+        const { bookings: pendingBookings, orders: pendingOrders, availableBonus } = await import('@/app/actions/settlements').then(m => m.getArtistPendingRevenue(artist.id))
+        const realizedEarningsData = { availableBonus }
 
         // 2. METRICS DATA - Get COMPLETED for Realized and CONFIRMED for Projection
         const metricsBookings = await prisma.booking.findMany({
@@ -322,6 +285,7 @@ export default async function FinancePage(props: { searchParams: Promise<{ date?
                     realizedEarnings,
                     projectionEarnings,
                     totalPendingEarnings,
+                    availableBonus: realizedEarningsData.availableBonus, // Créditos de indicação acumulados
                     monthlyBookings: metricsBookings.length + metricsOrders.length
                 }}
             />

@@ -36,6 +36,7 @@ interface FinanceClientProps {
         projectionEarnings: number
         monthlyBookings: number
         totalPendingEarnings: number
+        availableBonus: number
     }
     selectedDate?: string
 }
@@ -71,9 +72,13 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
     }
 
     const calculateSelectedTotal = () => {
-        return items
+        const baseTotal = items
             .filter(i => selectedItems.includes(i.id))
             .reduce((acc, i) => acc + i.studioShare, 0)
+
+        // Deduzimos o bônus disponível do valor que o artista repassa ao estúdio
+        const finalValue = Math.max(0, baseTotal - metrics.availableBonus)
+        return { baseTotal, finalValue, bonusApplied: Math.min(baseTotal, metrics.availableBonus) }
     }
 
     const handleCreateSettlement = async () => {
@@ -84,16 +89,19 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
             const bookingIds = selectedObjects.filter(i => i.type === 'TATTOO').map(i => i.id)
             const orderIds = selectedObjects.filter(i => i.type === 'PRODUCT').map(i => i.id)
 
+            const { finalValue, bonusApplied } = calculateSelectedTotal()
+
             const res = await createSettlement({
                 artistId: artist.id,
                 workspaceId: workspace.id,
                 bookingIds: bookingIds,
                 orderIds: orderIds,
-                totalValue: calculateSelectedTotal(),
+                totalValue: finalValue,
+                bonusDeduction: bonusApplied,
                 proofUrl: proofUrl
             })
             if (res.success) {
-                alert("Liquidação enviada para análise da IA!")
+                alert(`Liquidação enviada! R$ ${bonusApplied.toFixed(2)} de bônus foram abatidos.`)
                 setSelectedItems([])
                 setProofUrl('')
                 setShowProofModal(false)
@@ -142,7 +150,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <MetricCard title="REALIZADO (MÊS)" value={metrics.realizedEarnings} icon={<CheckCircle2 className="text-secondary" />} />
                 <MetricCard title="PROJEÇÃO (MÊS)" value={metrics.realizedEarnings + metrics.projectionEarnings} icon={<TrendingUp className="text-primary" />} trend={`+ ${formatCurrency(metrics.projectionEarnings)} aguardando`} />
-                <MetricCard title="BRUTO (MÊS)" value={metrics.monthlyRevenue} icon={<DollarSign className="text-primary" />} />
+                <MetricCard title="BÔNUS ACUMULADO" value={metrics.availableBonus} icon={<Smartphone className="text-yellow-400" />} trend="Abatível na próxima liquidação" />
             </div>
 
             {/* Tabs */}
@@ -167,8 +175,13 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                     <div className="bg-black/90 border border-primary/30 rounded-3xl p-6 shadow-[0_0_50px_var(--primary-glow)] flex items-center justify-between backdrop-blur-2xl relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
                         <div className="relative z-10">
-                            <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-1 animate-pulse">Total Selecionado para Acerto</p>
-                            <p className="text-3xl font-black font-orbitron text-white text-glow">{formatCurrency(calculateSelectedTotal())}</p>
+                            <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-1 animate-pulse">Total a Repassar (C/ Abatimento)</p>
+                            <p className="text-3xl font-black font-orbitron text-white text-glow">{formatCurrency(calculateSelectedTotal().finalValue)}</p>
+                            {calculateSelectedTotal().bonusApplied > 0 && (
+                                <p className="text-[8px] font-mono text-green-400 uppercase tracking-widest mt-1">
+                                    Dedução de {formatCurrency(calculateSelectedTotal().bonusApplied)} aplicada
+                                </p>
+                            )}
                         </div>
                         <Button
                             onClick={() => setShowProofModal(true)}
@@ -279,8 +292,13 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                         </div>
 
                         <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 space-y-6 text-center">
-                            <p className="text-[10px] font-mono text-gray-500 uppercase">Valor a Transferir</p>
-                            <p className="text-4xl font-black font-orbitron text-primary">{formatCurrency(calculateSelectedTotal())}</p>
+                            <p className="text-[10px] font-mono text-gray-500 uppercase">Valor Líquido a Transferir</p>
+                            <p className="text-4xl font-black font-orbitron text-primary">{formatCurrency(calculateSelectedTotal().finalValue)}</p>
+                            {calculateSelectedTotal().bonusApplied > 0 && (
+                                <p className="text-[10px] font-bold font-mono text-green-400 bg-green-400/10 py-2 rounded-lg">
+                                    Abatimento de {formatCurrency(calculateSelectedTotal().bonusApplied)} de Bônus aplicado.
+                                </p>
+                            )}
 
                             <div className="space-y-4">
                                 <div className="bg-black p-4 rounded-2xl border border-white/10 text-left">
