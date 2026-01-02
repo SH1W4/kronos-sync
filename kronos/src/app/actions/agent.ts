@@ -43,6 +43,49 @@ export async function queryAgent(userQuery: string, history: any[]) {
     // 2. Lógica de Resposta baseada em Regras (Com Workspace Isolation)
     let responseText = ""
 
+    // A. SYSTEM STATUS CHECK
+    if (query.includes('status') || query.includes('sistema') || query.includes('ping')) {
+        try {
+            const start = Date.now()
+            await prisma.user.count({ take: 1 }) // Ping DB
+            const latency = Date.now() - start
+            responseText = `KRONØS OS [ONLINE]. \nLatência Neural: ${latency}ms. \nTodos os sistemas operacionais.`
+        } catch (e) {
+            responseText = "ALERTA: Falha na conexão com o núcleo de memória (DB Error). Contate o suporte."
+        }
+    }
+    // B. FEEDBACK LOOP
+    else if (query.startsWith('feedback') || query.startsWith('sugestão') || query.startsWith('bug') || query.startsWith('ideia')) {
+        const feedbackContent = userQuery.replace(/^(feedback|sugestão|bug|ideia)/i, '').trim()
+
+        if (feedbackContent.length < 5) {
+            responseText = "Para registrar um feedback, preciso de mais detalhes. Tente: 'sugestão adicionar modo escuro'."
+        } else {
+            await prisma.agentLog.create({
+                data: {
+                    userId: session.user.id,
+                    workspaceId: session.activeWorkspaceId,
+                    query: userQuery,
+                    response: "FEEDBACK_ACK",
+                    intent: 'USER_FEEDBACK'
+                }
+            })
+            const hash = Math.random().toString(36).substring(7).toUpperCase()
+            responseText = `Recebido. Protocolo de melhoria iniciado. ID de Rastreamento: #${hash}. \nObrigado por contribuir com a evolução do sistema.`
+        }
+    }
+    // C. CONTEXTUAL GREETING
+    else if (query === 'olá' || query === 'oi' || query === 'hello' || query === 'hi') {
+        const hour = new Date().getHours()
+        let greeting = "Olá"
+        if (hour < 12) greeting = "Bom dia"
+        else if (hour < 18) greeting = "Boa tarde"
+        else greeting = "Boa noite"
+
+        const firstName = artist.user.name?.split(' ')[0] || "Artista"
+        responseText = `${greeting}, ${firstName}. KAI online e aguardando comandos. Tente 'status' ou 'agenda'.`
+    }
+
     if (query.includes('ganho') || query.includes('faturei') || query.includes('financeiro')) {
         const aggregations = await prisma.booking.aggregate({
             where: {
@@ -78,7 +121,7 @@ export async function queryAgent(userQuery: string, history: any[]) {
         }
     }
     else {
-        responseText = `Olá ${artist.user.name?.split(' ')[0]}! Sou KAI. Ainda estou aprendendo a analisar dados complexos deste workspace, mas posso te passar seus ganhos ou agenda.`
+        responseText = `Comando não reconhecido nos meus bancos de dados atuais. \n\nTente comandos como: \n- "Status" (Verificar sistemas) \n- "Agenda" (Seus próximos clientes) \n- "Financeiro" (Seus ganhos) \n- "Sugestão [texto]" (Enviar feedback)`
     }
 
     // Log Interaction
