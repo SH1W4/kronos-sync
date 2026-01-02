@@ -9,7 +9,7 @@ export default function McpWidget() {
     const [isOpen, setIsOpen] = useState(false)
     const [isTyping, setIsTyping] = useState(false)
     const [messages, setMessages] = useState<{ role: 'agent' | 'user', text: string }[]>([
-        { role: 'agent', text: 'KAI v1.0 Online. Sistemas Sincronizados.\n\nExperimente:\n- "Status"\n- "Financeiro"\n- "Sugestão [texto]"' }
+        { role: 'agent', text: 'KAI Active. \nEstou conectado ao sistema financeiro e de agenda.\n\nComo posso ser útil hoje?' }
     ])
     const [input, setInput] = useState('')
 
@@ -52,8 +52,8 @@ export default function McpWidget() {
                     {/* Header */}
                     <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-4 border-b border-white/10 flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                            <Sparkles size={16} className="text-primary" />
-                            <span className="font-orbitron font-bold text-sm text-white">MCP AGENT</span>
+                            <Sparkles size={16} className="text-primary animate-pulse" />
+                            <span className="font-orbitron font-bold text-sm text-white tracking-widest">KRONØS NETWORK</span>
                         </div>
                         <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white">
                             <X size={16} />
@@ -95,8 +95,8 @@ export default function McpWidget() {
                     {/* Input */}
                     <div className="p-3 bg-black flex gap-2 border-t border-white/10">
                         <input
-                            className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-3 text-xs focus:border-primary outline-none text-white font-mono"
-                            placeholder="Comando ('Status', 'Sugestão...')..."
+                            className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-3 text-xs focus:border-primary outline-none text-white font-mono placeholder:text-gray-600"
+                            placeholder="Pergunte naturalmente..."
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
