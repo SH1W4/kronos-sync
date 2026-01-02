@@ -220,9 +220,9 @@ export default async function ArtistDashboard() {
 
 function MetricCard({ title, value, trend, icon, variant }: any) {
     const variants: any = {
-        primary: "border-primary/20 text-primary shadow-[0_0_20px_rgba(139,92,246,0.05)]",
-        secondary: "border-purple-400/20 text-purple-400 shadow-[0_0_20px_rgba(192,132,252,0.05)]",
-        accent: "border-accent/20 text-accent shadow-[0_0_20px_rgba(34,197,94,0.05)]",
+        primary: "border-primary/20 text-primary shadow-[0_0_20px_var(--primary-glow)]",
+        secondary: "border-secondary/20 text-secondary shadow-[0_0_20px_rgba(var(--secondary-rgb),0.05)]",
+        accent: "border-accent/20 text-accent shadow-[0_0_20px_rgba(var(--accent-rgb),0.05)]",
         ghost: "border-white/5 text-gray-500",
     }
     return (
@@ -243,7 +243,7 @@ function MetricCard({ title, value, trend, icon, variant }: any) {
 function AppointmentCard({ id, time, client, project, status }: any) {
     const isLive = status === 'IN_PROGRESS' || status === 'CONFIRMED'
     return (
-        <div className={`relative overflow-hidden rounded-2xl p-6 border transition-all duration-500 group ${isLive ? 'bg-primary/10 border-primary/30 shadow-[0_0_30px_rgba(139,92,246,0.1)]' : 'bg-zinc-950/50 border-white/5 hover:border-white/20 hover:bg-zinc-900/50'}`}>
+        <div className={`relative overflow-hidden rounded-2xl p-6 border transition-all duration-500 group ${isLive ? 'bg-primary/10 border-primary/30 shadow-[0_0_30px_var(--primary-glow)]' : 'bg-zinc-950/50 border-white/5 hover:border-white/20 hover:bg-zinc-900/50'}`}>
             <div className="absolute inset-y-0 left-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
             <div className="flex flex-col md:flex-row gap-6 items-center relative z-10">
                 <div className="min-w-[100px] text-center md:text-left">
@@ -255,7 +255,7 @@ function AppointmentCard({ id, time, client, project, status }: any) {
                     <p className="text-[10px] text-gray-500 font-mono tracking-[0.2em] uppercase opacity-60">{project}</p>
                 </div>
                 <Link href={`/artist/anamnese/${id}`}>
-                    <Button variant="outline" className="h-10 px-6 border-primary/30 text-primary hover:bg-primary hover:text-black font-orbitron font-black uppercase italic tracking-widest text-[10px] rounded-xl transition-all shadow-[0_0_15px_rgba(139,92,246,0.1)]">
+                    <Button variant="outline" className="h-10 px-6 border-primary/30 text-primary hover:bg-primary hover:text-black font-orbitron font-black uppercase italic tracking-widest text-[10px] rounded-xl transition-all shadow-[0_0_15px_var(--primary-glow)]">
                         📝 VER FICHA
                     </Button>
                 </Link>

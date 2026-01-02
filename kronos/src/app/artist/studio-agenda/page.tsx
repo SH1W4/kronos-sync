@@ -46,11 +46,11 @@ export default function StudioAgendaPage() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-                            <Calendar className="text-purple-400" size={24} />
+                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                            <Calendar className="text-primary" size={24} />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-orbitron font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-white">
+                            <h1 className="text-2xl font-orbitron font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-white">
                                 AGENDA DO ESTÚDIO
                             </h1>
                             <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">
@@ -79,7 +79,7 @@ export default function StudioAgendaPage() {
                             variant="primary"
                             size="sm"
                             onClick={handleToday}
-                            className="bg-purple-600 hover:bg-purple-500 h-8 text-xs font-bold"
+                            className="bg-primary hover:opacity-90 h-8 text-xs font-bold text-background"
                         >
                             HOJE
                         </Button>
@@ -90,7 +90,7 @@ export default function StudioAgendaPage() {
                 {loading ? (
                     <div className="flex items-center justify-center h-96 border border-white/10 rounded-xl bg-gray-900/20">
                         <div className="flex flex-col items-center gap-4">
-                            <Loader2 className="animate-spin text-purple-400" size={32} />
+                            <Loader2 className="animate-spin text-primary" size={32} />
                             <p className="text-xs font-mono text-gray-500 animate-pulse">CARREGANDO DADOS...</p>
                         </div>
                     </div>

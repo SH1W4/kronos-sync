@@ -13,8 +13,11 @@ import { useRouter } from 'next/navigation'
 import { InkPassCard } from '@/components/invites/InkPassCard'
 import { getInvites, createInvite, revokeInvite } from '@/app/actions/invites'
 
+import { useTheme } from '@/contexts/theme-context'
+
 export default function SettingsPage() {
     const { data: session, update: updateSession } = useSession()
+    const { theme, setTheme } = useTheme()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [copied, setCopied] = useState(false)
@@ -234,6 +237,9 @@ export default function SettingsPage() {
         try {
             const result = await updateUserTheme(personalColor)
             if (result.success) {
+                // Update in-memory theme immediately
+                setTheme({ ...theme, primaryColor: personalColor })
+
                 alert('Tema pessoal atualizado!')
                 await updateSession()
             } else {
@@ -614,7 +620,7 @@ export default function SettingsPage() {
                                         <Button
                                             onClick={handleStudioSave}
                                             disabled={loading}
-                                            className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-10 rounded-xl transition-all"
+                                            className="bg-primary hover:opacity-80 text-background font-bold px-8 h-10 rounded-xl transition-all"
                                         >
                                             {loading ? 'SALVANDO...' : 'SALVAR CONFIGURAÇÕES'}
                                         </Button>
@@ -626,13 +632,13 @@ export default function SettingsPage() {
                         {activeTab === 'appearance' && (
                             <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Palette className="text-purple-400" size={20} />
+                                    <Palette className="text-primary" size={20} />
                                     <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Personalização do HUD</h2>
                                 </div>
 
                                 <div className="space-y-6">
-                                    <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
-                                        <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-2">Identidade Visual Pessoal</p>
+                                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                                        <p className="text-[10px] font-mono text-primary uppercase tracking-widest mb-2">Identidade Visual Pessoal</p>
                                         <p className="text-xs text-gray-400 leading-relaxed">
                                             Customize a cor do seu HUD pessoal. Esta configuração afeta apenas a sua visualização e não impacta outros membros do workspace.
                                         </p>
@@ -648,7 +654,7 @@ export default function SettingsPage() {
                                                 className="w-16 h-16 rounded-xl border-2 border-white/10 cursor-pointer bg-transparent"
                                             />
                                             <div className="flex-1 space-y-1">
-                                                <code className="text-xs text-purple-400 font-mono">{personalColor}</code>
+                                                <code className="text-xs font-mono" style={{ color: personalColor }}>{personalColor}</code>
                                                 <p className="text-[10px] text-gray-500">Painéis, botões, brilhos e scanlines se adaptarão à sua assinatura cromática.</p>
                                             </div>
                                         </div>
@@ -677,9 +683,9 @@ export default function SettingsPage() {
 
                                     <div className="flex justify-end">
                                         <Button
-                                            onClick={handleThemeSave}
+                                            onClick={handleSavePersonalTheme}
                                             disabled={loading}
-                                            className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-10 rounded-xl transition-all"
+                                            className="bg-primary hover:opacity-80 text-background font-bold px-8 h-10 rounded-xl transition-all shadow-[0_4px_20px_var(--primary-glow)]"
                                         >
                                             {loading ? 'APLICANDO...' : 'APLICAR TEMA'}
                                         </Button>
@@ -701,7 +707,7 @@ function SidebarLink({ icon, label, active = false, onClick }: { icon: React.Rea
             onClick={onClick}
             className={`
                 w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-mono tracking-widest uppercase transition-all
-                ${active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-white'}
+                ${active ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_var(--primary-glow)]' : 'text-gray-500 hover:bg-white/5 hover:text-white'}
             `}
         >
             {icon}

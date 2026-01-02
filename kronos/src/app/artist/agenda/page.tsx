@@ -82,8 +82,8 @@ export default function AgendaPage() {
             <div className="max-w-7xl mx-auto mb-6">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-500/10 rounded-lg">
-                            <Calendar className="text-purple-400" size={24} />
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                            <Calendar className="text-primary" size={24} />
                         </div>
                         <div>
                             <h1 className="text-2xl font-orbitron font-bold">Minha Agenda</h1>
@@ -97,7 +97,7 @@ export default function AgendaPage() {
                         <GoogleSyncStatus />
                         <Button
                             onClick={() => setShowBookingModal(true)}
-                            className="bg-purple-600 hover:bg-purple-500 gap-2 font-bold"
+                            className="bg-primary hover:opacity-90 text-background gap-2 font-bold"
                         >
                             <Plus size={18} />
                             <span className="hidden sm:inline">Novo</span>
@@ -112,7 +112,7 @@ export default function AgendaPage() {
                         <button
                             onClick={() => setView('day')}
                             className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${view === 'day'
-                                ? 'bg-purple-600 text-white'
+                                ? 'bg-primary text-background'
                                 : 'text-gray-400 hover:text-white'
                                 }`}
                         >
@@ -121,7 +121,7 @@ export default function AgendaPage() {
                         <button
                             onClick={() => setView('week')}
                             className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${view === 'week'
-                                ? 'bg-purple-600 text-white'
+                                ? 'bg-primary text-background'
                                 : 'text-gray-400 hover:text-white'
                                 }`}
                         >
@@ -163,7 +163,7 @@ export default function AgendaPage() {
             <div className="max-w-7xl mx-auto">
                 {loading ? (
                     <div className="flex items-center justify-center h-96">
-                        <Loader2 className="animate-spin text-purple-400" size={32} />
+                        <Loader2 className="animate-spin text-primary" size={32} />
                     </div>
                 ) : (
                     <CalendarView

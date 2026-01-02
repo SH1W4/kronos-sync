@@ -11,6 +11,7 @@ import {
     CartesianGrid
 } from 'recharts'
 import { formatCurrency } from '@/lib/utils'
+import { useTheme } from '@/contexts/theme-context'
 
 interface DashboardChartsProps {
     historyData: {
@@ -21,6 +22,9 @@ interface DashboardChartsProps {
 }
 
 export default function DashboardCharts({ historyData }: DashboardChartsProps) {
+    const { theme } = useTheme()
+    const primaryColor = theme.primaryColor
+
     return (
         <div className="bg-black/40 backdrop-blur-sm border border-white/5 rounded-2xl p-6 relative overflow-hidden group min-h-[400px]">
             {/* Header */}
@@ -35,11 +39,11 @@ export default function DashboardCharts({ historyData }: DashboardChartsProps) {
                 </div>
                 <div className="flex gap-4 text-[10px] font-mono tracking-widest uppercase">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-primary" />
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: primaryColor }} />
                         <span className="text-gray-400">Lucro</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-purple-900/50 border border-purple-500/30" />
+                        <div className="w-2 h-2 rounded-full border border-white/20" style={{ backgroundColor: `${primaryColor}30` }} />
                         <span className="text-gray-400">Faturamento</span>
                     </div>
                 </div>
@@ -55,12 +59,12 @@ export default function DashboardCharts({ historyData }: DashboardChartsProps) {
                     <AreaChart data={historyData}>
                         <defs>
                             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.1} />
-                                <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
+                                <stop offset="5%" stopColor={primaryColor} stopOpacity={0.1} />
+                                <stop offset="95%" stopColor={primaryColor} stopOpacity={0} />
                             </linearGradient>
                             <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.5} />
-                                <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.1} />
+                                <stop offset="5%" stopColor={primaryColor} stopOpacity={0.5} />
+                                <stop offset="95%" stopColor={primaryColor} stopOpacity={0.1} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
@@ -85,7 +89,7 @@ export default function DashboardCharts({ historyData }: DashboardChartsProps) {
                             content={({ active, payload }) => {
                                 if (active && payload && payload.length) {
                                     return (
-                                        <div className="bg-black/90 border border-primary/30 p-4 rounded-xl shadow-[0_0_30px_rgba(139,92,246,0.2)] backdrop-blur-xl">
+                                        <div className="bg-black/90 border border-primary/30 p-4 rounded-xl shadow-[0_0_30px_var(--primary-glow)] backdrop-blur-xl">
                                             <p className="text-[10px] font-mono text-gray-400 uppercase tracking-widest mb-2">
                                                 {payload[0].payload.month}
                                             </p>
@@ -106,7 +110,7 @@ export default function DashboardCharts({ historyData }: DashboardChartsProps) {
                         <Area
                             type="monotone"
                             dataKey="revenue"
-                            stroke="#8B5CF6"
+                            stroke={primaryColor}
                             strokeOpacity={0.3}
                             strokeWidth={2}
                             fillOpacity={1}
@@ -115,7 +119,7 @@ export default function DashboardCharts({ historyData }: DashboardChartsProps) {
                         <Area
                             type="monotone"
                             dataKey="earnings"
-                            stroke="#8B5CF6"
+                            stroke={primaryColor}
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorEarnings)"
