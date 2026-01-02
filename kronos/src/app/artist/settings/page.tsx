@@ -37,6 +37,7 @@ export default function SettingsPage() {
 
     // Workspace Stats
     const [studioName, setStudioName] = useState('')
+    const [studioLogo, setStudioLogo] = useState('')
     const [studioColor, setStudioColor] = useState('#8B5CF6')
     const [studioCapacity, setStudioCapacity] = useState(5)
 
@@ -75,6 +76,7 @@ export default function SettingsPage() {
                 setPixKey(currentWorkspace.pixKey || '')
                 setPixRecipient(currentWorkspace.pixRecipient || '')
                 setStudioName(currentWorkspace.name || '')
+                setStudioLogo(currentWorkspace.logoUrl || '')
                 setStudioColor(currentWorkspace.primaryColor || '#8B5CF6')
                 setStudioCapacity(currentWorkspace.capacity || 5)
                 setGoogleCalendarId(currentWorkspace.googleCalendarId || '')
@@ -176,7 +178,8 @@ export default function SettingsPage() {
             // Update Branding
             const brandingResult = await updateWorkspaceBranding({
                 name: studioName,
-                primaryColor: studioColor
+                primaryColor: studioColor,
+                logoUrl: studioLogo
             })
 
             // Update Capacity
@@ -254,6 +257,36 @@ export default function SettingsPage() {
             alert('Erro ao salvar tema')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Imagem muito grande. Máximo 2MB.')
+                return
+            }
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setImage(reader.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
+    const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Imagem muito grande. Máximo 2MB.')
+                return
+            }
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setStudioLogo(reader.result as string)
+            }
+            reader.readAsDataURL(file)
         }
     }
 
@@ -391,12 +424,37 @@ export default function SettingsPage() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[10px] font-mono text-gray-500 uppercase">URL da Foto de Perfil</label>
+                                                <label className="text-[10px] font-mono text-gray-500 uppercase">Foto de Perfil</label>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleImageUpload}
+                                                        className="hidden"
+                                                        id="profile-upload"
+                                                    />
+                                                    <label
+                                                        htmlFor="profile-upload"
+                                                        className="flex-1 flex items-center justify-center h-11 bg-white/5 border border-dashed border-white/20 rounded-xl cursor-pointer hover:bg-white/10 transition-all text-[10px] font-mono uppercase tracking-widest text-gray-400"
+                                                    >
+                                                        Selecionar Arquivo
+                                                    </label>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => setImage('')}
+                                                        className="h-11 w-11 border border-white/10"
+                                                        title="Remover Imagem"
+                                                    >
+                                                        <Trash2 size={16} className="text-red-500" />
+                                                    </Button>
+                                                </div>
+                                                <p className="text-[8px] text-gray-600 uppercase">Ou insira uma URL externa:</p>
                                                 <Input
                                                     placeholder="https://suaimagem.com/foto.jpg"
-                                                    value={image}
+                                                    value={image.startsWith('data:') ? '' : image}
                                                     onChange={(e) => setImage(e.target.value)}
-                                                    className="bg-black/50 border-white/10 h-11 font-mono text-[10px]"
+                                                    className="bg-black/50 border-white/10 h-9 font-mono text-[9px]"
                                                 />
                                             </div>
                                         </div>
@@ -591,14 +649,39 @@ export default function SettingsPage() {
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Nome do Estúdio</label>
-                                            <Input
-                                                value={studioName}
-                                                onChange={(e) => setStudioName(e.target.value)}
-                                                className="bg-black/50 border-white/10"
-                                                placeholder="KRONØS STUDIO"
-                                            />
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-mono text-gray-500 uppercase">Nome do Estúdio</label>
+                                                <Input
+                                                    value={studioName}
+                                                    onChange={(e) => setStudioName(e.target.value)}
+                                                    className="bg-black/50 border-white/10"
+                                                    placeholder="KRONØS STUDIO"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-mono text-gray-500 uppercase">Logo do Estúdio</label>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleLogoUpload}
+                                                        className="hidden"
+                                                        id="logo-upload"
+                                                    />
+                                                    <label
+                                                        htmlFor="logo-upload"
+                                                        className="flex-1 flex items-center justify-center h-11 bg-white/5 border border-dashed border-white/20 rounded-xl cursor-pointer hover:bg-white/10 transition-all text-[10px] font-mono uppercase tracking-widest text-gray-400"
+                                                    >
+                                                        Upload Logo
+                                                    </label>
+                                                    {studioLogo && (
+                                                        <div className="w-11 h-11 rounded-xl overflow-hidden border border-white/10 bg-white/5 p-1 shrink-0">
+                                                            <img src={studioLogo} alt="Logo Preview" className="w-full h-full object-contain" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-2">

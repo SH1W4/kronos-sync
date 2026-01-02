@@ -34,6 +34,21 @@ export default function InventoryPage() {
         setLoading(false)
     }
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Imagem muito grande. Máximo 2MB.')
+                return
+            }
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setFormData({ ...formData, imageUrl: reader.result as string })
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
     const handleOpenModal = (product: any = null) => {
         if (product) {
             setEditingProduct(product)
@@ -193,18 +208,46 @@ export default function InventoryPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">URL da Imagem do Produto</label>
-                                    <Input
-                                        placeholder="https://exemplo.com/imagem.jpg"
-                                        className="bg-white/5 border-white/10 h-14 rounded-2xl font-mono text-[10px]"
-                                        value={formData.imageUrl}
-                                        onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                                    />
-                                    {formData.imageUrl && (
-                                        <div className="mt-2 w-20 h-20 rounded-xl overflow-hidden border border-white/10">
-                                            <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                    <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Imagem do Produto</label>
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex gap-2 mb-2">
+                                                <Input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleImageUpload}
+                                                    className="hidden"
+                                                    id="product-upload"
+                                                />
+                                                <label
+                                                    htmlFor="product-upload"
+                                                    className="flex-1 flex items-center justify-center h-14 bg-white/5 border border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all text-[10px] font-mono uppercase tracking-widest text-gray-400"
+                                                >
+                                                    Selecionar Arquivo
+                                                </label>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, imageUrl: '' })}
+                                                    className="h-14 w-14 border border-white/10 rounded-2xl"
+                                                >
+                                                    <Trash2 size={20} className="text-red-500" />
+                                                </Button>
+                                            </div>
+                                            <Input
+                                                placeholder="Ou cole uma URL externa"
+                                                className="bg-white/5 border-white/10 h-10 rounded-xl font-mono text-[9px]"
+                                                value={formData.imageUrl.startsWith('data:') ? '' : formData.imageUrl}
+                                                onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                                            />
                                         </div>
-                                    )}
+                                        {formData.imageUrl && (
+                                            <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 shrink-0">
+                                                <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
