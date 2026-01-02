@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useState } from 'react'
-import { CheckCircle2, XCircle, Search, AlertCircle, Calendar } from 'lucide-react'
+import { CheckCircle2, XCircle, Search, AlertCircle, Calendar, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { approveSettlement } from '@/app/actions/settlements'
+import { approveSettlement, auditSettlement } from '@/app/actions/settlements'
 
 interface Settlement {
     id: string
@@ -20,6 +20,7 @@ interface Settlement {
         orders: number
     }
     aiFeedback: string | null
+    isAudited: boolean
 }
 
 interface FinanceAdminClientProps {
@@ -42,6 +43,20 @@ export default function FinanceAdminClient({ workspaceName, settlements, project
                 alert(`Liquidação ${status === 'APPROVED' ? 'confirmada' : 'rejeitada'} com sucesso!`)
             } else {
                 alert("Erro ao processar: " + res.message)
+            }
+        } finally {
+            setLoadingId(null)
+        }
+    }
+
+    const handleAudit = async (id: string) => {
+        setLoadingId(id)
+        try {
+            const res = await auditSettlement(id)
+            if (res.success) {
+                alert("Liquidação auditada com sucesso!")
+            } else {
+                alert("Erro ao auditar: " + res.message)
             }
         } finally {
             setLoadingId(null)
@@ -131,6 +146,11 @@ export default function FinanceAdminClient({ workspaceName, settlements, project
                                         }`}>
                                         {settlement.status}
                                     </div>
+                                    {settlement.isAudited && (
+                                        <div className="px-2 py-0.5 rounded text-[8px] font-mono uppercase font-bold border bg-blue-500/20 text-blue-400 border-blue-500/30 flex items-center gap-1">
+                                            <ShieldCheck size={8} /> AUDITADO
+                                        </div>
+                                    )}
                                     <span className="text-xs text-gray-500 font-mono">{formatDate(new Date(settlement.createdAt))}</span>
                                 </div>
                                 <h3 className="text-lg font-bold font-orbitron text-white group-hover:text-primary transition-colors">
@@ -170,6 +190,17 @@ export default function FinanceAdminClient({ workspaceName, settlements, project
                                         Rejeitar
                                     </Button>
                                 </div>
+                            )}
+
+                            {settlement.status === 'APPROVED' && !settlement.isAudited && (
+                                <Button
+                                    onClick={() => handleAudit(settlement.id)}
+                                    disabled={loadingId === settlement.id}
+                                    className="w-full md:w-auto bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                                >
+                                    {loadingId === settlement.id ? '...' : <Search className="w-4 h-4 mr-2" />}
+                                    Auditar
+                                </Button>
                             )}
                         </div>
                     ))

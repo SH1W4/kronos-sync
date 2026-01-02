@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -491,6 +490,7 @@ model Anamnesis {
   understandPermanence      Boolean   @default(false) // Você compreende que a tatuagem é permanente e que os resultados podem variar?
   followInstructions        Boolean   @default(false) // Você seguirá as instruções do(a) tatuador(a) para garantir a correta cicatrização?
   acceptedTerms             Boolean   @default(false) // Confirmação dos TERMOS DE RESPONSABILIDADE
+  allowSharing              Boolean   @default(false) // LGPD: Autorizo o compartilhamento de dados médicos entre profissionais deste workspace?
 
   // Assinatura e Metadados
   signatureData           String?   @db.Text // Assinatura digital (Base64/SVG)
@@ -562,6 +562,7 @@ enum RequestStatus {
   totalValue      Float
   proofUrl        String?          @db.Text
   status          SettlementStatus @default(PENDING)
+  isAudited       Boolean          @default(false) // Marcador de auditoria administrativa manual
   
   // AI Validation Data
   aiConfidence    Float?           // 0.0 to 1.0

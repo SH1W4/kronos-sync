@@ -31,6 +31,7 @@ export default function FichaAnamnesePage() {
         understandPermanence: false,
         followInstructions: false,
         acceptedTerms: false,
+        allowSharing: false,
         signatureData: ''
     })
 
@@ -298,6 +299,23 @@ export default function FichaAnamnesePage() {
                                     {formData.followInstructions && <CheckCircle2 size={14} className="text-white" />}
                                 </div>
                                 <span className="text-xs text-zinc-400 leading-relaxed font-mono uppercase tracking-tight">Eu seguirei todas as instruções de pós-procedimento.</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, allowSharing: !prev.allowSharing }))}
+                                className="flex items-start gap-3 w-full text-left group border border-primary/20 bg-primary/5 p-4 rounded-xl"
+                            >
+                                <div className={`mt-1 w-5 h-5 rounded border transition-all flex-shrink-0 flex items-center justify-center ${formData.allowSharing ? 'bg-primary border-primary' : 'bg-white/5 border-primary/20 group-hover:border-primary/40'
+                                    }`}>
+                                    {formData.allowSharing && <CheckCircle2 size={14} className="text-white" />}
+                                </div>
+                                <div className="space-y-1">
+                                    <span className="text-xs text-primary font-bold font-mono uppercase tracking-tight">Autorizo o compartilhamento seguro</span>
+                                    <p className="text-[10px] text-zinc-500 leading-relaxed font-mono uppercase">
+                                        Autorizo que meus dados médicos sejam compartilhados entre os profissionais deste estúdio para facilitar agendamentos futuros e garantir minha segurança.
+                                    </p>
+                                </div>
                             </button>
 
                             <div className="pt-4 border-t border-white/5 space-y-4">

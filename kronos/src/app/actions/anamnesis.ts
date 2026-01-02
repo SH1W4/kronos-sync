@@ -23,6 +23,7 @@ const anamnesisDataSchema = z.object({
     understandPermanence: z.boolean(),
     followInstructions: z.boolean(),
     acceptedTerms: z.boolean().refine((val) => val === true, 'Termos devem ser aceitos'),
+    allowSharing: z.boolean(),
     signatureData: z.string().min(100, 'Assinatura obrigatória').optional()
 })
 
@@ -74,9 +75,10 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 understandPermanence: validData.understandPermanence,
                 followInstructions: validData.followInstructions,
                 acceptedTerms: validData.acceptedTerms,
+                allowSharing: validData.allowSharing,
                 signatureData: validData.signatureData,
                 updatedAt: new Date()
-            },
+            } as any,
             create: {
                 bookingId: bookingId,
                 clientId: booking.clientId,
@@ -94,8 +96,9 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 understandPermanence: validData.understandPermanence,
                 followInstructions: validData.followInstructions,
                 acceptedTerms: validData.acceptedTerms,
+                allowSharing: validData.allowSharing,
                 signatureData: validData.signatureData,
-            }
+            } as any
         })
 
         console.log('✅ Anamnese sincronizada com CSV salva:', anamnesis.id)
@@ -124,12 +127,30 @@ export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId:
 
         console.log(`♻️ Clonando anamnese ${sourceAnamnesisId} para agendamento ${targetBookingId}`)
 
-        // 1. Buscar a ficha original
+        // 1. Buscar a ficha original com dados do artista e compartilhamento
         const source = await prisma.anamnesis.findUnique({
-            where: { id: sourceAnamnesisId }
+            where: { id: sourceAnamnesisId },
+            include: {
+                booking: {
+                    select: { artistId: true }
+                }
+            }
         })
 
         if (!source) throw new Error('Ficha original não encontrada.')
+
+        // 4. Segurança: Verificar se o artista atual pode acessar esta ficha
+        // Pode acessar se:
+        // - For ADMIN
+        // - For o autor da ficha original
+        // - A ficha permite compartilhamento (allowSharing: true)
+        const isOwner = source.booking?.artistId === session.user.id
+        const isAdmin = session.user.role === 'ADMIN'
+        const canAccess = isAdmin || isOwner || (source as any).allowSharing
+
+        if (!canAccess) {
+            throw new Error('Este cliente não autorizou o compartilhamento de dados médicos entre artistas. Uma nova ficha deve ser preenchida.')
+        }
 
         // 2. Buscar o agendamento destino
         const targetBooking = await prisma.booking.findUnique({
@@ -165,8 +186,9 @@ export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId:
                 understandPermanence: true,
                 followInstructions: true,
                 acceptedTerms: true,
+                allowSharing: (source as any).allowSharing, // Mantemos a preferência do cliente
                 signatureData: source.signatureData, // Clonar assinatura por conveniência (decisão de UX: artista valida visualmente)
-            }
+            } as any
         })
 
         revalidatePath(`/artist/clients/${targetBooking.clientId}`)

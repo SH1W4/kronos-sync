@@ -164,7 +164,10 @@ PWA:       Service Worker + Manifest
 3. ✅ **Ativação KAI:** Agente com NLP e Feedback.
 4. ✅ **Smart Anamnesis:** Otimização de fluxo recorrente.
 5. ✅ **QR Scanner:** Validação de cupons colaborativa.
-6. ⏳ **Notificações:** WhatsApp/Email.
+6. ✅ **Conformidade LGPD:** Controle de compartilhamento de dados médicos.
+7. ✅ **Auditoria:** Sistema de conferência administrativa de liquidações.
+8. ⏳ **Notificações:** WhatsApp/Email.
+9. ⏳ **Comissão Flexível:** Lógica de comissão por faixa de preço (Tiered).
 
 ### Próximo Sprint: Beta Testing (2-3 semanas)
 1. Recrutar 5-10 estúdios beta testers
@@ -208,6 +211,8 @@ PWA:       Service Worker + Manifest
 - ✅ Magic Link authentication (sem senhas)
 - ✅ Role-based access control (CODEX)
 - ✅ Dev layer com white-list por e-mail
+- ✅ Consentimento LGPD para compartilhamento de dados médicos
+- ✅ Auditoria administrativa de liquidações financeiras
 
 ### Pendente
 - ⚠️ Validações robustas (Zod) - EM ANDAMENTO

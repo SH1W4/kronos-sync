@@ -203,3 +203,16 @@ export async function approveSettlement(settlementId: string, status: 'APPROVED'
         return { success: false, message: "Erro ao atualizar status." }
     }
 }
+export async function auditSettlement(settlementId: string) {
+    try {
+        await prisma.settlement.update({
+            where: { id: settlementId },
+            data: { isAudited: true } as any
+        })
+        revalidatePath('/artist/finance')
+        return { success: true }
+    } catch (error) {
+        console.error("Error auditing settlement:", error)
+        return { success: false, message: "Erro ao auditar liquidação." }
+    }
+}

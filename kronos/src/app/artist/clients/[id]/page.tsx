@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { Mail, Phone, Calendar, DollarSign, AlertTriangle, Activity, FileText } from 'lucide-react'
-import Link from 'next/link'
+import { Button } from "@/components/ui/button"
 import { GiftButton } from '@/components/clients/gift-button'
 import { AnamnesisStatus } from '@/components/clients/anamnesis-status'
 
@@ -15,6 +15,35 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
 
     // Unwrap params in Next.js 15
     const { id } = await params
+
+    const artist = await prisma.artist.findUnique({
+        where: { userId: session.user.id }
+    })
+
+    const isAdmin = session.user.role === 'ADMIN'
+    const artistId = artist?.id
+
+    // 1. Verificar se este artista tem permissão para ver este cliente
+    // Regra: Admin vê tudo. Artista só vê se já atendeu ou tem agendamento com o cliente.
+    const hasAccessToClient = isAdmin || (artistId && await prisma.booking.count({
+        where: {
+            clientId: id,
+            artistId: artistId
+        }
+    }) > 0)
+
+    if (!hasAccessToClient) {
+        return (
+            <div className="p-10 text-center space-y-4">
+                <AlertTriangle className="mx-auto text-yellow-500" size={48} />
+                <h1 className="text-2xl font-orbitron font-bold">ACESSO RESTRITO</h1>
+                <p className="text-gray-400 font-mono text-sm uppercase">Você só pode acessar perfis de clientes que já atendeu ou que possuem agendamento com você.</p>
+                <Link href="/artist/agenda">
+                    <Button className="mt-4">Voltar para Agenda</Button>
+                </Link>
+            </div>
+        )
+    }
 
     const client = await prisma.user.findUnique({
         where: { id },
@@ -48,21 +77,24 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
         (a?.knownAllergies && a.knownAllergies !== 'NÃO')
     )
 
-    // Aggregated lists for display
-    const conditionsList = Array.from(new Set(allAnamnesis.flatMap(a => {
+    // Aggregated lists for display - ONLY if shared or owner
+    const secureAnamnesis = client.bookings
+        .filter(b => b.anamnesis && (isAdmin || b.artistId === artistId || (b.anamnesis as any).allowSharing))
+        .map(b => b.anamnesis!)
+
+    const conditionsList = Array.from(new Set(secureAnamnesis.flatMap(a => {
         const list = []
         if (a?.medicalConditionsTattoo && a.medicalConditionsTattoo !== 'NÃO') list.push(a.medicalConditionsTattoo)
         if (a?.medicalConditionsHealingDetails) list.push(a.medicalConditionsHealingDetails)
         return list
     })))
 
-    const allergiesList = Array.from(new Set(allAnamnesis.flatMap(a =>
+    const allergiesList = Array.from(new Set(secureAnamnesis.flatMap(a =>
         (a?.knownAllergies && a.knownAllergies !== 'NÃO') ? [a.knownAllergies] : []
     )))
 
-    // Find the LAST valid anamnesis for reuse logic
-    const lastValidAnamnesis = allAnamnesis
-        .filter((a): a is NonNullable<typeof a> => a !== null && a !== undefined)
+    // Find the LAST valid anamnesis for reuse logic (any that is accessible)
+    const lastValidAnamnesis = secureAnamnesis
         .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0]
 
     return (
@@ -165,7 +197,12 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                                 </div>
                                 <div>
                                     <p className="font-bold text-white">Sessão de Tatuagem</p>
-                                    <p className="text-xs text-gray-400">{booking.anamnesis?.artDescription || 'Sem descrição'}</p>
+                                    <p className="text-xs text-gray-400">
+                                        {(isAdmin || booking.artistId === artistId || (booking.anamnesis as any)?.allowSharing)
+                                            ? (booking.anamnesis?.artDescription || 'Sem descrição')
+                                            : 'DADOS PROTEGIDOS (OUTRO ARTISTA)'
+                                        }
+                                    </p>
                                 </div>
                             </div>
 
