@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { Mail, Phone, Calendar, DollarSign, AlertTriangle, Activity, FileText } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { GiftButton } from '@/components/clients/gift-button'
 import { AnamnesisStatus } from '@/components/clients/anamnesis-status'
