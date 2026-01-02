@@ -53,8 +53,13 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
     const monthName = currentDate.toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()
 
     const changeMonth = (months: number) => {
+        // Create new date based on current selected date
         const newDate = new Date(currentDate)
+        // Reset to day 1 to avoid month overflow issues (e.g. Jan 31 + 1 month -> Mar 3)
+        newDate.setDate(1)
+        // Add months
         newDate.setMonth(newDate.getMonth() + months)
+
         const dateString = `${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`
         router.push(`?date=${dateString}`)
     }

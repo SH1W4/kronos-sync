@@ -1,5 +1,8 @@
 'use server'
 
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth-options"
+
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -114,6 +117,11 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
 // --------------------------------------------------------------------------------
 export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId: string) {
     try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user) {
+            throw new Error('Não autorizado. Faça login novamente.')
+        }
+
         console.log(`♻️ Clonando anamnese ${sourceAnamnesisId} para agendamento ${targetBookingId}`)
 
         // 1. Buscar a ficha original
