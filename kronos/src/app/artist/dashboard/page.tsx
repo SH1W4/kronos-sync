@@ -56,18 +56,23 @@ export default async function ArtistDashboard() {
         )
     }
 
-    // 2. Definir Ranges
-    const now = new Date()
-    const startOfDay = new Date()
+    // 2. Definir Ranges (Fixo para Brasil/SP)
+    const options = { timeZone: 'America/Sao_Paulo' }
+    const nowStr = new Date().toLocaleString('en-US', options)
+    const now = new Date(nowStr)
+
+    const startOfDay = new Date(nowStr)
     startOfDay.setHours(0, 0, 0, 0)
-    const endOfDay = new Date()
+
+    const endOfDay = new Date(nowStr)
     endOfDay.setHours(23, 59, 59, 999)
-    const startOfMonth = new Date()
+
+    const startOfMonth = new Date(nowStr)
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
     // Calculate 6-month range for historical data
-    const sixMonthsAgo = new Date()
+    const sixMonthsAgo = new Date(nowStr)
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
     sixMonthsAgo.setDate(1)
     sixMonthsAgo.setHours(0, 0, 0, 0)

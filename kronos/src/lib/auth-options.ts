@@ -163,7 +163,7 @@ export const authOptions: NextAuthOptions = {
                                     primaryColor: "#00FF88",
                                     owner: {
                                         create: {
-                                            email: "admin@kronosync.com",
+                                            email: "galeria.kronos@gmail.com",
                                             name: "Mestre Supremo",
                                             role: "ADMIN"
                                         }
@@ -174,13 +174,13 @@ export const authOptions: NextAuthOptions = {
 
                         // 2. Garante Usuário Master
                         let masterUser = await prisma.user.findUnique({
-                            where: { email: "admin@kronosync.com" }
+                            where: { email: "galeria.kronos@gmail.com" }
                         })
 
                         if (!masterUser) {
                             masterUser = await prisma.user.create({
                                 data: {
-                                    email: "admin@kronosync.com",
+                                    email: "galeria.kronos@gmail.com",
                                     name: "Mestre Supremo",
                                     role: "ADMIN",
                                     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mestre",
@@ -359,15 +359,15 @@ export const authOptions: NextAuthOptions = {
 
                         // 2. Garante que o usuário 'dev' específico exista
                         let devUser = await prisma.user.findUnique({
-                            where: { email: "dev@kronos.com" },
+                            where: { email: "neo.sh1w4@gmail.com" },
                             include: { artist: true }
                         })
 
                         if (!devUser) {
                             devUser = await prisma.user.create({
                                 data: {
-                                    email: "dev@kronos.com",
-                                    name: "Dev Artist",
+                                    email: "neo.sh1w4@gmail.com",
+                                    name: "Neo Developer",
                                     role: "ARTIST",
                                     image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
                                 },
