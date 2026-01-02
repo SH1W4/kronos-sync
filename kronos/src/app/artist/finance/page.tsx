@@ -7,7 +7,8 @@ import FinanceAdminClient from "./FinanceAdminClient"
 
 export const dynamic = 'force-dynamic'
 
-export default async function FinancePage({ searchParams }: { searchParams: { date?: string } }) {
+export default async function FinancePage(props: { searchParams: Promise<{ date?: string }> }) {
+    const searchParams = await props.searchParams
     try {
         const session = await getServerSession(authOptions)
 
