@@ -51,7 +51,7 @@ export function GoogleSyncStatus() {
                 onClick={handleConnect}
                 variant="outline"
                 size="sm"
-                className="gap-2 border-purple-500/20 text-purple-400 hover:bg-purple-500/10 text-xs"
+                className="gap-2 border-primary/20 text-primary hover:bg-primary/10 text-xs"
             >
                 <ExternalLink size={14} />
                 Conectar Google Agenda
@@ -79,7 +79,7 @@ export function GoogleSyncStatus() {
                 size="sm"
                 className="h-7 px-2 gap-1.5 text-xs text-gray-400 hover:text-white"
             >
-                <RefreshCw className={`w-3 h-3 ${syncing ? 'animate-spin text-purple-400' : ''}`} />
+                <RefreshCw className={`w-3 h-3 ${syncing ? 'animate-spin text-primary' : ''}`} />
                 Sincronizar
             </Button>
         </div>

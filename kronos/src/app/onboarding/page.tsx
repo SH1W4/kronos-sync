@@ -278,7 +278,7 @@ function OnboardingContent() {
                     </div>
                 ) : mode === 'REQUEST' ? (
                     <div className="max-w-md mx-auto animate-in fade-in slide-in-from-right-4 duration-500">
-                        <div className="bg-gray-900/50 border border-purple-500/20 p-8 rounded-3xl backdrop-blur-md shadow-[0_0_50px_rgba(139,92,246,0.1)]">
+                        <div className="bg-gray-900/50 border border-primary/20 p-8 rounded-3xl backdrop-blur-md shadow-[0_0_50px_var(--primary-glow)]">
                             <div className="flex justify-center mb-6">
                                 <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
                                     <Rocket className="text-primary animate-bounce" size={32} />
@@ -341,7 +341,7 @@ function OnboardingContent() {
                                     <Button
                                         type="submit"
                                         disabled={loading || !studioName || !motivation}
-                                        className="flex-[2] bg-primary hover:bg-primary/80 text-white rounded-xl shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)] font-bold transition-all hover:scale-[1.02]"
+                                        className="flex-[2] bg-primary hover:opacity-90 text-black rounded-xl shadow-[0_0_20px_var(--primary-glow)] font-bold transition-all hover:scale-[1.02]"
                                     >
                                         {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
                                         ENVIAR SOLICITAÇÃO

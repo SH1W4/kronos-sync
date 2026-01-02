@@ -48,7 +48,7 @@ export default async function InvitePage({ params }: PageProps) {
             <div className="scanline opacity-20" />
 
             {/* Background Decorative Elements */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
 
             <div className="max-w-4xl w-full flex flex-col md:flex-row items-center gap-12 relative z-10">
                 {/* Left Side: The Pass */}
@@ -65,8 +65,8 @@ export default async function InvitePage({ params }: PageProps) {
                 <div className="w-full md:w-1/2 space-y-8 text-center md:text-left animate-in fade-in slide-in-from-right-8 duration-700 delay-300">
                     <div className="space-y-4">
                         <div className="flex items-center justify-center md:justify-start gap-2">
-                            <Sparkles size={16} className="text-purple-400" />
-                            <span className="text-[10px] font-mono text-purple-400 uppercase tracking-[0.3em] font-bold">Protocolo de Recrutamento</span>
+                            <Sparkles size={16} className="text-primary" />
+                            <span className="text-[10px] font-mono text-primary uppercase tracking-[0.3em] font-bold">Protocolo de Recrutamento</span>
                         </div>
                         <h1 className="text-4xl md:text-6xl font-orbitron font-black tracking-tight uppercase leading-none italic text-glitch" data-text="VOCÊ FOI CONVOCADO.">
                             VOCÊ FOI <br />

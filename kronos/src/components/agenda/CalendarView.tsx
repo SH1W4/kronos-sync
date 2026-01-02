@@ -105,13 +105,13 @@ export function CalendarView({
                     {weekDays.map(day => (
                         <div
                             key={day.toISOString()}
-                            className={`p-4 text-center ${isToday(day) ? 'bg-purple-500/10' : ''
+                            className={`p-4 text-center ${isToday(day) ? 'bg-primary/10' : ''
                                 }`}
                         >
                             <div className="text-xs text-gray-500 font-mono uppercase">
                                 {format(day, 'EEE', { locale: ptBR })}
                             </div>
-                            <div className={`text-lg font-bold ${isToday(day) ? 'text-purple-400' : ''
+                            <div className={`text-lg font-bold ${isToday(day) ? 'text-primary' : ''
                                 }`}>
                                 {format(day, 'd')}
                             </div>

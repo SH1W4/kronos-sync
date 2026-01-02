@@ -64,7 +64,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
 
             {/* Header / Profile Card */}
             <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-700 to-black border-2 border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-900/20">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-700 to-black border-2 border-primary/30 flex items-center justify-center shadow-lg shadow-[var(--primary-glow)]">
                     <span className="font-orbitron font-bold text-3xl">{client.name?.charAt(0)}</span>
                 </div>
                 <div className="flex-1">
@@ -97,7 +97,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                     </div>
                     <div className="flex justify-between items-center">
                         <span className="text-gray-400 text-sm">Ticket Médio</span>
-                        <span className="font-orbitron font-bold text-purple-400">
+                        <span className="font-orbitron font-bold text-primary">
                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bookingsCount > 0 ? totalSpent / bookingsCount : 0)}
                         </span>
                     </div>

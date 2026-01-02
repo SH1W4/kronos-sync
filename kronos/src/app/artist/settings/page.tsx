@@ -24,6 +24,7 @@ export default function SettingsPage() {
 
     // Form state
     const [name, setName] = useState('')
+    const [image, setImage] = useState('')
     const [commission, setCommission] = useState('')
     const [instagram, setInstagram] = useState('')
 
@@ -62,6 +63,9 @@ export default function SettingsPage() {
             }
             if ((session.user as any).instagram) {
                 setInstagram((session.user as any).instagram)
+            }
+            if (session.user.image) {
+                setImage(session.user.image)
             }
 
             // Initialize PIX if available
@@ -102,7 +106,8 @@ export default function SettingsPage() {
             const result = await updateArtistSettings({
                 name,
                 commissionRate: parseFloat(commission),
-                instagram
+                instagram,
+                image
             })
 
             if (result.success) {
@@ -278,8 +283,8 @@ export default function SettingsPage() {
             <div className="max-w-4xl mx-auto space-y-12 pb-20">
                 {/* Header */}
                 <div className="flex items-center gap-4 border-b border-white/5 pb-8">
-                    <div className="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
-                        <Settings className="text-purple-400" size={32} />
+                    <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
+                        <Settings className="text-primary" size={32} />
                     </div>
                     <div>
                         <h1 className="text-3xl font-orbitron font-black tracking-tighter uppercase pixel-text">Configurações</h1>
@@ -355,18 +360,46 @@ export default function SettingsPage() {
                         {activeTab === 'profile' && (
                             <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <User className="text-purple-400" size={20} />
+                                    <User className="text-primary" size={20} />
                                     <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Informações Pessoais</h2>
                                 </div>
 
                                 <div className="grid gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Nome de Exibição</label>
-                                        <Input
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            className="bg-black/50 border-white/10"
-                                        />
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="w-24 h-24 rounded-2xl border-2 border-white/10 bg-black/40 overflow-hidden relative group">
+                                                {image ? (
+                                                    <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                        <User size={40} />
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                    <span className="text-[8px] font-mono font-bold text-white uppercase text-center px-2">Alterar Via URL</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 space-y-4">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-mono text-gray-500 uppercase">Nome de Exibição</label>
+                                                <Input
+                                                    value={name}
+                                                    onChange={(e) => setName(e.target.value)}
+                                                    className="bg-black/50 border-white/10 h-11"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-mono text-gray-500 uppercase">URL da Foto de Perfil</label>
+                                                <Input
+                                                    placeholder="https://suaimagem.com/foto.jpg"
+                                                    value={image}
+                                                    onChange={(e) => setImage(e.target.value)}
+                                                    className="bg-black/50 border-white/10 h-11 font-mono text-[10px]"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* Instagram & KAI Section */}
@@ -397,7 +430,7 @@ export default function SettingsPage() {
                                         <Button
                                             onClick={handleSave}
                                             disabled={loading}
-                                            className="bg-purple-600 hover:bg-purple-500 font-bold px-8 h-10 rounded-xl transition-all"
+                                            className="bg-primary hover:opacity-90 text-background font-bold px-8 h-10 rounded-xl transition-all shadow-[0_0_15px_var(--primary-glow)]"
                                         >
                                             {loading ? 'SALVANDO...' : 'SALVAR PERFIL'}
                                         </Button>
@@ -409,7 +442,7 @@ export default function SettingsPage() {
                         {activeTab === 'link' && (
                             <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <LinkIcon className="text-purple-400" size={20} />
+                                    <LinkIcon className="text-primary" size={20} />
                                     <h2 className="font-bold uppercase tracking-wider text-sm">Jornada do Cliente</h2>
                                 </div>
 
@@ -420,7 +453,7 @@ export default function SettingsPage() {
 
                                     <div className="flex gap-2">
                                         <div className="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 h-12 flex items-center overflow-hidden">
-                                            <code className="text-xs text-purple-400 truncate">{clientLink}</code>
+                                            <code className="text-xs text-primary truncate">{clientLink}</code>
                                         </div>
                                         <Button
                                             onClick={copyToClipboard}
@@ -437,7 +470,7 @@ export default function SettingsPage() {
                         {activeTab === 'sync' && (
                             <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Calendar className="text-purple-400" size={20} />
+                                    <Calendar className="text-primary" size={20} />
                                     <h2 className="font-bold uppercase tracking-wider text-sm">Sincronização</h2>
                                 </div>
 
@@ -455,11 +488,11 @@ export default function SettingsPage() {
                         {activeTab === 'plan' && (
                             <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <CreditCard className="text-purple-400" size={20} />
-                                    <h2 className="font-bold uppercase tracking-wider text-sm text-purple-400">Assinatura & Plano</h2>
+                                    <CreditCard className="text-primary" size={20} />
+                                    <h2 className="font-bold uppercase tracking-wider text-sm text-primary">Assinatura & Plano</h2>
                                 </div>
 
-                                <div className="border border-purple-500/20 bg-purple-500/5 p-8 rounded-2xl text-center space-y-4">
+                                <div className="border border-primary/20 bg-primary/5 p-8 rounded-2xl text-center space-y-4">
                                     <h3 className="text-xl font-orbitron font-bold">PLANO RESIDENTE</h3>
                                     <p className="text-xs text-gray-500 font-mono uppercase tracking-widest">Status: Ativo até 2026</p>
                                     <div className="h-px bg-white/5 w-full" />
@@ -545,13 +578,13 @@ export default function SettingsPage() {
                         {activeTab === 'studio' && isAdmin && (
                             <section className="bg-gray-950/60 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Settings className="text-purple-400" size={20} />
+                                    <Settings className="text-primary" size={20} />
                                     <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Configuração do Estúdio</h2>
                                 </div>
 
                                 <div className="space-y-6">
-                                    <div className="p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
-                                        <p className="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-2">Soberania de Workspace</p>
+                                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                                        <p className="text-[10px] font-mono text-primary uppercase tracking-widest mb-2">Soberania de Workspace</p>
                                         <p className="text-xs text-gray-400 leading-relaxed">
                                             Configure a identidade visual global e a capacidade operacional do seu estúdio.
                                         </p>
@@ -592,7 +625,7 @@ export default function SettingsPage() {
                                                 className="w-16 h-16 rounded-xl border-2 border-white/10 cursor-pointer bg-transparent"
                                             />
                                             <div className="flex-1 space-y-1">
-                                                <code className="text-xs text-purple-400 font-mono">{studioColor}</code>
+                                                <code className="text-xs text-primary font-mono">{studioColor}</code>
                                                 <p className="text-[10px] text-gray-500">Esta cor será aplicada globalmente no HUD de todos os membros do workspace.</p>
                                             </div>
                                         </div>

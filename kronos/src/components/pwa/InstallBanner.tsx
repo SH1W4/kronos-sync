@@ -63,7 +63,7 @@ export default function InstallPWABanner() {
     if (!showBanner) return null
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg animate-in slide-in-from-top duration-500">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-black shadow-lg animate-in slide-in-from-top duration-500">
             <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 flex-1">
                     <Download className="w-5 h-5 shrink-0" />
@@ -76,7 +76,7 @@ export default function InstallPWABanner() {
                     <Button
                         onClick={handleInstall}
                         size="sm"
-                        className="bg-white text-purple-600 hover:bg-gray-100 font-bold"
+                        className="bg-black text-white hover:bg-black/90 font-bold border-none"
                     >
                         Instalar
                     </Button>

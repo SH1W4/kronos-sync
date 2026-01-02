@@ -21,7 +21,9 @@ export function SignatureCanvas({ onSave, onClear }: SignatureCanvasProps) {
         if (!ctx) return
 
         // Set line style
-        ctx.strokeStyle = '#a855f7' // purple-500
+        // Set line style - uses primary color from theme if available
+        const primaryColor = typeof window !== 'undefined' ? getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#a855f7' : '#a855f7'
+        ctx.strokeStyle = primaryColor
         ctx.lineWidth = 2
         ctx.lineCap = 'round'
         ctx.lineJoin = 'round'

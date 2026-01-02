@@ -137,7 +137,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                     <div>
                         <label className="block text-sm font-medium mb-2">Cliente</label>
                         {selectedClient ? (
-                            <div className="flex items-center justify-between p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                            <div className="flex items-center justify-between p-3 bg-primary/10 border border-primary/20 rounded-lg">
                                 <div>
                                     <p className="font-bold">{selectedClient.name}</p>
                                     <p className="text-sm text-gray-400">{selectedClient.phone}</p>
@@ -212,7 +212,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                                                     setClients([])
                                                     setClientSearch('')
                                                 }}
-                                                className="w-full text-left p-2 hover:bg-purple-500/10 rounded transition-colors"
+                                                className="w-full text-left p-2 hover:bg-primary/10 rounded transition-colors"
                                             >
                                                 <p className="font-bold text-sm">{client.name}</p>
                                                 <p className="text-xs text-gray-400">{client.phone}</p>
@@ -312,13 +312,13 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                     </div>
 
                     {/* Google Sync Toggle */}
-                    <div className="flex items-center gap-3 p-4 bg-purple-500/5 border border-purple-500/10 rounded-xl">
+                    <div className="flex items-center gap-3 p-4 bg-primary/5 border border-primary/10 rounded-xl">
                         <input
                             type="checkbox"
                             id="syncToGoogle"
                             checked={syncToGoogle}
                             onChange={(e) => setSyncToGoogle(e.target.checked)}
-                            className="w-4 h-4 rounded border-white/10 bg-black text-purple-600 focus:ring-purple-500"
+                            className="w-4 h-4 rounded border-white/10 bg-black text-primary focus:ring-primary"
                         />
                         <label htmlFor="syncToGoogle" className="text-sm font-medium text-gray-300 cursor-pointer">
                             Sincronizar com Google Agenda
@@ -338,7 +338,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                         <Button
                             type="submit"
                             disabled={loading || !selectedClient}
-                            className="flex-1 bg-purple-600 hover:bg-purple-500"
+                            className="flex-1 bg-primary hover:opacity-90 text-black border-none"
                         >
                             {loading && <Loader2 className="animate-spin mr-2" size={16} />}
                             Criar Agendamento

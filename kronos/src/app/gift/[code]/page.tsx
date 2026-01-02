@@ -37,10 +37,10 @@ export default async function GiftCardPage({ params }: { params: Promise<{ code:
     return (
         <div className="min-h-screen bg-black flex items-center justify-center p-4">
             {/* Ticket Container */}
-            <div className="relative w-full max-w-sm bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl shadow-purple-900/20 border border-white/10">
+            <div className="relative w-full max-w-sm bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl shadow-[var(--primary-glow)] border border-white/10">
 
                 {/* Decorative Elements */}
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 z-10"></div>
+                <div className="absolute top-0 left-0 right-0 h-2 bg-primary z-10"></div>
 
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
@@ -63,7 +63,7 @@ export default async function GiftCardPage({ params }: { params: Promise<{ code:
                     </div>
                     <h2 className="text-gray-400 text-xs tracking-[0.3em] font-medium uppercase mb-2">VOCÊ GANHOU</h2>
                     <h1 className="text-5xl font-orbitron font-bold text-white mb-2">{coupon.discountPercent}%</h1>
-                    <p className="font-serif italic text-purple-400 text-lg">de desconto</p>
+                    <p className="font-serif italic text-primary text-lg">de desconto</p>
                     <p className="text-zinc-200 text-sm font-medium mt-6 max-w-[240px] mx-auto drop-shadow-md leading-relaxed">
                         Válido para sua primeira sessão no Kronos Studio.
                     </p>
@@ -96,7 +96,7 @@ export default async function GiftCardPage({ params }: { params: Promise<{ code:
 
                     <div className="mt-6 text-center">
                         <p className="text-gray-500 text-xs uppercase mb-1">Código Promocional</p>
-                        <p className="font-mono text-xl font-bold tracking-widest text-white selection:bg-purple-500/30 px-4 py-2 bg-white/5 rounded border border-white/10">
+                        <p className="font-mono text-xl font-bold tracking-widest text-white selection:bg-primary/30 px-4 py-2 bg-white/5 rounded border border-white/10">
                             {coupon.code}
                         </p>
                     </div>

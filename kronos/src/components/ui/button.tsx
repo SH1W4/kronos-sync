@@ -17,9 +17,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <motion.button
         whileTap={{ scale: 0.96 }}
         className={cn(
-          "inline-flex items-center justify-center rounded-xl font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 disabled:pointer-events-none disabled:opacity-50",
+          "inline-flex items-center justify-center rounded-xl font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50",
           {
-            "bg-gradient-to-br from-purple-600 to-indigo-700 text-white shadow-lg shadow-purple-900/20 hover:shadow-purple-900/40 hover:-translate-y-0.5 active:translate-y-0": variant === "primary",
+            "bg-primary text-black shadow-lg shadow-[var(--primary-glow)] hover:opacity-90 hover:-translate-y-0.5 active:translate-y-0": variant === "primary",
             "bg-white/5 text-white border border-white/10 hover:bg-white/10": variant === "secondary",
             "border border-white/20 bg-transparent text-white hover:bg-white/5": variant === "outline",
             "text-gray-400 hover:text-white hover:bg-white/5": variant === "ghost",

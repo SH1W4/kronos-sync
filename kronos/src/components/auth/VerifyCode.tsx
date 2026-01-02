@@ -66,7 +66,7 @@ export default function VerifyCode({ email, onBack, inviteCode }: VerifyCodeProp
                     Código de Verificação
                 </label>
                 <p className="text-xs text-gray-500">
-                    Enviamos um código de 6 dígitos para <strong className="text-purple-400">{email}</strong>
+                    Enviamos um código de 6 dígitos para <strong className="text-primary">{email}</strong>
                 </p>
                 <Input
                     type="text"
@@ -89,7 +89,7 @@ export default function VerifyCode({ email, onBack, inviteCode }: VerifyCodeProp
 
             <Button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold"
+                className="w-full bg-primary hover:opacity-90 text-black font-bold border-none"
                 disabled={loading || code.length !== 6}
             >
                 {loading ? (

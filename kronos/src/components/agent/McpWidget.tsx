@@ -35,11 +35,11 @@ export default function McpWidget() {
 
             {/* Chat Window */}
             {isOpen && (
-                <div className="mb-4 w-80 h-96 bg-black/90 backdrop-blur-md border border-purple-500/30 rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.2)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
+                <div className="mb-4 w-80 h-96 bg-black/90 backdrop-blur-md border border-primary/30 rounded-2xl shadow-[0_0_30px_var(--primary-glow)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 p-4 border-b border-purple-500/20 flex justify-between items-center">
+                    <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-4 border-b border-white/10 flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                            <Sparkles size={16} className="text-purple-400" />
+                            <Sparkles size={16} className="text-primary" />
                             <span className="font-orbitron font-bold text-sm text-white">MCP AGENT</span>
                         </div>
                         <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white">
@@ -54,7 +54,7 @@ export default function McpWidget() {
                                 <div className={`
                                     max-w-[85%] p-3 rounded-xl text-xs font-mono
                                     ${msg.role === 'user'
-                                        ? 'bg-purple-600 text-white rounded-br-none'
+                                        ? 'bg-primary text-black rounded-br-none'
                                         : 'bg-gray-800 text-gray-200 rounded-bl-none border border-white/5'}
                                 `}>
                                     {msg.text}
@@ -66,13 +66,13 @@ export default function McpWidget() {
                     {/* Input */}
                     <div className="p-3 bg-black flex gap-2 border-t border-white/10">
                         <input
-                            className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-3 text-xs focus:border-purple-500 outline-none text-white"
+                            className="flex-1 bg-gray-900 border border-white/10 rounded-lg px-3 text-xs focus:border-primary outline-none text-white"
                             placeholder="Digite um comando..."
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                         />
-                        <Button size="icon" className="h-8 w-8 bg-purple-600 hover:bg-purple-700" onClick={handleSend}>
+                        <Button size="icon" className="h-8 w-8 bg-primary hover:opacity-90 text-black border-none" onClick={handleSend}>
                             <Send size={14} />
                         </Button>
                     </div>
@@ -82,10 +82,10 @@ export default function McpWidget() {
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="group relative w-14 h-14 rounded-full bg-gradient-to-tr from-purple-600 to-blue-600 flex items-center justify-center shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-110 active:scale-95"
+                className="group relative w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-[var(--primary-glow)] transition-all hover:scale-110 active:scale-95 text-black"
             >
                 <div className="absolute inset-0 rounded-full bg-white/20 animate-pulse group-hover:hidden"></div>
-                {isOpen ? <X className="text-white" /> : <Bot className="text-white w-6 h-6" />}
+                {isOpen ? <X /> : <Bot className="w-6 h-6" />}
 
                 {/* Notification Dot if needed */}
                 <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-black rounded-full"></span>

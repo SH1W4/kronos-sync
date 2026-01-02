@@ -135,9 +135,9 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
 
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MetricCard title="REALIZADO (MÊS)" value={metrics.realizedEarnings} icon={<CheckCircle2 className="text-green-400" />} />
-                <MetricCard title="PROJEÇÃO (MÊS)" value={metrics.realizedEarnings + metrics.projectionEarnings} icon={<TrendingUp className="text-blue-400" />} trend={`+ ${formatCurrency(metrics.projectionEarnings)} aguardando`} />
-                <MetricCard title="BRUTO (MÊS)" value={metrics.monthlyRevenue} icon={<DollarSign className="text-purple-400" />} />
+                <MetricCard title="REALIZADO (MÊS)" value={metrics.realizedEarnings} icon={<CheckCircle2 className="text-secondary" />} />
+                <MetricCard title="PROJEÇÃO (MÊS)" value={metrics.realizedEarnings + metrics.projectionEarnings} icon={<TrendingUp className="text-primary" />} trend={`+ ${formatCurrency(metrics.projectionEarnings)} aguardando`} />
+                <MetricCard title="BRUTO (MÊS)" value={metrics.monthlyRevenue} icon={<DollarSign className="text-primary" />} />
             </div>
 
             {/* Tabs */}
@@ -159,7 +159,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
             {/* Settlement Bar */}
             {selectedItems.length > 0 && activeTab === 'pending' && (
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 animate-in slide-in-from-bottom-8 duration-500">
-                    <div className="bg-black/90 border border-primary/30 rounded-3xl p-6 shadow-[0_0_50px_rgba(139,92,246,0.3)] flex items-center justify-between backdrop-blur-2xl relative overflow-hidden group">
+                    <div className="bg-black/90 border border-primary/30 rounded-3xl p-6 shadow-[0_0_50px_var(--primary-glow)] flex items-center justify-between backdrop-blur-2xl relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent pointer-events-none" />
                         <div className="relative z-10">
                             <p className="text-[10px] font-mono text-primary uppercase tracking-[0.2em] mb-1 animate-pulse">Total Selecionado para Acerto</p>
@@ -209,7 +209,7 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                                                 </div>
                                             </td>
                                             <td className="p-6">
-                                                <span className={`text-[10px] px-2 py-1 rounded font-mono ${item.type === 'TATTOO' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
+                                                <span className={`text-[10px] px-2 py-1 rounded font-mono ${item.type === 'TATTOO' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'}`}>
                                                     {item.type}
                                                 </span>
                                             </td>

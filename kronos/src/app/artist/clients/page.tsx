@@ -56,7 +56,7 @@ export default async function ClientsPage() {
                     <input
                         type="text"
                         placeholder="Buscar por nome..."
-                        className="w-full bg-black/50 border border-white/10 rounded-lg py-2 pl-10 text-sm focus:border-purple-500 outline-none"
+                        className="w-full bg-black/50 border border-white/10 rounded-lg py-2 pl-10 text-sm focus:border-primary outline-none"
                     />
                 </div>
             </div>
@@ -77,7 +77,7 @@ export default async function ClientsPage() {
 
                         return (
                             <div key={client.id} className="bg-gray-900/40 border border-white/5 p-6 rounded-xl hover:bg-gray-900/60 transition-all group relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 blur-3xl -z-10 group-hover:bg-purple-500/20 transition-all"></div>
+                                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-3xl -z-10 group-hover:bg-primary/20 transition-all"></div>
 
                                 <div className="flex items-center gap-4 mb-6">
                                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center border border-white/10">
@@ -104,7 +104,7 @@ export default async function ClientsPage() {
                                     </div>
                                     <div>
                                         <p className="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Sessões</p>
-                                        <p className="text-sm font-bold text-purple-400 font-orbitron">{projectCount}</p>
+                                        <p className="text-sm font-bold text-primary font-orbitron">{projectCount}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Anamneses</p>

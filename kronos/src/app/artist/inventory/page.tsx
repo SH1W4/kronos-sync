@@ -192,6 +192,20 @@ export default function InventoryPage() {
                                         onChange={e => setFormData({ ...formData, description: e.target.value })}
                                     />
                                 </div>
+                                <div>
+                                    <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">URL da Imagem do Produto</label>
+                                    <Input
+                                        placeholder="https://exemplo.com/imagem.jpg"
+                                        className="bg-white/5 border-white/10 h-14 rounded-2xl font-mono text-[10px]"
+                                        value={formData.imageUrl}
+                                        onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                                    />
+                                    {formData.imageUrl && (
+                                        <div className="mt-2 w-20 h-20 rounded-xl overflow-hidden border border-white/10">
+                                            <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Preço Base (R$)</label>

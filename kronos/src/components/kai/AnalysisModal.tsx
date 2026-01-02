@@ -36,11 +36,11 @@ export function KaiAnalysisModal({ isOpen, isLoading, onClose, onApply, suggesti
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm">
-            <div className="bg-zinc-950 border border-white/10 w-full max-w-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.15)] animate-in fade-in zoom-in duration-300">
+            <div className="bg-zinc-950 border border-white/10 w-full max-w-2xl rounded-2xl overflow-hidden shadow-[0_0_50px_var(--primary-glow)] animate-in fade-in zoom-in duration-300">
 
                 {/* Header */}
-                <div className="bg-purple-600/10 p-6 border-b border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-purple-400">
+                <div className="bg-primary/10 p-6 border-b border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-primary">
                         <Sparkles size={24} className="animate-pulse" />
                         <div>
                             <h2 className="font-orbitron font-bold tracking-tight text-lg uppercase">KAI Intelligence</h2>
@@ -55,7 +55,7 @@ export function KaiAnalysisModal({ isOpen, isLoading, onClose, onApply, suggesti
                 <div className="p-8 space-y-8">
                     {isLoading ? (
                         <div className="py-20 flex flex-col items-center justify-center text-center space-y-4">
-                            <Loader2 size={40} className="text-purple-500 animate-spin" />
+                            <Loader2 size={40} className="text-primary animate-spin" />
                             <div className="space-y-1">
                                 <p className="text-sm font-bold font-orbitron text-white uppercase tracking-wider">Aguarde, o KAI está analisando seu feed...</p>
                                 <p className="text-[10px] font-mono text-gray-500">Mapeando cores, estilos e bio para sua identidade visual.</p>
@@ -75,20 +75,20 @@ export function KaiAnalysisModal({ isOpen, isLoading, onClose, onApply, suggesti
                                 {/* BIO SECTION */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-gray-400">
-                                        <Type size={14} className="text-purple-400" />
+                                        <Type size={14} className="text-primary" />
                                         <label className="text-[10px] font-mono uppercase tracking-widest">Bio Sugerida pela IA (Editável)</label>
                                     </div>
                                     <Textarea
                                         value={editableBio}
                                         onChange={(e) => setEditableBio(e.target.value)}
-                                        className="bg-black/40 border-white/10 text-sm leading-relaxed min-h-[100px] focus:border-purple-500/50"
+                                        className="bg-black/40 border-white/10 text-sm leading-relaxed min-h-[100px] focus:border-primary/50"
                                     />
                                 </div>
 
                                 {/* STYLE TAGS */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-gray-400">
-                                        <Hash size={14} className="text-purple-400" />
+                                        <Hash size={14} className="text-primary" />
                                         <label className="text-[10px] font-mono uppercase tracking-widest">Estilos Identificados</label>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
@@ -100,7 +100,7 @@ export function KaiAnalysisModal({ isOpen, isLoading, onClose, onApply, suggesti
                                                 </button>
                                             </div>
                                         ))}
-                                        <button className="px-3 py-1.5 border border-dashed border-white/20 rounded-lg text-xs text-gray-500 hover:border-purple-500 hover:text-purple-400 transition-all">
+                                        <button className="px-3 py-1.5 border border-dashed border-white/20 rounded-lg text-xs text-gray-500 hover:border-primary hover:text-primary transition-all">
                                             + Adicionar estilo
                                         </button>
                                     </div>
@@ -109,7 +109,7 @@ export function KaiAnalysisModal({ isOpen, isLoading, onClose, onApply, suggesti
                                 {/* COLORS SECTION */}
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-gray-400">
-                                        <Palette size={14} className="text-purple-400" />
+                                        <Palette size={14} className="text-primary" />
                                         <label className="text-[10px] font-mono uppercase tracking-widest">Paleta de Cores do Feed</label>
                                     </div>
                                     <div className="flex gap-4">
@@ -148,7 +148,7 @@ export function KaiAnalysisModal({ isOpen, isLoading, onClose, onApply, suggesti
                                 </Button>
                                 <Button
                                     onClick={() => onApply({ bio: editableBio, styleTags: editableTags, primaryColor: suggestions?.primaryColor })}
-                                    className="flex-[2] bg-purple-600 hover:bg-purple-500 text-white font-bold tracking-widest gap-2"
+                                    className="flex-[2] bg-primary hover:opacity-90 text-black font-bold tracking-widest gap-2"
                                 >
                                     APLICAR AO MEU PERFIL <Check size={18} />
                                 </Button>

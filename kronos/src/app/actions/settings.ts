@@ -75,7 +75,7 @@ export async function updateUserTheme(color: string) {
     }
 }
 
-export async function updateArtistSettings(data: { name: string; commissionRate: number; instagram?: string }) {
+export async function updateArtistSettings(data: { name: string; commissionRate: number; instagram?: string; image?: string }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
@@ -85,11 +85,12 @@ export async function updateArtistSettings(data: { name: string; commissionRate:
         const userId = (session.user as any).id
         if (!userId) return { error: 'Usuário não encontrado' }
 
-        // Update user profile (name)
+        // Update user profile (name, image)
         await prisma.user.update({
             where: { id: userId },
             data: {
-                name: data.name
+                name: data.name,
+                image: data.image
             }
         })
 

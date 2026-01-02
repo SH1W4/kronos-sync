@@ -15,7 +15,7 @@ export function InkPassCard({
     code,
     type = 'RESIDENT',
     studioName = 'KRONØS',
-    primaryColor: initialColor = '#8B5CF6'
+    primaryColor: initialColor = '#8B5CF6' // Default purple if theme not loaded
 }: InkPassCardProps) {
     // Determine color based on type
     const primaryColor = type === 'ASSOCIATED' ? '#00FF88' : initialColor // Emerald for Associated
@@ -105,7 +105,7 @@ export function InkPassCard({
                             </div>
                             <div className="space-y-0.5">
                                 <span className="text-[7px] font-mono text-gray-600 uppercase">Silo</span>
-                                <span className="block text-[8px] font-bold text-purple-400 uppercase tracking-tighter">Active</span>
+                                <span className="block text-[8px] font-bold text-primary uppercase tracking-tighter">Active</span>
                             </div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ export function InkPassCard({
                         ))}
                     </div>
                     <div className="flex items-center gap-2">
-                        <Sparkles size={10} className="text-purple-400" />
+                        <Sparkles size={10} className="text-primary" />
                         <span className="text-[8px] font-mono text-gray-500 uppercase tracking-widest">Quantum Link Secured</span>
                     </div>
                 </div>

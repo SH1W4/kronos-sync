@@ -32,9 +32,9 @@ export function GiftButton({ clientId, existingCode }: { clientId: string, exist
     if (code) {
         return (
             <div className="flex flex-col gap-2 mt-2 animate-in fade-in">
-                <div className="flex items-center gap-2 bg-purple-500/20 border border-purple-500/50 rounded-lg px-3 py-2">
-                    <Gift size={16} className="text-purple-400 flex-shrink-0" />
-                    <span className="font-mono font-bold text-sm tracking-wider text-purple-200 truncate">{code}</span>
+                <div className="flex items-center gap-2 bg-primary/20 border border-primary/50 rounded-lg px-3 py-2">
+                    <Gift size={16} className="text-primary flex-shrink-0" />
+                    <span className="font-mono font-bold text-sm tracking-wider text-white truncate">{code}</span>
                     <button onClick={copyToClipboard} className="text-gray-400 hover:text-white ml-auto" title="Copiar Link">
                         {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                     </button>
@@ -43,7 +43,7 @@ export function GiftButton({ clientId, existingCode }: { clientId: string, exist
                     href={giftLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] text-center text-purple-400 hover:text-purple-300 underline underline-offset-2 uppercase tracking-wide"
+                    className="text-[10px] text-center text-primary hover:opacity-80 underline underline-offset-2 uppercase tracking-wide"
                 >
                     Visualizar Cartão Digital
                 </a>
@@ -55,7 +55,7 @@ export function GiftButton({ clientId, existingCode }: { clientId: string, exist
         <Button
             onClick={handleGenerate}
             disabled={loading}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold tracking-wider"
+            className="bg-primary hover:opacity-90 text-black font-bold tracking-wider border-none"
         >
             {loading ? 'GERANDO...' : '🎁 CRIAR CUPOM PRESENTE'}
         </Button>
