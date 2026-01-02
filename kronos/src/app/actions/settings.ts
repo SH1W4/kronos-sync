@@ -85,6 +85,8 @@ export async function updateArtistSettings(data: { name: string; commissionRate:
         const userId = (session.user as any).id
         if (!userId) return { error: 'Usuário não encontrado' }
 
+        const userRole = (session.user as any).role
+
         // Update user profile (name, image)
         await prisma.user.update({
             where: { id: userId },
@@ -94,13 +96,18 @@ export async function updateArtistSettings(data: { name: string; commissionRate:
             }
         })
 
-        // Update Artist profile (commissionRate, instagram)
+        // Update Artist profile (commissionRate restricted to ADMIN, instagram)
+        const artistData: any = {
+            instagram: data.instagram
+        }
+
+        if (userRole === 'ADMIN') {
+            artistData.commissionRate = data.commissionRate / 100
+        }
+
         await prisma.artist.update({
             where: { userId },
-            data: {
-                commissionRate: data.commissionRate / 100, // UX sends 10 for 10%
-                instagram: data.instagram
-            }
+            data: artistData
         })
 
         revalidatePath('/artist/settings')

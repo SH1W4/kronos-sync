@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
 import { ThemeCustomizer } from '@/components/theme/theme-customizer'
 import { signOut } from 'next-auth/react'
+import { TermsGate } from '@/components/auth/TermsGate'
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
     const { data: session, status, update: updateSession } = useSession()
@@ -156,7 +157,9 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
             {/* Área de Conteúdo Principal */}
             <main className="flex-1 overflow-y-auto bg-black relative">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none fixed"></div>
-                {children}
+                <TermsGate>
+                    {children}
+                </TermsGate>
                 <McpWidget />
                 <ThemeCustomizer />
             </main>

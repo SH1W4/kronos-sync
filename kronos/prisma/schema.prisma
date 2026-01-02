@@ -243,6 +243,8 @@ model Artist {
   calendarSyncEnabled  Boolean    @default(false)
   lastSyncedAt         DateTime?
   
+  termsAcceptedAt   DateTime?
+  
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
 

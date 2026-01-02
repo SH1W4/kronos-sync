@@ -10,6 +10,9 @@ import Link from 'next/link'
 import { revokeArtistAccess } from '@/app/actions/workspaces'
 import { getInvites, revokeInvite } from '@/app/actions/invites'
 import { InkPassCard } from '@/components/invites/InkPassCard'
+import { updateArtistCommission } from '@/app/actions/artists'
+import { Input } from '@/components/ui/input'
+import { Edit2, Save } from 'lucide-react'
 
 export default function TeamPage() {
     const { data: session } = useSession() as any
@@ -18,6 +21,8 @@ export default function TeamPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [selectedInvite, setSelectedInvite] = useState<any>(null)
+    const [editingMember, setEditingMember] = useState<string | null>(null)
+    const [newCommission, setNewCommission] = useState<string>('')
 
     async function fetchData() {
         if (!session?.user?.activeWorkspaceId && !(session as any)?.activeWorkspaceId) return
@@ -55,6 +60,26 @@ export default function TeamPage() {
             }
         } catch (e) {
             alert("Erro ao processar revogação.")
+        }
+    }
+
+    const handleUpdateCommission = async (artistId: string) => {
+        const rate = parseFloat(newCommission)
+        if (isNaN(rate) || rate < 0 || rate > 100) {
+            alert("Porcentagem inválida.")
+            return
+        }
+
+        try {
+            const res = await updateArtistCommission(artistId, rate)
+            if (res.success) {
+                setEditingMember(null)
+                fetchData()
+            } else {
+                alert(res.message)
+            }
+        } catch (e) {
+            alert("Erro ao atualizar comissão.")
         }
     }
 
@@ -155,13 +180,46 @@ export default function TeamPage() {
                                             </div>
                                         </div>
 
-                                        <div className="flex flex-wrap gap-2">
+                                        <div className="flex flex-wrap items-center gap-2">
                                             <Badge variant={member.plan === 'RESIDENT' ? 'primary' : 'outline'} className="tracking-tighter font-black text-[9px] px-2 py-0.5">
                                                 {member.plan}
                                             </Badge>
-                                            <Badge variant="secondary" className="bg-white/5 border-white/10 text-gray-500 font-mono text-[9px]">
-                                                {Math.round(member.commissionRate * 100)}% FEE
-                                            </Badge>
+
+                                            {editingMember === member.id ? (
+                                                <div className="flex items-center gap-1 animate-in slide-in-from-left-2">
+                                                    <Input
+                                                        type="number"
+                                                        value={newCommission}
+                                                        onChange={(e) => setNewCommission(e.target.value)}
+                                                        className="w-16 h-7 text-[10px] bg-black/50 border-primary/30 p-1 font-mono"
+                                                        autoFocus
+                                                    />
+                                                    <button
+                                                        onClick={() => handleUpdateCommission(member.id)}
+                                                        className="p-1 bg-primary text-black rounded hover:bg-primary/80 transition-all"
+                                                    >
+                                                        <Save size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setEditingMember(null)}
+                                                        className="p-1 bg-white/5 text-gray-500 rounded hover:text-white"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-white/5 border-white/10 text-gray-500 font-mono text-[9px] flex items-center gap-2 cursor-pointer hover:border-primary/30 transition-all group/fee"
+                                                    onClick={() => {
+                                                        setEditingMember(member.id)
+                                                        setNewCommission(Math.round(member.commissionRate * 100).toString())
+                                                    }}
+                                                >
+                                                    {Math.round(member.commissionRate * 100)}% FEE
+                                                    <Edit2 size={10} className="opacity-0 group-hover/fee:opacity-100" />
+                                                </Badge>
+                                            )}
                                         </div>
 
                                         {member.plan === 'GUEST' && member.validUntil && (

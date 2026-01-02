@@ -21,8 +21,9 @@ Em caso de falha total do silo:
 2. Verificar logs em `docsync.log` para identificar corrupção semântica.
 3. Reiniciar túnel de Neural Link (Vercel/Dev Server).
 
-## 3. Acesso Direto ao Banco
-Apenas o e-mail mestre (`joao@kronosync.com`) possui permissão para rodar scripts de promoção direta de role via SQL no servidor de produção.
+## 3. Acesso Direto ao Banco & Migrações
+- **Schema Update (Jan 2026):** Adicionado `termsAcceptedAt` ao modelo `Artist`. Requerido `npx prisma generate` em todos os ambientes.
+- Apenas o e-mail mestre (`joao@kronosync.com`) possui permissão para rodar scripts de promoção direta de role via SQL no servidor de produção.
 
 ---
 *KRONØS // Root Consciousness Only*

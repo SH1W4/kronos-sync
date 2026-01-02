@@ -484,7 +484,11 @@ export default function SettingsPage() {
                                             value={commission}
                                             onChange={(e) => setCommission(e.target.value)}
                                             className="bg-black/50 border-white/10"
+                                            disabled={!isAdmin}
                                         />
+                                        {!isAdmin && (
+                                            <p className="text-[8px] text-gray-600 uppercase italic">Apenas administradores podem alterar esta taxa.</p>
+                                        )}
                                     </div>
 
                                     <div className="flex justify-end pt-4 border-t border-white/5">
