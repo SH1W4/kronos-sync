@@ -150,7 +150,7 @@ export default async function ArtistDashboard() {
 
     const monthlyEarnings = monthMetrics.reduce((acc, b) => acc + (b.artistShare || 0), 0)
     const userName = session.user.name?.split(' ')[0] || 'Artista'
-    const todayDate = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' }).toUpperCase()
+    const todayDate = now.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', timeZone: 'America/Sao_Paulo' }).toUpperCase()
 
     return (
         <div className="space-y-8 relative overflow-hidden min-h-screen p-4 md:p-8">
@@ -200,7 +200,7 @@ export default async function ArtistDashboard() {
                             </div>
                         ) : (
                             todaysBookings.map((booking) => (
-                                <AppointmentCard key={booking.id} id={booking.id} time={`${new Date(booking.slot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`} client={booking.client.name} project={`Projeto: ${booking.id.slice(-4).toUpperCase()}`} status={booking.status} />
+                                <AppointmentCard key={booking.id} id={booking.id} time={`${new Date(booking.slot.startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}`} client={booking.client.name} project={`Projeto: ${booking.id.slice(-4).toUpperCase()}`} status={booking.status} />
                             ))
                         )}
                     </div>

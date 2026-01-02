@@ -50,7 +50,7 @@ async function main() {
       ownerId: masterOwner.id,
       pixKey: 'pix@kronosync.com',
       pixRecipient: 'KRONOS SYNC LTD',
-      capacity: 5
+      capacity: 3
     }
   })
 
