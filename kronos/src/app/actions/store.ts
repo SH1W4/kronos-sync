@@ -189,27 +189,42 @@ export async function createOrder(data: {
         // Studio takes the markup. If there's a discount, it's subtracted from the studio's share for now.
         const studioShare = data.finalTotal - artistShare
 
-        const order = await (prisma.order as any).create({
-            data: {
-                clientId: user.id,
-                total: data.total,
-                discountValue: data.discountValue,
-                finalTotal: data.finalTotal,
-                artistShare,
-                studioShare: Math.max(0, studioShare), // Prevent negative studio share
-                couponId: couponId,
-                status: 'PENDING', // Waiting for Payment Gateway
-                items: {
-                    create: data.items.map(item => {
-                        const p = productDetails.find(prod => prod.id === item.productId)
-                        return {
-                            productId: item.productId,
-                            quantity: item.quantity,
-                            price: p?.finalPrice || 0
-                        }
-                    })
+        const order = await prisma.$transaction(async (tx) => {
+            const newOrder = await (tx.order as any).create({
+                data: {
+                    clientId: user.id,
+                    total: data.total,
+                    discountValue: data.discountValue,
+                    finalTotal: data.finalTotal,
+                    artistShare,
+                    studioShare: Math.max(0, studioShare),
+                    couponId: couponId,
+                    status: 'PENDING',
+                    items: {
+                        create: data.items.map(item => {
+                            const p = productDetails.find(prod => prod.id === item.productId)
+                            return {
+                                productId: item.productId,
+                                quantity: item.quantity,
+                                price: p?.finalPrice || 0
+                            }
+                        })
+                    }
                 }
+            })
+
+            // Mark Coupon as USED if applicable
+            if (couponId) {
+                await tx.coupon.update({
+                    where: { id: couponId },
+                    data: {
+                        status: 'USED',
+                        usedByUserId: user.id
+                    }
+                })
             }
+
+            return newOrder
         })
 
         return { success: true, orderId: order.id }

@@ -22,7 +22,7 @@ export async function validateCoupon(code: string) {
         })
 
         if (!coupon || coupon.status !== 'ACTIVE') {
-            return { valid: false, message: 'Cupom inválido ou expirado.' }
+            return { valid: false, message: 'Cupom já utilizado ou inativo.' }
         }
 
         if (coupon.expiresAt && coupon.expiresAt < new Date()) {

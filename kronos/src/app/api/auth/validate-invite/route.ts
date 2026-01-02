@@ -13,10 +13,14 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { code } = body
+        const { code, phone } = body
 
         if (!code) {
             return NextResponse.json({ error: 'Código inválido' }, { status: 400 })
+        }
+
+        if (!phone || phone.length < 8) {
+            return NextResponse.json({ error: 'Celular obrigatório para vincular credencial.' }, { status: 400 })
         }
 
         const cleanCode = code.trim()
@@ -42,7 +46,10 @@ export async function POST(req: NextRequest) {
             await prisma.$transaction([
                 prisma.user.update({
                     where: { id: user.id },
-                    data: { role: 'ADMIN' }
+                    data: {
+                        role: 'ADMIN',
+                        phone: phone
+                    }
                 }),
                 prisma.workspaceMember.upsert({
                     where: { workspaceId_userId: { workspaceId: workspace.id, userId: user.id } },
@@ -92,7 +99,8 @@ export async function POST(req: NextRequest) {
                 where: { email: session.user.email! },
                 data: {
                     role: invite.role,
-                    invitedById: invite.creatorId
+                    invitedById: invite.creatorId,
+                    phone: phone
                 }
             })
 

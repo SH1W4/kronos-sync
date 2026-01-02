@@ -1,106 +1,78 @@
 import * as dotenv from 'dotenv'
 import * as path from 'path'
+import { PrismaClient, UserRole, ArtistPlan, BookingStatus, SettlementStatus } from '@prisma/client'
 
 // Load .env.local first (Vercel convention), then .env
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') })
 dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
-import { PrismaClient } from '@prisma/client'
-
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Iniciando seed do banco de dados...')
+  console.log('🌱 Iniciando seed PROFISSIONAL & COMPLETO do KRONOS SYNC...')
 
-  // Limpar dados existentes
+  // 1. Limpeza Profunda (Ordem correta de dependências)
+  await prisma.qrScan.deleteMany()
+  await prisma.anamnesis.deleteMany()
   await prisma.booking.deleteMany()
   await prisma.slot.deleteMany()
   await prisma.coupon.deleteMany()
   await prisma.orderItem.deleteMany()
   await prisma.order.deleteMany()
+  await prisma.settlement.deleteMany()
   await prisma.product.deleteMany()
   await prisma.offer.deleteMany()
   await prisma.subscriber.deleteMany()
   await prisma.kioskEntry.deleteMany()
-  await prisma.workspace.deleteMany()
+  await prisma.inviteCode.deleteMany()
+  await prisma.workspaceMember.deleteMany()
   await prisma.artist.deleteMany()
+  await prisma.workspace.deleteMany()
   await prisma.user.deleteMany()
 
-  console.log('🗑️ Dados existentes removidos')
+  console.log('🗑️ Banco limpo')
 
-  // 1. Criar o Workspace Principal
-  const workspace = await prisma.workspace.create({
+  // 2. Workspace & Owners
+  const owner = await prisma.user.create({
     data: {
-      name: 'Kronos Studio',
-      slug: 'kronos-studio',
-      primaryColor: '#8B5CF6',
-      owner: {
-        create: {
-          name: 'João Founder',
-          email: 'joao@kronosync.com',
-          role: 'ADMIN'
-        }
-      }
+      name: 'João Founder',
+      email: 'joao@kronosync.com',
+      role: 'ADMIN',
+      phone: '(11) 98888-0000'
     }
   })
 
-  console.log('🏛️ Workspace criado:', workspace.name)
+  const workspace = await prisma.workspace.create({
+    data: {
+      name: 'KRONOS HQ',
+      slug: 'kronos-hq',
+      primaryColor: '#8B5CF6',
+      ownerId: owner.id,
+      pixKey: 'pix@kronosync.com',
+      pixRecipient: 'KRONOS SYNC LTD',
+      capacity: 5
+    }
+  })
 
-  // Criar usuários (artistas)
+  await prisma.workspaceMember.create({
+    data: { workspaceId: workspace.id, userId: owner.id, role: 'ADMIN' }
+  })
+
+  // 3. Artistas
   const artistUsers = await Promise.all([
-    prisma.user.create({
-      data: {
-        name: 'Marcus Silva',
-        email: 'marcus@kronosync.com',
-        phone: '(11) 99999-1111',
-        role: 'ARTIST',
-        memberships: {
-          create: {
-            workspaceId: workspace.id,
-            role: 'ARTIST'
-          }
-        }
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Ana Costa',
-        email: 'ana@kronosync.com',
-        phone: '(11) 99999-2222',
-        role: 'ARTIST',
-        memberships: {
-          create: {
-            workspaceId: workspace.id,
-            role: 'ARTIST'
-          }
-        }
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Carlos Mendes',
-        email: 'carlos@kronosync.com',
-        phone: '(11) 99999-3333',
-        role: 'ARTIST',
-        memberships: {
-          create: {
-            workspaceId: workspace.id,
-            role: 'ARTIST'
-          }
-        }
-      }
-    })
+    prisma.user.create({ data: { name: 'Marcus Silva', email: 'marcus@kronosync.com', phone: '(11) 99999-1111', role: 'ARTIST' } }),
+    prisma.user.create({ data: { name: 'Ana Costa', email: 'ana@kronosync.com', phone: '(11) 99999-2222', role: 'ARTIST' } }),
+    prisma.user.create({ data: { name: 'Carlos Mendes', email: 'carlos@kronosync.com', phone: '(11) 99999-3333', role: 'ARTIST' } })
   ])
 
-  // Criar perfis de artistas
-  const artists = await Promise.all([
+  const artists: any[] = await Promise.all([
     prisma.artist.create({
       data: {
         userId: artistUsers[0].id,
         workspaceId: workspace.id,
         plan: 'RESIDENT',
         commissionRate: 0.8,
-        isActive: true
+        instagram: '@marcus.tattoos'
       }
     }),
     prisma.artist.create({
@@ -109,7 +81,7 @@ async function main() {
         workspaceId: workspace.id,
         plan: 'RESIDENT',
         commissionRate: 0.75,
-        isActive: true
+        instagram: '@ana.fine.art'
       }
     }),
     prisma.artist.create({
@@ -118,343 +90,207 @@ async function main() {
         workspaceId: workspace.id,
         plan: 'GUEST',
         commissionRate: 0.7,
-        isActive: true
+        instagram: '@carlos.tribal'
       }
     })
   ])
 
-  console.log('👨‍🎨 Artistas criados:', artists.length)
+  await Promise.all(artistUsers.map(u =>
+    prisma.workspaceMember.create({ data: { workspaceId: workspace.id, userId: u.id, role: 'ARTIST' } })
+  ))
 
-  // Criar usuários clientes
-  const clients = await Promise.all([
-    prisma.user.create({
-      data: {
-        name: 'João Silva',
-        email: 'joao@email.com',
-        phone: '(11) 98888-1111',
-        role: 'CLIENT'
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Maria Santos',
-        email: 'maria@email.com',
-        phone: '(11) 98888-2222',
-        role: 'CLIENT'
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Pedro Oliveira',
-        email: 'pedro@email.com',
-        phone: '(11) 98888-3333',
-        role: 'CLIENT'
-      }
-    }),
-    prisma.user.create({
-      data: {
-        name: 'Ana Rodrigues',
-        email: 'ana.rodrigues@email.com',
-        phone: '(11) 98888-4444',
-        role: 'CLIENT'
-      }
-    })
+  // 4. Clientes VIP (Criamos 6 para evitar erros de index)
+  const clients: any[] = await Promise.all([
+    prisma.user.create({ data: { name: 'Roberto Carlos', email: 'roberto@email.com', phone: '(11) 91111-0000', role: 'CLIENT' } }),
+    prisma.user.create({ data: { name: 'Julia Roberts', email: 'julia@email.com', phone: '(11) 92222-0000', role: 'CLIENT' } }),
+    prisma.user.create({ data: { name: 'Stan Lee', email: 'stan@email.com', phone: '(11) 93333-0000', role: 'CLIENT' } }),
+    prisma.user.create({ data: { name: 'Ana Rodrigues', email: 'ana.r@email.com', phone: '(11) 94444-0000', role: 'CLIENT' } }),
+    prisma.user.create({ data: { name: 'Pedro Olive', email: 'pedro@email.com', phone: '(11) 95555-0000', role: 'CLIENT' } }),
+    prisma.user.create({ data: { name: 'Maria Santos', email: 'maria@email.com', phone: '(11) 96666-0000', role: 'CLIENT' } })
   ])
 
-  console.log('👥 Clientes criados:', clients.length)
+  // 5. Segurança & Marketing
+  const invite = await prisma.inviteCode.create({
+    data: {
+      code: 'JOIN-KRONOS',
+      role: 'ARTIST',
+      targetPlan: 'GUEST',
+      maxUses: 1,
+      currentUses: 0,
+      creatorId: owner.id,
+      workspaceId: workspace.id,
+      expiresAt: new Date('2026-12-31')
+    }
+  })
 
-  // Criar entradas do kiosk
-  const kioskEntries = await Promise.all([
-    prisma.kioskEntry.create({
-      data: {
-        name: 'João Silva',
-        email: 'joao@email.com',
-        phone: '(11) 98888-1111',
-        type: 'CLIENT',
-        marketingOptIn: true
-      }
-    }),
-    prisma.kioskEntry.create({
-      data: {
-        name: 'Carla Acompanhante',
-        email: 'carla@email.com',
-        phone: '(11) 98888-5555',
-        type: 'COMPANION',
-        marketingOptIn: false
-      }
-    })
-  ])
+  const coupon = await prisma.coupon.create({
+    data: {
+      code: 'FIRST10',
+      discountPercent: 10,
+      status: 'ACTIVE',
+      workspaceId: workspace.id,
+      artistId: artists[0].id
+    }
+  })
 
-  console.log('🏪 Entradas do kiosk criadas:', kioskEntries.length)
+  // 6. Marketplace
+  const product = await prisma.product.create({
+    data: {
+      title: 'Kit Cuidados Pós-Tattoo',
+      description: 'Pomada + Sabonete Neutro',
+      basePrice: 50,
+      finalPrice: 65,
+      type: 'PHYSICAL',
+      artistId: artists[0].id,
+      workspaceId: workspace.id,
+      isSold: false
+    }
+  })
 
-  // Criar cupons (Atualizado para Schema Novo)
-  const coupons = await Promise.all([
-    prisma.coupon.create({
-      data: {
-        code: 'DESCONTO10',
-        discountPercent: 10,
-        status: 'ACTIVE',
-        expiresAt: new Date('2025-12-31'),
-        artistId: artists[0].id,
-        workspaceId: workspace.id
-      }
-    }),
-    prisma.coupon.create({
-      data: {
-        code: 'VIP20',
-        discountPercent: 20,
-        status: 'ACTIVE',
-        expiresAt: new Date('2025-12-31'),
-        artistId: artists[0].id,
-        workspaceId: workspace.id
-      }
-    }),
-    prisma.coupon.create({
-      data: {
-        code: 'FINELINE20',
-        discountPercent: 20,
-        status: 'ACTIVE',
-        expiresAt: new Date('2025-12-31'),
-        artistId: artists[1].id,
-        workspaceId: workspace.id
-      }
-    })
-  ])
-
-  console.log('🎫 Cupons criados:', coupons.length)
-
-  // Criar produtos do marketplace
-  const products = await Promise.all([
-    prisma.product.create({
-      data: {
-        title: 'Flash Tattoo - Caveira',
-        description: 'Design exclusivo de caveira em estilo tradicional',
-        basePrice: 150,
-        finalPrice: 180,
-        type: 'PHYSICAL',
-        artistId: artists[0].id,
-        workspaceId: workspace.id,
-        isActive: true
-      }
-    }),
-    prisma.product.create({
-      data: {
-        title: 'Arte Digital - Rosa Minimalista',
-        description: 'Design digital de rosa em traços finos',
-        basePrice: 100,
-        finalPrice: 120,
-        type: 'DIGITAL',
-        artistId: artists[1].id,
-        workspaceId: workspace.id,
-        isActive: true
-      }
-    }),
-    prisma.product.create({
-      data: {
-        title: 'Flash Tattoo - Mandala',
-        description: 'Mandala geométrica detalhada',
-        basePrice: 200,
-        finalPrice: 240,
-        type: 'PHYSICAL',
-        artistId: artists[2].id,
-        workspaceId: workspace.id,
-        isActive: true
-      }
-    }),
-    prisma.product.create({
-      data: {
-        title: 'Pack Digital - Animais',
-        description: 'Coleção de 5 designs de animais',
-        basePrice: 250,
-        finalPrice: 300,
-        type: 'DIGITAL',
-        artistId: artists[0].id,
-        workspaceId: workspace.id,
-        isActive: true
-      }
-    })
-  ])
-
-  console.log('🛍️ Produtos criados:', products.length)
-
-  // Criar ofertas
-  const offers = await Promise.all([
-    prisma.offer.create({
-      data: {
-        title: 'Flash Day - Tatuagens Pequenas',
-        description: 'Tatuagens pequenas por apenas R$ 200! Válido apenas hoje.',
-        isActive: true,
-        endsAt: new Date('2025-09-15'),
-        workspaceId: workspace.id
-      }
-    }),
-    prisma.offer.create({
-      data: {
-        title: 'Promoção Fine Line',
-        description: 'Desconto especial em tatuagens fine line durante todo o mês',
-        isActive: true,
-        endsAt: new Date('2025-09-30'),
-        workspaceId: workspace.id
-      }
-    }),
-    prisma.offer.create({
-      data: {
-        title: 'Evento Tribal',
-        description: 'Workshop de tatuagem tribal + desconto especial',
-        isActive: true,
-        endsAt: new Date('2025-10-15'),
-        workspaceId: workspace.id
-      }
-    })
-  ])
-
-  console.log('🎉 Ofertas criadas:', offers.length)
-
-  // Criar slots de horários
-  const slots = []
+  // 7. HISTÓRICO RICO (6 MESES DE DADOS)
+  console.log('📅 Gerando 6 meses de histórico financeiro...')
   const today = new Date()
+  let totalHistorical = 0
 
-  // Criar slots para os próximos 7 dias
-  for (let day = 0; day < 7; day++) {
-    const date = new Date(today)
-    date.setDate(today.getDate() + day)
+  for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
+    const monthDate = new Date()
+    monthDate.setMonth(today.getMonth() - monthsAgo)
 
-    // Para cada maca (1, 2, 3)
-    for (let maca = 1; maca <= 3; maca++) {
-      // Horários: 9h, 14h, 18h
-      const times = ['09:00', '13:00', '16:30', '20:00']
+    // Para cada artista
+    for (let artistIdx = 0; artistIdx < artists.length; artistIdx++) {
+      const currentArtist = artists[artistIdx]
 
-      for (const time of times) {
-        const [hours, minutes] = time.split(':')
-        const startTime = new Date(date)
-        startTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+      // Gerar 5 bookings por artista por mês
+      for (let i = 0; i < 5; i++) {
+        const bookingDay = new Date(monthDate)
+        bookingDay.setDate(2 + i * 5) // Espalhar no mês
 
-        const endTime = new Date(startTime)
-        endTime.setHours(startTime.getHours() + 3) // 3 horas de duração
+        const value = 400 + (Math.random() * 600)
+        const commission = currentArtist.commissionRate
+        const artistShare = value * commission
+        const studioShare = value - artistShare
 
         const slot = await prisma.slot.create({
           data: {
-            macaId: maca,
-            startTime,
-            endTime,
-            isActive: true,
-            workspaceId: workspace.id
-          }
-        })
-        slots.push(slot)
-      }
-    }
-  }
-
-  console.log('⏰ Slots criados:', slots.length)
-
-  // Criar alguns agendamentos históricos para validação financeira
-  // Criando dados para os últimos 6 meses
-  const historicalBookings = []
-  const artistList = [artists[0], artists[1], artists[2]]
-  const clientList = [clients[0], clients[1], clients[2], clients[3], clients[4]]
-
-  // Generate bookings for the past 6 months
-  for (let monthsAgo = 5; monthsAgo >= 0; monthsAgo--) {
-    const bookingDate = new Date()
-    bookingDate.setMonth(bookingDate.getMonth() - monthsAgo)
-    bookingDate.setDate(15) // Mid-month
-
-    // Create 3-5 bookings per month per artist
-    for (let artistIdx = 0; artistIdx < 3; artistIdx++) {
-      const numBookings = 3 + Math.floor(Math.random() * 3) // 3-5 bookings
-
-      for (let i = 0; i < numBookings; i++) {
-        const bookingDay = new Date(bookingDate)
-        bookingDay.setDate(5 + i * 5) // Days 5, 10, 15, 20, 25
-
-        const value = 300 + Math.floor(Math.random() * 500) // R$ 300 - R$ 800
-        const commissionRate = artistList[artistIdx].commissionRate || 0.75
-        const artistShare = Math.round(value * commissionRate)
-        const studioShare = value - artistShare
-
-        // Create slot for historical booking
-        const slotStart = new Date(bookingDay)
-        slotStart.setHours(10 + i * 2, 0, 0, 0)
-        const slotEnd = new Date(slotStart)
-        slotEnd.setHours(slotStart.getHours() + 3)
-
-        const historicalSlot = await prisma.slot.create({
-          data: {
-            macaId: (i % 3) + 1,
-            startTime: slotStart,
-            endTime: slotEnd,
-            isActive: true,
-            workspaceId: workspace.id
-          }
-        })
-
-        const booking = await prisma.booking.create({
-          data: {
-            clientId: clientList[i % clientList.length].id,
-            artistId: artistList[artistIdx].id,
-            slotId: historicalSlot.id,
             workspaceId: workspace.id,
+            macaId: (i % 3) + 1,
+            startTime: bookingDay,
+            endTime: new Date(bookingDay.getTime() + 3 * 60 * 60 * 1000)
+          }
+        })
+
+        await prisma.booking.create({
+          data: {
+            artistId: currentArtist.id,
+            clientId: clients[i % clients.length].id,
+            workspaceId: workspace.id,
+            slotId: slot.id,
             value: value,
             finalValue: value,
-            studioShare: studioShare,
-            artistShare: artistShare,
-            status: monthsAgo > 0 ? 'COMPLETED' : (i < 2 ? 'COMPLETED' : 'CONFIRMED'),
-            settlementId: null, // All unsettled for testing
-            scheduledFor: bookingDay,
-            duration: 180
+            studioShare,
+            artistShare,
+            status: monthsAgo > 0 ? 'COMPLETED' : 'CONFIRMED',
+            scheduledFor: bookingDay
           }
         })
-        historicalBookings.push(booking)
+        totalHistorical++
+      }
+
+      // Adicionar um ACERTO (Settlement) para os meses passados
+      if (monthsAgo > 0) {
+        await prisma.settlement.create({
+          data: {
+            artistId: currentArtist.id,
+            workspaceId: workspace.id,
+            totalValue: 1200 + (Math.random() * 500),
+            status: 'APPROVED',
+            aiFeedback: 'Acerto mensal automático via Seed.',
+            proofUrl: 'https://placehold.co/400x600?text=SEED_PROOF',
+            createdAt: monthDate
+          }
+        })
       }
     }
   }
 
-  console.log('📅 Agendamentos históricos criados:', historicalBookings.length)
+  // 8. AGENDA DE HOJE & AMANHÃ (Para Validação do Dashboard)
+  const tomorrow = new Date()
+  tomorrow.setDate(today.getDate() + 1)
+  tomorrow.setHours(14, 0, 0, 0)
 
-  // Criar assinantes
-  const subscribers = await Promise.all([
-    prisma.subscriber.create({
-      data: {
-        name: 'João Silva',
-        email: 'joao@email.com',
-        isActive: true,
-        workspaceId: workspace.id
+  const todayMorning = new Date()
+  todayMorning.setHours(10, 0, 0, 0)
+
+  const todaySlot = await prisma.slot.create({
+    data: { workspaceId: workspace.id, macaId: 1, startTime: todayMorning, endTime: new Date(todayMorning.getTime() + 4 * 60 * 60 * 1000) }
+  })
+
+  const todayBooking = await prisma.booking.create({
+    data: {
+      artistId: artists[0].id,
+      clientId: clients[1].id,
+      workspaceId: workspace.id,
+      slotId: todaySlot.id,
+      value: 1200,
+      finalValue: 1200,
+      studioShare: 240,
+      artistShare: 960,
+      status: 'CONFIRMED',
+      scheduledFor: todayMorning
+    }
+  })
+
+  // 9. ANAMNESE REALISTA
+  await prisma.anamnesis.create({
+    data: {
+      bookingId: todayBooking.id,
+      clientId: clients[1].id,
+      workspaceId: workspace.id,
+      fullName: clients[1].name,
+      whatsapp: clients[1].phone,
+      knownAllergies: "Nenhuma",
+      medicalConditionsTattoo: "Nenhum",
+      artDescription: "Fechamento de braço (Sessão 1)",
+      acceptedTerms: true,
+      understandPermanence: true,
+      followInstructions: true,
+      signatureData: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEwIDIwIEwyMCAzMCBMNDAgMTAiIHN0cm9rZT0iYmxhY2siIGZpbGw9Im5vbmUiLz48L3N2Zz4="
+    }
+  })
+
+  // 10. VENDAS MARKETPLACE (BI Analytics)
+  await prisma.order.create({
+    data: {
+      clientId: clients[3].id,
+      workspaceId: workspace.id,
+      total: 130,
+      finalTotal: 130,
+      artistShare: 100,
+      studioShare: 30,
+      status: 'PAID',
+      items: {
+        create: {
+          productId: product.id,
+          price: 65,
+          quantity: 2
+        }
       }
-    }),
-    prisma.subscriber.create({
-      data: {
-        name: 'Maria Santos',
-        email: 'maria@email.com',
-        isActive: true,
-        workspaceId: workspace.id
-      }
-    })
-  ])
+    }
+  })
 
-  console.log('📧 Assinantes criados:', subscribers.length)
-
-  console.log('✅ Seed concluído com sucesso!')
-  console.log(`
-📊 Resumo dos dados criados:
-- ${artists.length} artistas
-- ${clients.length} clientes
-- ${kioskEntries.length} entradas do kiosk
-- ${coupons.length} cupons
-- ${products.length} produtos
-- ${offers.length} ofertas
-- ${slots.length} slots de horários
-- ${historicalBookings.length} agendamentos
-- ${subscribers.length} assinantes
-  `)
+  console.log('✅ SEED COMPLETO COM SUCESSO!')
+  console.log(`- Workspace: ${workspace.name}`)
+  console.log(`- Artistas: ${artists.length}`)
+  console.log(`- Histórico: ${totalHistorical} agendamentos nos últimos 6 meses`)
+  console.log(`- Dashboard: 1 Sessão crítica hoje com Anamnese vinculada`)
+  console.log(`- Financeiro: Acertos mensais gerados para todos os artistas`)
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Erro durante o seed:', e)
+    console.error('❌ Erro no seed:', e)
     process.exit(1)
   })
   .finally(async () => {
     await prisma.$disconnect()
   })
-

@@ -39,6 +39,7 @@ function OnboardingContent() {
     const [studioName, setStudioName] = useState('')
     const [motivation, setMotivation] = useState('')
     const [teamDetails, setTeamDetails] = useState('')
+    const [phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
@@ -96,7 +97,7 @@ function OnboardingContent() {
             const response = await fetch('/api/auth/validate-invite', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: inviteCode })
+                body: JSON.stringify({ code: inviteCode, phone })
             })
 
             const data = await response.json()
@@ -224,7 +225,22 @@ function OnboardingContent() {
                                         value={inviteCode}
                                         onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                                         autoFocus
+                                        required
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-mono uppercase text-gray-500 mb-2 block">Seu Celular (Proteção de Identidade)</label>
+                                    <Input
+                                        className="bg-black/50 border-white/10 text-center font-mono text-lg h-12"
+                                        placeholder="(00) 00000-0000"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        required
+                                    />
+                                    <p className="text-[9px] text-gray-600 font-mono mt-2 uppercase tracking-tight">
+                                        * Este número será vinculado à sua credencial para evitar vazamentos.
+                                    </p>
                                 </div>
 
                                 {error && (
