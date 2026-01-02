@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache"
  * Criação direta de Workspace.
  * Mantida para uso administrativo ou chaves mestras.
  */
-export async function createWorkspace(data: { name: string, primaryColor: string }) {
+export async function createWorkspace(data: { name: string, primaryColor: string, capacity?: number }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
@@ -40,7 +40,7 @@ export async function createWorkspace(data: { name: string, primaryColor: string
                     slug: finalSlug,
                     primaryColor: data.primaryColor || '#8B5CF6',
                     ownerId: user.id,
-                    capacity: 3
+                    capacity: data.capacity || 3
                 }
             })
 

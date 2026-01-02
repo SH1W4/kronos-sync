@@ -130,7 +130,7 @@ model Workspace {
   pixRecipient  String?
   
   // Settings
-  capacity      Int       @default(5) // Número de macas/cadeiras
+  capacity      Int       @default(3) // Número de macas/cadeiras
   
   // Google Calendar Integration (Shared Studio Calendar)
   googleCalendarId String? // e.g., "abc123@group.calendar.google.com"

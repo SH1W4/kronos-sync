@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
                     data: {
                         name: 'Kronos Studio',
                         slug: 'kronos-studio',
-                        ownerId: user.id
+                        ownerId: user.id,
+                        capacity: 3
                     }
                 })
             }
