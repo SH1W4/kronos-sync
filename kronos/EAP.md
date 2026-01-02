@@ -5,10 +5,10 @@
 
 ## 📊 Status do Projeto
 
-**Versão:** 2.0.0  
-**Completude:** 75% → Meta: 100% MVP  
-**Última Atualização:** 22 de Dezembro de 2025  
-**Branch Ativa:** `feat/kai-agent-rag`
+**Versão:** 2.1.0  
+**Completude:** 90% → Meta: 100% MVP  
+**Última Atualização:** 02 de Janeiro de 2026  
+**Branch Ativa:** `main` (Production)
 
 ---
 
@@ -58,6 +58,7 @@ PWA:       Service Worker + Manifest
 - [x] **INK PASS** - Sistema de convites premium
 - [x] **Google Sync** - Sincronização bidirecional de calendário
 - [x] **PWA** - Manifest + Service Worker + ícones
+- [x] **Smart Anamnesis** - Reuso de fichas e links rápidos (Novo)
 
 ### Features Avançadas (100%)
 - [x] **Assistente KAI** - Branding por IA via Instagram
@@ -154,15 +155,14 @@ PWA:       Service Worker + Manifest
 
 ## 📈 Roadmap de Desenvolvimento
 
-### Sprint Atual: Finalização do MVP (3-4 dias)
-**Objetivo:** Chegar a 100% de completude do MVP
+### Sprint Atual: Refinamento & Launch (Janeiro 2026)
+**Objetivo:** Polimento Final e Lançamento
 
-1. ✅ **Dia 1 (Manhã):** Validações Zod
-2. ⏳ **Dia 1 (Tarde):** Notificações E-mail
-3. ⏳ **Dia 2 (Manhã):** Analytics Básico
-4. ⏳ **Dia 2 (Tarde):** Melhorias de UX
-5. ⏳ **Dia 3:** Preparação Deploy + Testes
-6. ⏳ **Dia 4:** Deploy Produção + Validação
+1. ✅ **Governança:** artist-terms.md + TermsGate Implementado
+2. ✅ **Branding:** Visual B&W e KAI Network.
+3. ✅ **Ativação KAI:** Agente com NLP e Feedback.
+4. ⏳ **Smart Anamnesis:** Otimização de fluxo recorrente.
+5. ⏳ **Notificações:** WhatsApp/Email.
 
 ### Próximo Sprint: Beta Testing (2-3 semanas)
 1. Recrutar 5-10 estúdios beta testers

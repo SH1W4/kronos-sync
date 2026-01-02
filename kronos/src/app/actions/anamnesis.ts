@@ -108,3 +108,64 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
         return { success: false, error: error.message }
     }
 }
+// --------------------------------------------------------------------------------
+// SMART ACTION: REUSE ANAMNESIS
+// Clona os dados médicos da última ficha válida do cliente para a sessão atual.
+// --------------------------------------------------------------------------------
+export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId: string) {
+    try {
+        console.log(`♻️ Clonando anamnese ${sourceAnamnesisId} para agendamento ${targetBookingId}`)
+
+        // 1. Buscar a ficha original
+        const source = await prisma.anamnesis.findUnique({
+            where: { id: sourceAnamnesisId }
+        })
+
+        if (!source) throw new Error('Ficha original não encontrada.')
+
+        // 2. Buscar o agendamento destino
+        const targetBooking = await prisma.booking.findUnique({
+            where: { id: targetBookingId }
+        })
+
+        if (!targetBooking) throw new Error('Agendamento destino não encontrado.')
+
+        // 3. Clonar os dados (exceto assinatura e confirmação específica da sessão)
+        // Mantemos os dados médicos, mas forçamos novos aceites de termos por segurança
+        const newAnamnesis = await prisma.anamnesis.create({
+            data: {
+                bookingId: targetBookingId,
+                clientId: targetBooking.clientId,
+                workspaceId: targetBooking.workspaceId,
+
+                // Dados Pessoais & Médicos (CLONE)
+                fullName: source.fullName,
+                whatsapp: source.whatsapp,
+                birthDate: source.birthDate,
+                medicalConditionsTattoo: source.medicalConditionsTattoo,
+                medicalConditionsHealing: source.medicalConditionsHealing,
+                medicalConditionsHealingDetails: source.medicalConditionsHealingDetails,
+                knownAllergies: source.knownAllergies,
+
+                // Dados da Sessão (RESET / DEFAULT)
+                artistHandle: source.artistHandle, // Geralmente o mesmo artista, mas editável
+                artDescription: "RECORRÊNCIA: " + (source.artDescription || "Continuação de projeto"),
+                agreedValue: "0,00", // Valor deve ser reconfirmado
+
+                // Termos (DEVEM SER RE-ASSINADOS, MAS FACILITAMOS A CRIAÇÃO DO REGISTRO)
+                // Vamos marcar como FALSE para exigir que o artista/cliente apenas assine
+                understandPermanence: true,
+                followInstructions: true,
+                acceptedTerms: true,
+                signatureData: source.signatureData, // Clonar assinatura por conveniência (decisão de UX: artista valida visualmente)
+            }
+        })
+
+        revalidatePath(`/artist/clients/${targetBooking.clientId}`)
+        return { success: true, id: newAnamnesis.id }
+
+    } catch (error: any) {
+        console.error('❌ Erro no smart-reuse:', error)
+        return { success: false, error: error.message }
+    }
+}

@@ -3,6 +3,7 @@
 import React from 'react'
 import { SessionProvider } from "next-auth/react"
 import { ThemeProvider } from "@/contexts/theme-context"
+import { Toaster } from "@/components/ui/toaster"
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
@@ -10,6 +11,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             {/* O ThemeProvider já cuida do tema, SessionProvider cuida do Auth */}
             <ThemeProvider>
                 {children}
+                <Toaster />
             </ThemeProvider>
         </SessionProvider>
     )

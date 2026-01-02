@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { Mail, Phone, Calendar, DollarSign, AlertTriangle, Activity, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { GiftButton } from '@/components/clients/gift-button'
+import { AnamnesisStatus } from '@/components/clients/anamnesis-status'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,6 +59,11 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
     const allergiesList = Array.from(new Set(allAnamnesis.flatMap(a =>
         (a?.knownAllergies && a.knownAllergies !== 'NÃO') ? [a.knownAllergies] : []
     )))
+
+    // Find the LAST valid anamnesis for reuse logic
+    const lastValidAnamnesis = allAnamnesis
+        .filter((a): a is NonNullable<typeof a> => a !== null && a !== undefined)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())[0]
 
     return (
         <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 text-white">
@@ -169,15 +175,22 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                                     <p className="font-mono text-green-400">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(booking.value)}</p>
                                 </div>
                                 {booking.anamnesis ? (
-                                    <Link href={`/artist/anamnese/${booking.id}`}>
-                                        <span className="px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded text-xs uppercase font-bold hover:bg-green-500/20 transition-colors">
-                                            Ficha OK
-                                        </span>
-                                    </Link>
+                                    <AnamnesisStatus
+                                        bookingId={booking.id}
+                                        status="COMPLETED"
+                                        anamnesisId={booking.anamnesis.id}
+                                        clientName={client.name || 'Cliente'}
+                                        clientPhone={client.phone}
+                                    />
                                 ) : (
-                                    <span className="px-3 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded text-xs uppercase font-bold">
-                                        Pendente
-                                    </span>
+                                    <AnamnesisStatus
+                                        bookingId={booking.id}
+                                        status="PENDING"
+                                        clientName={client.name || 'Cliente'}
+                                        clientPhone={client.phone}
+                                        lastValidAnamnesisId={lastValidAnamnesis?.id}
+                                        lastValidAnamnesisDate={lastValidAnamnesis?.updatedAt.toString()}
+                                    />
                                 )}
                             </div>
                         </div>
