@@ -114,7 +114,7 @@ export async function exportAnamnesisCSV() {
             escapeCSV(a.knownAllergies),
             escapeCSV(a.medicalConditionsHealing === "SIM" ? a.medicalConditionsHealingDetails : "NÃO"),
             escapeCSV(a.artDescription),
-            a.allowSharing ? "SIM" : "NÃO"
+            (a as any).allowSharing ? "SIM" : "NÃO"
         ])
 
         const csvContent = [header, ...rows].map(r => r.join(",")).join("\n")
