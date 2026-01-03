@@ -194,7 +194,8 @@ export const artistSettingsSchema = z.object({
     commissionRate: commissionRateSchema.optional(),
     instagram: z.string()
         .regex(/^@?[a-zA-Z0-9._]+$/, 'Username do Instagram inválido')
-        .optional()
+        .optional(),
+    calendarSyncEnabled: z.boolean().optional()
 })
 
 export const userThemeSchema = z.object({

@@ -162,7 +162,7 @@ export async function exportFinanceCSV() {
             escapeCSV(b.artist.user.name),
             b.value.toFixed(2),
             b.status,
-            escapeCSV(b.type)
+            escapeCSV((b as any).type)
         ])
 
         const csvContent = [header, ...rows].map(r => r.join(",")).join("\n")
@@ -246,7 +246,7 @@ export async function generateClientDossier(clientId: string) {
 
         md += `## 📅 HISTÓRICO DE SESSÕES\n`
         client.bookings.forEach(b => {
-            md += `### ${new Date(b.slot.startTime).toLocaleDateString('pt-BR')} - ${b.type}\n`
+            md += `### ${new Date(b.slot.startTime).toLocaleDateString('pt-BR')} - ${(b as any).type}\n`
             md += `- **Artista:** ${b.artist.user.name}\n`
             md += `- **Valor:** R$ ${b.value.toFixed(2)}\n`
             md += `- **Status:** ${b.status}\n\n`

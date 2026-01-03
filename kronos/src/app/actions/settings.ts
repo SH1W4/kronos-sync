@@ -88,7 +88,7 @@ export async function updateUserTheme(color: string) {
     }
 }
 
-export async function updateArtistSettings(data: { name: string; commissionRate: number; instagram?: string; image?: string }) {
+export async function updateArtistSettings(data: { name?: string; commissionRate?: number; instagram?: string; image?: string; calendarSyncEnabled?: boolean }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
@@ -100,27 +100,31 @@ export async function updateArtistSettings(data: { name: string; commissionRate:
 
         const userRole = (session.user as any).role
 
-        // Validação
-        const validated = artistSettingsSchema.safeParse(data)
+        // Validação - Partial because we allow updating subsets
+        const partialSchema = artistSettingsSchema.partial()
+        const validated = partialSchema.safeParse(data)
         if (!validated.success) {
             return { error: validated.error.issues[0].message }
         }
 
-        // Update user profile (name, image)
-        await prisma.user.update({
-            where: { id: userId },
-            data: {
-                name: data.name,
-                image: data.image
-            }
-        })
-
-        // Update Artist profile (commissionRate restricted to ADMIN, instagram)
-        const artistData: any = {
-            instagram: data.instagram
+        // Update user profile (name, image) if provided
+        if (data.name || data.image) {
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    ...(data.name && { name: data.name }),
+                    ...(data.image && { image: data.image })
+                }
+            })
         }
 
-        if (userRole === 'ADMIN') {
+        // Update Artist profile (commissionRate restricted to ADMIN, instagram, calendarSyncEnabled)
+        const artistData: any = {
+            instagram: data.instagram,
+            calendarSyncEnabled: data.calendarSyncEnabled
+        }
+
+        if (userRole === 'ADMIN' && data.commissionRate !== undefined) {
             artistData.commissionRate = data.commissionRate / 100
         }
 

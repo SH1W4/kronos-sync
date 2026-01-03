@@ -27,10 +27,17 @@ export async function getCalendarStatus() {
         // Check if we have the needed scope
         const hasScope = account.scope?.includes('https://www.googleapis.com/auth/calendar')
 
+        // Fetch artist preferences
+        const artist = await prisma.artist.findUnique({
+            where: { userId: (session.user as any).id },
+            select: { calendarSyncEnabled: true }
+        })
+
         return {
             connected: true,
             email: session.user.email,
             hasRequiredScopes: hasScope,
+            calendarSyncEnabled: artist?.calendarSyncEnabled || false,
             lastSyncedAt: null // TODO: Implement sync tracking in Artist model
         }
     } catch (error) {

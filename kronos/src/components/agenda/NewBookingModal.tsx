@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Loader2, X } from 'lucide-react'
 import { createBooking } from '@/app/actions/bookings'
+import { getCalendarStatus } from '@/app/actions/calendar'
 import { searchClients, createQuickClient } from '@/app/actions/clients'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -40,6 +41,17 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
 
     const [loading, setLoading] = useState(false)
     const [searchLoading, setSearchLoading] = useState(false)
+
+    // Load user preference for sync
+    React.useEffect(() => {
+        getCalendarStatus().then(status => {
+            if (status.connected && status.calendarSyncEnabled) {
+                setSyncToGoogle(true)
+            } else {
+                setSyncToGoogle(false)
+            }
+        })
+    }, [])
 
     // Search clients
     const handleSearchClients = async (query: string) => {

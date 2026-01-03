@@ -69,11 +69,9 @@ export async function createBooking(data: {
         try {
             const { checkGoogleAvailability } = await import('@/app/actions/calendar')
 
-            // Check Unit (Artist)
-            const isArtistAvailable = await checkGoogleAvailability(user.id, start, end)
-            if (!isArtistAvailable) {
-                return { error: 'Seu Google Agenda está ocupado neste horário.' }
-            }
+            // Check Unit (Artist) - REMOVED for Studio-First Strategy
+            // Personal events should NOT block studio bookings.
+
 
             // Check Tower (Studio Owner) - if different person
             if (user.id !== workspace.ownerId) {
@@ -89,16 +87,7 @@ export async function createBooking(data: {
         } catch (err) {
             console.warn('⚠️ Google Availability Check Failed (Fail Open)', err)
         }
-        try {
-            const { checkGoogleAvailability } = await import('@/app/actions/calendar')
-            const isAvailableOnGoogle = await checkGoogleAvailability(user.id, start, end)
-
-            if (!isAvailableOnGoogle) {
-                return { error: 'Horário indisponível: Existe um conflito no seu Google Calendar.' }
-            }
-        } catch (err) {
-            console.warn('⚠️ Google Availability Check Failed (Fail Open)', err)
-        }
+        // Duplicate check removed.
 
         for (let i = 1; i <= TOTAL_MACAS; i++) {
             const conflict = await prisma.slot.findFirst({
