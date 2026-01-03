@@ -3,7 +3,8 @@ import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from 'next/link'
-import { Search, MapPin, Calendar, Mail, Phone } from 'lucide-react'
+import { Search, MapPin, Calendar, Mail, Phone, Download } from 'lucide-react'
+import { ExportIntelligence } from "@/components/clients/ExportIntelligence"
 
 export const dynamic = 'force-dynamic'
 
@@ -51,13 +52,16 @@ export default async function ClientsPage() {
                     <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">{clients.length} Clientes Ativos</p>
                 </div>
 
-                <div className="relative w-full md:w-64">
-                    <Search className="absolute left-3 top-3 text-gray-500" size={16} />
-                    <input
-                        type="text"
-                        placeholder="Buscar por nome..."
-                        className="w-full bg-black/50 border border-white/10 rounded-lg py-2 pl-10 text-sm focus:border-primary outline-none"
-                    />
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative w-full md:w-64">
+                        <Search className="absolute left-3 top-3 text-gray-500" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Buscar por nome..."
+                            className="w-full bg-black/50 border border-white/10 rounded-lg py-2 pl-10 text-sm focus:border-primary outline-none"
+                        />
+                    </div>
+                    <ExportIntelligence />
                 </div>
             </div>
 

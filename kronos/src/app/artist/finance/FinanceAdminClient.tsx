@@ -5,6 +5,7 @@ import { CheckCircle2, XCircle, Search, AlertCircle, Calendar, ShieldCheck } fro
 import { Button } from '@/components/ui/button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { approveSettlement, auditSettlement } from '@/app/actions/settlements'
+import { ExportFinance } from "@/components/clients/ExportFinance"
 
 interface Settlement {
     id: string
@@ -73,6 +74,7 @@ export default function FinanceAdminClient({ workspaceName, settlements, project
                     <h1 className="text-3xl font-orbitron font-bold pixel-text text-transparent bg-clip-text bg-gradient-to-r from-primary to-white">CAIXA DO ESTÚDIO</h1>
                     <p className="text-xs font-mono text-gray-500 uppercase tracking-widest">Painel Administrativo • {workspaceName}</p>
                 </div>
+                <ExportFinance />
             </div>
 
             {/* KPI Cards */}
@@ -206,6 +208,6 @@ export default function FinanceAdminClient({ workspaceName, settlements, project
                     ))
                 )}
             </div>
-        </div>
+        </div >
     )
 }

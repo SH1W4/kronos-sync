@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { GiftButton } from '@/components/clients/gift-button'
 import { AnamnesisStatus } from '@/components/clients/anamnesis-status'
+import { ClientDossierButton } from '@/components/clients/ClientDossierButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -114,8 +115,9 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                         <span className="flex items-center gap-2"><Calendar size={14} /> Cliente desde {new Date(client.createdAt).getFullYear()}</span>
                     </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
                     <GiftButton clientId={client.id} existingCode={client.generatedCoupons?.[0]?.code} />
+                    <ClientDossierButton clientId={client.id} clientName={client.name || 'Cliente'} />
                 </div>
             </div>
 

@@ -343,7 +343,11 @@ export default function SettingsPage() {
         const file = e.target.files?.[0]
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                alert('Imagem muito grande. Máximo 2MB.')
+                toast({
+                    title: "Imagem muito grande",
+                    description: "O limite máximo é de 2MB por arquivo.",
+                    variant: "destructive"
+                })
                 return
             }
             const reader = new FileReader()
@@ -358,7 +362,11 @@ export default function SettingsPage() {
         const file = e.target.files?.[0]
         if (file) {
             if (file.size > 2 * 1024 * 1024) {
-                alert('Imagem muito grande. Máximo 2MB.')
+                toast({
+                    title: "Logo muito grande",
+                    description: "O limite máximo é de 2MB por arquivo.",
+                    variant: "destructive"
+                })
                 return
             }
             const reader = new FileReader()

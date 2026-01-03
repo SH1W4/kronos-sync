@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { createSettlement } from '@/app/actions/settlements'
 import { useRouter } from 'next/navigation'
+import { ExportFinance } from "@/components/clients/ExportFinance"
 
 interface FinanceItem {
     id: string
@@ -131,8 +132,9 @@ export default function FinanceClient({ artist, workspace, items, settlements, m
                     </div>
                 </div>
 
-                <div className="flex gap-4 w-full md:w-auto">
-                    <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-xl">
+                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto items-end">
+                    <ExportFinance />
+                    <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-xl hidden lg:block">
                         <p className="text-[8px] text-gray-400 font-mono uppercase tracking-[0.3em] mb-1">Chave PIX Estúdio</p>
                         <p className="text-sm font-bold font-mono text-primary tracking-wider">{workspace.pixKey || 'Não configurada'}</p>
                     </div>
