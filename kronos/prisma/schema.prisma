@@ -81,6 +81,7 @@ model User {
   createdInvites InviteCode[] @relation("Creator")
   anamneses     Anamnesis[]
   agentLogs     AgentLog[]
+  agentFeedbacks AgentFeedback[] @relation("UserFeedback")
   generatedCoupons Coupon[] @relation("GeneratedBy")
   usedCoupons      Coupon[] @relation("UsedBy")
   workspaceRequests WorkspaceRequest[]
@@ -149,6 +150,7 @@ model Workspace {
   helpArticles  HelpArticle[]
   anamneses     Anamnesis[]
   agentLogs     AgentLog[]
+  agentFeedbacks AgentFeedback[]
   settlements   Settlement[]
 
   createdAt     DateTime  @default(now())
@@ -595,3 +597,30 @@ model QrScan {
   @@map("qr_scans")
 }
 
+enum FeedbackType {
+  SUGGESTION
+  BUG
+  FEATURE
+}
+
+enum FeedbackStatus {
+  PENDING
+  REVIEWED
+  IMPLEMENTED
+}
+
+model AgentFeedback {
+  id          String         @id @default(cuid())
+  userId      String
+  workspaceId String
+  type        FeedbackType
+  message     String         @db.Text
+  status      FeedbackStatus @default(PENDING)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user        User           @relation("UserFeedback", fields: [userId], references: [id])
+  workspace   Workspace      @relation(fields: [workspaceId], references: [id])
+
+  @@map("agent_feedbacks")
+}

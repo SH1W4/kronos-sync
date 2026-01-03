@@ -5,8 +5,8 @@
 
 ## 📊 Status do Projeto
 
-**Versão:** 2.6.0 (PLATINUM)
-**Completude:** 98% (Fase Final de Integração)
+**Versão:** 2.7.0 (PLATINUM)
+**Completude:** 99% (Fase Final de Polimento - Studio First)
 **Setup:** `SH1W4 / SYMBEON LABS`
 **Último Update:** 03 de Janeiro de 2026
   
@@ -17,7 +17,7 @@
 ## 🎯 Visão Geral
 
 O KRONØS SYNC é um sistema operacional completo para estúdios de tatuagem de elite, oferecendo:
-- Agendamento inteligente com Google Sync
+- Agendamento inteligente com Google Sync (Studio-First)
 - Anamnese digital com assinatura biométrica
 - Kiosk de captura de leads gamificado
 - Financeiro automatizado com IA (OCR)
@@ -41,7 +41,7 @@ PWA:       Service Worker + Manifest
 ```
 
 ### Integrações
-- Google Calendar API (sincronização de agendamentos)
+- Google Calendar API (sincronização de agendamentos unidirecional)
 - Instagram API (análise de branding via KAI)
 - Resend (notificações por e-mail) - **100% OPERACIONAL**
 
@@ -58,7 +58,7 @@ PWA:       Service Worker + Manifest
 - [x] **Financeiro** - Auto-settle com IA (OCR mock)
 - [x] **Marketplace** - Produtos físicos e digitais
 - [x] **INK PASS** - Sistema de convites premium
-- [x] **Google Sync** - Sincronização bidirecional de calendário
+- [x] **Google Sync** - Sincronização e conflitos (Studio ID)
 - [x] **PWA** - Manifest + Service Worker + ícones
 - [x] **Smart Anamnesis** - Reuso de fichas e links rápidos
 - [x] **QR Scanner** - Validação de cupons cross-artista
@@ -69,6 +69,7 @@ PWA:       Service Worker + Manifest
 - [x] **Personalização de Cores** - ThemeCustomizer + Settings
 - [x] **Estética Cyber Y2K** - Glitch effects, scanlines, glassmorphism
 - [x] **Integrations & Availability** - Custom Studio Calendar support (`galeria.kronos@gmail.com`)
+- [x] **Google Deep Integration** - Push-to-Personal & Studio-First Logic
 
 ### Documentação (100%)
 - [x] **DocSync Integration** - Metadados semânticos em todos os docs

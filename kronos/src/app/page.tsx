@@ -120,13 +120,13 @@ export default function LandingPage() {
                     </div>
 
                     <h1 className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight">
-                        Ordem absoluta para <br />
-                        <span className="font-orbitron font-light text-zinc-400">estúdios de alto desempenho.</span>
+                        Controle absoluto para <br />
+                        <span className="font-orbitron font-light text-zinc-400">estúdios de elite.</span>
                     </h1>
 
                     <p className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10">
-                        Soberania financeira, gestão de fluxo e inteligência de dados.
-                        <br />A inteligência que organiza o seu fluxo e remove o ruído para você focar no seu legado.
+                        Soberania financeira e inteligência de dados.
+                        <br />Silencie o caos operacional e foque no que importa: seu legado.
                     </p>
 
                     <div className="flex gap-4">
