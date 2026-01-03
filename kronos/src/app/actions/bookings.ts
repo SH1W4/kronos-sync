@@ -145,6 +145,7 @@ export async function createBooking(data: {
                 studioShare: data.estimatedPrice * user.artist.commissionRate,
                 artistShare: data.estimatedPrice * (1 - user.artist.commissionRate),
                 status: data.status || 'OPEN',
+                type: data.type,
                 scheduledFor: data.scheduledFor,
                 duration: data.duration,
                 notes: data.notes as any,

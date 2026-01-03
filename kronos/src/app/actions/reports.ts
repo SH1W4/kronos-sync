@@ -148,7 +148,9 @@ export async function exportFinanceCSV() {
             },
             include: {
                 client: true,
-                artist: true
+                artist: {
+                    include: { user: true }
+                }
             },
             orderBy: { createdAt: 'desc' }
         })
@@ -157,7 +159,7 @@ export async function exportFinanceCSV() {
         const rows = bookings.map(b => [
             b.createdAt.toLocaleDateString('pt-BR'),
             escapeCSV(b.client.name),
-            escapeCSV(b.artist.name),
+            escapeCSV(b.artist.user.name),
             b.value.toFixed(2),
             b.status,
             escapeCSV(b.type)
@@ -192,7 +194,9 @@ export async function generateClientDossier(clientId: string) {
                     orderBy: { createdAt: 'desc' },
                     include: {
                         anamnesis: true,
-                        artist: true,
+                        artist: {
+                            include: { user: true }
+                        },
                         slot: true
                     }
                 }
@@ -243,7 +247,7 @@ export async function generateClientDossier(clientId: string) {
         md += `## 📅 HISTÓRICO DE SESSÕES\n`
         client.bookings.forEach(b => {
             md += `### ${new Date(b.slot.startTime).toLocaleDateString('pt-BR')} - ${b.type}\n`
-            md += `- **Artista:** ${b.artist.name}\n`
+            md += `- **Artista:** ${b.artist.user.name}\n`
             md += `- **Valor:** R$ ${b.value.toFixed(2)}\n`
             md += `- **Status:** ${b.status}\n\n`
         })

@@ -273,6 +273,7 @@ model Booking {
   status           BookingStatus @default(OPEN)
   fichaUrl         String?
   fichaStatus      FichaStatus   @default(PENDING)
+  type             String        @default("TATTOO")
   confirmationSent Boolean       @default(false)
   scheduledFor     DateTime
   duration         Int           @default(120) // em minutos
