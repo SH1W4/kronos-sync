@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
 import { UserRole, ArtistPlan } from "@prisma/client"
+import { inviteSchema } from "@/lib/validations"
 
 function generateCode() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -26,6 +27,12 @@ export async function createInvite(options: {
 
     if (!session?.user?.id || !session?.activeWorkspaceId) {
         return { success: false, error: "Não autorizado ou sem workspace ativo" }
+    }
+
+    // Validação Zod
+    const validated = inviteSchema.safeParse(options)
+    if (!validated.success) {
+        return { success: false, error: validated.error.issues[0].message }
     }
 
     const { role, targetPlan, maxUses = 1, durationDays, customCode } = options

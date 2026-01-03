@@ -7,32 +7,12 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { encrypt } from '@/lib/crypto'
-
-// Schema de validação para anamnese (compatível com CSV)
-const anamnesisDataSchema = z.object({
-    fullName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').optional(),
-    whatsapp: z.string().regex(/^\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}$/, 'Formato esperado: (11) 99999-9999').optional(),
-    birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida').optional(),
-    medicalConditionsTattoo: z.string().max(500).optional(),
-    medicalConditionsHealing: z.string().max(500).optional(),
-    medicalConditionsHealingDetails: z.string().max(500).optional(),
-    knownAllergies: z.string().max(500).optional(),
-    artistHandle: z.string().optional(),
-    artDescription: z.string().max(1000).optional(),
-    agreedValue: z.string().optional(),
-    understandPermanence: z.boolean(),
-    followInstructions: z.boolean(),
-    acceptedTerms: z.boolean().refine((val) => val === true, 'Termos devem ser aceitos'),
-    allowSharing: z.boolean(),
-    signatureData: z.string().min(100, 'Assinatura obrigatória').optional()
-})
-
-export type AnamnesisData = z.infer<typeof anamnesisDataSchema>
+import { anamnesisSchema } from "@/lib/validations"
 
 export async function saveAnamnesis(bookingId: string, data: unknown) {
     try {
         // Validar dados de entrada
-        const validated = anamnesisDataSchema.safeParse(data)
+        const validated = anamnesisSchema.safeParse(data)
         if (!validated.success) {
             const firstError = validated.error.issues[0]
             return {

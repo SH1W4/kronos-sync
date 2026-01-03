@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
+import { userThemeSchema, artistSettingsSchema, workspaceBrandingSchema } from "@/lib/validations"
 
 export async function updateWorkspaceCapacity(capacity: number) {
     try {
@@ -14,6 +15,12 @@ export async function updateWorkspaceCapacity(capacity: number) {
 
         const workspaceId = (session.user as any).activeWorkspaceId
         if (!workspaceId) return { error: 'Workspace não encontrado' }
+
+        // Validação
+        const validated = workspaceBrandingSchema.pick({ capacity: true }).safeParse({ capacity })
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
+        }
 
         // Security check: Only owners or admins should change this
         // defaulting to allowing any artist member for beta speed/trust
@@ -62,6 +69,12 @@ export async function updateUserTheme(color: string) {
         const userId = (session.user as any).id
         if (!userId) return { error: 'Usuário não encontrado' }
 
+        // Validação
+        const validated = userThemeSchema.safeParse({ customColor: color })
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
+        }
+
         await prisma.user.update({
             where: { id: userId },
             data: { customColor: color }
@@ -86,6 +99,12 @@ export async function updateArtistSettings(data: { name: string; commissionRate:
         if (!userId) return { error: 'Usuário não encontrado' }
 
         const userRole = (session.user as any).role
+
+        // Validação
+        const validated = artistSettingsSchema.safeParse(data)
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
+        }
 
         // Update user profile (name, image)
         await prisma.user.update({

@@ -9,6 +9,7 @@ import { createBooking } from '@/app/actions/bookings'
 import { searchClients, createQuickClient } from '@/app/actions/clients'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { useToast } from '@/components/ui/use-toast'
 
 interface BookingModalProps {
     onClose: () => void
@@ -21,6 +22,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
     const [clients, setClients] = useState<any[]>([])
     const [selectedClient, setSelectedClient] = useState<any>(null)
     const [showNewClientForm, setShowNewClientForm] = useState(false)
+    const { toast } = useToast()
 
     // New client form
     const [newClientName, setNewClientName] = useState('')
@@ -78,12 +80,24 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                 setNewClientName('')
                 setNewClientPhone('')
                 setNewClientEmail('')
+                toast({
+                    title: "Cliente criado",
+                    description: `${result.client.name} foi adicionado à base.`,
+                })
             } else {
-                alert(result.error || 'Erro ao criar cliente')
+                toast({
+                    title: "Erro ao criar cliente",
+                    description: result.error || "Ocorreu um erro inesperado.",
+                    variant: "destructive"
+                })
             }
         } catch (error) {
             console.error('Error creating client:', error)
-            alert('Erro ao criar cliente')
+            toast({
+                title: "Erro no servidor",
+                description: "Não foi possível criar o cliente agora.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -93,7 +107,11 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!selectedClient) {
-            alert('Selecione um cliente')
+            toast({
+                title: "Atenção",
+                description: "Selecione um cliente para o agendamento.",
+                variant: "default"
+            })
             return
         }
 
@@ -113,13 +131,25 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
             })
 
             if (result.success) {
+                toast({
+                    title: "Agendamento Realizado",
+                    description: "O cliente receberá um e-mail de confirmação.",
+                })
                 onSuccess()
             } else {
-                alert(result.error || 'Erro ao criar agendamento')
+                toast({
+                    title: "Conflito ou Erro",
+                    description: result.error || "Espaço ou horário indisponível.",
+                    variant: "destructive"
+                })
             }
         } catch (error) {
             console.error('Error creating booking:', error)
-            alert('Erro ao criar agendamento')
+            toast({
+                title: "Falha Crítica",
+                description: "Erro ao processar agendamento.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }

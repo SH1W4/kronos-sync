@@ -102,25 +102,35 @@ export const workspaceNameSchema = z.string()
 // ============================================
 
 export const anamnesisSchema = z.object({
-    name: nameSchema,
-    phone: phoneSchema,
+    fullName: nameSchema,
+    whatsapp: phoneSchema,
     birthDate: birthDateSchema,
-    allergies: z.string().max(500, 'Texto muito longo').optional(),
-    medications: z.string().max(500, 'Texto muito longo').optional(),
-    healthConditions: z.string().max(500, 'Texto muito longo').optional(),
-    signature: z.string().min(100, 'Assinatura obrigatória'),
-    consentGiven: z.boolean().refine((val) => val === true, 'Consentimento obrigatório')
+    medicalConditionsTattoo: z.string().max(1000).optional(),
+    medicalConditionsHealing: z.string().max(1000).optional(),
+    medicalConditionsHealingDetails: z.string().max(1000).optional(),
+    knownAllergies: z.string().max(1000).optional(),
+    artistHandle: z.string().optional(),
+    artDescription: z.string().max(1000).optional(),
+    agreedValue: z.string().optional(),
+    understandPermanence: z.boolean(),
+    followInstructions: z.boolean(),
+    acceptedTerms: z.boolean().refine((val) => val === true, 'Termos devem ser aceitos'),
+    allowSharing: z.boolean(),
+    signatureData: z.string().min(100, 'Assinatura obrigatória').optional()
 })
 
 export const bookingSchema = z.object({
-    clientId: z.string().uuid('ID de cliente inválido'),
-    artistId: z.string().uuid('ID de artista inválido'),
-    slotId: z.string().uuid('ID de slot inválido'),
-    value: moneySchema.min(50, 'Valor mínimo: R$ 50'),
+    clientId: z.string().min(10, 'ID de cliente inválido'),
+    artistId: z.string().min(10, 'ID de artista inválido').optional(),
+    scheduledFor: z.date().or(z.string().datetime()),
     duration: z.number()
         .min(30, 'Duração mínima: 30 minutos')
         .max(480, 'Duração máxima: 8 horas'),
-    description: z.string().max(1000, 'Descrição muito longa').optional()
+    type: z.string().min(2, 'Tipo de trabalho obrigatório'),
+    estimatedPrice: moneySchema.min(50, 'Valor mínimo: R$ 50'),
+    notes: z.string().max(1000, 'Descrição muito longa').optional(),
+    status: z.enum(['OPEN', 'CONFIRMED', 'COMPLETED', 'CANCELLED']).optional(),
+    syncToGoogle: z.boolean().optional()
 })
 
 export const kioskEntrySchema = z.object({
@@ -160,21 +170,35 @@ export const productSchema = z.object({
     imageUrl: z.string().url('URL de imagem inválida').optional()
 })
 
+export const createWorkspaceSchema = z.object({
+    name: workspaceNameSchema,
+    primaryColor: colorSchema.optional(),
+    capacity: z.number().min(1).max(20).optional()
+})
+
+export const workspaceRequestSchema = z.object({
+    studioName: workspaceNameSchema,
+    teamDetails: z.string().min(10, 'Detalhes da equipe muito curtos').max(2000),
+    motivation: z.string().min(20, 'Sua motivação deve ter pelo menos 20 caracteres').max(2000)
+})
+
 export const workspaceBrandingSchema = z.object({
     name: workspaceNameSchema.optional(),
-    primaryColor: colorSchema.optional()
+    primaryColor: colorSchema.optional(),
+    capacity: z.number().min(1, 'Mínimo 1 maca').max(20, 'Máximo 20 macas').optional(),
+    pixKey: pixKeySchema.optional(),
+    pixRecipient: z.string().min(3).max(100).optional()
 })
-
-export const userThemeSchema = z.object({
-    customColor: colorSchema
-})
-
 export const artistSettingsSchema = z.object({
     name: nameSchema.optional(),
     commissionRate: commissionRateSchema.optional(),
     instagram: z.string()
         .regex(/^@?[a-zA-Z0-9._]+$/, 'Username do Instagram inválido')
         .optional()
+})
+
+export const userThemeSchema = z.object({
+    customColor: colorSchema
 })
 
 // ============================================

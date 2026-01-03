@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { slugify } from "@/lib/utils"
 import { revalidatePath } from "next/cache"
-
+import { createWorkspaceSchema, workspaceRequestSchema } from "@/lib/validations"
 /**
  * Criação direta de Workspace.
  * Mantida para uso administrativo ou chaves mestras.
@@ -15,6 +15,12 @@ export async function createWorkspace(data: { name: string, primaryColor: string
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
             return { error: 'Não autorizado' }
+        }
+
+        // Validação Zod
+        const validated = createWorkspaceSchema.safeParse(data)
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
         }
 
         const user = await prisma.user.findUnique({
@@ -96,6 +102,12 @@ export async function submitWorkspaceRequest(data: {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
             return { error: 'Não autorizado' }
+        }
+
+        // Validação Zod
+        const validated = workspaceRequestSchema.safeParse(data)
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
         }
 
         const user = await prisma.user.findUnique({

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { trackQrScan } from '@/app/actions/analytics'
+import { useToast } from '@/components/ui/use-toast'
 
 // Custom Tattoo Machine Icon SVG (Refined & Elegant)
 const TattooMachineIcon = ({ className }: { className?: string }) => (
@@ -37,6 +38,7 @@ export default function KioskPage() {
     const [loading, setLoading] = useState(false)
     const [successCode, setSuccessCode] = useState<string | null>(null)
     const [showIntroArt, setShowIntroArt] = useState(false)
+    const { toast } = useToast()
 
     const [formData, setFormData] = useState({
         name: '',
@@ -79,12 +81,24 @@ export default function KioskPage() {
 
             if (res.success) {
                 setSuccessCode(res.couponCode || 'KRONOS_MAGIC')
+                toast({
+                    title: "INK PASS Gerado",
+                    description: "Seu cupom de desconto está ativo!",
+                })
             } else {
-                alert(res.message)
+                toast({
+                    title: "Acesso Negado",
+                    description: res.message || "VIP PIN inválido ou erro no sistema.",
+                    variant: "destructive"
+                })
             }
         } catch (error) {
             console.error(error)
-            alert('Erro ao processar convite INK PASS.')
+            toast({
+                title: "Falha de Rede",
+                description: "Não foi possível conectar ao Ink Link.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }

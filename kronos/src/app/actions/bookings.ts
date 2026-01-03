@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, getGoogleCalendarClient } from "@/lib/google"
+import { bookingSchema } from "@/lib/validations"
+import { sendBookingConfirmation } from "@/lib/notifications"
 
 /**
  * Create a new booking
@@ -23,6 +25,12 @@ export async function createBooking(data: {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
             return { error: 'Não autorizado' }
+        }
+
+        // Validação Zod
+        const validated = bookingSchema.safeParse(data)
+        if (!validated.success) {
+            return { error: `Dados inválidos: ${validated.error.issues[0].message}` }
         }
 
         // Get artist from session
@@ -44,7 +52,7 @@ export async function createBooking(data: {
         // Fetch Workspace Settings (Capacity)
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId },
-            select: { capacity: true, ownerId: true }
+            select: { capacity: true, ownerId: true, name: true }
         })
 
         if (!workspace) return { error: 'Workspace inválido' }
@@ -190,6 +198,21 @@ export async function createBooking(data: {
         }
 
         revalidatePath('/artist/agenda')
+
+        // 5. Notificar Cliente (Background)
+        if (booking.client.email) {
+            sendBookingConfirmation({
+                clientName: booking.client.name || 'Cliente',
+                clientEmail: booking.client.email,
+                artistName: user.name || 'Artista',
+                studioName: workspace.name,
+                scheduledFor: data.scheduledFor,
+                duration: data.duration,
+                value: data.estimatedPrice,
+                bookingId: booking.id
+            }).catch(e => console.error('⚠️ Erro ao enviar notificação:', e))
+        }
+
         return { success: true, booking }
 
     } catch (error) {

@@ -12,6 +12,7 @@ import { updateUserTheme, updateWorkspaceCapacity } from '@/app/actions/settings
 import { useRouter } from 'next/navigation'
 import { InkPassCard } from '@/components/invites/InkPassCard'
 import { getInvites, createInvite, revokeInvite } from '@/app/actions/invites'
+import { useToast } from '@/components/ui/use-toast'
 
 import { useTheme } from '@/contexts/theme-context'
 
@@ -19,6 +20,7 @@ export default function SettingsPage() {
     const { data: session, update: updateSession } = useSession()
     const { theme, setTheme } = useTheme()
     const router = useRouter()
+    const { toast } = useToast()
     const [loading, setLoading] = useState(false)
     const [copied, setCopied] = useState(false)
 
@@ -117,13 +119,24 @@ export default function SettingsPage() {
 
             if (result.success) {
                 await updateSession()
-                alert('Configurações salvas com sucesso!')
+                toast({
+                    title: "Perfil Atualizado",
+                    description: "Suas configurações foram salvas no Neural Link.",
+                })
             } else {
-                alert(result.error || 'Erro ao salvar')
+                toast({
+                    title: "Erro ao Salvar",
+                    description: result.error || "Ocorreu um erro inesperado.",
+                    variant: "destructive"
+                })
             }
         } catch (error) {
             console.error('Error saving settings:', error)
-            alert('Erro ao salvar as configurações')
+            toast({
+                title: "Falha de Sincronia",
+                description: "Não foi possível salvar as configurações agora.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -148,14 +161,25 @@ export default function SettingsPage() {
                 customCode: newInviteCode || undefined
             })
             if (result.success) {
-                alert('Chave gerada com sucesso!')
+                toast({
+                    title: "Chave Ativada",
+                    description: "Nova chave de convite gerada com sucesso.",
+                })
                 setNewInviteCode('')
                 fetchInvites()
             } else {
-                alert(result.error)
+                toast({
+                    title: "Erro na Chave",
+                    description: result.error || "Falha ao gerar o convite.",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao gerar chave')
+            toast({
+                title: "Erro do Sistema",
+                description: "Não foi possível gerar a chave.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -168,10 +192,18 @@ export default function SettingsPage() {
             if (result.success) {
                 fetchInvites()
             } else {
-                alert(result.error)
+                toast({
+                    title: "Erro ao Revogar",
+                    description: result.error || "Ação não permitida.",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao revogar')
+            toast({
+                title: "Falha na Ação",
+                description: "Erro ao revogar chave.",
+                variant: "destructive"
+            })
         }
     }
 
@@ -194,13 +226,24 @@ export default function SettingsPage() {
             })
 
             if (brandingResult.success && capacityResult.success && calendarResult.success) {
-                alert('Configurações do estúdio salvas com sucesso!')
+                toast({
+                    title: "Estúdio Configurado",
+                    description: "Configurações globais de workspace aplicadas.",
+                })
                 await updateSession()
             } else {
-                alert(brandingResult.error || capacityResult.error || calendarResult.error || 'Erro ao salvar')
+                toast({
+                    title: "Conflito Studio",
+                    description: brandingResult.error || capacityResult.error || calendarResult.error || "Erro ao salvar",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao salvar configurações do estúdio')
+            toast({
+                title: "Falha Studio",
+                description: "Erro ao salvar configurações do estúdio.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -211,13 +254,24 @@ export default function SettingsPage() {
         try {
             const result = await updateUserTheme(personalColor)
             if (result.success) {
-                alert('Tema aplicado com sucesso!')
+                toast({
+                    title: "Tema Aplicado",
+                    description: "Assinatura cromática alterada.",
+                })
                 await updateSession()
             } else {
-                alert(result.error || 'Erro ao aplicar tema')
+                toast({
+                    title: "Erro no Tema",
+                    description: result.error || "Falha ao aplicar.",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao aplicar tema')
+            toast({
+                title: "Falha de Interface",
+                description: "Erro ao aplicar tema.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -231,13 +285,24 @@ export default function SettingsPage() {
                 primaryColor: studioColor
             })
             if (result.success) {
-                alert('Branding do estúdio atualizado!')
+                toast({
+                    title: "Branding Atualizado",
+                    description: "Identidade visual do estúdio sincronizada.",
+                })
                 await updateSession()
             } else {
-                alert(result.error)
+                toast({
+                    title: "Erro Branding",
+                    description: result.error || "Falha ao salvar.",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao salvar branding')
+            toast({
+                title: "Falha de Estúdio",
+                description: "Erro ao salvar branding.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -251,13 +316,24 @@ export default function SettingsPage() {
                 // Update in-memory theme immediately
                 setTheme({ ...theme, primaryColor: personalColor })
 
-                alert('Tema pessoal atualizado!')
+                toast({
+                    title: "HUD Atualizado",
+                    description: "Seu tema pessoal foi aplicado com sucesso.",
+                })
                 await updateSession()
             } else {
-                alert(result.error)
+                toast({
+                    title: "Erro Tema",
+                    description: result.error || "Falha ao salvar tema.",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao salvar tema')
+            toast({
+                title: "Falha Crítica",
+                description: "Erro ao salvar tema.",
+                variant: "destructive"
+            })
         } finally {
             setLoading(false)
         }
@@ -298,13 +374,24 @@ export default function SettingsPage() {
         try {
             const result = await updateWorkspaceFinance({ pixKey, pixRecipient })
             if (result.success) {
-                alert('Dados PIX atualizados!')
+                toast({
+                    title: "PIX Configurado",
+                    description: "Dados de recebimento salvos com sucesso.",
+                })
                 await updateSession()
             } else {
-                alert(result.error)
+                toast({
+                    title: "Erro Financeiro",
+                    description: result.error || "Falha ao salvar PIX.",
+                    variant: "destructive"
+                })
             }
         } catch (e) {
-            alert('Erro ao salvar PIX')
+            toast({
+                title: "Falha de Rede",
+                description: "Não foi possível salvar o PIX agora.",
+                variant: "destructive"
+            })
         } finally {
             setIsPixLoading(false)
         }
