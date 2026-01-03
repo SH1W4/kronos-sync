@@ -52,7 +52,7 @@ export async function createBooking(data: {
         // Fetch Workspace Settings (Capacity)
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId },
-            select: { capacity: true, ownerId: true, name: true }
+            select: { capacity: true, ownerId: true, name: true, googleCalendarId: true }
         })
 
         if (!workspace) return { error: 'Workspace inválido' }
@@ -77,7 +77,10 @@ export async function createBooking(data: {
 
             // Check Tower (Studio Owner) - if different person
             if (user.id !== workspace.ownerId) {
-                const isStudioAvailable = await checkGoogleAvailability(workspace.ownerId, start, end)
+                // Se houver calendario do workspace configurado, usa ele. Senao usa o 'primary' do dono.
+                const calendarToCheck = workspace.googleCalendarId || 'primary'
+
+                const isStudioAvailable = await checkGoogleAvailability(workspace.ownerId, start, end, calendarToCheck)
                 if (!isStudioAvailable) {
                     return { error: 'Agenda do Estúdio está bloqueada neste horário.' }
                 }

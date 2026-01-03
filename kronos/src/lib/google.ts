@@ -129,3 +129,42 @@ export async function deleteCalendarEvent(userId: string, googleEventId: string)
         return { success: false, error: error.message }
     }
 }
+
+/**
+ * Check if the user is available on Google Calendar for the given time range.
+ * Returns true if available (no conflicts), false if busy.
+ */
+export async function checkGoogleAvailability(userId: string, start: Date, end: Date, calendarId: string = 'primary'): Promise<boolean> {
+    try {
+        const calendar = await getGoogleCalendarClient(userId)
+        if (!calendar) return true // Assume available if not connected (or handle strict mode later)
+
+        const response = await calendar.events.list({
+            calendarId: calendarId,
+            timeMin: start.toISOString(),
+            timeMax: end.toISOString(),
+            singleEvents: true,
+            orderBy: 'startTime',
+        })
+
+        const events = response.data.items || []
+
+        // any event in this range that acts as "busy"
+        // Google events are "transparent" (Available) or "opaque" (Busy). 
+        // Default is opaque.
+        const conflicts = events.filter((event: any) => {
+            // Filter out "Available" transparency events
+            if (event.transparency === 'transparent') return false
+
+            // Filter out our own KRONOS events (optional, but good practice if we don't want to block re-scheduling)
+            // But for "new booking", any existing event is a blocker.
+            return true
+        })
+
+        return conflicts.length === 0
+
+    } catch (error) {
+        console.error('Error checking Google availability:', error)
+        return true // Fail open? Or fail closed? For MVP better fail open to not block operation on API error.
+    }
+}

@@ -134,13 +134,17 @@ export async function importGoogleEvents(startDate: Date, endDate: Date) {
  * Check if the user is available on Google Calendar for the given time range.
  * Returns true if available (no conflicts), false if busy.
  */
-export async function checkGoogleAvailability(userId: string, start: Date, end: Date): Promise<boolean> {
+/**
+ * Check if the user is available on Google Calendar for the given time range.
+ * Returns true if available (no conflicts), false if busy.
+ */
+export async function checkGoogleAvailability(userId: string, start: Date, end: Date, calendarId: string = 'primary'): Promise<boolean> {
     try {
         const calendar = await getGoogleCalendarClient(userId)
         if (!calendar) return true // Assume available if not connected (or handle strict mode later)
 
         const response = await calendar.events.list({
-            calendarId: 'primary',
+            calendarId: calendarId,
             timeMin: start.toISOString(),
             timeMax: end.toISOString(),
             singleEvents: true,
