@@ -36,6 +36,11 @@ Não é apenas uma agenda, é um **Sistema Operacional de Estúdio** que gerenci
 - O sistema vende produtos Digitais e Físicos (`ProductType`).
 - Cupons (`Coupon`) podem ser de porcentagem ou valor fixo e estão atrelados a um artista (para abater da comissão correta).
 
+### 4. Governança & Trava Jurídica
+- **TermsGate:** Componente que intercepta o login e exige o aceite do `termsAcceptedAt` (Prisma).
+- **Admin Exclusive:** Apenas membros com role `ADMIN` podem alterar o `commissionRate` via UI de Equipe ou Configurações.
+- **Auditoria:** Todo aceite de termo gera um timestamp permanente.
+
 ---
 
 ## 🤖 Capacidades do Agente (MCP Capabilities)

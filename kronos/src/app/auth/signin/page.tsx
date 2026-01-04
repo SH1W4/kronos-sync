@@ -5,6 +5,7 @@ import { BrandLogo } from '@/components/ui/brand-logo'
 import MagicLinkLogin from '@/components/auth/MagicLinkLogin'
 import VerifyCode from '@/components/auth/VerifyCode'
 import { useSearchParams } from 'next/navigation'
+import DevLogin from '@/components/auth/DevLogin'
 
 function SignInContent() {
     const searchParams = useSearchParams()
@@ -38,6 +39,7 @@ function SignInContent() {
                     ) : (
                         <VerifyCode email={email} onBack={() => setStep('email')} inviteCode={inviteCode} />
                     )}
+                    <DevLogin />
                 </div>
             </div>
         </div>
