@@ -138,160 +138,20 @@ export const authOptions: NextAuthOptions = {
             }
         }),
         CredentialsProvider({
-            id: "credentials", // Dev Mode
-            name: "Modo Dev (Bypass)",
+            id: "credentials",
+            name: "Test Login",
             credentials: {
-                username: { label: "Username (use 'dev')", type: "text", placeholder: "dev" },
+                username: { label: "Username", type: "text" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                try {
-                    // MESTRE / ADMIN BYPASS
-                    // MASTER BYPASS (Used by E2E Tests)
-                    if (credentials?.username === "master") {
-                        console.log("👑 ACESSO MASTER: Iniciando Sessão Administrativa...")
-
-                        const masterUser = await prisma.user.upsert({
-                            where: { email: 'admin@kronos.com' },
-                            update: { role: 'ADMIN' },
-                            create: {
-                                email: 'admin@kronos.com',
-                                name: 'Master Admin',
-                                role: 'ADMIN',
-                                image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Master"
-                            }
-                        })
-
-                        const workspace = await prisma.workspace.upsert({
-                            where: { slug: 'demo-studio' },
-                            update: {},
-                            create: {
-                                name: "Kronus Demo Studio",
-                                slug: "demo-studio",
-                                primaryColor: "#8B5CF6",
-                                ownerId: masterUser.id
-                            }
-                        })
-
-                        const artist = await prisma.artist.upsert({
-                            where: { userId: masterUser.id },
-                            create: {
-                                userId: masterUser.id,
-                                workspaceId: workspace.id,
-                                plan: "RESIDENT",
-                                commissionRate: 0.10,
-                                isActive: true,
-                                termsAcceptedAt: new Date()
-                            },
-                            update: { workspaceId: workspace.id, isActive: true, termsAcceptedAt: new Date() }
-                        })
-
-                        await prisma.workspaceMember.upsert({
-                            where: { workspaceId_userId: { workspaceId: workspace.id, userId: masterUser.id } },
-                            create: { workspaceId: workspace.id, userId: masterUser.id, role: 'ADMIN' },
-                            update: { role: 'ADMIN' }
-                        })
-
-                        // 3. SEED DATA (Only if totally empty to save time)
-                        const bookingCount = await prisma.booking.count({ where: { workspaceId: workspace.id } })
-                        if (bookingCount === 0) {
-                            const scenarios = [
-                                { name: 'Ricardo Mautone', email: 'ricardo@kronos.com', time: 10, art: 'Samurai Full Sleeve', value: 4500 },
-                                { name: 'Lucas Mendonça', email: 'lucas@kronos.com', time: 14, art: 'Leão Realismo', value: 2800 },
-                                { name: 'Beatriz Oliveira', email: 'beatriz@kronos.com', time: 18, art: 'Floral Fineline', value: 850 }
-                            ]
-
-                            for (const s of scenarios) {
-                                const u = await prisma.user.upsert({
-                                    where: { email: s.email },
-                                    create: { name: s.name, email: s.email, role: 'CLIENT', phone: '(11) 99999-0000' },
-                                    update: { name: s.name }
-                                })
-
-                                const start = new Date()
-                                start.setHours(s.time, 0, 0, 0)
-                                const end = new Date(start)
-                                end.setHours(s.time + 3, 0, 0, 0)
-
-                                const slot = await prisma.slot.create({ data: { workspaceId: workspace.id, startTime: start, endTime: end, macaId: 1 } })
-                                const b = await prisma.booking.create({
-                                    data: {
-                                        workspaceId: workspace.id, artistId: artist.id, clientId: u.id, slotId: slot.id,
-                                        status: 'CONFIRMED', value: s.value, finalValue: s.value,
-                                        studioShare: s.value * 0.1, artistShare: s.value * 0.9,
-                                        scheduledFor: start, duration: 180, fichaStatus: 'COMPLETED'
-                                    }
-                                })
-                                await prisma.anamnesis.create({
-                                    data: { clientId: u.id, workspaceId: workspace.id, bookingId: b.id, fullName: s.name, whatsapp: u.phone, artDescription: s.art, agreedValue: s.value.toString() }
-                                })
-                            }
-
-                            console.log("📝 Semeando feedbacks de demonstração...")
-                            await prisma.agentFeedback.createMany({
-                                data: [
-                                    {
-                                        userId: masterUser.id,
-                                        workspaceId: workspace.id,
-                                        type: 'BUG',
-                                        message: 'Botão de salvar não responde ocasionalmente.',
-                                        status: 'PENDING'
-                                    },
-                                    {
-                                        userId: masterUser.id,
-                                        workspaceId: workspace.id,
-                                        type: 'SUGGESTION',
-                                        message: 'Adicionar filtro por data na agenda.',
-                                        status: 'REVIEWED'
-                                    }
-                                ]
-                            })
-                        }
-
-                        return { id: masterUser.id, email: masterUser.email, name: masterUser.name, image: masterUser.image, role: masterUser.role }
-                    }
-
-                    // DEV BYPASS (Manual Dev Testing)
-                    if (credentials?.username === "dev") {
-                        console.log("🔓 ACESSO DEV: Garantindo Perfil de Artista...")
-
-                        let workspace = await prisma.workspace.findFirst()
-                        if (!workspace) {
-                            const admin = await prisma.user.upsert({
-                                where: { email: 'admin@kronos.com' },
-                                update: {},
-                                create: { email: 'admin@kronos.com', name: 'Admin System', role: 'ADMIN' }
-                            })
-                            workspace = await prisma.workspace.create({
-                                data: { name: "Kronus Demo Studio", slug: "demo-studio", ownerId: admin.id }
-                            })
-                        }
-
-                        const devUser = await prisma.user.upsert({
-                            where: { email: "neo.sh1w4@gmail.com" },
-                            update: { role: "ARTIST" },
-                            create: { email: "neo.sh1w4@gmail.com", name: "Neo Developer", role: "ARTIST", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" }
-                        })
-
-                        await prisma.artist.upsert({
-                            where: { userId: devUser.id },
-                            create: { userId: devUser.id, workspaceId: workspace.id, plan: "RESIDENT", isActive: true },
-                            update: { workspaceId: workspace.id, isActive: true }
-                        })
-
-                        await prisma.workspaceMember.upsert({
-                            where: { workspaceId_userId: { workspaceId: workspace.id, userId: devUser.id } },
-                            create: { workspaceId: workspace.id, userId: devUser.id, role: "ADMIN" },
-                            update: { role: "ADMIN" }
-                        })
-
-                        return { id: devUser.id, email: devUser.email, name: devUser.name, image: devUser.image, role: devUser.role }
-                    }
-                    return null
-                } catch (error) {
-                    console.error("❌ ERRO NO DEV MODE:", error)
-                    throw error // Joga o erro para NextAuth capturar
+                if (credentials?.username === "master") {
+                    const masterUser = await prisma.user.findFirst({
+                        where: { email: { in: ['galeria.kronos@gmail.com', 'admin@kronos.com'] } }
+                    })
+                    if (masterUser) return masterUser
                 }
+                return null
             }
         })
     ],

@@ -64,20 +64,6 @@ export default function AuthSelectPage() {
                     </button>
                 </div>
 
-                {/* Dev Mode Shortcut for Presentation */}
-                {process.env.NODE_ENV === 'development' && (
-                    <div className="mt-12 flex justify-center animate-pulse">
-                        <button
-                            onClick={() => {
-                                const { signIn } = require('next-auth/react')
-                                signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })
-                            }}
-                            className="px-6 py-2 bg-red-500/10 border border-red-500/30 text-red-500 rounded-full font-mono text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all shadow-[0_0_20px_rgba(239,68,68,0.2)]"
-                        >
-                            🚀 ACESSO RÁPIDO: MODO PROFISSIONAL (DEV)
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     )

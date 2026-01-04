@@ -2,8 +2,8 @@
 
 > "A complexidade é inimiga da execução. O luxo é o domínio do tempo."
 
-## 1. Core Identity: "Cyber-Luxury"
-O Kronos não é apenas um software de agendamento; é um Sistema Operacional para estúdios de elite. A estética deve refletir isso.
+## 1. Core Identity: "Cyber-Luxury" & Independent PaaS
+O Kronos não é apenas um software de agendamento; é uma **Infraestrutura Proprietária (PaaS)** independente licenciada para o estúdio. O sistema é o "cérebro digital" separado do corpo físico da operação.
 
 ### 🎨 Pilares Visuais
 *   **Minimalismo Industrial (Monochrome):** Abstração do arco-íris neon em favor de um **Preto & Branco (B&W) de alto contraste**. O luxo é binário: Presença ou Ausência.

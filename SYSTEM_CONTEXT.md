@@ -113,11 +113,21 @@ KRONØS SYNC is architected as a **Professional-First Operating System** for tat
 
 ---
 
-## 🔮 07. FUTURE ROADMAP (AI CONTEXT)
+## ⚖️ 07. LEGAL & IP GOVERNANCE (THE SHIELD)
 
-- **Phase 1 (Sync):** Global WhatsApp notification engine.
-- **Phase 2 (BI):** Multi-workspace admin dashboard for franchises.
-- **Phase 3 (AI):** Image recognition for automated anamnesis analysis.
+### **Propriedade Intelectual**
+- **Soberania do Código:** O Core Engine e o algortimo KAI pertencem à *Kronos Network* (Desenvolvedor).
+- **Licenciamento:** O Estúdio possui uma licença de uso comercial limitada (Partner License).
+- **Dados:** Pertencem ao Estúdio (LGPD).
+
+---
+
+## 🔮 08. FUTURE ROADMAP (2026 EXECUTION)
+
+- **Q1 (Foundation):** Validation of Kiosk > Booking conversion & Internal Onboarding.
+- **Q2 (Automation):** WhatsApp Notification Engine & AI Receipt Risk Score.
+- **Q3 (Optimization):** Advanced BI (LTV/Churn) & Inventory Control.
+- **Q4 (Strategy):** Pivot decision (SaaS vs Exclusive).
 
 ---
 

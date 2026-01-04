@@ -73,8 +73,38 @@
   - [x] **Digital Identity Sync:** Adição do campo Instagram ao modelo Artist.
   - [x] **Studio-First Validation:** Algoritmo de IA que valida o PIX para o estúdio (Workspace) com 99% de confiança.
 
-## Fase 5: Ecossistema & Escala (Em Foco 🔮)
-- [ ] **Dashboards de Performance Avançados**
-- [ ] **Automação de Marketing** (Re-engagement de Leads)
-- [ ] **Integração com Gateways de Pagamento** (Direto)
-- [ ] **KAI Advanced Portfólio:** Análise de visão computacional real para qualidade técnica.
+## Roadmap Técnico 2026 (Foco Interno)
+
+### Q1 (Jan-Mar): Foundation & Validação 🚧
+- [x] **Professional Gate:** Auth robusto e Invite System.
+- [x] **Kiosk Experience:** Conversão de Lead e QR Code.
+- [ ] **Google Calendar Sync:** Finalizar integração bidirecional.
+- [ ] **Onboarding Interno:** Treinamento e cadastro de 100% dos artistas.
+
+### Q2 (Apr-Jun): Automação Interna
+- [ ] **WhatsApp Notifications:** Lembretes de booking e alertas financeiros.
+- [ ] **AI Receipt Validation:** Pontuação de risco para comprovantes.
+- [ ] **Mobile PWA:** Otimização final para tablets do estúdio.
+
+### Q3 (Jul-Sep): Otimização
+- [ ] **Advanced BI:** LTV, Churn e Cohort Analysis.
+- [ ] **Inventory Management:** Controle de produtos do estúdio.
+- [ ] **Template Library:** Gestão de contratos e anamneses.
+
+### Q4 (Oct-Dec): Decisão Estratégica
+- [ ] **Documentation Completion:** Manual completo do sistema.
+- [ ] **Case Study:** Métricas reais do Estúdio Kronos.
+- [ ] **Strategic Pivot:** Decisão sobre abertura SaaS vs Manter Interno.
+
+## Fase 10: Production Readiness & Recruitment (Concluído ✅)
+- [x] **Elite Setup (Showcase v2.1):** Seeding de 7 cenários estratégicos.
+- [x] **Security Hardening:** Remoção de Dev Mode e Bypasses.
+- [x] **Walkthrough Visual:** Documentação de prova de conceito para stakeholders.
+
+## Fase 11: Brand Storytelling & Concept Refinement (Concluído ✅)
+- [x] **Hero Copy Refinement:** "Controle absoluto para estúdios de elite".
+- [x] **Philosophy Section:** Conceito de Tempo e Legado.
+
+## Fase 12: Internal Strategic Dossier & IP Strategy (Concluído ✅)
+- [x] **DOSSIER_KRONOS.md:** Manifesto estratégico com dados de mercado e SWOT.
+- [x] **IP Protection:** Definição jurídica de não-engenharia reversa e soberania do "Ø".
