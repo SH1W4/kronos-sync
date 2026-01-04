@@ -184,28 +184,28 @@ export default function FeedbackDashboard() {
                             <label className="text-sm font-medium mb-2 block">Tipo</label>
                             <div className="flex gap-2">
                                 <Button
-                                    variant={filter === 'ALL' ? 'default' : 'outline'}
+                                    variant={filter === 'ALL' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setFilter('ALL')}
                                 >
                                     Todos ({stats.total})
                                 </Button>
                                 <Button
-                                    variant={filter === 'SUGGESTION' ? 'default' : 'outline'}
+                                    variant={filter === 'SUGGESTION' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setFilter('SUGGESTION')}
                                 >
                                     Sugestões ({stats.suggestions})
                                 </Button>
                                 <Button
-                                    variant={filter === 'BUG' ? 'default' : 'outline'}
+                                    variant={filter === 'BUG' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setFilter('BUG')}
                                 >
                                     Bugs ({stats.bugs})
                                 </Button>
                                 <Button
-                                    variant={filter === 'FEATURE' ? 'default' : 'outline'}
+                                    variant={filter === 'FEATURE' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setFilter('FEATURE')}
                                 >
@@ -217,28 +217,28 @@ export default function FeedbackDashboard() {
                             <label className="text-sm font-medium mb-2 block">Status</label>
                             <div className="flex gap-2">
                                 <Button
-                                    variant={statusFilter === 'ALL' ? 'default' : 'outline'}
+                                    variant={statusFilter === 'ALL' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setStatusFilter('ALL')}
                                 >
                                     Todos
                                 </Button>
                                 <Button
-                                    variant={statusFilter === 'PENDING' ? 'default' : 'outline'}
+                                    variant={statusFilter === 'PENDING' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setStatusFilter('PENDING')}
                                 >
                                     Pendentes
                                 </Button>
                                 <Button
-                                    variant={statusFilter === 'REVIEWED' ? 'default' : 'outline'}
+                                    variant={statusFilter === 'REVIEWED' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setStatusFilter('REVIEWED')}
                                 >
                                     Revisados
                                 </Button>
                                 <Button
-                                    variant={statusFilter === 'IMPLEMENTED' ? 'default' : 'outline'}
+                                    variant={statusFilter === 'IMPLEMENTED' ? 'primary' : 'outline'}
                                     size="sm"
                                     onClick={() => setStatusFilter('IMPLEMENTED')}
                                 >
@@ -272,12 +272,12 @@ export default function FeedbackDashboard() {
                                             <div className="flex items-center gap-2">
                                                 <Badge variant={
                                                     feedback.type === 'BUG' ? 'destructive' :
-                                                        feedback.type === 'FEATURE' ? 'default' : 'secondary'
+                                                        feedback.type === 'FEATURE' ? 'primary' : 'secondary'
                                                 }>
                                                     {feedback.type}
                                                 </Badge>
                                                 <Badge variant={
-                                                    feedback.status === 'IMPLEMENTED' ? 'default' :
+                                                    feedback.status === 'IMPLEMENTED' ? 'primary' :
                                                         feedback.status === 'REVIEWED' ? 'secondary' : 'outline'
                                                 }>
                                                     {feedback.status}
@@ -301,7 +301,7 @@ export default function FeedbackDashboard() {
                                             {feedback.status === 'REVIEWED' && (
                                                 <Button
                                                     size="sm"
-                                                    variant="default"
+                                                    variant="primary"
                                                     onClick={() => updateStatus(feedback.id, 'IMPLEMENTED')}
                                                 >
                                                     Marcar como Implementado
