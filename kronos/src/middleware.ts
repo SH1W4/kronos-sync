@@ -8,40 +8,59 @@ export async function middleware(request: NextRequest) {
         secret: process.env.NEXTAUTH_SECRET
     })
 
-    const { pathname } = request.nextUrl
+    const isAuthPage = request.nextUrl.pathname.startsWith('/auth') ||
+        request.nextUrl.pathname.startsWith('/onboarding')
+    const isArtistPage = request.nextUrl.pathname.startsWith('/artist')
+    const isPublicPage = request.nextUrl.pathname === '/' ||
+        request.nextUrl.pathname.startsWith('/kiosk') ||
+        request.nextUrl.pathname.startsWith('/fichas') ||
+        request.nextUrl.pathname.startsWith('/api/auth')
 
-    // 1. Redirection for Authenticated Users (Sticky Route Persistence)
-    // Se o usuário já está logado e tenta acessar rotas de entrada ou a agenda
-    if (token) {
-        if (pathname === '/' || pathname === '/auth/select' || pathname === '/auth/signin' || pathname === '/dashboard') {
-            const role = token.role as string
+    // Security Headers
+    const response = NextResponse.next()
 
-            // 1. For Professionals (Artist/Admin) -> Go to Artist Dashboard
-            if (role === 'ARTIST' || role === 'ADMIN') {
-                if (pathname !== '/dashboard') {
-                    return NextResponse.redirect(new URL('/artist/dashboard', request.url))
-                }
-                return NextResponse.next()
-            }
+    // Only add security headers in production
+    if (process.env.NODE_ENV === 'production') {
+        // Content Security Policy
+        response.headers.set(
+            'Content-Security-Policy',
+            "default-src 'self'; " +
+            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; " +
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+            "img-src 'self' data: https: blob:; " +
+            "font-src 'self' https://fonts.gstatic.com; " +
+            "connect-src 'self' https://vercel.live https://*.google.com https://*.googleapis.com; " +
+            "frame-ancestors 'none';"
+        )
 
-            // 2. For Clients -> Go to Kiosk if trying to access dashboard/select
-            if (role === 'CLIENT') {
-                if (pathname === '/dashboard' || pathname === '/auth/select') {
-                    return NextResponse.redirect(new URL('/kiosk', request.url))
-                }
-                // Allow them to see home page or signin
-                return NextResponse.next()
-            }
+        // Security Headers
+        response.headers.set('X-Frame-Options', 'DENY')
+        response.headers.set('X-Content-Type-Options', 'nosniff')
+        response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+        response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+        response.headers.set(
+            'Strict-Transport-Security',
+            'max-age=31536000; includeSubDomains'
+        )
+    }
 
-            // 3. Default for authenticated without specific role or other routes
-            return NextResponse.redirect(new URL('/onboarding', request.url))
+    // Authentication logic
+    if (!token && isArtistPage) {
+        return NextResponse.redirect(new URL('/onboarding', request.url))
+    }
+
+    if (token && isAuthPage) {
+        const role = token.role as string
+        if (role === 'ARTIST' || role === 'ADMIN') {
+            return NextResponse.redirect(new URL('/artist/dashboard', request.url))
         }
     }
 
-    return NextResponse.next()
+    return response
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
-    matcher: ['/', '/auth/select', '/auth/signin', '/dashboard'],
+    matcher: [
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    ],
 }
