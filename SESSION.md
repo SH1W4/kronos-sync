@@ -8,6 +8,9 @@
 ### 🏛️ Posicionamento Estratégico (Dossier & Manifesto)
 - **Manifesto Técnico:** Definição do KRONØS SYNC como infraestrutura proprietária e independente (PaaS).
 - **Proteção IP:** Estabelecimento de licença de uso comercial limitada e proteção de código-fonte/marca "Ø".
+- **Dados & Mercado:** Inclusão de análise SWOT e dados de mercado (R$ 2.5 Bi Brasil) para validação de modelo de negócio.
+- **Storytelling (Vanguarda):** Refinamento da Landing Page com Hero "Controle Absoluto" e seção de Filosofia "Guardião do Foco".
+- **Manuais Operacionais:** Criação de `MANUAL_ADMIN.md` e `MANUAL_ARTIST.md` com a nova identidade verbal e procedimentos de segurança.
 - **Roadmap 2026:** Definição de metas trimestrais (Q1-Q4) com foco em validação interna e automação.
 
 ### 📝 Notas Técnicas
