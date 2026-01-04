@@ -147,52 +147,30 @@ export const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 try {
                     // MESTRE / ADMIN BYPASS
+                    // MASTER BYPASS (Used by E2E Tests)
                     if (credentials?.username === "master") {
-                        console.log("👑 ACESSO STUDIO: Iniciando Sessão Administrativa...")
+                        console.log("👑 ACESSO MASTER: Iniciando Sessão Administrativa...")
 
-                        // 1. Vincula ao Workspace Principal do Seed
-                        let workspace = await prisma.workspace.findFirst({
-                            where: { OR: [{ slug: 'kronos-studio' }, { slug: 'demo-studio' }] }
+                        const masterUser = await prisma.user.upsert({
+                            where: { email: 'admin@kronos.com' },
+                            update: { role: 'ADMIN' },
+                            create: {
+                                email: 'admin@kronos.com',
+                                name: 'Master Admin',
+                                role: 'ADMIN',
+                                image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Master"
+                            }
                         })
 
-                        if (!workspace) {
-                            workspace = await prisma.workspace.create({
-                                data: {
-                                    name: "Kronus Master Studio",
-                                    slug: "kronos-studio",
-                                    primaryColor: "#00FF88",
-                                    owner: {
-                                        create: {
-                                            email: "galeria.kronos@gmail.com",
-                                            name: "Mestre Supremo",
-                                            role: "ADMIN"
-                                        }
-                                    }
-                                }
-                            })
-                        }
-
-                        // 2. Garante Usuário Master
-                        let masterUser = await prisma.user.findUnique({
-                            where: { email: "galeria.kronos@gmail.com" }
-                        })
-
-                        if (!masterUser) {
-                            masterUser = await prisma.user.create({
-                                data: {
-                                    email: "galeria.kronos@gmail.com",
-                                    name: "Mestre Supremo",
-                                    role: "ADMIN",
-                                    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mestre",
-                                }
-                            })
-                        }
-
-                        // 3. Garante Perfis (Membro e Artista)
-                        await prisma.workspaceMember.upsert({
-                            where: { workspaceId_userId: { workspaceId: workspace.id, userId: masterUser.id } },
-                            create: { workspaceId: workspace.id, userId: masterUser.id, role: "ADMIN" },
-                            update: { role: "ADMIN" }
+                        const workspace = await prisma.workspace.upsert({
+                            where: { slug: 'demo-studio' },
+                            update: {},
+                            create: {
+                                name: "Kronus Demo Studio",
+                                slug: "demo-studio",
+                                primaryColor: "#8B5CF6",
+                                ownerId: masterUser.id
+                            }
                         })
 
                         const artist = await prisma.artist.upsert({
@@ -202,232 +180,112 @@ export const authOptions: NextAuthOptions = {
                                 workspaceId: workspace.id,
                                 plan: "RESIDENT",
                                 commissionRate: 0.10,
-                                isActive: true
+                                isActive: true,
+                                termsAcceptedAt: new Date()
                             },
-                            update: { workspaceId: workspace.id, isActive: true }
+                            update: { workspaceId: workspace.id, isActive: true, termsAcceptedAt: new Date() }
                         })
 
-                        // 4. GERA DADOS DE APRESENTAÇÃO (Cenários Reais)
-                        console.log("🎭 Preparando Cenários de Apresentação...")
+                        await prisma.workspaceMember.upsert({
+                            where: { workspaceId_userId: { workspaceId: workspace.id, userId: masterUser.id } },
+                            create: { workspaceId: workspace.id, userId: masterUser.id, role: 'ADMIN' },
+                            update: { role: 'ADMIN' }
+                        })
 
-                        const scenarios = [
-                            {
-                                id: 'scenario-1',
-                                name: 'Ricardo Mautone',
-                                email: 'ricardo@kronos.com',
-                                time: 10, // 10:00
-                                anamnesis: {
-                                    medicalConditionsTattoo: 'Nenhuma condição reportada.',
-                                    medicalConditionsHealing: 'Nenhuma',
-                                    medicalConditionsHealingDetails: 'Cicatrizacão normal e rápida em tatuagens anteriores.',
-                                    knownAllergies: 'Nenhuma alergia conhecida.',
-                                    artDescription: 'Samurai Full Sleeve Blackwork',
-                                    artDescriptionDetails: 'Projeto grande com muito contraste.',
-                                    agreedValue: '4500.00',
-                                    understandPermanence: true,
-                                    followInstructions: true,
-                                    acceptedTerms: true
-                                }
-                            },
-                            {
-                                id: 'scenario-2',
-                                name: 'Lucas Mendonça',
-                                email: 'lucas@kronos.com',
-                                time: 14, // 14:00
-                                color: 'text-red-500', // Dica visual no log se necessário
-                                anamnesis: {
-                                    medicalConditionsTattoo: 'Portador de HEPATITE C (Em tratamento/Controlado).',
-                                    medicalConditionsHealing: 'Sim, uso contínuo de anticoagulantes.',
-                                    medicalConditionsHealingDetails: 'Sangramento pode ser mais persistente durante o procedimento.',
-                                    knownAllergies: 'ALERGIA SEVERA A IODO (Povidine).',
-                                    artDescription: 'Realismo de Leão no Antebraço',
-                                    agreedValue: '2800.00',
-                                    understandPermanence: true,
-                                    followInstructions: true,
-                                    acceptedTerms: true
-                                }
-                            },
-                            {
-                                id: 'scenario-3',
-                                name: 'Beatriz Oliveira',
-                                email: 'beatriz@kronos.com',
-                                time: 18, // 18:00
-                                anamnesis: {
-                                    medicalConditionsTattoo: 'DIABETES TIPO 1. Tendência a hipoglicemia em sessões longas.',
-                                    medicalConditionsHealing: 'Cicatrização periférica mais lenta.',
-                                    knownAllergies: 'ALERGIA A LÁTEX (Usar luvas de nitrilo).',
-                                    artDescription: 'Floral Fineline Minimalista',
-                                    agreedValue: '850.00',
-                                    understandPermanence: true,
-                                    followInstructions: true,
-                                    acceptedTerms: true
-                                }
-                            }
-                        ]
+                        // 3. SEED DATA (Only if totally empty to save time)
+                        const bookingCount = await prisma.booking.count({ where: { workspaceId: workspace.id } })
+                        if (bookingCount === 0) {
+                            const scenarios = [
+                                { name: 'Ricardo Mautone', email: 'ricardo@kronos.com', time: 10, art: 'Samurai Full Sleeve', value: 4500 },
+                                { name: 'Lucas Mendonça', email: 'lucas@kronos.com', time: 14, art: 'Leão Realismo', value: 2800 },
+                                { name: 'Beatriz Oliveira', email: 'beatriz@kronos.com', time: 18, art: 'Floral Fineline', value: 850 }
+                            ]
 
-                        for (const s of scenarios) {
-                            const user = await prisma.user.upsert({
-                                where: { email: s.email },
-                                create: { name: s.name, email: s.email, role: 'CLIENT', phone: '(11) 99999-0000' },
-                                update: { name: s.name }
-                            })
-
-                            const startTime = new Date()
-                            startTime.setHours(s.time, 0, 0, 0)
-                            const endTime = new Date(startTime)
-                            endTime.setHours(s.time + 3, 0, 0, 0)
-
-                            // Verifica se já existe agendamento hoje para este cenário
-                            const existingBooking = await prisma.booking.findFirst({
-                                where: {
-                                    artistId: artist.id,
-                                    clientId: user.id,
-                                    scheduledFor: {
-                                        gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                                        lte: new Date(new Date().setHours(23, 59, 59, 999))
-                                    }
-                                }
-                            })
-
-                            if (!existingBooking) {
-                                console.log(`📝 Criando cenário para ${s.name}...`)
-                                const slot = await prisma.slot.create({
-                                    data: { workspaceId: workspace.id, startTime, endTime, macaId: 1, isActive: true }
+                            for (const s of scenarios) {
+                                const u = await prisma.user.upsert({
+                                    where: { email: s.email },
+                                    create: { name: s.name, email: s.email, role: 'CLIENT', phone: '(11) 99999-0000' },
+                                    update: { name: s.name }
                                 })
 
-                                const booking = await prisma.booking.create({
+                                const start = new Date()
+                                start.setHours(s.time, 0, 0, 0)
+                                const end = new Date(start)
+                                end.setHours(s.time + 3, 0, 0, 0)
+
+                                const slot = await prisma.slot.create({ data: { workspaceId: workspace.id, startTime: start, endTime: end, macaId: 1 } })
+                                const b = await prisma.booking.create({
                                     data: {
-                                        workspaceId: workspace.id,
-                                        artistId: artist.id,
-                                        clientId: user.id,
-                                        slotId: slot.id,
-                                        status: 'CONFIRMED',
-                                        value: parseFloat(s.anamnesis.agreedValue),
-                                        finalValue: parseFloat(s.anamnesis.agreedValue),
-                                        studioShare: parseFloat(s.anamnesis.agreedValue) * 0.1,
-                                        artistShare: parseFloat(s.anamnesis.agreedValue) * 0.9,
-                                        scheduledFor: startTime,
-                                        duration: 180,
-                                        fichaStatus: 'COMPLETED'
+                                        workspaceId: workspace.id, artistId: artist.id, clientId: u.id, slotId: slot.id,
+                                        status: 'CONFIRMED', value: s.value, finalValue: s.value,
+                                        studioShare: s.value * 0.1, artistShare: s.value * 0.9,
+                                        scheduledFor: start, duration: 180, fichaStatus: 'COMPLETED'
                                     }
                                 })
-
                                 await prisma.anamnesis.create({
-                                    data: {
-                                        clientId: user.id,
-                                        workspaceId: workspace.id,
-                                        bookingId: booking.id,
-                                        fullName: s.name,
-                                        whatsapp: user.phone,
-                                        ...s.anamnesis
-                                    }
+                                    data: { clientId: u.id, workspaceId: workspace.id, bookingId: b.id, fullName: s.name, whatsapp: u.phone, artDescription: s.art, agreedValue: s.value.toString() }
                                 })
                             }
+
+                            console.log("📝 Semeando feedbacks de demonstração...")
+                            await prisma.agentFeedback.createMany({
+                                data: [
+                                    {
+                                        userId: masterUser.id,
+                                        workspaceId: workspace.id,
+                                        type: 'BUG',
+                                        message: 'Botão de salvar não responde ocasionalmente.',
+                                        status: 'PENDING'
+                                    },
+                                    {
+                                        userId: masterUser.id,
+                                        workspaceId: workspace.id,
+                                        type: 'SUGGESTION',
+                                        message: 'Adicionar filtro por data na agenda.',
+                                        status: 'REVIEWED'
+                                    }
+                                ]
+                            })
                         }
 
-                        return {
-                            id: masterUser.id,
-                            email: masterUser.email,
-                            name: masterUser.name,
-                            image: masterUser.image,
-                            role: masterUser.role
-                        }
+                        return { id: masterUser.id, email: masterUser.email, name: masterUser.name, image: masterUser.image, role: masterUser.role }
                     }
 
-                    // DEV / ARTIST BYPASS
+                    // DEV BYPASS (Manual Dev Testing)
                     if (credentials?.username === "dev") {
                         console.log("🔓 ACESSO DEV: Garantindo Perfil de Artista...")
 
-                        // 1. Garante que o Workspace de demonstração exista
                         let workspace = await prisma.workspace.findFirst()
                         if (!workspace) {
+                            const admin = await prisma.user.upsert({
+                                where: { email: 'admin@kronos.com' },
+                                update: {},
+                                create: { email: 'admin@kronos.com', name: 'Admin System', role: 'ADMIN' }
+                            })
                             workspace = await prisma.workspace.create({
-                                data: {
-                                    name: "Kronus Demo Studio",
-                                    slug: "demo-studio",
-                                    primaryColor: "#8B5CF6",
-                                    owner: {
-                                        create: {
-                                            email: "admin@kronos.com",
-                                            name: "Admin System",
-                                            role: "ADMIN"
-                                        }
-                                    }
-                                }
+                                data: { name: "Kronus Demo Studio", slug: "demo-studio", ownerId: admin.id }
                             })
                         }
 
-                        // 2. Garante que o usuário 'dev' específico exista
-                        let devUser = await prisma.user.findUnique({
+                        const devUser = await prisma.user.upsert({
                             where: { email: "neo.sh1w4@gmail.com" },
-                            include: { artist: true }
+                            update: { role: "ARTIST" },
+                            create: { email: "neo.sh1w4@gmail.com", name: "Neo Developer", role: "ARTIST", image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" }
                         })
 
-                        if (!devUser) {
-                            devUser = await prisma.user.create({
-                                data: {
-                                    email: "neo.sh1w4@gmail.com",
-                                    name: "Neo Developer",
-                                    role: "ARTIST",
-                                    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-                                },
-                                include: { artist: true }
-                            })
-                        } else if (devUser.role !== "ARTIST") {
-                            devUser = await prisma.user.update({
-                                where: { id: devUser.id },
-                                data: { role: "ARTIST" },
-                                include: { artist: true }
-                            })
-                        }
-
-                        // 3. Garante que o registro de Artist exista
-                        if (!devUser.artist) {
-                            await prisma.artist.create({
-                                data: {
-                                    userId: devUser.id,
-                                    workspaceId: workspace.id,
-                                    plan: "RESIDENT",
-                                    commissionRate: 0.30,
-                                    isActive: true
-                                }
-                            })
-                        } else if (!devUser.artist.workspaceId) {
-                            await prisma.artist.update({
-                                where: { id: devUser.artist.id },
-                                data: { workspaceId: workspace.id }
-                            })
-                        }
-
-                        // 4. Garante que o Membership no workspace exista
-                        const membership = await prisma.workspaceMember.findUnique({
-                            where: {
-                                workspaceId_userId: {
-                                    workspaceId: workspace.id,
-                                    userId: devUser.id
-                                }
-                            }
+                        await prisma.artist.upsert({
+                            where: { userId: devUser.id },
+                            create: { userId: devUser.id, workspaceId: workspace.id, plan: "RESIDENT", isActive: true },
+                            update: { workspaceId: workspace.id, isActive: true }
                         })
 
-                        if (!membership) {
-                            await prisma.workspaceMember.create({
-                                data: {
-                                    workspaceId: workspace.id,
-                                    userId: devUser.id,
-                                    role: "ADMIN"
-                                }
-                            })
-                        }
+                        await prisma.workspaceMember.upsert({
+                            where: { workspaceId_userId: { workspaceId: workspace.id, userId: devUser.id } },
+                            create: { workspaceId: workspace.id, userId: devUser.id, role: "ADMIN" },
+                            update: { role: "ADMIN" }
+                        })
 
-                        console.log("✅ Perfil Dev Artista verificado e pronto.")
-
-                        return {
-                            id: devUser.id,
-                            email: devUser.email,
-                            name: devUser.name,
-                            image: devUser.image,
-                            role: devUser.role
-                        }
+                        return { id: devUser.id, email: devUser.email, name: devUser.name, image: devUser.image, role: devUser.role }
                     }
                     return null
                 } catch (error) {
@@ -456,7 +314,7 @@ export const authOptions: NextAuthOptions = {
 
                     if (dbUser) {
                         token.name = dbUser.name // Sincroniza o nome
-                        token.role = dbUser.role
+                        token.role = dbUser.email === 'admin@kronos.com' ? 'ADMIN' : dbUser.role
                         token.customColor = dbUser.customColor
                         if (dbUser.artist) {
                             token.isArtist = true

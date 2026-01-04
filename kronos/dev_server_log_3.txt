@@ -1,0 +1,830 @@
+
+> kronos-sync@2.0.0 dev
+> next dev --turbopack
+
+ ÔÜá Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\Jo├úo\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\Jo├úo\Desktop\PROJETOS\05_PLATFORMS\kronos_sync\kronos\package-lock.json
+
+   Ôû▓ Next.js 16.0.10 (Turbopack)
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.1.8:3000
+   - Environments: .env.local, .env
+
+ Ô£ô Starting...
+ ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+ Ô£ô Ready in 2.2s
+ Ôùï Compiling /auth/signin ...
+ GET /auth/signin 200 in 4.5s (compile: 4.0s, proxy.ts: 110ms, render: 372ms)
+ÔÜá´©Å Auth initialized
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/providers 200 in 1888ms (compile: 1830ms, proxy.ts: 8ms, render: 51ms)
+ GET /api/auth/session 200 in 2.2s (compile: 2.1s, proxy.ts: 10ms, render: 56ms)
+ GET /api/auth/csrf 200 in 55ms (compile: 22ms, proxy.ts: 6ms, render: 28ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 5.6s (compile: 22ms, proxy.ts: 12ms, render: 5.6s)
+ Ôùï Compiling /artist/dashboard ...
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /artist/dashboard 200 in 5.8s (compile: 5.1s, proxy.ts: 22ms, render: 693ms)
+ GET /auth/signin 200 in 891ms (compile: 163ms, proxy.ts: 244ms, render: 484ms)
+ GET /api/auth/session 200 in 143ms (compile: 76ms, proxy.ts: 8ms, render: 60ms)
+ GET /api/auth/providers 200 in 73ms (compile: 27ms, proxy.ts: 12ms, render: 34ms)
+ GET /api/auth/csrf 200 in 56ms (compile: 13ms, proxy.ts: 8ms, render: 35ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 3.3s (compile: 21ms, proxy.ts: 11ms, render: 3.2s)
+ GET /api/auth/session 200 in 1086ms (compile: 23ms, proxy.ts: 11ms, render: 1052ms)
+ÔÜá´©Å Auth initialized
+ Ôùï Compiling /artist/feedback ...
+ GET /artist/dashboard 200 in 4.0s (compile: 18ms, proxy.ts: 17ms, render: 3.9s)
+ POST /artist/dashboard 200 in 1206ms (compile: 12ms, proxy.ts: 10ms, render: 1184ms)
+ POST /artist/dashboard 200 in 633ms (compile: 10ms, proxy.ts: 13ms, render: 610ms)
+ GET /artist/feedback 200 in 12.5s (compile: 12.3s, proxy.ts: 60ms, render: 226ms)
+ GET /api/auth/session 200 in 241ms (compile: 40ms, proxy.ts: 39ms, render: 163ms)
+ÔÜá´©Å Auth initialized
+ Ô£ô Compiled in 2.7s
+­ƒøí´©Å Middleware: /auth/signin | Token: ÔØî
+ GET /auth/signin 200 in 810ms (compile: 107ms, proxy.ts: 380ms, render: 322ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: ÔØî
+ GET /api/auth/session 200 in 106ms (compile: 56ms, proxy.ts: 19ms, render: 31ms)
+­ƒøí´©Å Middleware: /api/auth/providers | Token: ÔØî
+ GET /api/auth/providers 200 in 68ms (compile: 18ms, proxy.ts: 8ms, render: 42ms)
+­ƒøí´©Å Middleware: /api/auth/csrf | Token: ÔØî
+ GET /api/auth/csrf 200 in 52ms (compile: 12ms, proxy.ts: 7ms, render: 33ms)
+­ƒøí´©Å Middleware: /api/auth/callback/credentials | Token: ÔØî
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 3.3s (compile: 11ms, proxy.ts: 9ms, render: 3.3s)
+­ƒøí´©Å Middleware: /artist/dashboard | Token: Ô£à
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ GET /artist/dashboard 200 in 1204ms (compile: 50ms, proxy.ts: 25ms, render: 1130ms)
+ GET /api/auth/session 200 in 358ms (compile: 41ms, proxy.ts: 14ms, render: 303ms)
+­ƒøí´©Å Middleware: /api/auth/_log | Token: Ô£à
+ POST /api/auth/_log 200 in 227ms (compile: 125ms, proxy.ts: 74ms, render: 28ms)
+ GET /artist/feedback 200 in 478ms (compile: 28ms, proxy.ts: 10ms, render: 439ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+ GET /api/auth/session 200 in 236ms (compile: 13ms, proxy.ts: 12ms, render: 212ms)
+ÔÜá´©Å Auth initialized
+ Ô£ô Compiled in 833ms
+­ƒøí´©Å Middleware: /auth/signin | Token: ÔØî
+ GET /auth/signin 200 in 3.2s (compile: 1989ms, proxy.ts: 597ms, render: 657ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: ÔØî
+­ƒøí´©Å Middleware: /api/auth/providers | Token: ÔØî
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 1777ms (compile: 1618ms, proxy.ts: 73ms, render: 86ms)
+ GET /api/auth/providers 200 in 1749ms (compile: 1636ms, proxy.ts: 65ms, render: 47ms)
+­ƒøí´©Å Middleware: /api/auth/csrf | Token: ÔØî
+ GET /api/auth/csrf 200 in 56ms (compile: 10ms, proxy.ts: 7ms, render: 39ms)
+­ƒøí´©Å Middleware: /api/auth/callback/credentials | Token: ÔØî
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+­ƒôØ Semeando feedbacks de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 5.3s (compile: 14ms, proxy.ts: 7ms, render: 5.3s)
+­ƒøí´©Å Middleware: /artist/dashboard | Token: Ô£à
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ GET /artist/dashboard 200 in 1673ms (compile: 463ms, proxy.ts: 12ms, render: 1198ms)
+ GET /artist/feedback 200 in 727ms (compile: 329ms, proxy.ts: 39ms, render: 359ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+ GET /api/auth/session 200 in 238ms (compile: 26ms, proxy.ts: 22ms, render: 190ms)
+ÔÜá´©Å Auth initialized
+­ƒøí´©Å Middleware: /auth/signin | Token: ÔØî
+ GET /auth/signin 200 in 921ms (compile: 102ms, proxy.ts: 294ms, render: 525ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: ÔØî
+ GET /api/auth/session 200 in 316ms (compile: 111ms, proxy.ts: 18ms, render: 187ms)
+­ƒøí´©Å Middleware: /api/auth/providers | Token: ÔØî
+ GET /api/auth/providers 200 in 59ms (compile: 16ms, proxy.ts: 9ms, render: 34ms)
+­ƒøí´©Å Middleware: /api/auth/csrf | Token: ÔØî
+ GET /api/auth/csrf 200 in 59ms (compile: 37ms, proxy.ts: 8ms, render: 14ms)
+­ƒøí´©Å Middleware: /api/auth/callback/credentials | Token: ÔØî
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 6.7s (compile: 29ms, proxy.ts: 18ms, render: 6.7s)
+­ƒøí´©Å Middleware: /artist/dashboard | Token: Ô£à
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ GET /artist/dashboard 200 in 255ms (compile: 17ms, proxy.ts: 16ms, render: 222ms)
+ GET /artist/feedback 200 in 116ms (compile: 17ms, proxy.ts: 8ms, render: 91ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+ GET /api/auth/session 200 in 167ms (compile: 18ms, proxy.ts: 8ms, render: 141ms)
+ÔÜá´©Å Auth initialized
+­ƒøí´©Å Middleware: /auth/signin | Token: ÔØî
+ GET /auth/signin 200 in 745ms (compile: 118ms, proxy.ts: 238ms, render: 390ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: ÔØî
+ GET /api/auth/session 200 in 319ms (compile: 150ms, proxy.ts: 35ms, render: 135ms)
+­ƒøí´©Å Middleware: /api/auth/providers | Token: ÔØî
+ GET /api/auth/providers 200 in 116ms (compile: 11ms, proxy.ts: 71ms, render: 34ms)
+­ƒøí´©Å Middleware: /api/auth/csrf | Token: ÔØî
+ GET /api/auth/csrf 200 in 42ms (compile: 9ms, proxy.ts: 5ms, render: 27ms)
+­ƒøí´©Å Middleware: /api/auth/callback/credentials | Token: ÔØî
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 5.1s (compile: 16ms, proxy.ts: 9ms, render: 5.1s)
+­ƒøí´©Å Middleware: /artist/dashboard | Token: Ô£à
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ GET /artist/dashboard 200 in 791ms (compile: 42ms, proxy.ts: 26ms, render: 723ms)
+ GET /api/auth/session 200 in 356ms (compile: 21ms, proxy.ts: 10ms, render: 326ms)
+­ƒøí´©Å Middleware: /api/auth/_log | Token: Ô£à
+ POST /api/auth/_log 200 in 94ms (compile: 38ms, proxy.ts: 28ms, render: 27ms)
+ GET /artist/feedback 200 in 244ms (compile: 22ms, proxy.ts: 7ms, render: 215ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+ GET /api/auth/session 200 in 178ms (compile: 15ms, proxy.ts: 12ms, render: 152ms)
+ÔÜá´©Å Auth initialized
+­ƒøí´©Å Middleware: /auth/signin | Token: ÔØî
+ GET /auth/signin 200 in 1077ms (compile: 101ms, proxy.ts: 305ms, render: 671ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: ÔØî
+ GET /api/auth/session 200 in 209ms (compile: 76ms, proxy.ts: 30ms, render: 103ms)
+­ƒøí´©Å Middleware: /api/auth/providers | Token: ÔØî
+ GET /api/auth/providers 200 in 55ms (compile: 11ms, proxy.ts: 13ms, render: 30ms)
+­ƒøí´©Å Middleware: /api/auth/csrf | Token: ÔØî
+ GET /api/auth/csrf 200 in 57ms (compile: 14ms, proxy.ts: 5ms, render: 37ms)
+­ƒøí´©Å Middleware: /api/auth/callback/credentials | Token: ÔØî
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 3.0s (compile: 9ms, proxy.ts: 7ms, render: 3.0s)
+­ƒøí´©Å Middleware: /artist/dashboard | Token: Ô£à
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ GET /api/auth/session 200 in 559ms (compile: 16ms, proxy.ts: 10ms, render: 532ms)
+ GET /artist/dashboard 200 in 907ms (compile: 20ms, proxy.ts: 9ms, render: 877ms)
+ GET /artist/feedback 200 in 129ms (compile: 20ms, proxy.ts: 29ms, render: 80ms)
+­ƒøí´©Å Middleware: /api/auth/_log | Token: Ô£à
+ POST /api/auth/_log 200 in 52ms (compile: 26ms, proxy.ts: 13ms, render: 12ms)
+­ƒøí´©Å Middleware: /api/auth/session | Token: Ô£à
+ GET /api/auth/session 200 in 906ms (compile: 29ms, proxy.ts: 24ms, render: 853ms)
+ÔÜá´©Å Auth initialized
+­ƒøí´©Å Middleware: /api/feedback | Token: Ô£à
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ POST /artist/feedback 200 in 993ms (compile: 19ms, proxy.ts: 17ms, render: 957ms)
+­ƒøí´©Å Middleware: /artist/feedback | Token: Ô£à
+ POST /artist/feedback 200 in 53ms (compile: 9ms, proxy.ts: 9ms, render: 35ms)
+ Ôùï Compiling /api/feedback ...
+­ƒöì Feedback API: User=admin@kronos.com, Role=ADMIN
+ Ô£ô Compiled in 243ms
+ GET /auth/signin 200 in 2.6s (compile: 182ms, proxy.ts: 918ms, render: 1482ms)
+ GET /auth/signin 200 in 2.4s (compile: 884ms, proxy.ts: 775ms, render: 787ms)
+ GET /auth/signin 200 in 2.5s (compile: 1004ms, proxy.ts: 784ms, render: 681ms)
+ GET /api/auth/session 200 in 218ms (compile: 172ms, proxy.ts: 8ms, render: 38ms)
+ GET /api/auth/session 200 in 95ms (compile: 63ms, proxy.ts: 6ms, render: 26ms)
+ GET /api/auth/providers 200 in 53ms (compile: 35ms, proxy.ts: 6ms, render: 12ms)
+ GET /api/auth/session 200 in 83ms (compile: 55ms, proxy.ts: 7ms, render: 21ms)
+ GET /api/auth/csrf 200 in 142ms (compile: 71ms, proxy.ts: 10ms, render: 60ms)
+ GET /api/auth/providers 200 in 105ms (compile: 40ms, proxy.ts: 13ms, render: 52ms)
+ GET /api/auth/providers 200 in 110ms (compile: 81ms, proxy.ts: 15ms, render: 14ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ GET /api/auth/csrf 200 in 122ms (compile: 72ms, proxy.ts: 24ms, render: 27ms)
+ GET /api/auth/csrf 200 in 82ms (compile: 32ms, proxy.ts: 15ms, render: 34ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 3.1s (compile: 70ms, proxy.ts: 22ms, render: 3.0s)
+ POST /api/auth/callback/credentials 200 in 3.0s (compile: 27ms, proxy.ts: 8ms, render: 3.0s)
+ POST /api/auth/callback/credentials 200 in 3.1s (compile: 27ms, proxy.ts: 9ms, render: 3.0s)
+ GET /artist/dashboard 200 in 1031ms (compile: 260ms, proxy.ts: 244ms, render: 527ms)
+ GET /artist/feedback 200 in 360ms (compile: 47ms, proxy.ts: 51ms, render: 262ms)
+ÔÜá´©Å Auth initialized
+ GET /artist/dashboard 200 in 2.5s (compile: 39ms, proxy.ts: 314ms, render: 2.1s)
+ GET /api/auth/session 200 in 633ms (compile: 90ms, proxy.ts: 23ms, render: 519ms)
+ GET /api/auth/session 200 in 580ms (compile: 26ms, proxy.ts: 60ms, render: 494ms)
+ GET /api/auth/session 200 in 550ms (compile: 30ms, proxy.ts: 21ms, render: 499ms)
+ POST /artist/feedback 200 in 655ms (compile: 42ms, proxy.ts: 25ms, render: 588ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /artist/dashboard 200 in 3.5s (compile: 314ms, proxy.ts: 182ms, render: 3.0s)
+ Ôùï Compiling /artist/agenda ...
+ÔÜá´©Å Auth initialized
+ POST /artist/dashboard 200 in 1642ms (compile: 12ms, proxy.ts: 10ms, render: 1620ms)
+ POST /artist/dashboard 200 in 658ms (compile: 10ms, proxy.ts: 9ms, render: 640ms)
+ POST /artist/dashboard 200 in 636ms (compile: 10ms, proxy.ts: 9ms, render: 617ms)
+ POST /artist/dashboard 200 in 580ms (compile: 8ms, proxy.ts: 7ms, render: 565ms)
+ GET /artist/agenda 200 in 38.0s (compile: 36.2s, proxy.ts: 51ms, render: 1697ms)
+ GET /artist/agenda 200 in 38.1s (compile: 37.8s, proxy.ts: 78ms, render: 145ms)
+ GET /api/auth/session 200 in 1305ms (compile: 541ms, proxy.ts: 46ms, render: 718ms)
+ GET /api/auth/session 200 in 1313ms (compile: 566ms, proxy.ts: 51ms, render: 696ms)
+ POST /artist/agenda 200 in 1086ms (compile: 47ms, proxy.ts: 17ms, render: 1022ms)
+ POST /artist/agenda 200 in 1084ms (compile: 333ms, proxy.ts: 15ms, render: 736ms)
+ÔÜá´©Å Auth initialized
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1460ms (compile: 88ms, proxy.ts: 15ms, render: 1358ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1489ms (compile: 35ms, proxy.ts: 16ms, render: 1438ms)
+ POST /artist/agenda 200 in 1717ms (compile: 1030ms, proxy.ts: 10ms, render: 677ms)
+ POST /artist/agenda 200 in 1693ms (compile: 944ms, proxy.ts: 10ms, render: 739ms)
+ POST /artist/agenda 200 in 711ms (compile: 98ms, proxy.ts: 36ms, render: 578ms)
+ POST /artist/agenda 200 in 716ms (compile: 58ms, proxy.ts: 35ms, render: 624ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1187ms (compile: 44ms, proxy.ts: 12ms, render: 1130ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1257ms (compile: 43ms, proxy.ts: 64ms, render: 1151ms)
+ POST /artist/agenda 200 in 732ms (compile: 34ms, proxy.ts: 9ms, render: 689ms)
+ POST /artist/agenda 200 in 624ms (compile: 26ms, proxy.ts: 10ms, render: 588ms)
+ GET /auth/signin 200 in 1582ms (compile: 230ms, proxy.ts: 94ms, render: 1257ms)
+ GET /auth/signin 200 in 2.2s (compile: 917ms, proxy.ts: 570ms, render: 675ms)
+ GET /auth/signin 200 in 1895ms (compile: 1293ms, proxy.ts: 291ms, render: 311ms)
+ GET /api/auth/session 200 in 5.2s (compile: 4.9s, proxy.ts: 91ms, render: 149ms)
+ GET /api/auth/providers 200 in 3.3s (compile: 3.2s, proxy.ts: 15ms, render: 95ms)
+ GET /api/auth/session 200 in 5.2s (compile: 5.0s, proxy.ts: 105ms, render: 88ms)
+ GET /api/auth/session 200 in 5.2s (compile: 5.0s, proxy.ts: 109ms, render: 81ms)
+ GET /api/auth/providers 200 in 3.3s (compile: 3.2s, proxy.ts: 15ms, render: 76ms)
+ GET /api/auth/providers 200 in 3.4s (compile: 3.2s, proxy.ts: 90ms, render: 70ms)
+ GET /api/auth/csrf 200 in 93ms (compile: 36ms, proxy.ts: 16ms, render: 42ms)
+ GET /api/auth/csrf 200 in 96ms (compile: 41ms, proxy.ts: 16ms, render: 39ms)
+ GET /api/auth/csrf 200 in 102ms (compile: 51ms, proxy.ts: 12ms, render: 39ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo...
+ POST /api/auth/callback/credentials 200 in 3.2s (compile: 47ms, proxy.ts: 27ms, render: 3.1s)
+ POST /api/auth/callback/credentials 200 in 3.4s (compile: 84ms, proxy.ts: 9ms, render: 3.3s)
+ POST /api/auth/callback/credentials 200 in 4.1s (compile: 60ms, proxy.ts: 23ms, render: 4.0s)
+ GET /artist/dashboard 200 in 1648ms (compile: 43ms, proxy.ts: 25ms, render: 1580ms)
+ GET /artist/dashboard 200 in 2.5s (compile: 53ms, proxy.ts: 33ms, render: 2.4s)
+ GET /artist/agenda 200 in 3.9s (compile: 569ms, proxy.ts: 197ms, render: 3.1s)
+ GET /artist/agenda 200 in 3.8s (compile: 665ms, proxy.ts: 150ms, render: 3.0s)
+ GET /artist/dashboard 200 in 4.2s (compile: 1154ms, proxy.ts: 98ms, render: 3.0s)
+ GET /artist/feedback 200 in 1016ms (compile: 494ms, proxy.ts: 67ms, render: 455ms)
+ GET /api/auth/session 200 in 640ms (compile: 120ms, proxy.ts: 33ms, render: 487ms)
+ GET /api/auth/session 200 in 1091ms (compile: 96ms, proxy.ts: 35ms, render: 960ms)
+ GET /api/auth/session 200 in 957ms (compile: 18ms, proxy.ts: 13ms, render: 926ms)
+ÔÜá´©Å Auth initialized
+ POST /artist/agenda 200 in 1183ms (compile: 306ms, proxy.ts: 108ms, render: 769ms)
+ POST /artist/feedback 200 in 1045ms (compile: 227ms, proxy.ts: 10ms, render: 809ms)
+ GET /api/feedback 200 in 1390ms (compile: 65ms, proxy.ts: 8ms, render: 1317ms)
+ POST /artist/feedback 200 in 322ms (compile: 54ms, proxy.ts: 15ms, render: 252ms)
+ POST /artist/agenda 200 in 2.1s (compile: 944ms, proxy.ts: 12ms, render: 1139ms)
+ POST /artist/agenda 200 in 1604ms (compile: 26ms, proxy.ts: 11ms, render: 1567ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1420ms (compile: 30ms, proxy.ts: 10ms, render: 1381ms)
+ POST /artist/agenda 200 in 676ms (compile: 73ms, proxy.ts: 7ms, render: 596ms)
+ POST /artist/agenda 200 in 743ms (compile: 21ms, proxy.ts: 7ms, render: 716ms)
+ POST /artist/agenda 200 in 618ms (compile: 22ms, proxy.ts: 9ms, render: 587ms)
+ POST /artist/agenda 200 in 622ms (compile: 28ms, proxy.ts: 10ms, render: 584ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1319ms (compile: 250ms, proxy.ts: 12ms, render: 1057ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1299ms (compile: 211ms, proxy.ts: 6ms, render: 1082ms)
+ POST /artist/agenda 200 in 1151ms (compile: 485ms, proxy.ts: 45ms, render: 621ms)
+ POST /artist/agenda 200 in 910ms (compile: 296ms, proxy.ts: 6ms, render: 609ms)
+ POST /artist/agenda 200 in 636ms (compile: 28ms, proxy.ts: 13ms, render: 595ms)
+ POST /artist/agenda 200 in 634ms (compile: 28ms, proxy.ts: 8ms, render: 598ms)
+ Ô£ô Compiled in 5.1s
+ Ô£ô Compiled in 4.4s
+ GET /auth/signin 200 in 4.1s (compile: 255ms, proxy.ts: 331ms, render: 3.6s)
+ GET /auth/signin 200 in 4.4s (compile: 1346ms, proxy.ts: 559ms, render: 2.5s)
+ GET /auth/signin 200 in 4.2s (compile: 2.1s, proxy.ts: 327ms, render: 1749ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 1874ms (compile: 1501ms, proxy.ts: 99ms, render: 274ms)
+ GET /api/auth/session 200 in 1882ms (compile: 1559ms, proxy.ts: 101ms, render: 223ms)
+ GET /api/auth/providers 200 in 1671ms (compile: 1379ms, proxy.ts: 61ms, render: 231ms)
+ GET /api/auth/providers 200 in 1916ms (compile: 1602ms, proxy.ts: 96ms, render: 217ms)
+ GET /api/auth/session 200 in 1842ms (compile: 1578ms, proxy.ts: 46ms, render: 219ms)
+ GET /api/auth/providers 200 in 1963ms (compile: 1674ms, proxy.ts: 94ms, render: 195ms)
+ GET /api/auth/csrf 200 in 326ms (compile: 142ms, proxy.ts: 52ms, render: 132ms)
+ GET /api/auth/csrf 200 in 334ms (compile: 164ms, proxy.ts: 54ms, render: 116ms)
+ GET /api/auth/csrf 200 in 295ms (compile: 183ms, proxy.ts: 12ms, render: 100ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+ POST /api/auth/callback/credentials 200 in 3.2s (compile: 107ms, proxy.ts: 24ms, render: 3.1s)
+ POST /api/auth/callback/credentials 200 in 3.2s (compile: 156ms, proxy.ts: 20ms, render: 3.0s)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ POST /api/auth/callback/credentials 200 in 6.4s (compile: 78ms, proxy.ts: 25ms, render: 6.3s)
+ÔÜá´©Å Auth initialized
+ GET /artist/dashboard 200 in 18.7s (compile: 2.3s, proxy.ts: 22ms, render: 16.4s)
+ GET /artist/dashboard 200 in 15.5s (compile: 126ms, proxy.ts: 55ms, render: 15.4s)
+ GET /api/auth/session 200 in 14.0s (compile: 121ms, proxy.ts: 19ms, render: 13.9s)
+ GET /artist/dashboard 200 in 18.7s (compile: 1042ms, proxy.ts: 21ms, render: 17.7s)
+ POST /api/auth/_log 200 in 242ms (compile: 126ms, proxy.ts: 64ms, render: 52ms)
+ POST /api/auth/_log 200 in 263ms (compile: 164ms, proxy.ts: 70ms, render: 29ms)
+ GET /artist/feedback 200 in 15.0s (compile: 1765ms, proxy.ts: 32ms, render: 13.2s)
+ GET /artist/agenda 200 in 16.2s (compile: 13.9s, proxy.ts: 83ms, render: 2.2s)
+ GET /artist/agenda 200 in 16.1s (compile: 14.1s, proxy.ts: 53ms, render: 1992ms)
+ GET /api/auth/session 200 in 626ms (compile: 10ms, proxy.ts: 38ms, render: 578ms)
+ GET /api/auth/session 200 in 1016ms (compile: 122ms, proxy.ts: 43ms, render: 851ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 1949ms (compile: 73ms, proxy.ts: 54ms, render: 1822ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ POST /artist/agenda 200 in 3.3s (compile: 46ms, proxy.ts: 9ms, render: 3.3s)
+ POST /artist/agenda 200 in 2.5s (compile: 86ms, proxy.ts: 23ms, render: 2.4s)
+ GET /api/feedback 200 in 1991ms (compile: 1693ms, proxy.ts: 92ms, render: 206ms)
+ POST /artist/feedback 200 in 1985ms (compile: 79ms, proxy.ts: 85ms, render: 1820ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1496ms (compile: 53ms, proxy.ts: 26ms, render: 1417ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1694ms (compile: 41ms, proxy.ts: 11ms, render: 1643ms)
+ POST /artist/agenda 200 in 830ms (compile: 97ms, proxy.ts: 417ms, render: 317ms)
+ POST /artist/agenda 200 in 1190ms (compile: 83ms, proxy.ts: 8ms, render: 1098ms)
+ POST /artist/agenda 200 in 732ms (compile: 69ms, proxy.ts: 11ms, render: 652ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1184ms (compile: 22ms, proxy.ts: 67ms, render: 1095ms)
+ POST /artist/agenda 200 in 667ms (compile: 22ms, proxy.ts: 9ms, render: 636ms)
+ POST /artist/agenda 200 in 861ms (compile: 28ms, proxy.ts: 5ms, render: 828ms)
+ POST /artist/agenda 200 in 3.1s (compile: 2.4s, proxy.ts: 73ms, render: 600ms)
+ GET /auth/signin 200 in 3.2s (compile: 398ms, proxy.ts: 829ms, render: 1975ms)
+ GET /auth/signin 200 in 3.0s (compile: 1078ms, proxy.ts: 614ms, render: 1305ms)
+ GET /auth/signin 200 in 3.0s (compile: 1293ms, proxy.ts: 606ms, render: 1087ms)
+ GET /api/auth/session 200 in 685ms (compile: 376ms, proxy.ts: 61ms, render: 249ms)
+ GET /api/auth/session 200 in 906ms (compile: 761ms, proxy.ts: 16ms, render: 130ms)
+ GET /api/auth/session 200 in 878ms (compile: 600ms, proxy.ts: 156ms, render: 121ms)
+ GET /api/auth/providers 200 in 699ms (compile: 159ms, proxy.ts: 75ms, render: 464ms)
+ GET /api/auth/providers 200 in 725ms (compile: 327ms, proxy.ts: 78ms, render: 319ms)
+ GET /api/auth/providers 200 in 685ms (compile: 615ms, proxy.ts: 26ms, render: 44ms)
+ GET /api/auth/csrf 200 in 240ms (compile: 132ms, proxy.ts: 33ms, render: 75ms)
+ GET /api/auth/csrf 200 in 205ms (compile: 106ms, proxy.ts: 34ms, render: 65ms)
+ GET /api/auth/csrf 200 in 263ms (compile: 170ms, proxy.ts: 54ms, render: 39ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 3.3s (compile: 126ms, proxy.ts: 38ms, render: 3.2s)
+ POST /api/auth/callback/credentials 200 in 3.4s (compile: 168ms, proxy.ts: 35ms, render: 3.2s)
+ POST /api/auth/callback/credentials 200 in 3.2s (compile: 84ms, proxy.ts: 33ms, render: 3.1s)
+ GET /artist/dashboard 200 in 4.6s (compile: 85ms, proxy.ts: 56ms, render: 4.5s)
+ GET /artist/dashboard 200 in 4.8s (compile: 3.3s, proxy.ts: 59ms, render: 1488ms)
+ GET /artist/dashboard 200 in 4.9s (compile: 3.3s, proxy.ts: 63ms, render: 1565ms)
+ GET /artist/feedback 200 in 2.2s (compile: 62ms, proxy.ts: 86ms, render: 2.0s)
+ GET /artist/agenda 200 in 2.1s (compile: 318ms, proxy.ts: 48ms, render: 1780ms)
+ GET /artist/agenda 200 in 2.2s (compile: 489ms, proxy.ts: 48ms, render: 1636ms)
+ GET /api/auth/session 200 in 1810ms (compile: 173ms, proxy.ts: 563ms, render: 1074ms)
+ GET /api/auth/session 200 in 3.2s (compile: 271ms, proxy.ts: 1915ms, render: 1037ms)
+ GET /api/auth/session 200 in 3.3s (compile: 776ms, proxy.ts: 1486ms, render: 1030ms)
+ POST /artist/feedback 200 in 770ms (compile: 25ms, proxy.ts: 38ms, render: 707ms)
+ GET /api/feedback 200 in 808ms (compile: 285ms, proxy.ts: 24ms, render: 499ms)
+ POST /artist/agenda 200 in 1126ms (compile: 219ms, proxy.ts: 50ms, render: 858ms)
+ POST /artist/agenda 200 in 1135ms (compile: 152ms, proxy.ts: 50ms, render: 933ms)
+ÔÜá´©Å Auth initialized
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1588ms (compile: 117ms, proxy.ts: 21ms, render: 1449ms)
+ POST /artist/agenda 200 in 1607ms (compile: 46ms, proxy.ts: 29ms, render: 1531ms)
+ POST /artist/agenda 200 in 825ms (compile: 50ms, proxy.ts: 17ms, render: 758ms)
+ POST /artist/agenda 200 in 862ms (compile: 103ms, proxy.ts: 16ms, render: 743ms)
+Error: aborted
+    at ignore-listed frames {
+  code: 'ECONNRESET'
+}
+ Ô¿» uncaughtException: Error: aborted
+    at ignore-listed frames {
+  code: 'ECONNRESET'
+}
+ Ô¿» uncaughtException:  Error: aborted
+    at ignore-listed frames {
+  code: 'ECONNRESET'
+}
+ POST /artist/agenda 200 in 797ms (compile: 40ms, proxy.ts: 37ms, render: 719ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1150ms (compile: 36ms, proxy.ts: 9ms, render: 1105ms)
+ POST /artist/agenda 200 in 620ms (compile: 20ms, proxy.ts: 12ms, render: 588ms)
+ POST /artist/agenda 200 in 645ms (compile: 25ms, proxy.ts: 8ms, render: 612ms)
+ POST /artist/agenda 200 in 630ms (compile: 37ms, proxy.ts: 9ms, render: 583ms)
+ POST /artist/agenda 200 in 822ms (compile: 22ms, proxy.ts: 8ms, render: 791ms)
+ Ô£ô Compiled in 951ms
+ GET /auth/signin 200 in 2.7s (compile: 194ms, proxy.ts: 45ms, render: 2.5s)
+ GET /auth/signin 200 in 3.2s (compile: 653ms, proxy.ts: 411ms, render: 2.1s)
+ GET /auth/signin 200 in 2.7s (compile: 1547ms, proxy.ts: 38ms, render: 1163ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 1926ms (compile: 1309ms, proxy.ts: 131ms, render: 486ms)
+ GET /api/auth/providers 200 in 1678ms (compile: 1266ms, proxy.ts: 37ms, render: 376ms)
+ GET /api/auth/providers 200 in 1665ms (compile: 1251ms, proxy.ts: 34ms, render: 380ms)
+ GET /api/auth/providers 200 in 1667ms (compile: 1271ms, proxy.ts: 35ms, render: 362ms)
+ GET /api/auth/session 200 in 2.0s (compile: 1555ms, proxy.ts: 116ms, render: 352ms)
+ GET /api/auth/session 200 in 2.0s (compile: 1550ms, proxy.ts: 121ms, render: 347ms)
+ GET /api/auth/csrf 200 in 427ms (compile: 110ms, proxy.ts: 68ms, render: 248ms)
+ GET /api/auth/csrf 200 in 675ms (compile: 173ms, proxy.ts: 32ms, render: 470ms)
+ GET /api/auth/csrf 200 in 707ms (compile: 203ms, proxy.ts: 27ms, render: 476ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+­ƒÄ¡ Semeando cen├írios de demonstra├º├úo para hoje...
+ POST /api/auth/callback/credentials 200 in 4.5s (compile: 1204ms, proxy.ts: 155ms, render: 3.2s)
+ POST /api/auth/callback/credentials 200 in 5.1s (compile: 1389ms, proxy.ts: 519ms, render: 3.2s)
+ POST /api/auth/callback/credentials 200 in 5.2s (compile: 1227ms, proxy.ts: 280ms, render: 3.6s)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /artist/dashboard 200 in 6.0s (compile: 3.5s, proxy.ts: 59ms, render: 2.4s)
+ GET /artist/dashboard 200 in 6.0s (compile: 3.6s, proxy.ts: 54ms, render: 2.3s)
+ GET /artist/dashboard 200 in 6.0s (compile: 1927ms, proxy.ts: 64ms, render: 4.0s)
+ Ô£ô Compiled in 2.9s
+ GET /auth/signin 200 in 1226ms (compile: 243ms, proxy.ts: 139ms, render: 844ms)
+ GET /auth/signin 200 in 1268ms (compile: 608ms, proxy.ts: 66ms, render: 595ms)
+ GET /auth/signin 200 in 1320ms (compile: 662ms, proxy.ts: 99ms, render: 558ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/providers 200 in 4.1s (compile: 3.6s, proxy.ts: 20ms, render: 440ms)
+ GET /api/auth/session 200 in 4.3s (compile: 3.9s, proxy.ts: 16ms, render: 333ms)
+ GET /api/auth/providers 200 in 4.1s (compile: 3.8s, proxy.ts: 21ms, render: 314ms)
+ GET /api/auth/providers 200 in 4.1s (compile: 3.8s, proxy.ts: 19ms, render: 296ms)
+ GET /api/auth/session 200 in 4.3s (compile: 4.0s, proxy.ts: 16ms, render: 298ms)
+ GET /api/auth/session 200 in 4.3s (compile: 4.0s, proxy.ts: 18ms, render: 289ms)
+ GET /api/auth/csrf 200 in 200ms (compile: 41ms, proxy.ts: 52ms, render: 108ms)
+ GET /api/auth/csrf 200 in 208ms (compile: 91ms, proxy.ts: 48ms, render: 69ms)
+ GET /api/auth/csrf 200 in 191ms (compile: 101ms, proxy.ts: 24ms, render: 65ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 3.3s (compile: 200ms, proxy.ts: 46ms, render: 3.1s)
+ POST /api/auth/callback/credentials 200 in 3.3s (compile: 135ms, proxy.ts: 39ms, render: 3.2s)
+ POST /api/auth/callback/credentials 200 in 3.4s (compile: 87ms, proxy.ts: 28ms, render: 3.2s)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /artist/dashboard 200 in 12.8s (compile: 3.8s, proxy.ts: 65ms, render: 9.0s)
+ GET /artist/dashboard 200 in 12.8s (compile: 1800ms, proxy.ts: 62ms, render: 11.0s)
+ GET /artist/dashboard 200 in 12.9s (compile: 1114ms, proxy.ts: 59ms, render: 11.7s)
+ GET /artist/feedback 200 in 8.3s (compile: 6.5s, proxy.ts: 590ms, render: 1224ms)
+ GET /api/auth/session 200 in 1130ms (compile: 51ms, proxy.ts: 32ms, render: 1047ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+ POST /artist/feedback 200 in 1079ms (compile: 13ms, proxy.ts: 12ms, render: 1055ms)
+ GET /api/feedback 200 in 1122ms (compile: 811ms, proxy.ts: 14ms, render: 298ms)
+ GET /auth/signin 200 in 5.1s (compile: 863ms, proxy.ts: 481ms, render: 3.7s)
+ GET /api/auth/session 200 in 745ms (compile: 167ms, proxy.ts: 11ms, render: 567ms)
+ GET /api/auth/providers 200 in 190ms (compile: 40ms, proxy.ts: 109ms, render: 41ms)
+ GET /api/auth/csrf 200 in 58ms (compile: 12ms, proxy.ts: 13ms, render: 34ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 5.3s (compile: 21ms, proxy.ts: 30ms, render: 5.2s)
+ GET /api/auth/session 200 in 660ms (compile: 21ms, proxy.ts: 16ms, render: 623ms)
+ÔÜá´©Å Auth initialized
+ GET /artist/dashboard 200 in 7.3s (compile: 30ms, proxy.ts: 48ms, render: 7.2s)
+ GET /artist/agenda 200 in 6.4s (compile: 5.3s, proxy.ts: 10ms, render: 1037ms)
+ GET /api/auth/session 200 in 592ms (compile: 33ms, proxy.ts: 25ms, render: 534ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+ POST /artist/agenda 200 in 936ms (compile: 45ms, proxy.ts: 14ms, render: 877ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1538ms (compile: 27ms, proxy.ts: 7ms, render: 1503ms)
+ POST /artist/agenda 200 in 894ms (compile: 30ms, proxy.ts: 8ms, render: 856ms)
+ POST /artist/agenda 200 in 274ms (compile: 30ms, proxy.ts: 7ms, render: 237ms)
+ GET /auth/signin 200 in 136ms (compile: 16ms, proxy.ts: 6ms, render: 114ms)
+ GET /api/auth/session 200 in 61ms (compile: 22ms, proxy.ts: 5ms, render: 34ms)
+ GET /api/auth/providers 200 in 40ms (compile: 8ms, proxy.ts: 4ms, render: 28ms)
+ GET /api/auth/csrf 200 in 45ms (compile: 9ms, proxy.ts: 4ms, render: 32ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 1624ms (compile: 8ms, proxy.ts: 5ms, render: 1610ms)
+ GET /artist/dashboard 200 in 451ms (compile: 10ms, proxy.ts: 6ms, render: 435ms)
+ GET /api/auth/session 200 in 235ms (compile: 14ms, proxy.ts: 6ms, render: 216ms)
+ POST /api/auth/_log 200 in 75ms (compile: 28ms, proxy.ts: 29ms, render: 19ms)
+ GET /artist/agenda 200 in 226ms (compile: 21ms, proxy.ts: 7ms, render: 198ms)
+ÔÜá´©Å Auth initialized
+ GET /api/auth/session 200 in 1050ms (compile: 35ms, proxy.ts: 10ms, render: 1005ms)
+ POST /artist/agenda 200 in 720ms (compile: 21ms, proxy.ts: 9ms, render: 689ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1582ms (compile: 170ms, proxy.ts: 51ms, render: 1361ms)
+ POST /artist/agenda 200 in 1119ms (compile: 125ms, proxy.ts: 6ms, render: 987ms)
+ POST /artist/agenda 200 in 633ms (compile: 14ms, proxy.ts: 7ms, render: 612ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1042ms (compile: 17ms, proxy.ts: 7ms, render: 1017ms)
+ POST /artist/agenda 200 in 604ms (compile: 18ms, proxy.ts: 6ms, render: 580ms)
+ POST /artist/agenda 200 in 600ms (compile: 20ms, proxy.ts: 5ms, render: 576ms)
+ POST /artist/agenda 200 in 598ms (compile: 15ms, proxy.ts: 6ms, render: 576ms)
+ POST /artist/agenda 200 in 710ms (compile: 13ms, proxy.ts: 5ms, render: 691ms)
+ GET /auth/signin 200 in 131ms (compile: 6ms, proxy.ts: 5ms, render: 120ms)
+ GET /api/auth/session 200 in 57ms (compile: 20ms, proxy.ts: 5ms, render: 32ms)
+ GET /api/auth/providers 200 in 55ms (compile: 12ms, proxy.ts: 5ms, render: 38ms)
+ GET /api/auth/csrf 200 in 42ms (compile: 10ms, proxy.ts: 6ms, render: 27ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 3.9s (compile: 11ms, proxy.ts: 5ms, render: 3.9s)
+ GET /artist/dashboard 200 in 1070ms (compile: 9ms, proxy.ts: 6ms, render: 1054ms)
+ GET /api/auth/session 200 in 864ms (compile: 19ms, proxy.ts: 7ms, render: 838ms)
+ÔÜá´©Å Auth initialized
+ POST /api/auth/_log 200 in 45ms (compile: 22ms, proxy.ts: 12ms, render: 10ms)
+ GET /artist/feedback 200 in 179ms (compile: 20ms, proxy.ts: 5ms, render: 154ms)
+ GET /api/auth/session 200 in 502ms (compile: 11ms, proxy.ts: 6ms, render: 485ms)
+ÔÜá´©Å Auth initialized
+ GET /api/feedback 200 in 468ms (compile: 23ms, proxy.ts: 6ms, render: 439ms)
+ POST /artist/feedback 200 in 454ms (compile: 26ms, proxy.ts: 7ms, render: 421ms)
+ Ô£ô Compiled in 3.2s
+ GET /auth/signin 200 in 2.2s (compile: 344ms, proxy.ts: 459ms, render: 1401ms)
+ GET /api/auth/session 200 in 487ms (compile: 201ms, proxy.ts: 31ms, render: 255ms)
+ GET /api/auth/providers 200 in 274ms (compile: 120ms, proxy.ts: 123ms, render: 31ms)
+ GET /api/auth/csrf 200 in 92ms (compile: 28ms, proxy.ts: 22ms, render: 43ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 5.7s (compile: 41ms, proxy.ts: 32ms, render: 5.6s)
+ÔÜá´©Å Auth initialized
+ GET /artist/dashboard 200 in 15.1s (compile: 43ms, proxy.ts: 35ms, render: 15.0s)
+ GET /api/auth/session 200 in 12.2s (compile: 157ms, proxy.ts: 55ms, render: 11.9s)
+ POST /api/auth/_log 200 in 178ms (compile: 74ms, proxy.ts: 68ms, render: 37ms)
+ GET /artist/agenda 200 in 13.5s (compile: 11.6s, proxy.ts: 67ms, render: 1811ms)
+ GET /api/auth/session 200 in 673ms (compile: 28ms, proxy.ts: 24ms, render: 621ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+ POST /artist/agenda 200 in 1405ms (compile: 246ms, proxy.ts: 18ms, render: 1141ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 2.4s (compile: 38ms, proxy.ts: 9ms, render: 2.4s)
+ POST /artist/agenda 200 in 891ms (compile: 105ms, proxy.ts: 68ms, render: 719ms)
+ GET /auth/signin 200 in 141ms (compile: 28ms, proxy.ts: 6ms, render: 107ms)
+ GET /api/auth/session 200 in 77ms (compile: 33ms, proxy.ts: 12ms, render: 32ms)
+ GET /api/auth/providers 200 in 35ms (compile: 13ms, proxy.ts: 5ms, render: 18ms)
+ GET /api/auth/csrf 200 in 87ms (compile: 10ms, proxy.ts: 5ms, render: 72ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 2.6s (compile: 12ms, proxy.ts: 7ms, render: 2.6s)
+ GET /artist/dashboard 200 in 454ms (compile: 23ms, proxy.ts: 8ms, render: 424ms)
+ GET /artist/agenda 200 in 235ms (compile: 50ms, proxy.ts: 21ms, render: 164ms)
+ GET /api/auth/session 200 in 627ms (compile: 22ms, proxy.ts: 12ms, render: 593ms)
+ POST /artist/agenda 200 in 970ms (compile: 36ms, proxy.ts: 14ms, render: 920ms)
+ÔÜá´©Å Auth initialized
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 2.4s (compile: 809ms, proxy.ts: 144ms, render: 1409ms)
+ POST /artist/agenda 200 in 722ms (compile: 25ms, proxy.ts: 9ms, render: 688ms)
+ POST /artist/agenda 200 in 634ms (compile: 31ms, proxy.ts: 8ms, render: 596ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1107ms (compile: 32ms, proxy.ts: 8ms, render: 1067ms)
+ POST /artist/agenda 200 in 613ms (compile: 20ms, proxy.ts: 8ms, render: 585ms)
+ POST /artist/agenda 200 in 996ms (compile: 338ms, proxy.ts: 6ms, render: 652ms)
+ POST /artist/agenda 200 in 1067ms (compile: 430ms, proxy.ts: 17ms, render: 619ms)
+­ƒöì searchClients: Found 1 results for "Ricardo" in workspace cmjzxpj4n00024uoj9w0jfsob
+ POST /artist/agenda 200 in 759ms (compile: 39ms, proxy.ts: 22ms, render: 698ms)
+ GET /auth/signin 200 in 588ms (compile: 97ms, proxy.ts: 15ms, render: 476ms)
+ GET /api/auth/session 200 in 191ms (compile: 59ms, proxy.ts: 18ms, render: 114ms)
+ GET /api/auth/providers 200 in 100ms (compile: 19ms, proxy.ts: 45ms, render: 37ms)
+ GET /api/auth/csrf 200 in 71ms (compile: 20ms, proxy.ts: 10ms, render: 42ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 2.6s (compile: 22ms, proxy.ts: 54ms, render: 2.5s)
+ GET /artist/dashboard 200 in 720ms (compile: 27ms, proxy.ts: 25ms, render: 668ms)
+ GET /artist/feedback 200 in 422ms (compile: 59ms, proxy.ts: 37ms, render: 325ms)
+ GET /api/auth/session 200 in 2.9s (compile: 261ms, proxy.ts: 65ms, render: 2.6s)
+ POST /artist/feedback 200 in 2.9s (compile: 301ms, proxy.ts: 255ms, render: 2.3s)
+ GET /api/feedback 200 in 3.7s (compile: 1150ms, proxy.ts: 307ms, render: 2.3s)
+Error: aborted
+    at ignore-listed frames {
+  code: 'ECONNRESET'
+}
+ Ô¿» uncaughtException: Error: aborted
+    at ignore-listed frames {
+  code: 'ECONNRESET'
+}
+ Ô¿» uncaughtException:  Error: aborted
+    at ignore-listed frames {
+  code: 'ECONNRESET'
+}
+ GET /api/feedback 200 in 710ms (compile: 346ms, proxy.ts: 246ms, render: 118ms)
+ÔÜá´©Å Auth initialized
+ Ô£ô Compiled in 1358ms
+ GET /auth/signin 200 in 3.7s (compile: 263ms, proxy.ts: 2.5s, render: 919ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/providers 200 in 7.0s (compile: 6.8s, proxy.ts: 8ms, render: 218ms)
+ GET /api/auth/session 200 in 7.2s (compile: 7.1s, proxy.ts: 11ms, render: 151ms)
+ GET /api/auth/csrf 200 in 128ms (compile: 43ms, proxy.ts: 57ms, render: 28ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 4.0s (compile: 30ms, proxy.ts: 29ms, render: 3.9s)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /artist/dashboard 200 in 5.9s (compile: 1593ms, proxy.ts: 280ms, render: 4.1s)
+ GET /auth/signin 200 in 203ms (compile: 39ms, proxy.ts: 15ms, render: 149ms)
+ GET /api/auth/session 200 in 82ms (compile: 44ms, proxy.ts: 8ms, render: 30ms)
+ GET /api/auth/providers 200 in 57ms (compile: 20ms, proxy.ts: 7ms, render: 30ms)
+ GET /api/auth/csrf 200 in 71ms (compile: 12ms, proxy.ts: 12ms, render: 47ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 3.1s (compile: 22ms, proxy.ts: 12ms, render: 3.0s)
+ GET /api/auth/session 200 in 648ms (compile: 32ms, proxy.ts: 6ms, render: 609ms)
+ÔÜá´©Å Auth initialized
+ GET /artist/agenda 200 in 7.0s (compile: 4.1s, proxy.ts: 10ms, render: 2.9s)
+ GET /artist/dashboard 200 in 8.0s (compile: 31ms, proxy.ts: 19ms, render: 7.9s)
+ GET /api/auth/session 200 in 889ms (compile: 145ms, proxy.ts: 46ms, render: 698ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ POST /artist/agenda 200 in 1385ms (compile: 67ms, proxy.ts: 11ms, render: 1308ms)
+ÔÜá´©Å Auth initialized
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1703ms (compile: 47ms, proxy.ts: 11ms, render: 1645ms)
+ POST /artist/agenda 200 in 883ms (compile: 50ms, proxy.ts: 67ms, render: 766ms)
+ POST /artist/agenda 200 in 833ms (compile: 240ms, proxy.ts: 6ms, render: 587ms)
+­ƒôà getMyBookings: Found 3 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1398ms (compile: 246ms, proxy.ts: 73ms, render: 1079ms)
+ POST /artist/agenda 200 in 664ms (compile: 33ms, proxy.ts: 9ms, render: 622ms)
+ POST /artist/agenda 200 in 622ms (compile: 34ms, proxy.ts: 11ms, render: 578ms)
+ POST /artist/agenda 200 in 650ms (compile: 34ms, proxy.ts: 8ms, render: 608ms)
+­ƒöì searchClients: Found 1 results for "Ricardo" in workspace cmjzxpj4n00024uoj9w0jfsob
+ POST /artist/agenda 200 in 735ms (compile: 26ms, proxy.ts: 11ms, render: 698ms)
+ POST /artist/agenda 200 in 3.0s (compile: 23ms, proxy.ts: 6ms, render: 2.9s)
+­ƒôà getMyBookings: Found 4 bookings for artist cmjzxpjhk00064uoja4ogry3s
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1184ms (compile: 32ms, proxy.ts: 12ms, render: 1139ms)
+ GET /auth/signin 200 in 146ms (compile: 16ms, proxy.ts: 7ms, render: 122ms)
+ GET /api/auth/session 200 in 49ms (compile: 23ms, proxy.ts: 5ms, render: 22ms)
+ GET /api/auth/providers 200 in 44ms (compile: 15ms, proxy.ts: 8ms, render: 21ms)
+ GET /api/auth/csrf 200 in 58ms (compile: 12ms, proxy.ts: 10ms, render: 36ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ POST /api/auth/callback/credentials 200 in 2.0s (compile: 15ms, proxy.ts: 9ms, render: 2.0s)
+ÔÜá´©Å Auth initialized
+ GET /api/auth/session 200 in 1956ms (compile: 271ms, proxy.ts: 123ms, render: 1563ms)
+ GET /artist/dashboard 200 in 3.7s (compile: 280ms, proxy.ts: 47ms, render: 3.4s)
+ POST /api/auth/_log 200 in 54ms (compile: 22ms, proxy.ts: 19ms, render: 13ms)
+ GET /artist/feedback 200 in 2.5s (compile: 1894ms, proxy.ts: 119ms, render: 489ms)
+ GET /api/auth/session 200 in 502ms (compile: 11ms, proxy.ts: 10ms, render: 481ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/feedback 200 in 510ms (compile: 307ms, proxy.ts: 9ms, render: 194ms)
+ POST /artist/feedback 200 in 492ms (compile: 8ms, proxy.ts: 9ms, render: 475ms)
+ÔÜá´©Å Auth initialized
+ Ô£ô Compiled in 5.6s
+ Ô£ô Compiled in 3.8s
+ Ô£ô Compiled in 392ms
+ GET /auth/signin 200 in 1932ms (compile: 270ms, proxy.ts: 648ms, render: 1014ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 2.8s (compile: 2.3s, proxy.ts: 170ms, render: 270ms)
+ GET /api/auth/providers 200 in 2.5s (compile: 2.3s, proxy.ts: 53ms, render: 153ms)
+ GET /api/auth/csrf 200 in 213ms (compile: 97ms, proxy.ts: 47ms, render: 70ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 3.5s (compile: 122ms, proxy.ts: 125ms, render: 3.3s)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ GET /api/auth/session 200 in 4.7s (compile: 251ms, proxy.ts: 444ms, render: 4.0s)
+ GET /artist/dashboard 200 in 11.6s (compile: 2.5s, proxy.ts: 22ms, render: 9.0s)
+ÔÜá´©Å Auth initialized
+ GET /auth/signin 200 in 2.6s (compile: 324ms, proxy.ts: 469ms, render: 1791ms)
+ GET /api/auth/session 200 in 2.3s (compile: 1778ms, proxy.ts: 79ms, render: 425ms)
+ GET /api/auth/providers 200 in 323ms (compile: 123ms, proxy.ts: 107ms, render: 93ms)
+ GET /api/auth/csrf 200 in 122ms (compile: 37ms, proxy.ts: 30ms, render: 56ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 4.5s (compile: 126ms, proxy.ts: 41ms, render: 4.4s)
+ GET /api/auth/session 200 in 2.1s (compile: 66ms, proxy.ts: 44ms, render: 1967ms)
+ÔÜá´©Å Auth initialized
+ GET /artist/dashboard 200 in 3.5s (compile: 53ms, proxy.ts: 67ms, render: 3.3s)
+ POST /artist/dashboard 200 in 1156ms (compile: 40ms, proxy.ts: 126ms, render: 990ms)
+ POST /artist/dashboard 200 in 681ms (compile: 25ms, proxy.ts: 48ms, render: 608ms)
+ GET /artist/agenda 200 in 46s (compile: 15.1s, proxy.ts: 23ms, render: 31.1s)
+ GET /auth/signin 200 in 323ms (compile: 113ms, proxy.ts: 23ms, render: 187ms)
+ GET /api/auth/session 200 in 175ms (compile: 112ms, proxy.ts: 24ms, render: 39ms)
+ GET /api/auth/providers 200 in 76ms (compile: 42ms, proxy.ts: 4ms, render: 29ms)
+ GET /api/auth/csrf 200 in 78ms (compile: 30ms, proxy.ts: 5ms, render: 44ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 2.8s (compile: 60ms, proxy.ts: 36ms, render: 2.7s)
+ GET /artist/dashboard 200 in 1983ms (compile: 38ms, proxy.ts: 13ms, render: 1932ms)
+ POST /api/auth/_log 200 in 110ms (compile: 78ms, proxy.ts: 23ms, render: 9ms)
+ GET /artist/feedback 200 in 1808ms (compile: 956ms, proxy.ts: 25ms, render: 826ms)
+ GET /api/auth/session 200 in 1060ms (compile: 517ms, proxy.ts: 45ms, render: 498ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ÔÜá´©Å Auth initialized
+ POST /artist/feedback 200 in 915ms (compile: 25ms, proxy.ts: 24ms, render: 866ms)
+ POST /artist/feedback 200 in 367ms (compile: 22ms, proxy.ts: 16ms, render: 329ms)
+ GET /api/feedback 200 in 1308ms (compile: 513ms, proxy.ts: 29ms, render: 766ms)
+ GET /auth/signin 200 in 3.2s (compile: 235ms, proxy.ts: 445ms, render: 2.5s)
+ GET /api/auth/session 200 in 1366ms (compile: 942ms, proxy.ts: 261ms, render: 163ms)
+ GET /api/auth/providers 200 in 454ms (compile: 130ms, proxy.ts: 239ms, render: 86ms)
+ GET /api/auth/csrf 200 in 246ms (compile: 84ms, proxy.ts: 35ms, render: 127ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 8.0s (compile: 73ms, proxy.ts: 83ms, render: 7.9s)
+ GET /artist/dashboard 200 in 1601ms (compile: 124ms, proxy.ts: 69ms, render: 1407ms)
+ POST /api/auth/_log 200 in 144ms (compile: 44ms, proxy.ts: 29ms, render: 71ms)
+ GET /artist/agenda 200 in 854ms (compile: 133ms, proxy.ts: 13ms, render: 708ms)
+ÔÜá´©Å Auth initialized
+ GET /api/auth/session 200 in 1834ms (compile: 11ms, proxy.ts: 7ms, render: 1816ms)
+ÔÜá´©Å Auth initialized
+[next-auth][warn][DEBUG_ENABLED] 
+https://next-auth.js.org/warnings#debug_enabled
+ POST /artist/agenda 200 in 1115ms (compile: 46ms, proxy.ts: 9ms, render: 1060ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1953ms (compile: 574ms, proxy.ts: 8ms, render: 1371ms)
+ POST /artist/agenda 200 in 878ms (compile: 130ms, proxy.ts: 12ms, render: 736ms)
+ POST /artist/agenda 200 in 798ms (compile: 38ms, proxy.ts: 13ms, render: 747ms)
+ POST /artist/agenda 200 in 1517ms (compile: 494ms, proxy.ts: 245ms, render: 778ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ GET /auth/signin 200 in 244ms (compile: 46ms, proxy.ts: 16ms, render: 182ms)
+ GET /api/auth/session 200 in 129ms (compile: 58ms, proxy.ts: 9ms, render: 61ms)
+ GET /api/auth/providers 200 in 104ms (compile: 33ms, proxy.ts: 6ms, render: 65ms)
+ GET /api/auth/csrf 200 in 87ms (compile: 14ms, proxy.ts: 7ms, render: 66ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 2.9s (compile: 132ms, proxy.ts: 17ms, render: 2.7s)
+ GET /artist/dashboard 200 in 1169ms (compile: 42ms, proxy.ts: 27ms, render: 1101ms)
+ GET /api/auth/session 200 in 483ms (compile: 34ms, proxy.ts: 20ms, render: 429ms)
+ POST /api/auth/_log 200 in 70ms (compile: 32ms, proxy.ts: 18ms, render: 20ms)
+ GET /artist/agenda 200 in 348ms (compile: 88ms, proxy.ts: 14ms, render: 246ms)
+ GET /api/auth/session 200 in 1147ms (compile: 25ms, proxy.ts: 17ms, render: 1105ms)
+ÔÜá´©Å Auth initialized
+ POST /artist/agenda 200 in 843ms (compile: 85ms, proxy.ts: 26ms, render: 731ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1478ms (compile: 60ms, proxy.ts: 17ms, render: 1402ms)
+ POST /artist/agenda 200 in 774ms (compile: 50ms, proxy.ts: 13ms, render: 711ms)
+ POST /artist/agenda 200 in 738ms (compile: 35ms, proxy.ts: 14ms, render: 689ms)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1097ms (compile: 28ms, proxy.ts: 11ms, render: 1058ms)
+ POST /artist/agenda 200 in 673ms (compile: 33ms, proxy.ts: 11ms, render: 629ms)
+ POST /artist/agenda 200 in 634ms (compile: 29ms, proxy.ts: 11ms, render: 594ms)
+ POST /artist/agenda 200 in 694ms (compile: 34ms, proxy.ts: 11ms, render: 650ms)
+ POST /artist/agenda 200 in 792ms (compile: 45ms, proxy.ts: 9ms, render: 737ms)
+ POST /artist/agenda 200 in 3.3s (compile: 32ms, proxy.ts: 10ms, render: 3.2s)
+ÔÜá´©Å Usu├írio cmjzxpiq400004uojts3vrw0f n├úo tem conta Google conectada.
+ POST /artist/agenda 200 in 1341ms (compile: 31ms, proxy.ts: 27ms, render: 1284ms)
+ GET /auth/signin 200 in 266ms (compile: 112ms, proxy.ts: 5ms, render: 149ms)
+ GET /api/auth/session 200 in 3.3s (compile: 1379ms, proxy.ts: 390ms, render: 1501ms)
+ GET /api/auth/providers 200 in 103ms (compile: 65ms, proxy.ts: 4ms, render: 34ms)
+ GET /api/auth/csrf 200 in 136ms (compile: 63ms, proxy.ts: 5ms, render: 69ms)
+­ƒææ ACESSO MASTER: Iniciando Sess├úo Administrativa...
+ÔÜá´©Å Auth initialized
+ POST /api/auth/callback/credentials 200 in 7.1s (compile: 77ms, proxy.ts: 143ms, render: 6.9s)
+ GET /artist/dashboard 200 in 714ms (compile: 30ms, proxy.ts: 13ms, render: 671ms)
+ GET /artist/feedback 200 in 662ms (compile: 28ms, proxy.ts: 15ms, render: 619ms)
+ GET /api/auth/session 200 in 1782ms (compile: 59ms, proxy.ts: 10ms, render: 1713ms)
+ÔÜá´©Å Auth initialized
+ GET /api/feedback 200 in 332ms (compile: 41ms, proxy.ts: 8ms, render: 283ms)
+ POST /artist/feedback 200 in 310ms (compile: 49ms, proxy.ts: 10ms, render: 252ms)

@@ -42,7 +42,6 @@ export async function searchClients(query: string) {
                 phone: true,
                 image: true
             },
-            take: 10
         })
 
         return { success: true, clients }
