@@ -62,6 +62,7 @@ model User {
   emailVerified DateTime?
   image         String?
   phone         String?
+  password      String?   // Hash bcrypt para Login Soberano
   role          UserRole  @default(CLIENT)
   customColor   String    @default("#8B5CF6")
   accounts      Account[]

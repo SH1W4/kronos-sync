@@ -25,133 +25,52 @@ export const authOptions: NextAuthOptions = {
                 }
             }
         }),
-        CredentialsProvider({
-            id: "magic-link",
-            name: "Magic Link",
-            credentials: {
-                email: { label: "Email", type: "email" },
-                code: { label: "Code", type: "text" },
-                inviteCode: { label: "Invite Code", type: "text" }
-            },
-            async authorize(credentials) {
-                if (!credentials?.email || !credentials?.code) return null
-
-                try {
-                    // 1. Validate Login Code
-                    const verificationCode = await prisma.verificationCode.findFirst({
-                        where: {
-                            email: credentials.email.toLowerCase(),
-                            code: credentials.code.trim(),
-                            used: false,
-                            expiresAt: { gte: new Date() }
-                        },
-                        orderBy: { createdAt: 'desc' }
-                    })
-
-                    if (!verificationCode) {
-                        throw new Error("Código inválido ou expirado")
-                    }
-
-                    // 2. Mark code as used
-                    await prisma.verificationCode.update({
-                        where: { id: verificationCode.id },
-                        data: { used: true }
-                    })
-
-                    // 3. Find User
-                    let user = await prisma.user.findUnique({
-                        where: { email: credentials.email.toLowerCase() },
-                        include: { artist: true }
-                    })
-
-                    // 4. Professional Gate Logic
-                    const isProfessional = user && (user.role === 'ARTIST' || user.role === 'ADMIN')
-                    const inviteCode = credentials.inviteCode
-
-                    if (!isProfessional) {
-                        // If not a pro, MUST have a valid invite code to enter
-                        if (!inviteCode) {
-                            throw new Error("Acesso restrito a profissionais. Utilize um link de convite.")
-                        }
-
-                        const invite = await prisma.inviteCode.findUnique({
-                            where: { code: inviteCode, isActive: true },
-                        })
-
-                        if (!invite || (invite.expiresAt && invite.expiresAt < new Date()) || (invite.maxUses > 0 && invite.currentUses >= invite.maxUses)) {
-                            throw new Error("Convite inválido ou expirado")
-                        }
-
-                        // Create/Upgrade User as Artist
-                        if (!user) {
-                            user = await prisma.user.create({
-                                data: {
-                                    email: credentials.email.toLowerCase(),
-                                    name: credentials.email.split('@')[0],
-                                    role: 'ARTIST'
-                                },
-                                include: { artist: true }
-                            })
-                        } else {
-                            // If they were a CLIENT, upgrade to ARTIST
-                            user = await prisma.user.update({
-                                where: { id: user.id },
-                                data: { role: 'ARTIST' },
-                                include: { artist: true }
-                            })
-                        }
-
-                        // Create Artist Profile linked to the invite's workspace
-                        if (!user.artist) {
-                            await prisma.artist.create({
-                                data: {
-                                    userId: user.id,
-                                    workspaceId: invite.workspaceId,
-                                    plan: invite.targetPlan || 'GUEST',
-                                    validUntil: invite.durationDays ? new Date(Date.now() + invite.durationDays * 24 * 60 * 60 * 1000) : null
-                                }
-                            })
-                        }
-
-                        // Increment invite uses
-                        await prisma.inviteCode.update({
-                            where: { id: invite.id },
-                            data: { currentUses: { increment: 1 } }
-                        })
-                    }
-
-                    if (!user) {
-                        throw new Error("Falha crítica: Usuário não pôde ser autenticado.")
-                    }
-
-                    return {
-                        id: user.id,
-                        email: user.email,
-                        name: user.name,
-                        role: user.role,
-                        image: user.image
-                    }
-                } catch (error: any) {
-                    console.error("❌ Magic Link Error:", error)
-                    throw new Error(error.message || "Erro na autenticação")
-                }
-            }
-        }),
+        // Magic Link Provider Removed for Sovereign Auth Pivot (Phase 15)
         CredentialsProvider({
             id: "credentials",
-            name: "Test Login",
+            name: "Sovereign Login",
             credentials: {
-                username: { label: "Username", type: "text" },
+                email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                if (credentials?.username === "master") {
-                    const masterUser = await prisma.user.findFirst({
-                        where: { email: { in: ['galeria.kronos@gmail.com', 'admin@kronos.com'] } }
-                    })
-                    if (masterUser) return masterUser
+                if (!credentials?.email || !credentials?.password) return null
+
+                // 1. Find User
+                const user = await prisma.user.findUnique({
+                    where: { email: credentials.email.toLowerCase() },
+                    include: { artist: true }
+                })
+
+                if (!user) {
+                    throw new Error("Usuário não encontrado.")
                 }
-                return null
+
+                // 2. PASSWORD CHECK (Sovereign)
+                if (user.password) {
+                    // @ts-ignore (bcryptjs types loaded)
+                    const bcrypt = await import('bcryptjs')
+                    const isValid = await bcrypt.compare(credentials.password, user.password)
+
+                    if (!isValid) {
+                        throw new Error("Senha incorreta.")
+                    }
+                } else {
+                    // MIGRATION FALLBACK: If user has no password (legacy magic link user),
+                    // prevent login and tell them to reset/register?
+                    // OR: Auto-create password via Invite flow?
+                    // Re-registering with same email via /auth/register should update it?
+                    // For now, fail secure.
+                    throw new Error("Conta antiga sem senha. Por favor, use seu código de convite para atualizar o cadastro.")
+                }
+
+                return {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    role: user.role,
+                    image: user.image
+                }
             }
         })
     ],
