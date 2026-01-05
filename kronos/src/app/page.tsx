@@ -121,7 +121,7 @@ export default function LandingPage() {
 
                     <h1 className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight">
                         Controle absoluto para <br />
-                        <span className="font-orbitron font-light text-zinc-400">estúdios de elite.</span>
+                        <span className="font-orbitron font-light text-zinc-400">estúdios profissionais.</span>
                     </h1>
 
                     <p className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10">
@@ -137,6 +137,22 @@ export default function LandingPage() {
                         </Link>
                     </div>
                 </div>
+            </section>
+
+            {/* PHILOSOPHY SECTION */}
+            <section className="py-20 px-6 bg-black border-t border-white/5 relative overflow-hidden">
+                <div className="container mx-auto max-w-3xl text-center relative z-10">
+                    <h2 className="text-xs font-mono text-primary tracking-[0.5em] uppercase mb-6 opacity-70">Manifesto</h2>
+                    <h3 className="text-2xl md:text-3xl font-orbitron font-medium text-white mb-8">
+                        O GUARDIÃO DO FOCO
+                    </h3>
+                    <p className="text-zinc-400 font-light leading-loose text-lg font-sans">
+                        Para o artista, o tempo não se gasta; se investe. O KRONØS opera como a barreira definitiva entre sua arte e o ruído do mundo. Absorvemos a complexidade administrativa para que você habite permanentemente o <span className="text-white font-medium">Estado de Flow</span>. Foque na sua arte. O sistema blinda o seu tempo.
+                    </p>
+                    <div className="w-px h-16 bg-gradient-to-b from-primary/50 to-transparent mx-auto mt-12"></div>
+                </div>
+                {/* Background decorative elements */}
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
             </section>
 
             {/* Elegant Features Grid */}

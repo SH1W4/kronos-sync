@@ -45,6 +45,15 @@ export async function POST(req: NextRequest) {
         console.log(`🔑 [AUTH] Código para ${email}: ${code}`)
 
         if (!emailResult.success) {
+            // In DEVELOPMENT, allow proceeding even if email fails (check terminal for code)
+            if (process.env.NODE_ENV === 'development') {
+                console.warn("⚠️ [DEV MODE] Email failed but proceeding. Code is in terminal.")
+                return NextResponse.json({
+                    success: true,
+                    message: 'Modo Dev: Código no Terminal!'
+                })
+            }
+
             return NextResponse.json({
                 error: 'Erro ao enviar email. Tente novamente.'
             }, { status: 500 })

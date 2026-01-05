@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
 
     // Authentication logic
     if (!token && isArtistPage) {
-        return NextResponse.redirect(new URL('/onboarding', request.url))
+        return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
 
     if (token && isAuthPage) {

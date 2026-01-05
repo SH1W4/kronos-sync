@@ -23,6 +23,9 @@ graph TD
     H -->|Nível de Senioridade| I[Permissão para Convidar Clientes]
     I -->|Referral Code| J[Círculo de Novos Clientes]
     
+    D -->|LOGIN| K[TermsGate: Aceite Jurídico]
+    K -->|Confirmar| H
+    
     subgraph "Camada de Segurança"
     B
     F
@@ -71,12 +74,12 @@ graph LR
 
 A monetização ocorre em camadas, permitindo que você valide o valor antes de cobrar caro.
 
-| Fase | Modelo | Foco |
-| :--- | :--- | :--- |
-| **1. Validação (Atual)** | Uso Próprio | Estabilizar o Agente KAI e a lógica de comissões no Kronos. |
-| **2. Beta Fechado** | Revenue Share (%) | Convidar 2-3 estúdios parceiros. Cobrar uma taxa pequena sobre cada agendamento feito pelo sistema. |
-| **3. SaaS Pro** | Assinatura Mensal | Valor fixo mensal para estúdios (Tier 1: Até 5 artistas, Tier 2: Ilimitado). |
-| **4. Marketplace** | Comissionamento de Produtos | Venda de artes, aftercare e produtos físicos via portal do estúdio. |
+| Fase                     | Modelo                      | Foco                                                                                                |
+| :----------------------- | :-------------------------- | :-------------------------------------------------------------------------------------------------- |
+| **1. Validação (Atual)** | Uso Próprio                 | Estabilizar o Agente KAI e a lógica de comissões no Kronos.                                         |
+| **2. Beta Fechado**      | Revenue Share (%)           | Convidar 2-3 estúdios parceiros. Cobrar uma taxa pequena sobre cada agendamento feito pelo sistema. |
+| **3. SaaS Pro**          | Assinatura Mensal           | Valor fixo mensal para estúdios (Tier 1: Até 5 artistas, Tier 2: Ilimitado).                        |
+| **4. Marketplace**       | Comissionamento de Produtos | Venda de artes, aftercare e produtos físicos via portal do estúdio.                                 |
 
 ---
 
@@ -92,6 +95,8 @@ A monetização ocorre em camadas, permitindo que você valide o valor antes de 
 - [x] Adicionar `workspaceId` em `Booking`, `Artist` e `Order` (Silo de Dados implementado).
 - [x] Implementar seletor de estúdio no Dashboard Admin (Exclusivo para Gestão).
 - [x] **Linkage Lock:** Implementado o vínculo permanente artista-workspace via chave de acesso (Proteção de Silo).
+- [x] **Governance Layer:** Implementado o `TermsGate` mandatório (Artist Agreement v1.0).
+- [x] **Supreme Performance:** Otimização de renderização e estabilidade Next.js 15.
 
 ---
 *Documento atualizado em 21/12/2025: A infraestrutura base para SaaS Multi-Tenant está operacional e blindada.*

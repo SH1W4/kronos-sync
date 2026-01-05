@@ -258,21 +258,6 @@ function OnboardingContent() {
                                         VALIDAR
                                     </Button>
                                 </div>
-
-                                <div className="mt-6 pt-6 border-t border-white/5 text-center">
-
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        className="text-gray-600 hover:text-white text-[10px] uppercase tracking-widest mt-2"
-                                        onClick={async () => {
-                                            const { signIn } = await import('next-auth/react')
-                                            signIn('credentials', { username: 'dev', password: '123', callbackUrl: '/artist/dashboard' })
-                                        }}
-                                    >
-                                        🐛 DEV MODE
-                                    </Button>
-                                </div>
                             </form>
                         </div>
                     </div>
@@ -368,9 +353,10 @@ function OnboardingContent() {
                             </Button>
                         </div>
                     </div>
-                )}
-            </div>
-        </div>
+                )
+                }
+            </div >
+        </div >
     )
 }
 

@@ -1,40 +1,43 @@
 # KRONOS SYNC - System Map for MCP Agents
 
-## 🧠 Contexto do Sistema
-Kronos Sync é uma plataforma de gestão para estúdios de arte e tatuagem "High-End".
-Não é apenas uma agenda, é um **Sistema Operacional de Estúdio** que gerencia fluxo financeiro, comissionamento de artistas e experiência do cliente.
+## 🧠 Contexto do Sistema (Internal Studio Focus)
+**KRONØS SYNC** é a infraestrutura de gestão proprietária do Estúdio Kronos.
+- **Missão:** Organizar o tempo operacional (Kronos) para proteger o tempo criativo (Kairos).
+- **Princípio:** Dados do estúdio são isolados (`workspaceId`) e não poluem um registry global.
+
+## 🛠️ Stack Técnico & Arquitetura
+- **Framework:** Next.js 15 (App Router) + Server Actions.
+- **Database:** Prisma (PostgreSQL) com strict scoping.
+- **Auth:** NextAuth.js (Magic Link + Invite System).
+- **UI:** Tailwind CSS v4 + Framer Motion.
 
 ---
 
-## 📂 Estrutura de Diretórios Importante
-- `src/app`: Rotas da aplicação (App Router).
-- `src/lib/auth-options.ts`: Configuração central de Autenticação (NextAuth).
-- `src/lib/prisma.ts`: Instância do cliente de Banco de Dados.
-- `prisma/schema.prisma`: A verdade absoluta sobre a estrutura de dados.
+## 💎 Módulos Operacionais (Fase 1 - Interna)
 
----
+### 1. Professional Gate (Auth)
+- **Invite-only:** Acesso exclusivo via código de convite.
+- **Roles:** `ADMIN` (Gestão), `ARTIST` (Operacional/Residente).
+- **Auth:** Magic Link (6 dígitos).
 
-## 💎 Regras de Negócio (Business Logic)
+### 2. Kiosk Experience (Recepção)
+- **Scope:** Dados salvos como `KioskEntry`, pertencentes ao estúdio.
+- **Flow:** Captura de Lead -> Validação por PIN do Artista -> Geração de Cupom.
 
-### 1. Agendamentos (`Booking`)
-- Todo agendamento está ligado a um `Slot` (horário/maca) e um `Artist`.
-- **Status:**
-  - `OPEN`: Horário livre/Bloqueado mas sem cliente confirmado.
-  - `CONFIRMED`: Cliente pagou ou confirmou. Ocupa a agenda.
-  - `COMPLETED`: Serviço realizado. Dispara cálculos financeiros.
-  - `CANCELLED`: Libera o slot.
-- **Sincronização:** Agendamentos `CONFIRMED` devem ter um `googleEventId` correspondente na agenda do artista.
+### 3. Booking & Scheduling
+- **Core:** Calendário multi-artista com detecção de conflitos.
+- **Sync:** Integração unidirecional com Google Calendar (Em progresso).
 
-### 2. Financeiro & Comissões
-- Cada `Artist` tem um `commissionRate` (0.0 a 1.0).
-- O valor do agendamento é dividido:
-  - `studioShare`: Parte da casa.
-  - `artistShare`: Parte do artista (`finalValue * commissionRate`).
-- Produtos (`Product`) também geram comissão se vendidos.
+### 4. Financeiro & Settlement
+- **State Machine:** `PENDING` -> `VALIDATING` -> `APPROVED` -> `RESOLVED`.
+- **Workflow:** Upload de comprovante PIX -> Validação IA/Admin.
 
-### 3. Marketplace & Ofertas
-- O sistema vende produtos Digitais e Físicos (`ProductType`).
-- Cupons (`Coupon`) podem ser de porcentagem ou valor fixo e estão atrelados a um artista (para abater da comissão correta).
+### 5. Governança & IP
+
+### 5. Propriedade Intelectual & Soberania
+- **IP Protection:** O símbolo "Ø" e o core engine são protegidos contra engenharia reversa.
+- **Independent PaaS:** O sistema opera como uma infraestrutura licenciada (`KRONØS NETWORK`), desacoplada da gestão física do estúdio.
+- **Smart-Reuse:** A lógica de reuso de anamneses respeita a autoria do artista (Dono do dado = Artista que atendeu).
 
 ---
 
@@ -61,10 +64,23 @@ Se você é um agente AI integrado a este sistema, aqui está o que você deve s
 2.  **"Quem são os clientes de amanhã?"**
     - *Query:* Listar `Booking` join `User` (Cliente) para `Date.tomorrow()`.
 
+3.  **"Auditoria de Segurança"**
+    - *Check:* Verificar logs de `TermsGate` e tentativas de acesso inválidas.
+
 ---
 
 ## 🔐 Autenticação & Permissões
-- **Admin:** Acesso total.
+- **Admin:** Acesso total (Master).
 - **Artist:** Vê apenas sua agenda e suas finanças.
-- **Client:** Vê seus agendamentos e histórico de compras.
-*Nota: O sistema usa Google OAuth. Tokens de acesso são renovados automaticamente para operações offline.*
+- **Client:** Acesso restrito via Magic Link ou QR Code (Kiosk).
+- **Security:**
+    - **No-Bypass:** Modos de desenvolvimento removidos de produção.
+    - **Magic Link Only:** Login via email seguro (Resend).
+    - **IP Guard:** Monitoramento de padrões de acesso.
+
+---
+
+## 📜 Scripts de Governança
+- `scripts/clean-slate.ts`: Reset seguro e seeding de "Showcase Scenarios".
+- `scripts/promote-admin.ts`: Elevação de privilégio controlada via CLI.
+- `scripts/check-finances.ts`: Auditoria de consistência financeira.
