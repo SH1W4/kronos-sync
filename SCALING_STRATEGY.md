@@ -23,8 +23,9 @@ graph TD
     H -->|Nível de Senioridade| I[Permissão para Convidar Clientes]
     I -->|Referral Code| J[Círculo de Novos Clientes]
     
-    D -->|LOGIN| K[TermsGate: Aceite Jurídico]
-    K -->|Confirmar| H
+    D -->|REGISTRO| K[Criação de Credencial Soberana]
+    K -->|LOGIN| L[TermsGate: Aceite Jurídico]
+    L -->|Confirmar| H
     
     subgraph "Camada de Segurança"
     B
