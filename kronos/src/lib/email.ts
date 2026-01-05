@@ -54,3 +54,53 @@ export async function sendVerificationCode(email: string, code: string) {
 export function generateVerificationCode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
+
+export async function sendPasswordResetEmail(email: string, token: string) {
+  if (!resend) {
+    console.error('Resend not configured for reset password.')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  const resetLink = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/reset-password?token=${token}`
+
+  try {
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'KRONOS SYNC <acesso@kronosync.com.br>',
+      to: email,
+      subject: 'Recuperação de Acesso - KRONOS SYNC',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #000; color: #fff;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #8B5CF6; margin: 0;">KRONOS SYNC</h1>
+            <p style="color: #999; font-size: 12px; margin-top: 5px;">Recuperação de Credencial</p>
+          </div>
+          
+          <div style="background: #111; border: 1px solid #333; border-radius: 12px; padding: 30px; text-align: center;">
+            <p style="color: #ccc; margin-bottom: 20px;">Recebemos uma solicitação para redefinir sua senha.</p>
+            <p style="color: #999; font-size: 14px; margin-bottom: 30px;">
+                Clique no botão abaixo para criar uma nova senha segura.
+            </p>
+            
+            <a href="${resetLink}" style="background: #8B5CF6; color: #fff; text-decoration: none; font-weight: bold; padding: 15px 30px; border-radius: 8px; display: inline-block;">
+              REDEFINIR SENHA
+            </a>
+
+            <p style="color: #666; font-size: 12px; margin-top: 30px;">
+              Este link expira em 1 hora.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+            <p style="color: #666; font-size: 12px;">
+              Se você não solicitou, ignore este email. Sua conta permanece segura.
+            </p>
+          </div>
+        </div>
+      `
+    })
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending reset email:', error)
+    return { success: false, error }
+  }
+}
