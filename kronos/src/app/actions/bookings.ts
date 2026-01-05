@@ -181,7 +181,8 @@ export async function createBooking(data: {
                         summary: `[KRONØS] ${(booking as any).artist.user.name} - ${(booking as any).client.name}`,
                         description: `Espelho de Agendamento\nArtista: ${(booking as any).artist.user.name}\nCliente: ${(booking as any).client.name}\nValor: R$ ${data.estimatedPrice}`,
                         startTime: data.scheduledFor,
-                        endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000)
+                        endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000),
+                        calendarId: workspace.googleCalendarId || 'primary' // Fix: Target Studio Calendar
                     })
                 }
 
