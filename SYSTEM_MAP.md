@@ -34,10 +34,11 @@
 
 ### 5. Governança & IP
 
-### 5. Propriedade Intelectual & Soberania
-- **IP Protection:** O símbolo "Ø" e o core engine são protegidos contra engenharia reversa.
-- **Independent PaaS:** O sistema opera como uma infraestrutura licenciada (`KRONØS NETWORK`), desacoplada da gestão física do estúdio.
-- **Smart-Reuse:** A lógica de reuso de anamneses respeita a autoria do artista (Dono do dado = Artista que atendeu).
+### 5. Propriedade Intelectual & Soberania (Legal Shield)
+- **Trademark Protection:** A marca nominativa **KRONØS SYNC™**, o elemento figurativo **"Ø"** e a identidade visual (*Trade Dress*) são propriedade intelectual exclusiva e protegida.
+- **Core Engine Sovereignty:** A lógica de agendamento, algoritmos de comissão (Financial Vault) e a arquitetura "Sovereign Gate" constituem **Segredo Industrial**.
+- **Licenciamento Estrito:** O uso do software é concedido via licença revogável (`SaaS/PaaS`), sem transferência de propriedade do código-fonte.
+- **Smart-Reuse & Autoridade:** Dados de clientes pertencem ao Estúdio (LGPD), mas a Inteligência de Negócios (BI) anonimizada alimenta a evolução do KAI Agent.
 
 ---
 
