@@ -121,3 +121,27 @@
 ## Fase 16: Account Recovery (Concluído ✅)
 - [x] **Forgot Password Flow:** Tokenização segura.
 - [x] **Reset UI:** Interface dedicada para redefinição.
+
+## Fase 17: Motor de Gamificação (Soul Sync) (Em Planejamento 🧠)
+- [ ] **Infrastructure Layer**
+  - [ ] Schema: `ArtistGamification` (XP, Level, Streak).
+  - [ ] Schema: `Achievements` (Badge Definitions).
+  - [ ] Lib: Algoritmo de Progressão (Math.sqrt curve).
+- [ ] **Logic Hooks (Event-Driven)**
+  - [ ] **Booking:** +500 XP ao finalizar sessão.
+  - [ ] **Kiosk:** +50 XP ao gerar Lead (Ink Pass).
+  - [ ] **Financeiro:** +200 XP ao manter compliance em dia.
+  - [ ] **Economy:** +100 XP por cupom resgatado Cross-Artist.
+- [ ] **Visual Experience**
+  - [ ] **Profile Widget:** Barra de XP e Nível atual.
+  - [ ] **Hall of Fame:** Grid de conquistas desbloqueadas.
+  - [ ] **Toasts Gamificados:** Feedback visual ao ganhar XP.
+
+## Fase 18: Automação Inteligente (N8N Layer) (Q2 2026 🤖)
+- [ ] **Infrastructure**
+  - [ ] Self-Hosted N8N (Docker/Portainer).
+  - [ ] Webhook Security (HMAC Signature).
+- [ ] **Workflows**
+  - [ ] **WhatsApp:** Notificações ativas via API (Evolution/Z-API).
+  - [ ] **Email Marketing:** Régua de relacionamento pós-tattoo.
+  - [ ] **Admin Alerts:** Relatórios financeiros semanais.
