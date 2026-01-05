@@ -18,7 +18,7 @@
 ### 1. Professional Gate (Auth)
 - **Invite-only:** Acesso exclusivo via código de convite.
 - **Roles:** `ADMIN` (Gestão), `ARTIST` (Operacional/Residente).
-- **Auth:** Magic Link (6 dígitos).
+- **Auth:** Email/Senha (Sovereign Credentials) + Recovery Flow.
 
 ### 2. Kiosk Experience (Recepção)
 - **Scope:** Dados salvos como `KioskEntry`, pertencentes ao estúdio.
@@ -26,7 +26,7 @@
 
 ### 3. Booking & Scheduling
 - **Core:** Calendário multi-artista com detecção de conflitos.
-- **Sync:** Integração unidirecional com Google Calendar (Em progresso).
+- **Sync:** Integração Opcional com Google Calendar (Manual Connect).
 
 ### 4. Financeiro & Settlement
 - **State Machine:** `PENDING` -> `VALIDATING` -> `APPROVED` -> `RESOLVED`.
@@ -75,7 +75,7 @@ Se você é um agente AI integrado a este sistema, aqui está o que você deve s
 - **Client:** Acesso restrito via Magic Link ou QR Code (Kiosk).
 - **Security:**
     - **No-Bypass:** Modos de desenvolvimento removidos de produção.
-    - **Magic Link Only:** Login via email seguro (Resend).
+    - **Bcrypt Hash:** Senhas armazenadas com criptografia forte.
     - **IP Guard:** Monitoramento de padrões de acesso.
 
 ---

@@ -18,14 +18,14 @@ KRONØS SYNC is architected as a **Professional-First Operating System** for tat
 ## 🔒 02. AUTHENTICATION & THE PROFESSIONAL GATE
 
 ### **Lógica de Segurança (Implemented in `src/lib/auth-options.ts`)**
-- **Magic Link System:** Uses a 6-digit verification code sent via **Resend**.
+- **Sovereign Credentials:** Users login via standardized Email/Password (bcrypt hash).
 - **The Gate Logic:**
     - If user exists and role is `ARTIST` or `ADMIN` → **ALLOW ACCESS**.
     - If user does not exist:
-        - Must have a valid `inviteCode` in the URL/Credentials.
-        - System validates invite (active? uses available? expired?).
-        - System creates/upgrades user to `ARTIST` role and creates their profile.
-    - If neither condition is met → **ACCESS DENIED** (Strictly forbids account creation for non-invited clients).
+        - **Account Creation Disabled:** New users CANNOT register on the login page.
+        - **Invite-Only:** Registration (`/auth/register`) requires a valid `InviteCode` and Phone Number verification.
+        - System validates invite (active? uses available? expired?) before creating `ARTIST` profile.
+    - **Account Recovery:** Self-service "Forgot Password" flow via secure tokens (`PasswordResetToken`).
 - **The Terms Gate (Legal Lock):** 
     - Once authenticated, if `termsAcceptedAt` is NULL → **LOCKED**.
     - User is redirected to a full-screen agreement modal. 
@@ -42,7 +42,7 @@ KRONØS SYNC is architected as a **Professional-First Operating System** for tat
 
 ### **1. Management Dashboard (`/artist/*`)**
 - High-level metrics visualization.
-- Google Calendar integration for schedule synchronization.
+- **Optional Google Calendar Sync:** Artists can choose to link their personal calendar (One-way Sync from Kronos -> Google).
 - Artist profile and portfolio management.
 
 ### **2. Financial Vault (`Settlements System`)**
@@ -74,9 +74,10 @@ KRONØS SYNC is architected as a **Professional-First Operating System** for tat
 ## 📊 04. DATABASE SCHEMA OVERVIEW (CRITICAL)
 
 ### **Identity & Team**
-- `User`: Global identifier. Role defines boundary (`ADMIN`, `ARTIST`, `CLIENT`).
+- `User`: Global identifier with `password` hash. Role defines boundary (`ADMIN`, `ARTIST`, `CLIENT`).
 - `Artist`: Professional profile linked to `User`.
 - `InviteCode`: The key to the Professional Gate.
+- `PasswordResetToken`: Secure entry for account recovery.
 
 ### **Operations**
 - `Workspace`: The studio container. All operations are scoped here.

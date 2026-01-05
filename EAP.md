@@ -10,17 +10,17 @@
   - UI Components (Glassmorphism, Micro-interactions).
 
 ## Fase 2: Autenticação & Integração (Concluído ✅)
-- [x] **Sistema de Auth**
-  - NextAuth.js Configurado.
-  - Google Provider Integration.
-  - Scopes de Calendário e Profile.
+- [x] **Sistema de Auth (Sovereign Pivot)**
+  - [x] NextAuth.js Configurado (Credentials Provider).
+  - [x] Senhas Hash (Bcrypt) + Token de Convite.
+  - [x] Google Provider rebaixado para Feature Opcional.
 - [x] **Database Schema**
   - Modelagem de Usuários (Clientes, Artistas, Admin).
   - Modelagem de Agendamentos (Slots, Status).
   - Modelagem Financeira (Comissões, Produtos).
-- [x] **Google Calendar Sync (Setup)**
-  - Obtenção de Credenciais Cloud Console.
-  - Configuração de Refresh Tokens (Offline Access).
+- [x] **Account Recovery**
+  - Fluxo "Esqueci minha senha" com token seguro.
+  - E-mail transacional via Resend.
 - [x] **SaaS Multi-Tenant Architecture**
   - Isolamento Atômico de Dados por **Workspace**.
   - Modelo de Permissionamento (Dono, Admin, Artista, Staff).
@@ -46,9 +46,9 @@
   - [x] Visualização de Agenda do Dia.
 - [x] **Segurança & Acesso**
   - [x] Modo Dev (Bypass para testes locais).
-  - [x] Correção de Fluxo de Login (Google + Roles).
+  - [x] Correção de Fluxo de Login (Sovereign Credentials).
 - [x] **Módulo 1: Dashboard Inicial** (KPIS, Agendamentos Hoje)
-- [x] **Módulo 2: Agenda** (Visualização, Novo Agendamento, Google Sync)
+- [x] **Módulo 2: Agenda** (Visualização, Novo Agendamento, Connect Google)
 - [x] **Módulo 3: Ficha de Anamnese** (Link Público, Assinatura Digital, Persistência)
   - [x] **Upgrade KRONØS:** Conformidade total com campos do CSV Standard.
   - [x] **Triagem Inteligente:** Sistema de Alertas Clínicos para o artista.
@@ -78,7 +78,7 @@
 ### Q1 (Jan-Mar): Foundation & Validação 🚧
 - [x] **Professional Gate:** Auth robusto e Invite System.
 - [x] **Kiosk Experience:** Conversão de Lead e QR Code.
-- [ ] **Google Calendar Sync:** Finalizar integração bidirecional.
+- [x] **Google Calendar Sync:** Feature Opcional de Sync (Unidirecional).
 - [ ] **Onboarding Interno:** Treinamento e cadastro de 100% dos artistas.
 
 ### Q2 (Apr-Jun): Automação Interna
@@ -108,3 +108,16 @@
 ## Fase 12: Internal Strategic Dossier & IP Strategy (Concluído ✅)
 - [x] **DOSSIER_KRONOS.md:** Manifesto estratégico com dados de mercado e SWOT.
 - [x] **IP Protection:** Definição jurídica de não-engenharia reversa e soberania do "Ø".
+
+## Fase 14: User Manuals & Handover (Concluído ✅)
+- [x] **Manuais Operacionais:** Admin e Artista.
+- [x] **Credenciais Mestre:** Protocolo de entrega segura.
+
+## Fase 15: Sovereign Auth Pivot (Concluído ✅)
+- [x] **Soberania de Acesso:** Migração para Credentials (Email/Senha).
+- [x] **Google Decoupling:** Integração de agenda desacoplada do login.
+- [x] **Database Hardening:** Hashing seguro e validação de convites estrita.
+
+## Fase 16: Account Recovery (Concluído ✅)
+- [x] **Forgot Password Flow:** Tokenização segura.
+- [x] **Reset UI:** Interface dedicada para redefinição.
