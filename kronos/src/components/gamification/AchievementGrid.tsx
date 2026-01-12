@@ -6,7 +6,6 @@ import { LucideIcon, Trophy, Star, Lock } from 'lucide-react'
 import * as LucideIcons from 'lucide-react'
 
 interface Achievement {
-    id: string
     code: string
     title: string
     description: string
@@ -30,7 +29,7 @@ export function AchievementGrid({ allAchievements, unlockedCodes }: AchievementG
 
                 return (
                     <motion.div
-                        key={ach.id}
+                        key={ach.code}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}

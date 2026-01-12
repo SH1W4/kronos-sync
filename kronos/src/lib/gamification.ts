@@ -150,11 +150,7 @@ export async function equipSkin(artistId: string, slot: SkinSlot, skinCode: stri
         const skinDef = SKIN_CATALOG.find(s => s.id === skinCode)
 
         if (!hasSkin && skinDef?.rarity !== 'COMMON') {
-            // Basic strict check: Must own skin unless common (maybe common needs unlock too? let's stick to ownership check)
-            // But we haven't seeded common skins.
-            // Let's assume Commons are always valid or should be seeded.
-            // For safety: if Common, allow.
-            if (skinDef?.rarity !== 'COMMON') return { success: false, error: 'Skin not owned' }
+            return { success: false, error: 'Skin not owned' }
         }
 
         // Map Slot to DB Field
