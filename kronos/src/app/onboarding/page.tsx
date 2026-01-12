@@ -200,12 +200,12 @@ function OnboardingContent() {
                             </button>
                         </div>
 
-                        <div className="mt-6 text-center">
-                            <p className="text-xs font-mono text-gray-600 uppercase tracking-widest mb-4">Já é da casa?</p>
+                        <div className="mt-8 text-center">
+                            <p className="text-[10px] font-mono text-primary/60 uppercase tracking-widest mb-4">Já é da casa?</p>
                             <Button
                                 onClick={() => router.push('/auth/signin')}
                                 variant="outline"
-                                className="border-white/10 text-white hover:bg-white/10 h-10 px-8 rounded-xl font-bold font-orbitron text-[10px] tracking-widest uppercase"
+                                className="border-primary/20 text-primary/80 hover:bg-primary/10 hover:border-primary/40 hover:text-primary h-10 px-8 rounded-xl font-bold font-orbitron text-[10px] tracking-widest uppercase transition-all duration-300 shadow-[0_0_20px_rgba(0,255,136,0.02)] hover:shadow-[0_0_25px_rgba(0,255,136,0.1)]"
                             >
                                 Ir direto para o Login (E-mail)
                             </Button>
