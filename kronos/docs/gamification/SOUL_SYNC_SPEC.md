@@ -19,15 +19,15 @@ Utilizamos uma curva de raiz quadrada clássica para escalabilidade infinita sua
 ### Fórmula de Nível
 $$ Nível = \lfloor \sqrt{\frac{XP}{100}} \rfloor + 1 $$
 
-### Exemplos de Progressão
-| XP Total  | Nível | Título (Conceitual) |
-| :-------- | :---- | :------------------ |
-| 0         | 1     | Iniciante           |
-| 100       | 2     | Aprendiz            |
-| 400       | 3     | Artista Jr.         |
-| 2.500     | 6     | Residente           |
-| 10.000    | 11    | Mestre              |
-| 1.000.000 | 101   | Lenda               |
+### Exemplos de Progressão (Lore Criativa)
+| XP Total  | Nível | Título (Insignia)         | Conceito                                                 |
+| :-------- | :---- | :------------------------ | :------------------------------------------------------- |
+| 0         | 1     | **Iniciado da Tinta** 💧   | O começo da jornada. O contato com a matéria-prima.      |
+| 2.500     | 6     | **Andarilho da Agulha** ✒️ | A busca pelo estilo próprio. Caminhando entre técnicas.  |
+| 10.000    | 11    | **Arquiteto de Pele** 📐   | Domínio da estrutura e anatomia. Construção sólida.      |
+| 40.000    | 21    | **Tecelão do Tempo** ⏳    | Controle do ritmo e da sessão. O tempo trabalha a favor. |
+| 250.000   | 51    | **Escultor de Almas** 🔥   | A arte transcende a pele e marca a essência.             |
+| 1.000.000 | 101   | **Titã do Kronos** ⚡      | Lenda viva. Um pilar do ecossistema.                     |
 
 ---
 
@@ -74,6 +74,27 @@ A lógica é reativa. Não há "job" rodando em background. O XP é concedido no
 - `actions/booking.ts` -> `completeBooking()` -> Dispara `+500 XP`.
 - `actions/leads.ts` -> `registerCompanionLead()` -> Dispara `+50 XP`.
 - `actions/coupons.ts` -> `redeemCouponAction()` -> Dispara `+100 XP`.
+
+---
+
+- `actions/coupons.ts` -> `redeemCouponAction()` -> Dispara `+100 XP`.
+
+---
+
+## 6. Sistema de Avatar (Skins)
+
+Permite ao artista customizar sua identidade visual no ecossistema ("Avatar de Alquimia").
+
+### Slots de Equipamento
+1.  **Base:** O corpo do personagem (Humano, Ciborgue, Etéreo).
+2.  **Aura:** Brilho de fundo (Indica Nível/Senioridade).
+3.  **Máscara:** Acessório facial (Estilo/Personalidade).
+4.  **Artefato:** Item de mão (Máquina, Tablet, Katana).
+
+### Regras de Desbloqueio
+- **Por Nível:** Ex: Aura Dourada só no Nível 50.
+- **Por Conquista:** Ex: Máscara Oni só para quem faturou 10k (High Roller).
+- **Loja (Futuro):** Troca de glifos por skins exclusivas.
 
 ---
 

@@ -54,7 +54,6 @@ enum QrType {
   KIOSK
 }
 
-
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -62,31 +61,31 @@ model User {
   emailVerified DateTime?
   image         String?
   phone         String?
-  password      String?   // Hash bcrypt para Login Soberano
+  password      String? // Hash bcrypt para Login Soberano
   role          UserRole  @default(CLIENT)
   customColor   String    @default("#8B5CF6")
   accounts      Account[]
   sessions      Session[]
-  
+
   // Relations
-  artist        Artist?
-  bookings      Booking[]
-  orders        Order[]
-  memberships   WorkspaceMember[]
-  ownedWorkspaces Workspace[]   @relation("WorkspaceOwner")
-  
+  artist          Artist?
+  bookings        Booking[]
+  orders          Order[]
+  memberships     WorkspaceMember[]
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+
   // Invite System
-  invitedBy     User?         @relation("UserInvites", fields: [invitedById], references: [id])
-  invitedById   String?
-  invitedUsers  User[]        @relation("UserInvites")
-  createdInvites InviteCode[] @relation("Creator")
-  anamneses     Anamnesis[]
-  agentLogs     AgentLog[]
-  agentFeedbacks AgentFeedback[] @relation("UserFeedback")
-  generatedCoupons Coupon[] @relation("GeneratedBy")
-  usedCoupons      Coupon[] @relation("UsedBy")
+  invitedBy         User?              @relation("UserInvites", fields: [invitedById], references: [id])
+  invitedById       String?
+  invitedUsers      User[]             @relation("UserInvites")
+  createdInvites    InviteCode[]       @relation("Creator")
+  anamneses         Anamnesis[]
+  agentLogs         AgentLog[]
+  agentFeedbacks    AgentFeedback[]    @relation("UserFeedback")
+  generatedCoupons  Coupon[]           @relation("GeneratedBy")
+  usedCoupons       Coupon[]           @relation("UsedBy")
   workspaceRequests WorkspaceRequest[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -96,98 +95,98 @@ model User {
 // ... (rest of the file until the end)
 
 model InviteCode {
-  id          String      @id @default(cuid())
-  code        String      @unique
-  role        UserRole    @default(CLIENT)
-  targetPlan  ArtistPlan? // Se for convite para artista, define se é RESIDENT ou GUEST
-  creatorId   String
-  workspaceId String?     // Se for convite para workspace específico
-  maxUses     Int         @default(1)
-  currentUses Int         @default(0)
-  expiresAt   DateTime?
-  durationDays Int?       // Para convites GUEST, define quantos dias o perfil será válido
-  isActive    Boolean     @default(true)
-  viewCount   Int         @default(0)
-  
-  creator     User        @relation("Creator", fields: [creatorId], references: [id])
-  workspace   Workspace?  @relation(fields: [workspaceId], references: [id])
-  
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id           String      @id @default(cuid())
+  code         String      @unique
+  role         UserRole    @default(CLIENT)
+  targetPlan   ArtistPlan? // Se for convite para artista, define se é RESIDENT ou GUEST
+  creatorId    String
+  workspaceId  String? // Se for convite para workspace específico
+  maxUses      Int         @default(1)
+  currentUses  Int         @default(0)
+  expiresAt    DateTime?
+  durationDays Int? // Para convites GUEST, define quantos dias o perfil será válido
+  isActive     Boolean     @default(true)
+  viewCount    Int         @default(0)
+
+  creator   User       @relation("Creator", fields: [creatorId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("invite_codes")
 }
 
 model Workspace {
-  id            String    @id @default(cuid())
-  name          String
-  slug          String    @unique
-  logoUrl       String?
-  primaryColor  String    @default("#8B5CF6")
-  ownerId       String
-  owner         User      @relation("WorkspaceOwner", fields: [ownerId], references: [id])
-  
+  id           String  @id @default(cuid())
+  name         String
+  slug         String  @unique
+  logoUrl      String?
+  primaryColor String  @default("#8B5CF6")
+  ownerId      String
+  owner        User    @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+
   // Payment Config (Custom PIX)
-  pixKey        String? 
-  pixRecipient  String?
-  
+  pixKey       String?
+  pixRecipient String?
+
   // Settings
-  capacity      Int       @default(3) // Número de macas/cadeiras
-  
+  capacity Int @default(3) // Número de macas/cadeiras
+
   // Google Calendar Integration (Shared Studio Calendar)
   googleCalendarId String? // e.g., "abc123@group.calendar.google.com"
 
-  members       WorkspaceMember[]
-  artists       Artist[]
-  bookings      Booking[]
-  slots         Slot[]
-  products      Product[]
-  coupons       Coupon[]
-  orders        Order[]
-  offers        Offer[]
-  subscribers   Subscriber[]
-  kioskEntries  KioskEntry[]
-  invites       InviteCode[]
-  helpArticles  HelpArticle[]
-  anamneses     Anamnesis[]
-  agentLogs     AgentLog[]
+  members        WorkspaceMember[]
+  artists        Artist[]
+  bookings       Booking[]
+  slots          Slot[]
+  products       Product[]
+  coupons        Coupon[]
+  orders         Order[]
+  offers         Offer[]
+  subscribers    Subscriber[]
+  kioskEntries   KioskEntry[]
+  invites        InviteCode[]
+  helpArticles   HelpArticle[]
+  anamneses      Anamnesis[]
+  agentLogs      AgentLog[]
   agentFeedbacks AgentFeedback[]
-  settlements   Settlement[]
+  settlements    Settlement[]
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("workspaces")
 }
 
 model WorkspaceMember {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   workspaceId String
   userId      String
-  role        UserRole  @default(ARTIST)
-  
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        UserRole @default(ARTIST)
 
-  createdAt   DateTime  @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 
   @@unique([workspaceId, userId])
   @@map("workspace_members")
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -239,36 +238,37 @@ model PasswordResetToken {
 }
 
 model Artist {
-  id                String     @id @default(cuid())
-  userId            String     @unique
-  workspaceId       String?    // Inicialmente opcional para facilitar migração
-  plan              ArtistPlan @default(GUEST)
-  commissionRate    Float      @default(0.30)
-  monthlyEarnings   Float      @default(0)
-  commissionThreshold Float    @default(10000)
-  isActive          Boolean    @default(true)
-  instagram         String?    @db.Text
-  validUntil        DateTime?  // Data limite para perfis GUEST (provisórios)
-  
+  id                  String     @id @default(cuid())
+  userId              String     @unique
+  workspaceId         String? // Inicialmente opcional para facilitar migração
+  plan                ArtistPlan @default(GUEST)
+  commissionRate      Float      @default(0.30)
+  monthlyEarnings     Float      @default(0)
+  commissionThreshold Float      @default(10000)
+  isActive            Boolean    @default(true)
+  instagram           String?    @db.Text
+  validUntil          DateTime? // Data limite para perfis GUEST (provisórios)
+
   // Google Calendar Integration
-  googleCalendarId     String?    // Primary calendar ID
-  googleRefreshToken   String?    @db.Text // For API access (encrypted)
-  calendarSyncEnabled  Boolean    @default(false)
-  lastSyncedAt         DateTime?
-  
-  termsAcceptedAt   DateTime?
-  
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  googleCalendarId    String? // Primary calendar ID
+  googleRefreshToken  String?   @db.Text // For API access (encrypted)
+  calendarSyncEnabled Boolean   @default(false)
+  lastSyncedAt        DateTime?
+
+  termsAcceptedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace Workspace? @relation(fields: [workspaceId], references: [id])
-  bookings  Booking[]
-  products  Product[]
-  coupons   Coupon[]
-  kioskEntries KioskEntry[]
-  settlements  Settlement[]
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace          Workspace?          @relation(fields: [workspaceId], references: [id])
+  bookings           Booking[]
+  products           Product[]
+  coupons            Coupon[]
+  kioskEntries       KioskEntry[]
+  settlements        Settlement[]
+  ArtistGamification ArtistGamification?
 
   @@map("artists")
 }
@@ -291,24 +291,24 @@ model Booking {
   confirmationSent Boolean       @default(false)
   scheduledFor     DateTime
   duration         Int           @default(120) // em minutos
-  
+
   // Google Calendar Sync
-  googleEventId    String?       // Link to Google Calendar event
-  syncedToGoogle   Boolean       @default(false)
-  notes            String?       @db.Text
-  
-  couponId         String?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  googleEventId  String? // Link to Google Calendar event
+  syncedToGoogle Boolean @default(false)
+  notes          String? @db.Text
+
+  couponId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  artist    Artist    @relation(fields: [artistId], references: [id])
-  client    User      @relation(fields: [clientId], references: [id])
+  artist    Artist     @relation(fields: [artistId], references: [id])
+  client    User       @relation(fields: [clientId], references: [id])
   workspace Workspace? @relation(fields: [workspaceId], references: [id])
-  slot      Slot      @relation(fields: [slotId], references: [id])
-  coupon    Coupon?   @relation(fields: [couponId], references: [id])
+  slot      Slot       @relation(fields: [slotId], references: [id])
+  coupon    Coupon?    @relation(fields: [couponId], references: [id])
   anamnesis Anamnesis?
-  
+
   settlementId String?
   settlement   Settlement? @relation(fields: [settlementId], references: [id])
 
@@ -318,7 +318,7 @@ model Booking {
 model Slot {
   id          String   @id @default(cuid())
   workspaceId String?
-  macaId      Int      // 1, 2, 3
+  macaId      Int // 1, 2, 3
   startTime   DateTime
   endTime     DateTime
   isActive    Boolean  @default(true)
@@ -357,31 +357,31 @@ model Product {
 }
 
 model Coupon {
-  id            String   @id @default(cuid())
-  code          String   @unique
-  discountPercent Int    @default(10)
-  workspaceId   String?
-  
+  id              String  @id @default(cuid())
+  code            String  @unique
+  discountPercent Int     @default(10)
+  workspaceId     String?
+
   // Referral Fields
   originClientId String?
   originClient   User?   @relation("GeneratedBy", fields: [originClientId], references: [id])
-  
-  usedByUserId   String?
-  usedByUser     User?   @relation("UsedBy", fields: [usedByUserId], references: [id])
-  
-  artistId       String?
-  status         String   @default("ACTIVE") // ACTIVE, USED, EXPIRED
-  
-  createdAt      DateTime @default(now())
-  expiresAt      DateTime?
-  viewCount      Int      @default(0)
-  updatedAt      DateTime @updatedAt // Adicionado para manter compatibilidade
-  
+
+  usedByUserId String?
+  usedByUser   User?   @relation("UsedBy", fields: [usedByUserId], references: [id])
+
+  artistId String?
+  status   String  @default("ACTIVE") // ACTIVE, USED, EXPIRED
+
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  viewCount Int       @default(0)
+  updatedAt DateTime  @updatedAt // Adicionado para manter compatibilidade
+
   // Relations preserved/updated
-  workspace      Workspace? @relation(fields: [workspaceId], references: [id])
-  bookings       Booking[]
-  artist         Artist?   @relation(fields: [artistId], references: [id])
-  orders         Order[]
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  bookings  Booking[]
+  artist    Artist?    @relation(fields: [artistId], references: [id])
+  orders    Order[]
 
   @@map("coupons")
 }
@@ -400,14 +400,14 @@ model Order {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  settlementId  String?
-  settlement    Settlement? @relation(fields: [settlementId], references: [id])
+  settlementId String?
+  settlement   Settlement? @relation(fields: [settlementId], references: [id])
 
   // Relations
   client    User        @relation(fields: [clientId], references: [id])
   workspace Workspace?  @relation(fields: [workspaceId], references: [id])
   coupon    Coupon?     @relation(fields: [couponId], references: [id])
-  items  OrderItem[]
+  items     OrderItem[]
 
   @@map("orders")
 }
@@ -438,7 +438,7 @@ model Offer {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("offers")
 }
@@ -452,72 +452,71 @@ model Subscriber {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("subscribers")
 }
 
 model KioskEntry {
-  id           String   @id @default(cuid())
-  workspaceId  String?
-  name         String
-  email        String?
-  phone        String?
-  type         String   // "CLIENT" or "COMPANION"
+  id             String  @id @default(cuid())
+  workspaceId    String?
+  name           String
+  email          String?
+  phone          String?
+  type           String // "CLIENT" or "COMPANION"
   marketingOptIn Boolean @default(false)
-  
-  // Strategic Profiling Fields
-  instagram    String?
-  barrier      String?  // What prevents them from tattooing
-  intent       String?  // What they want to tattoo
-  artistId     String?  // Lead attribution
-  
-  createdAt    DateTime @default(now())
 
-  workspace    Workspace? @relation(fields: [workspaceId], references: [id])
-  artist       Artist?    @relation(fields: [artistId], references: [id])
+  // Strategic Profiling Fields
+  instagram String?
+  barrier   String? // What prevents them from tattooing
+  intent    String? // What they want to tattoo
+  artistId  String? // Lead attribution
+
+  createdAt DateTime @default(now())
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  artist    Artist?    @relation(fields: [artistId], references: [id])
 
   @@map("kiosk_entries")
 }
 
-
 model Anamnesis {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   clientId    String
   workspaceId String?
-  bookingId   String?  @unique 
-  
+  bookingId   String? @unique
+
   // Questionário baseado no CSV fornecido (KRONØS Standard)
-  fullName                  String?   // Qual seu nome completo?
-  whatsapp                  String?   // Qual é o seu número do WhatsApp?
-  birthDate                 String?   // Quando é o seu aniversário?
-  medicalConditionsTattoo   String?   @db.Text // Você tem alguma condição médica que possa afetar o processo de tatuagem?
-  medicalConditionsHealing  String?   @db.Text // Você possui alguma condição médica que possa afetar o processo de cicatrização da tatuagem?
+  fullName                        String? // Qual seu nome completo?
+  whatsapp                        String? // Qual é o seu número do WhatsApp?
+  birthDate                       String? // Quando é o seu aniversário?
+  medicalConditionsTattoo         String? @db.Text // Você tem alguma condição médica que possa afetar o processo de tatuagem?
+  medicalConditionsHealing        String? @db.Text // Você possui alguma condição médica que possa afetar o processo de cicatrização da tatuagem?
   medicalConditionsHealingDetails String? @db.Text // Se sim, qual?
-  knownAllergies           String?   @db.Text // Tem alguma alergia conhecida a produtos, como; tintas ou materiais de curativo?
-  
+  knownAllergies                  String? @db.Text // Tem alguma alergia conhecida a produtos, como; tintas ou materiais de curativo?
+
   // Detalhes do Projeto (Snapshot)
-  artistHandle             String?   // Qual o @ da(o) artista responsável pelo seu projeto?
-  artDescription           String?   @db.Text // qual a arte?
-  agreedValue              String?   // Qual foi o valor acertado entre você e o artista?
-  
+  artistHandle   String? // Qual o @ da(o) artista responsável pelo seu projeto?
+  artDescription String? @db.Text // qual a arte?
+  agreedValue    String? // Qual foi o valor acertado entre você e o artista?
+
   // Confirmações e Termos
-  understandPermanence      Boolean   @default(false) // Você compreende que a tatuagem é permanente e que os resultados podem variar?
-  followInstructions        Boolean   @default(false) // Você seguirá as instruções do(a) tatuador(a) para garantir a correta cicatrização?
-  acceptedTerms             Boolean   @default(false) // Confirmação dos TERMOS DE RESPONSABILIDADE
-  allowSharing              Boolean   @default(false) // LGPD: Autorizo o compartilhamento de dados médicos entre profissionais deste workspace?
+  understandPermanence Boolean @default(false) // Você compreende que a tatuagem é permanente e que os resultados podem variar?
+  followInstructions   Boolean @default(false) // Você seguirá as instruções do(a) tatuador(a) para garantir a correta cicatrização?
+  acceptedTerms        Boolean @default(false) // Confirmação dos TERMOS DE RESPONSABILIDADE
+  allowSharing         Boolean @default(false) // LGPD: Autorizo o compartilhamento de dados médicos entre profissionais deste workspace?
 
   // Assinatura e Metadados
-  signatureData           String?   @db.Text // Assinatura digital (Base64/SVG)
-  
+  signatureData String? @db.Text // Assinatura digital (Base64/SVG)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
   client    User       @relation(fields: [clientId], references: [id])
   workspace Workspace? @relation(fields: [workspaceId], references: [id])
   booking   Booking?   @relation(fields: [bookingId], references: [id])
-  
+
   @@map("anamneses")
 }
 
@@ -531,7 +530,7 @@ model HelpArticle {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("help_articles")
 }
@@ -544,24 +543,24 @@ model AgentLog {
   response    String   @db.Text
   intent      String?
   createdAt   DateTime @default(now())
-  
-  user        User      @relation(fields: [userId], references: [id])
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id])
+
+  user      User       @relation(fields: [userId], references: [id])
+  workspace Workspace? @relation(fields: [workspaceId], references: [id])
 
   @@map("agent_logs")
 }
 
 model WorkspaceRequest {
-  id              String   @id @default(cuid())
-  userId          String
-  studioName      String
-  teamDetails     String?  @db.Text
-  motivation      String?  @db.Text
-  status          RequestStatus @default(PENDING)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          String        @id @default(cuid())
+  userId      String
+  studioName  String
+  teamDetails String?       @db.Text
+  motivation  String?       @db.Text
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-  user            User     @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@map("workspace_requests")
 }
@@ -570,41 +569,43 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
-}model Settlement {
-  id              String           @id @default(cuid())
-  artistId        String
-  workspaceId     String
-  totalValue      Float
-  proofUrl        String?          @db.Text
-  status          SettlementStatus @default(PENDING)
-  isAudited       Boolean          @default(false) // Marcador de auditoria administrativa manual
-  
-  // AI Validation Data
-  aiConfidence    Float?           // 0.0 to 1.0
-  aiExtractedData Json?            // { value, date, recipient, etc }
-  aiFeedback      String?          @db.Text
-  
-  // Gamification / Token
-  tokenData       Json?            // { glyphId, points, sequence }
-  
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+}
 
-  artist          Artist           @relation(fields: [artistId], references: [id])
-  workspace       Workspace        @relation(fields: [workspaceId], references: [id])
-  bookings        Booking[]
-  orders          Order[]
+model Settlement {
+  id          String           @id @default(cuid())
+  artistId    String
+  workspaceId String
+  totalValue  Float
+  proofUrl    String?          @db.Text
+  status      SettlementStatus @default(PENDING)
+  isAudited   Boolean          @default(false) // Marcador de auditoria administrativa manual
+
+  // AI Validation Data
+  aiConfidence    Float? // 0.0 to 1.0
+  aiExtractedData Json? // { value, date, recipient, etc }
+  aiFeedback      String? @db.Text
+
+  // Gamification / Token
+  tokenData Json? // { glyphId, points, sequence }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist    Artist    @relation(fields: [artistId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  bookings  Booking[]
+  orders    Order[]
 
   @@map("settlements")
 }
 
 model QrScan {
-  id          String   @id @default(cuid())
-  type        QrType
-  targetId    String   // ID do convite, cupom ou workspace
-  code        String?  // O código real escaneado
-  userAgent   String?  // Informações do navegador
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  type      QrType
+  targetId  String // ID do convite, cupom ou workspace
+  code      String? // O código real escaneado
+  userAgent String? // Informações do navegador
+  createdAt DateTime @default(now())
 
   @@map("qr_scans")
 }
@@ -631,8 +632,73 @@ model AgentFeedback {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
-  user        User           @relation("UserFeedback", fields: [userId], references: [id])
-  workspace   Workspace      @relation(fields: [workspaceId], references: [id])
+  user      User      @relation("UserFeedback", fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
 
   @@map("agent_feedbacks")
+}
+
+// --- GAMIFICATION ENGINE (SOUL SYNC) ---
+
+model ArtistGamification {
+  id            String   @id @default(cuid())
+  artistId      String   @unique
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  currentStreak Int      @default(0)
+  lastActivity  DateTime @default(now())
+
+  // Avatar Snapshot (Desnormalizado)
+  baseSkinId     String?
+  auraSkinId     String?
+  maskSkinId     String?
+  artifactSkinId String?
+
+  artist       Artist              @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  achievements ArtistAchievement[]
+  skins        ArtistSkin[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("artist_gamification")
+}
+
+model ArtistSkin {
+  id                   String   @id @default(cuid())
+  artistGamificationId String
+  skinCode             String // ex: "mask_oni_cyber"
+  acquiredAt           DateTime @default(now())
+
+  gamification ArtistGamification @relation(fields: [artistGamificationId], references: [id], onDelete: Cascade)
+
+  @@unique([artistGamificationId, skinCode])
+  @@map("artist_skins")
+}
+
+model Achievement {
+  id          String @id @default(cuid())
+  code        String @unique // ex: "FIRST_INK"
+  title       String
+  description String
+  icon        String // Identificador visual do Glyph
+  xpReward    Int
+  rarity      String @default("COMMON") // COMMON, RARE, EPIC, LEGENDARY
+
+  unlockedBy ArtistAchievement[]
+
+  @@map("achievements")
+}
+
+model ArtistAchievement {
+  id                   String   @id @default(cuid())
+  artistGamificationId String
+  achievementId        String
+  unlockedAt           DateTime @default(now())
+
+  gamification ArtistGamification @relation(fields: [artistGamificationId], references: [id], onDelete: Cascade)
+  achievement  Achievement        @relation(fields: [achievementId], references: [id])
+
+  @@unique([artistGamificationId, achievementId])
+  @@map("artist_achievements")
 }

@@ -1,75 +1,43 @@
-export interface AchievementDefinition {
+export interface AchievementItem {
     code: string
     title: string
     description: string
-    icon: string // Lucide icon name or internal glyph ID
+    icon: string
     xpReward: number
     rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY'
-    criteria?: string
 }
 
-export const ACHIEVEMENTS: AchievementDefinition[] = [
-    // 🟢 ONBOARDING
+export const ACHIEVEMENTS: AchievementItem[] = [
     {
-        code: "FIRST_INK",
-        title: "Primeiro Traço",
-        description: "Completou o primeiro agendamento oficial no sistema.",
-        icon: "PenTool",
-        xpReward: 200,
-        rarity: "COMMON"
+        code: 'FIRST_INK',
+        title: 'Primeiro Traço',
+        description: 'Concluiu o primeiro agendamento pela plataforma.',
+        icon: 'Droplet',
+        xpReward: 100,
+        rarity: 'COMMON'
     },
     {
-        code: "PROFILE_COMPLETED",
-        title: "Identidade Digital",
-        description: "Preencheu 100% do perfil (Bio, Instagram, Foto).",
-        icon: "UserCheck",
-        xpReward: 150,
-        rarity: "COMMON"
-    },
-
-    // 🔵 ECONOMY & LEADS
-    {
-        code: "LEAD_MAGNET",
-        title: "Imã de Leads",
-        description: "Trouxe 10 acompanhantes que se cadastraram no Kiosk.",
-        icon: "Magnet",
+        code: 'HIGH_ROLLER',
+        title: 'Aposta Alta',
+        description: 'Realizou um agendamento com valor acima de R$ 2.000.',
+        icon: 'BadgeDollarSign',
         xpReward: 500,
-        rarity: "RARE"
+        rarity: 'RARE'
     },
     {
-        code: "CROSS_POLLINATOR",
-        title: "Polinizador",
-        description: "Teve 5 cupons escaneados por outros artistas.",
-        icon: "Share2",
-        xpReward: 600,
-        rarity: "RARE"
-    },
-
-    // 🟣 MASTERY & VOLUME
-    {
-        code: "HIGH_ROLLER",
-        title: "High Roller",
-        description: "Faturou mais de R$ 10.000,00 em um único mês.",
-        icon: "Trophy",
-        xpReward: 1000,
-        rarity: "EPIC"
+        code: 'PERFECT_WEEK',
+        title: 'Semana Perfeita',
+        description: 'Manteve a agenda cheia por 5 dias consecutivos.',
+        icon: 'CalendarCheck',
+        xpReward: 300,
+        rarity: 'EPIC'
     },
     {
-        code: "VETERAN_INK",
-        title: "Veterano do KRONØS",
-        description: "Realizou 100 agendamentos na plataforma.",
-        icon: "Award",
-        xpReward: 2000,
-        rarity: "LEGENDARY"
-    },
-
-    // 🟡 GOVERNANCE
-    {
-        code: "GUARDIAN",
-        title: "Guardião",
-        description: "Manteve 100% de aprovação nos acertos financeiros por 3 meses.",
-        icon: "ShieldCheck",
-        xpReward: 1500,
-        rarity: "EPIC"
+        code: 'LEGENDARY_ARTIST',
+        title: 'Lenda Viva',
+        description: 'Alcançou o Nível 50 na plataforma.',
+        icon: 'Crown',
+        xpReward: 5000,
+        rarity: 'LEGENDARY'
     }
 ]

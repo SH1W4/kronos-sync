@@ -50,3 +50,18 @@ export function calculateProgress(xp: number): number {
 
     return Math.min(100, Math.floor((xpInCurrentLevel / xpNeededForNext) * 100))
 }
+
+export const LEVEL_TITLES = [
+    { minLevel: 1, title: 'Ink Initiate', label: 'Iniciado da Tinta', badge: '/assets/gamification/badges/badge_0_0.png' },
+    { minLevel: 5, title: 'Needle Walker', label: 'Andarilho da Agulha', badge: '/assets/gamification/badges/badge_0_1.png' },
+    { minLevel: 10, title: 'Skin Architect', label: 'Arquiteto de Pele', badge: '/assets/gamification/badges/badge_0_2.png' },
+    { minLevel: 20, title: 'Time Weaver', label: 'Tecelão do Tempo', badge: '/assets/gamification/badges/badge_1_0.png' },
+    { minLevel: 50, title: 'Soul Etcher', label: 'Escultor de Almas', badge: '/assets/gamification/badges/badge_1_1.png' },
+    { minLevel: 100, title: 'Kronos Titan', label: 'Titã do Kronos', badge: '/assets/gamification/badges/badge_1_2.png' }
+]
+
+export function getLevelTitle(level: number): { label: string, badge: string } {
+    // Find the highest tier that matches the level
+    const tier = LEVEL_TITLES.slice().reverse().find(t => level >= t.minLevel)
+    return tier ? { label: tier.label, badge: tier.badge } : { label: LEVEL_TITLES[0].label, badge: LEVEL_TITLES[0].badge }
+}
