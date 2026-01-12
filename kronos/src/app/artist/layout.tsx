@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen, ShoppingBag, ChevronDown, QrCode } from 'lucide-react'
+import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen, ShoppingBag, ChevronDown, QrCode, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
 import { ThemeCustomizer } from '@/components/theme/theme-customizer'
@@ -58,6 +58,7 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
 
                     <nav className="space-y-2">
                         <NavItem href="/artist/dashboard" icon={<LayoutDashboard size={20} />} label="VISÃO GERAL" active={pathname === '/artist/dashboard'} />
+                        <NavItem href="/artist/profile" icon={<User size={20} />} label="MEU PERFIL" active={pathname === '/artist/profile'} />
                         <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
                         <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
                         <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
