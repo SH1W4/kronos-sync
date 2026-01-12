@@ -140,3 +140,55 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
         return { error: 'Erro ao atualizar configurações' }
     }
 }
+
+export async function updatePassword(data: any) {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.email) {
+            return { error: 'Não autorizado' }
+        }
+
+        const userId = (session.user as any).id
+        if (!userId) return { error: 'Usuário não encontrado' }
+
+        // Validação
+        const { passwordChangeSchema } = await import("@/lib/validations")
+        const validated = passwordChangeSchema.safeParse(data)
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
+        }
+
+        const { currentPassword, newPassword } = validated.data
+
+        // 1. Get User
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        })
+
+        if (!user) return { error: 'Usuário não encontrado' }
+
+        // 2. Verify Current Password
+        if (user.password) {
+            const bcrypt = await import('bcryptjs')
+            const isValid = await bcrypt.compare(currentPassword, user.password)
+            if (!isValid) {
+                return { error: 'Senha atual incorreta' }
+            }
+        }
+
+        // 3. Hash New Password
+        const bcrypt = await import('bcryptjs')
+        const hashedPassword = await bcrypt.hash(newPassword, 12)
+
+        // 4. Update Database
+        await prisma.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword }
+        })
+
+        return { success: true }
+    } catch (error) {
+        console.error("Error updating password:", error)
+        return { error: 'Erro ao atualizar senha' }
+    }
+}

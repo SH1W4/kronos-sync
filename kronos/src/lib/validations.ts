@@ -202,6 +202,18 @@ export const userThemeSchema = z.object({
     customColor: colorSchema
 })
 
+export const passwordChangeSchema = z.object({
+    currentPassword: z.string().min(1, 'Senha atual é obrigatória'),
+    newPassword: z.string()
+        .min(8, 'A nova senha deve ter pelo menos 8 caracteres')
+        .regex(/[A-Z]/, 'A nova senha deve conter pelo menos uma letra maiúscula')
+        .regex(/[0-9]/, 'A nova senha deve conter pelo menos um número'),
+    confirmPassword: z.string().min(1, 'Confirmação de senha é obrigatória')
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "As senhas não coincidem",
+    path: ["confirmPassword"],
+})
+
 // ============================================
 // HELPER TYPES
 // ============================================

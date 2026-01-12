@@ -6,7 +6,7 @@ import { Settings, User, Shield, Calendar, CreditCard, Bell, Link as LinkIcon, C
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
-import { updateArtistSettings } from '@/app/actions/settings'
+import { updateArtistSettings, updatePassword } from '@/app/actions/settings'
 import { updateWorkspaceFinance, updateWorkspaceBranding, updateWorkspaceCalendar } from '@/app/actions/workspaces'
 import { updateUserTheme, updateWorkspaceCapacity } from '@/app/actions/settings'
 import { useRouter } from 'next/navigation'
@@ -56,6 +56,12 @@ export default function SettingsPage() {
     const [newInviteCode, setNewInviteCode] = useState('')
     const [selectedInvite, setSelectedInvite] = useState<any>(null)
     const [activeTab, setActiveTab] = useState<'profile' | 'link' | 'sync' | 'plan' | 'security' | 'payments' | 'studio' | 'appearance'>('profile')
+
+    // Password Change State
+    const [currentPassword, setCurrentPassword] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [isPasswordLoading, setIsPasswordLoading] = useState(false)
 
     // Initialize values when session is available
     const [isInitialized, setIsInitialized] = useState(false)
@@ -405,6 +411,42 @@ export default function SettingsPage() {
         }
     }
 
+    const handleChangePassword = async () => {
+        setIsPasswordLoading(true)
+        try {
+            const result = await updatePassword({
+                currentPassword,
+                newPassword,
+                confirmPassword
+            })
+
+            if (result.success) {
+                toast({
+                    title: "Senha Alterada",
+                    description: "Sua chave de acesso foi atualizada com sucesso.",
+                })
+                setCurrentPassword('')
+                setNewPassword('')
+                setConfirmPassword('')
+            } else {
+                toast({
+                    title: "Erro na Alteração",
+                    description: result.error || "Verifique os dados e tente novamente.",
+                    variant: "destructive"
+                })
+            }
+        } catch (error) {
+            console.error('Error changing password:', error)
+            toast({
+                title: "Falha de Segurança",
+                description: "Não foi possível alterar a senha agora.",
+                variant: "destructive"
+            })
+        } finally {
+            setIsPasswordLoading(false)
+        }
+    }
+
     const isAdmin = (session?.user as any)?.role === 'ADMIN'
 
     return (
@@ -680,6 +722,55 @@ export default function SettingsPage() {
                                             </span>
                                         </div>
                                         <span className="text-[8px] font-black font-mono text-red-500/60 uppercase tracking-widest border border-red-500/30 px-2 py-1 rounded">VÍNCULO ATIVO</span>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-white/5 space-y-6">
+                                    <div className="flex items-center gap-2">
+                                        <Shield className="text-primary" size={20} />
+                                        <h2 className="font-bold uppercase tracking-wider text-sm pixel-text">Alterar Senha de Login</h2>
+                                    </div>
+
+                                    <div className="grid gap-4 max-w-sm">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Senha Atual</label>
+                                            <Input
+                                                type="password"
+                                                value={currentPassword}
+                                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                                className="bg-black/50 border-white/10"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Nova Senha</label>
+                                            <Input
+                                                type="password"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                                className="bg-black/50 border-white/10"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Confirmar Nova Senha</label>
+                                            <Input
+                                                type="password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                                className="bg-black/50 border-white/10"
+                                            />
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <Button
+                                                onClick={handleChangePassword}
+                                                disabled={isPasswordLoading}
+                                                className="w-full bg-white hover:bg-gray-200 text-black font-bold h-10 rounded-xl transition-all"
+                                            >
+                                                {isPasswordLoading ? 'ATUALIZANDO...' : 'ATUALIZAR SENHA'}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </section>
