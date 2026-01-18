@@ -2,8 +2,28 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { LucideIcon, Trophy, Star, Lock } from 'lucide-react'
-import * as LucideIcons from 'lucide-react'
+import { 
+    Trophy, 
+    Lock, 
+    Droplet, 
+    BadgeDollarSign, 
+    CalendarCheck, 
+    Crown,
+    Star,
+    Zap, 
+    LucideIcon 
+} from 'lucide-react'
+
+// Safer static mapping to avoid tree-shaking issues in production
+const ICON_MAP: Record<string, LucideIcon> = {
+    'Droplet': Droplet,
+    'BadgeDollarSign': BadgeDollarSign,
+    'CalendarCheck': CalendarCheck,
+    'Crown': Crown,
+    'Star': Star,
+    'Zap': Zap,
+    'Trophy': Trophy
+}
 
 interface Achievement {
     code: string
@@ -24,8 +44,8 @@ export function AchievementGrid({ allAchievements, unlockedCodes }: AchievementG
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {allAchievements.map((ach, index) => {
                 const isUnlocked = unlockedCodes.includes(ach.code)
-                // Dynamically get Lucide icon if it exists, otherwise fallback to Trophy
-                const IconComponent = (LucideIcons as any)[ach.icon] || Trophy
+                // Safe lookup with fallback
+                const IconComponent = ICON_MAP[ach.icon] || Trophy
 
                 return (
                     <motion.div

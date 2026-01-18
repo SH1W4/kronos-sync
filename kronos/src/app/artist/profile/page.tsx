@@ -41,8 +41,9 @@ export default function ProfilePage() {
 
     if (!data) return <div>Erro ao carregar perfil.</div>
 
-    const unlockedSkinCodes = data.skins.map((s: any) => s.skinCode)
-    const unlockedAchievementCodes = data.achievements.map((a: any) => a.achievement.code)
+    // Defensive check for missing arrays, defaults to empty to prevent map crashes
+    const unlockedSkinCodes = data.skins?.map((s: any) => s.skinCode) || []
+    const unlockedAchievementCodes = data.achievements?.map((a: any) => a.achievement.code) || []
 
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-12 pb-24">
@@ -66,7 +67,7 @@ export default function ProfilePage() {
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/80">Neural Link Active</span>
                         </div>
                         <h1 className="text-4xl font-black uppercase tracking-tighter text-zinc-100">
-                            {data.artist.name || 'Artista'}
+                            {data.artist?.name || 'Artista'}
                         </h1>
                         <p className="text-zinc-500 text-sm max-w-md">
                             Sincronizando alma e tecnologia no Kronos OS.

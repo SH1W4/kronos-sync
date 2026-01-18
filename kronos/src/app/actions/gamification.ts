@@ -21,6 +21,7 @@ export async function getGamificationData() {
         let gamification = await prisma.artistGamification.findUnique({
             where: { artistId: artist.id },
             include: {
+                artist: true,
                 skins: true,
                 achievements: {
                     include: { achievement: true }
@@ -33,6 +34,7 @@ export async function getGamificationData() {
             gamification = await prisma.artistGamification.create({
                 data: { artistId: artist.id },
                 include: {
+                    artist: true,
                     skins: true,
                     achievements: {
                         include: { achievement: true }
