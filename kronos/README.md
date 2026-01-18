@@ -1,4 +1,4 @@
-# KRONØS SYNC
+voc# KRONØS SYNC
 
 <div align="center">
 
