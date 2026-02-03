@@ -1,4 +1,43 @@
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
+import { useToast } from '@/components/ui/use-toast'
+import { useTheme } from '@/contexts/theme-context'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+    updateArtistSettings,
+    updateUserTheme,
+    updateWorkspaceCapacity,
+    getWorkspaceSettings,
+    updatePassword
+} from '@/app/actions/settings'
+import {
+    createInvite,
+    getInvites,
+    revokeInvite
+} from '@/app/actions/invites'
+import {
+    User,
+    Link as LinkIcon,
+    Calendar,
+    CreditCard,
+    Shield,
+    Users,
+    Settings,
+    Landmark,
+    Palette,
+    Trash2,
+    Instagram,
+    Copy,
+    Check,
+    Lock,
+    LogOut,
+    Eye,
+    EyeOff,
+    Loader2,
+    Save
+} from 'lucide-react'
 
 export default function SettingsPage() {
     const { user } = useUser()
