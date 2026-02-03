@@ -423,8 +423,6 @@ export default function SettingsPage() {
             if (result.success) {
                 toast({
                     title: "PIX Configurado",
-                    description: "Chave atualizada com sucesso.",
-                })
                     description: "Dados de recebimento salvos com sucesso.",
                 })
                 await user?.reload()
