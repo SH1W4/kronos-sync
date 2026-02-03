@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getCalendarStatus, syncAllBookings } from '@/app/actions/calendar'
-import { signIn } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 import { updateArtistSettings } from '@/app/actions/settings'
 import { toast } from '@/components/ui/use-toast'
 
@@ -44,8 +44,24 @@ export function GoogleSyncStatus() {
         }
     }
 
-    const handleConnect = () => {
-        signIn('google', { callbackUrl: window.location.href })
+    const { user } = useUser()
+
+    const handleConnect = async () => {
+         if (!user) return
+
+         try {
+             const externalAccount = await user.createExternalAccount({
+                 strategy: 'oauth_google',
+                 redirectUrl: window.location.href
+             })
+             
+             if (externalAccount.verification?.externalVerificationRedirectUrl) {
+                window.location.href = externalAccount.verification.externalVerificationRedirectUrl
+             }
+         } catch (err) {
+             console.error("Link google error:", err)
+             toast({ title: "Erro ao conectar", description: "Tente novamente mais tarde.", variant: "destructive" })
+         }
     }
 
     const handleToggleSync = async (checked: boolean) => {
