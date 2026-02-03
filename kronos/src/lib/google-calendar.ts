@@ -1,6 +1,5 @@
 import { google } from 'googleapis'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 
 export interface CalendarEvent {
   id?: string
@@ -31,12 +30,19 @@ export class GoogleCalendarService {
   }
 
   static async fromSession() {
-    const session = await getServerSession(authOptions)
-    if (!session?.accessToken) {
-      throw new Error('No access token available')
+    const { userId } = await auth()
+    if (!userId) {
+      throw new Error('Not authenticated')
     }
 
-    return new GoogleCalendarService(session.accessToken as string)
+    const client = await clerkClient()
+    const { data } = await client.users.getUserOauthAccessToken(userId, 'oauth_google')
+
+    if (!data || data.length === 0) {
+      throw new Error('No Google access token found')
+    }
+
+    return new GoogleCalendarService(data[0].token)
   }
 
   async createEvent(event: CalendarEvent): Promise<string> {
