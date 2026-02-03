@@ -210,3 +210,105 @@ export async function updatePassword(data: any) {
         return { error: 'Erro ao atualizar senha' }
     }
 }
+
+export async function updateWorkspaceBranding(data: { name?: string; primaryColor?: string; logoUrl?: string }) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
+        if (!workspaceId) return { error: 'Workspace não encontrado' }
+
+        // Validação parcial
+        const validated = workspaceBrandingSchema.pick({ name: true, primaryColor: true }).safeParse(data)
+        if (!validated.success) {
+            return { error: validated.error.issues[0].message }
+        }
+
+        await prisma.workspace.update({
+            where: { id: workspaceId },
+            data: {
+                ...(data.name && { name: data.name }),
+                ...(data.primaryColor && { primaryColor: data.primaryColor }),
+                ...(data.logoUrl && { logoUrl: data.logoUrl })
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true }
+    } catch (error) {
+        console.error("Error updating branding:", error)
+        return { error: 'Erro ao atualizar branding' }
+    }
+}
+
+export async function updateWorkspaceCalendar(data: { googleCalendarId?: string }) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
+        if (!workspaceId) return { error: 'Workspace não encontrado' }
+
+        await prisma.workspace.update({
+            where: { id: workspaceId },
+            data: {
+                googleCalendarId: data.googleCalendarId
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true }
+    } catch (error) {
+        console.error("Error updating calendar:", error)
+        return { error: 'Erro ao atualizar calendário' }
+    }
+}
+
+export async function updateWorkspacePix(data: { pixKey: string; pixRecipient: string }) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
+        if (!workspaceId) return { error: 'Workspace não encontrado' }
+        
+        // Simples validação
+        if (!data.pixKey || !data.pixRecipient) return { error: 'Dados incompletos' }
+
+        await prisma.workspace.update({
+            where: { id: workspaceId },
+            data: {
+                pixKey: data.pixKey,
+                pixRecipient: data.pixRecipient
+            }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true }
+    } catch (error) {
+        console.error("Error updating pix:", error)
+        return { error: 'Erro ao atualizar PIX' }
+    }
+}

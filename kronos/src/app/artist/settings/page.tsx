@@ -10,7 +10,10 @@ import {
     updateUserTheme,
     updateWorkspaceCapacity,
     getWorkspaceSettings,
-    updatePassword
+    updatePassword,
+    updateWorkspaceBranding,
+    updateWorkspaceCalendar,
+    updateWorkspacePix
 } from '@/app/actions/settings'
 import {
     createInvite,
