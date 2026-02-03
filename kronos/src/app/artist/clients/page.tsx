@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import Link from 'next/link'
@@ -9,14 +8,14 @@ import { ExportIntelligence } from "@/components/clients/ExportIntelligence"
 export const dynamic = 'force-dynamic'
 
 export default async function ClientsPage() {
-    const session = await getServerSession(authOptions)
+    const { userId: clerkUserId } = await auth()
 
-    if (!session?.user) {
-        redirect('/auth/signin')
+    if (!clerkUserId) {
+        redirect('/sign-in')
     }
 
-    const artist = await prisma.artist.findUnique({
-        where: { userId: session.user.id }
+    const artist = await prisma.artist.findFirst({
+        where: { user: { clerkId: clerkUserId } }
     })
 
     if (!artist) return <div>Perfil não encontrado</div>
