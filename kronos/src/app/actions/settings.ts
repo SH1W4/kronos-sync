@@ -160,13 +160,17 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
 
 export async function updatePassword(data: any) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const userId = (session.user as any).id
-        if (!userId) return { error: 'Usuário não encontrado' }
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user) return { error: 'Usuário não encontrado' }
+        const userId = user.id
 
         // Validação
         const { passwordChangeSchema } = await import("@/lib/validations")
