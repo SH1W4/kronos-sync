@@ -72,62 +72,8 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                 </div>
 
                 <div className="p-6 border-t border-white/5 space-y-4">
-                    {/* Workspace Switcher / Display */}
-                    {(session?.user as any)?.activeWorkspaceId && (
-                        <div className="relative group">
-                            {(session?.user as any)?.role === 'ADMIN' ? (
-                                <>
-                                    <button
-                                        onClick={() => router.push('/auth/select')}
-                                        className="w-full flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10 hover:border-primary/50 transition-all text-left"
-                                    >
-                                        <div className="flex items-center gap-2 overflow-hidden">
-                                            <div
-                                                className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_currentColor] flex-shrink-0"
-                                                style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
-                                            />
-                                            <span className="text-[10px] font-bold text-white truncate uppercase tracking-tighter">
-                                                {(session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.name}
-                                            </span>
-                                        </div>
-                                        <ChevronDown size={14} className="text-gray-500 group-hover:text-primary transition-colors" />
-                                    </button>
-
-                                    <div className="absolute bottom-full left-0 w-full mb-2 bg-gray-900 border border-white/10 rounded-xl overflow-hidden hidden group-hover:block z-50 shadow-2xl animate-in fade-in slide-in-from-bottom-2">
-                                        <p className="p-3 text-[8px] font-mono text-gray-500 uppercase border-b border-white/5">Trocar Estúdio</p>
-                                        {(session as any).workspaces?.map((w: any) => (
-                                            <button
-                                                key={w.id}
-                                                onClick={() => {
-                                                    (session?.user as any).activeWorkspaceId !== w.id && updateSession({ activeWorkspaceId: w.id })
-                                                }}
-                                                className={`w-full p-3 text-left hover:bg-white/5 flex items-center gap-2 transition-all ${w.id === (session?.user as any).activeWorkspaceId ? 'bg-primary/10' : ''}`}
-                                            >
-                                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: w.primaryColor }} />
-                                                <span className={`text-[10px] font-bold uppercase tracking-tighter ${w.id === (session?.user as any).activeWorkspaceId ? 'text-primary' : 'text-gray-400'}`}>
-                                                    {w.name}
-                                                </span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            ) : (
-                                /* ARTIST DISPLAY: Static Vínculo Permanente */
-                                <div className="w-full flex items-center gap-2 p-3 bg-white/2 rounded-xl border border-white/5 cursor-default">
-                                    <div
-                                        className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]"
-                                        style={{ color: (session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.primaryColor || '#8B5CF6', backgroundColor: 'currentColor' }}
-                                    />
-                                    <div className="overflow-hidden">
-                                        <p className="text-[7px] font-mono text-gray-500 uppercase tracking-widest leading-none mb-1">CONECTADO_A</p>
-                                        <p className="text-[10px] font-bold text-gray-300 truncate uppercase tracking-tighter">
-                                            {(session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.name}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    {/* Workspace Switcher / Display - TODO: Reimplement with Clerk/Context */}
+                    {/* (Legacy Workspace Switcher removed during Auth Migration) */}
 
                     <div className="flex items-center justify-between mb-4 overflow-hidden group/user">
                         <div className="flex items-center gap-3">
