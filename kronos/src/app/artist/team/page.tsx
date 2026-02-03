@@ -1,4 +1,29 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { InkPassCard } from '@/components/invites/InkPassCard'
+import { getInvites, revokeInvite } from '@/app/actions/invites'
+import { revokeArtistAccess, updateArtistCommission } from '@/app/actions/workspaces'
+import {
+    Shield,
+    Plus,
+    Users,
+    Trash2,
+    Save,
+    X,
+    Edit2,
+    Clock,
+    Key,
+    Ticket,
+    Copy,
+    Check
+} from 'lucide-react'
 
 export default function TeamPage() {
     const { user } = useUser()
