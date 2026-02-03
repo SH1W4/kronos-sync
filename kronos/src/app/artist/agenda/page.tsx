@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { startOfWeek, endOfWeek, addDays, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 export default function AgendaPage() {
     const { user } = useUser()
