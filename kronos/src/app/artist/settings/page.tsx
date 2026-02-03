@@ -419,10 +419,12 @@ export default function SettingsPage() {
     const handleSavePix = async () => {
         setIsPixLoading(true)
         try {
-            const result = await updateWorkspaceFinance({ pixKey, pixRecipient })
+            const result = await updateWorkspacePix({ pixKey, pixRecipient })
             if (result.success) {
                 toast({
                     title: "PIX Configurado",
+                    description: "Chave atualizada com sucesso.",
+                })
                     description: "Dados de recebimento salvos com sucesso.",
                 })
                 await user?.reload()
