@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { getDocumentation } from '@/app/actions/docs'
 import ReactMarkdown from 'react-markdown'
 import { Book, Shield, FileText, ChevronRight, Terminal, Search, Zap, Cpu } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 
 export default function CodexPage() {
-    const { data: session } = useSession()
+    const { user, isLoaded } = useUser()
     const [docs, setDocs] = useState<any[]>([])
     const [selectedDoc, setSelectedDoc] = useState<any>(null)
     const [searchQuery, setSearchQuery] = useState('')
@@ -15,8 +15,8 @@ export default function CodexPage() {
 
     useEffect(() => {
         const fetchDocs = async () => {
-            const userRole = (session?.user as any)?.role || 'ARTIST'
-            const userEmail = session?.user?.email || null
+            const userRole = (user?.publicMetadata as any)?.role || 'ARTIST'
+            const userEmail = user?.primaryEmailAddress?.emailAddress || null
             const data = await getDocumentation(userRole, userEmail)
             setDocs(data)
             if (data.length > 0) {
@@ -24,10 +24,12 @@ export default function CodexPage() {
             }
             setLoading(false)
         }
-        if (session) {
+        if (isLoaded && user) {
             fetchDocs()
+        } else if (isLoaded && !user) {
+            setLoading(false) // Not authenticated
         }
-    }, [session])
+    }, [user, isLoaded])
 
     const filteredDocs = docs.filter(doc =>
         doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
