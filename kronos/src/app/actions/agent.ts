@@ -87,7 +87,7 @@ export async function queryAgent(userQuery: string, history: any[]) {
     else if (/(quanto|qual).*(ganhei|faturei|lucro|comiss[aã]o)|(meu).*(dinheiro|saldo|extrato)|financeiro/i.test(query)) {
         const aggregations = await prisma.booking.aggregate({
             where: {
-                workspaceId: session.activeWorkspaceId,
+                workspaceId: activeWorkspaceId,
                 artistId: artist.id,
                 status: 'COMPLETED'
             },
