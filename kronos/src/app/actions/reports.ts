@@ -1,8 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 
 /**
  * UTILS: CSV Escaping
@@ -21,12 +20,19 @@ function escapeCSV(value: any) {
  */
 export async function exportClientsCSV() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { error: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
-        const isAdmin = session.user.role === 'ADMIN'
-        const artist = await prisma.artist.findUnique({ where: { userId: session.user.id } })
+        const userWithMemberships = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true, artist: true }
+        })
+
+        if (!userWithMemberships) return { error: 'Usuário não encontrado' }
+
+        const workspaceId = userWithMemberships.memberships[0]?.workspaceId
+        const isAdmin = userWithMemberships.role === 'ADMIN'
+        const artist = userWithMemberships.artist
 
         if (!workspaceId) return { error: 'Workspace não encontrado' }
 
@@ -81,12 +87,19 @@ export async function exportClientsCSV() {
  */
 export async function exportAnamnesisCSV() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { error: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
-        const isAdmin = session.user.role === 'ADMIN'
-        const artist = await prisma.artist.findUnique({ where: { userId: session.user.id } })
+        const userWithMemberships = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true, artist: true }
+        })
+
+        if (!userWithMemberships) return { error: 'Usuário não encontrado' }
+
+        const workspaceId = userWithMemberships.memberships[0]?.workspaceId
+        const isAdmin = userWithMemberships.role === 'ADMIN'
+        const artist = userWithMemberships.artist
 
         if (!workspaceId) return { error: 'Workspace não encontrado' }
 
@@ -131,12 +144,19 @@ export async function exportAnamnesisCSV() {
  */
 export async function exportFinanceCSV() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { error: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
-        const isAdmin = session.user.role === 'ADMIN'
-        const artist = await prisma.artist.findUnique({ where: { userId: session.user.id } })
+        const userWithMemberships = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true, artist: true }
+        })
+
+        if (!userWithMemberships) return { error: 'Usuário não encontrado' }
+
+        const workspaceId = userWithMemberships.memberships[0]?.workspaceId
+        const isAdmin = userWithMemberships.role === 'ADMIN'
+        const artist = userWithMemberships.artist
 
         if (!workspaceId) return { error: 'Workspace não encontrado' }
 
@@ -179,12 +199,19 @@ export async function exportFinanceCSV() {
  */
 export async function generateClientDossier(clientId: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { error: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
-        const artist = await prisma.artist.findUnique({ where: { userId: session.user.id } })
-        const isAdmin = session.user.role === 'ADMIN'
+        const userWithMemberships = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true, artist: true }
+        })
+
+        if (!userWithMemberships) return { error: 'Usuário não encontrado' }
+
+        const workspaceId = userWithMemberships.memberships[0]?.workspaceId
+        const isAdmin = userWithMemberships.role === 'ADMIN'
+        const artist = userWithMemberships.artist
 
         const client = await prisma.user.findUnique({
             where: { id: clientId },

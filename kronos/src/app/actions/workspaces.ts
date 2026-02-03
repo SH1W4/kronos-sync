@@ -1,8 +1,6 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
 import { slugify } from "@/lib/utils"
 import { revalidatePath } from "next/cache"
 import { createWorkspaceSchema, workspaceRequestSchema } from "@/lib/validations"
@@ -10,10 +8,12 @@ import { createWorkspaceSchema, workspaceRequestSchema } from "@/lib/validations
  * Criação direta de Workspace.
  * Mantida para uso administrativo ou chaves mestras.
  */
+import { auth } from "@clerk/nextjs/server"
+
 export async function createWorkspace(data: { name: string, primaryColor: string, capacity?: number }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
@@ -24,7 +24,7 @@ export async function createWorkspace(data: { name: string, primaryColor: string
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email }
+            where: { clerkId: clerkUserId }
         })
 
         if (!user) {
@@ -99,21 +99,13 @@ export async function submitWorkspaceRequest(data: {
     motivation: string
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        // Validação Zod
-        const validated = workspaceRequestSchema.safeParse(data)
-        if (!validated.success) {
-            return { error: validated.error.issues[0].message }
-        }
-
         const user = await prisma.user.findUnique({
-            where: { id: (session.user as any).id || '' }
-        }) || await prisma.user.findUnique({
-            where: { email: session.user.email }
+            where: { clerkId: clerkUserId }
         })
 
         if (!user) {
@@ -157,10 +149,19 @@ export async function updateWorkspaceFinance(data: {
     pixRecipient?: string
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
 
-        if (!session?.user || !activeWorkspaceId) {
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+        if (!user || !activeWorkspaceId) {
             return { error: 'Não autorizado ou nenhum estúdio ativo.' }
         }
 
@@ -169,7 +170,7 @@ export async function updateWorkspaceFinance(data: {
             where: {
                 workspaceId_userId: {
                     workspaceId: activeWorkspaceId,
-                    userId: (session.user as any).id
+                    userId: user.id
                 }
             }
         })
@@ -207,10 +208,19 @@ export async function updateWorkspaceBranding(data: {
     logoUrl?: string
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
 
-        if (!session?.user || !activeWorkspaceId) {
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+        if (!user || !activeWorkspaceId) {
             return { error: 'Não autorizado ou nenhum estúdio ativo.' }
         }
 
@@ -219,7 +229,7 @@ export async function updateWorkspaceBranding(data: {
             where: {
                 workspaceId_userId: {
                     workspaceId: activeWorkspaceId,
-                    userId: (session.user as any).id
+                    userId: user.id
                 }
             }
         })
@@ -256,10 +266,19 @@ export async function updateWorkspaceCalendar(data: {
     googleCalendarId?: string
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
 
-        if (!session?.user || !activeWorkspaceId) {
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+        if (!user || !activeWorkspaceId) {
             return { error: 'Não autorizado ou nenhum estúdio ativo.' }
         }
 
@@ -268,7 +287,7 @@ export async function updateWorkspaceCalendar(data: {
             where: {
                 workspaceId_userId: {
                     workspaceId: activeWorkspaceId,
-                    userId: (session.user as any).id
+                    userId: user.id
                 }
             }
         })
@@ -301,10 +320,19 @@ export async function updateWorkspaceCalendar(data: {
  */
 export async function revokeArtistAccess(artistId: string) {
     try {
-        const session = await getServerSession(authOptions)
-        const activeWorkspaceId = (session as any)?.activeWorkspaceId || (session?.user as any)?.activeWorkspaceId
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
 
-        if (!session?.user || !activeWorkspaceId) {
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+        if (!user || !activeWorkspaceId) {
             return { error: 'Não autorizado ou nenhum estúdio ativo.' }
         }
 
@@ -313,7 +341,7 @@ export async function revokeArtistAccess(artistId: string) {
             where: {
                 workspaceId_userId: {
                     workspaceId: activeWorkspaceId,
-                    userId: (session.user as any).id
+                    userId: user.id
                 }
             }
         })
@@ -333,7 +361,7 @@ export async function revokeArtistAccess(artistId: string) {
         }
 
         // 3. Impedir que o mestre remova a si mesmo (precisa ser feito via outra lógica se necessário)
-        if (targetArtist.userId === (session.user as any).id) {
+        if (targetArtist.userId === user.id) {
             return { error: 'Você não pode revogar seu próprio acesso de mestre.' }
         }
 

@@ -1,20 +1,44 @@
 import { google } from 'googleapis'
 import { prisma } from '@/lib/prisma'
 
+import { clerkClient } from '@clerk/nextjs/server'
+
 /**
  * Gets a Google Calendar client for a specific user, 
- * automatically handling OAuth credentials from the Prisma Account table.
+ * leveraging Clerk's OAuth token management.
  */
 export async function getGoogleCalendarClient(userId: string) {
-    const account = await prisma.account.findFirst({
-        where: {
-            userId,
-            provider: 'google'
-        }
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { clerkId: true }
     })
 
-    if (!account || !account.access_token) {
-        console.warn(`⚠️ Usuário ${userId} não tem conta Google conectada.`)
+    if (!user?.clerkId) {
+        console.warn(`⚠️ Usuário ${userId} não tem clerkId vinculado. Tentando fallback NextAuth...`)
+        // Fallback para NextAuth (Legado)
+        const account = await prisma.account.findFirst({
+            where: { userId, provider: 'google' }
+        })
+        if (!account || !account.access_token) return null
+
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET
+        )
+        oauth2Client.setCredentials({
+            access_token: account.access_token,
+            refresh_token: account.refresh_token,
+            expiry_date: account.expires_at ? account.expires_at * 1000 : undefined
+        })
+        return google.calendar({ version: 'v3', auth: oauth2Client })
+    }
+
+    const client = await clerkClient()
+    const response = await client.users.getUserOauthAccessToken(user.clerkId, 'oauth_google');
+    const token = response.data[0];
+
+    if (!token) {
+        console.warn(`⚠️ Usuário ${userId} (Clerk: ${user.clerkId}) não tem token Google no Clerk.`)
         return null
     }
 
@@ -24,12 +48,11 @@ export async function getGoogleCalendarClient(userId: string) {
     )
 
     oauth2Client.setCredentials({
-        access_token: account.access_token,
-        refresh_token: account.refresh_token,
-        expiry_date: account.expires_at ? account.expires_at * 1000 : undefined
+        access_token: token.token,
+        // Clerk handles refreshing, but we might need the refresh_token if we do background jobs
+        // For server actions on behalf of logged user, access_token from Clerk is enough
     })
 
-    // Auto-refresh handled by the library if refresh_token is present
     return google.calendar({ version: 'v3', auth: oauth2Client })
 }
 

@@ -1,19 +1,18 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { equipSkin } from "@/lib/gamification"
 import { SkinSlot } from "@/data/gamification/skins"
 
 export async function getGamificationData() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return null
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return null
 
         const artist = await prisma.artist.findFirst({
-            where: { user: { email: session.user.email } }
+            where: { user: { clerkId: clerkUserId } }
         })
 
         if (!artist) return null
@@ -52,11 +51,11 @@ export async function getGamificationData() {
 
 export async function equipSkinAction(slot: SkinSlot, skinCode: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { success: false, error: 'Unauthorized' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { success: false, error: 'Unauthorized' }
 
         const artist = await prisma.artist.findFirst({
-            where: { user: { email: session.user.email } }
+            where: { user: { clerkId: clerkUserId } }
         })
 
         if (!artist) return { success: false, error: 'Artist not found' }

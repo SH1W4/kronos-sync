@@ -1,5 +1,6 @@
 "use server"
 
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
@@ -13,6 +14,11 @@ export async function createSettlement(data: {
     proofUrl: string
 }) {
     try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { success: false, message: 'Não autorizado' }
+        }
+
         const settlement = await prisma.settlement.create({
             data: {
                 artistId: data.artistId,
@@ -176,6 +182,19 @@ export async function getArtistPendingRevenue(artistId: string) {
 
 export async function approveSettlement(settlementId: string, status: 'APPROVED' | 'REJECTED') {
     try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { success: false, message: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user || user.role !== 'ADMIN') {
+            return { success: false, message: 'Apenas administradores podem aprovar liquidações.' }
+        }
+
         const settlement = await prisma.settlement.update({
             where: { id: settlementId },
             data: { status },
@@ -183,8 +202,6 @@ export async function approveSettlement(settlementId: string, status: 'APPROVED'
         })
 
         // Se a liquidação for aprovada, e houver bônus abatidos, resetamos os ganhos do artista
-        // Note: Em um sistema mais complexo, faríamos um controle granular por transação.
-        // Aqui, como o bônus é "abatido" no ato da liquidação total, resetamos o saldo de comissões de indicação.
         if (status === 'APPROVED' && settlement.aiExtractedData) {
             const data = settlement.aiExtractedData as any
             if (data.bonusDeducted > 0) {
@@ -203,8 +220,22 @@ export async function approveSettlement(settlementId: string, status: 'APPROVED'
         return { success: false, message: "Erro ao atualizar status." }
     }
 }
+
 export async function auditSettlement(settlementId: string) {
     try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { success: false, message: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user || user.role !== 'ADMIN') {
+            return { success: false, message: 'Apenas administradores podem auditar liquidações.' }
+        }
+
         await prisma.settlement.update({
             where: { id: settlementId },
             data: { isAudited: true } as any

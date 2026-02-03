@@ -1,19 +1,23 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { userThemeSchema, artistSettingsSchema, workspaceBrandingSchema } from "@/lib/validations"
 
 export async function updateWorkspaceCapacity(capacity: number) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
         if (!workspaceId) return { error: 'Workspace não encontrado' }
 
         // Validação
@@ -40,12 +44,17 @@ export async function updateWorkspaceCapacity(capacity: number) {
 
 export async function getWorkspaceSettings() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
         if (!workspaceId) return { error: 'Workspace não encontrado' }
 
         const workspace = await prisma.workspace.findUnique({
@@ -61,12 +70,16 @@ export async function getWorkspaceSettings() {
 
 export async function updateUserTheme(color: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const userId = (session.user as any).id
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        const userId = user?.id
         if (!userId) return { error: 'Usuário não encontrado' }
 
         // Validação
@@ -90,15 +103,19 @@ export async function updateUserTheme(color: string) {
 
 export async function updateArtistSettings(data: { name?: string; commissionRate?: number; instagram?: string; image?: string; calendarSyncEnabled?: boolean }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const userId = (session.user as any).id
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        const userId = user?.id
         if (!userId) return { error: 'Usuário não encontrado' }
 
-        const userRole = (session.user as any).role
+        const userRole = user.role
 
         // Validação - Partial because we allow updating subsets
         const partialSchema = artistSettingsSchema.partial()

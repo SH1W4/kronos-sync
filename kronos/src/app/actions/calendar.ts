@@ -1,8 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth, clerkClient } from "@clerk/nextjs/server"
 import { getGoogleCalendarClient, createCalendarEvent } from "@/lib/google"
 import { revalidatePath } from "next/cache"
 
@@ -12,33 +11,32 @@ import { revalidatePath } from "next/cache"
  */
 export async function getCalendarStatus() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { connected: false }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { connected: false }
 
-        const account = await prisma.account.findFirst({
-            where: {
-                userId: (session.user as any).id,
-                provider: 'google'
-            }
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
         })
 
-        if (!account) return { connected: false }
+        if (!user) return { connected: false }
+
+        // Fetch tokens from Clerk to verify connection
+        const client = await clerkClient()
+        const response = await client.users.getUserOauthAccessToken(clerkUserId, 'oauth_google');
+        const token = response.data[0];
+
+        if (!token) return { connected: false }
 
         // Check if we have the needed scope
-        const hasScope = account.scope?.includes('https://www.googleapis.com/auth/calendar')
-
-        // Fetch artist preferences
-        const artist = await prisma.artist.findUnique({
-            where: { userId: (session.user as any).id },
-            select: { calendarSyncEnabled: true }
-        })
+        const hasScope = token.scopes?.includes('https://www.googleapis.com/auth/calendar')
 
         return {
             connected: true,
-            email: session.user.email,
+            email: user.email,
             hasRequiredScopes: hasScope,
-            calendarSyncEnabled: artist?.calendarSyncEnabled || false,
-            lastSyncedAt: null // TODO: Implement sync tracking in Artist model
+            calendarSyncEnabled: user.artist?.calendarSyncEnabled || false,
+            lastSyncedAt: user.artist?.lastSyncedAt || null
         }
     } catch (error) {
         console.error('Error fetching calendar status:', error)
@@ -51,12 +49,11 @@ export async function getCalendarStatus() {
  */
 export async function syncAllBookings() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) throw new Error('Unauthorized')
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) throw new Error('Unauthorized')
 
-        const userId = (session.user as any).id
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { clerkId: clerkUserId },
             include: { artist: true }
         })
 
@@ -75,7 +72,7 @@ export async function syncAllBookings() {
 
         let successCount = 0
         for (const booking of bookings) {
-            const result = await createCalendarEvent(userId, {
+            const result = await createCalendarEvent(user.id, {
                 summary: `Tatuagem: ${booking.client.name}`,
                 description: `Sessão agendada via KRONØS\nURL: ${process.env.NEXTAUTH_URL}/artist/agenda`,
                 startTime: booking.scheduledFor,
@@ -109,10 +106,15 @@ export async function syncAllBookings() {
  */
 export async function importGoogleEvents(startDate: Date, endDate: Date) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) throw new Error('Unauthorized')
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) throw new Error('Unauthorized')
 
-        const calendar = await getGoogleCalendarClient((session.user as any).id)
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+        if (!user) throw new Error('User not found')
+
+        const calendar = await getGoogleCalendarClient(user.id)
         if (!calendar) return { success: false, error: 'Google Calendar not connected' }
 
         const response = await calendar.events.list({

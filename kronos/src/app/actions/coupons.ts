@@ -1,8 +1,6 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from 'next/cache'
 
 export async function validateCoupon(code: string) {
@@ -69,12 +67,20 @@ export async function applyCommissionToArtist(orderId: string) {
     }
 }
 
+import { auth } from "@clerk/nextjs/server"
+
 export async function redeemCouponAction(code: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { success: false, message: 'Não autorizado.' }
         }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user) return { success: false, message: 'Usuário não encontrado.' }
 
         if (!code) return { success: false, message: 'Código inválido.' }
 
@@ -102,7 +108,7 @@ export async function redeemCouponAction(code: string) {
             where: { id: coupon.id },
             data: {
                 status: 'USED',
-                usedByUserId: session.user.id // Artista que deu baixa
+                usedByUserId: user.id // Artista que deu baixa
             }
         })
 

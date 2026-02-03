@@ -4,20 +4,22 @@ import React, { useState, useEffect } from 'react'
 import { Shield, Check, ArrowRight, Lock, FileText, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { acceptArtistTerms, checkTermsAcceptance } from '@/app/actions/artists'
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 
 export function TermsGate({ children }: { children: React.ReactNode }) {
-    const { data: session, status } = useSession()
+    const { user, isLoaded, isSignedIn } = useUser()
     const [mustAccept, setMustAccept] = useState(false)
     const [loading, setLoading] = useState(false)
     const [scrolledToBottom, setScrolledToBottom] = useState(false)
 
     useEffect(() => {
-        const userRole = (session?.user as any)?.role
-        if (status === 'authenticated' && (userRole === 'ARTIST' || userRole === 'ADMIN')) {
-            checkTerms()
+        if (isLoaded && isSignedIn) {
+            const userRole = user?.publicMetadata?.role
+            if (userRole === 'ARTIST' || userRole === 'ADMIN') {
+                checkTerms()
+            }
         }
-    }, [status, session])
+    }, [isLoaded, isSignedIn, user])
 
     async function checkTerms() {
         // Double check status to avoid flickers

@@ -11,22 +11,25 @@ import { submitWorkspaceRequest } from '@/app/actions/workspaces'
 
 export const dynamic = 'force-dynamic'
 
+import { useUser, useAuth } from '@clerk/nextjs'
+
 function OnboardingContent() {
-    const { data: session, update, status } = useSession()
+    const { user, isLoaded, isSignedIn } = useUser()
+    const { userId } = useAuth()
     const router = useRouter()
     const searchParams = useSearchParams()
 
     // Check if user is already authenticated to bypass onboarding
     React.useEffect(() => {
-        if (status === 'authenticated' && session?.user) {
-            const role = (session.user as any).role
+        if (isLoaded && isSignedIn && user) {
+            const role = user.publicMetadata?.role
             if (role === 'ARTIST' || role === 'ADMIN') {
                 router.replace('/artist/dashboard')
             } else if (role === 'CLIENT') {
                 router.replace('/kiosk')
             }
         }
-    }, [session, status, router])
+    }, [user, isLoaded, isSignedIn, router])
 
     const initialRole = searchParams.get('role')
     const initialMode = searchParams.get('mode')

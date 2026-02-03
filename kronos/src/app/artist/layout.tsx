@@ -1,42 +1,38 @@
-'use client'
-
-import { useSession } from 'next-auth/react'
+import { useUser, useClerk, UserButton } from '@clerk/nextjs'
 import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen, ShoppingBag, ChevronDown, QrCode, User } from 'lucide-react'
+import { LayoutDashboard, Calendar, DollarSign, Users, Settings, LogOut, Shield, BookOpen, ShoppingBag, ChevronDown, QrCode, User as UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import McpWidget from '@/components/agent/McpWidget'
 import { ThemeCustomizer } from '@/components/theme/theme-customizer'
-import { signOut } from 'next-auth/react'
 import { TermsGate } from '@/components/auth/TermsGate'
 
 export default function ArtistLayout({ children }: { children: React.ReactNode }) {
-    const { data: session, status, update: updateSession } = useSession()
+    const { user, isLoaded, isSignedIn } = useUser()
+    const { signOut } = useClerk()
     const router = useRouter()
     const pathname = usePathname()
+    const [dbUser, setDbUser] = useState<any>(null)
 
     useEffect(() => {
-        if (status === 'loading') return
-        if (!session) {
+        if (!isLoaded) return
+        if (!isSignedIn) {
             router.push('/auth/signin')
             return
         }
 
-        const userRole = (session?.user as any)?.role
-        const activeWorkspaceId = (session?.user as any)?.activeWorkspaceId
-
+        // Fetch additional DB data if needed (Role/Workspace)
+        // For now using metadata from Clerk
+        const userRole = user?.publicMetadata?.role
+        
         if (userRole !== 'ARTIST' && userRole !== 'ADMIN') {
-            router.push('/dashboard')
-            return
+            // Se não for artista nem admin, talvez seja um novo registro desvinculado
+            // router.push('/onboarding')
         }
+    }, [user, isLoaded, isSignedIn, router])
 
-        if (userRole === 'ARTIST' && !activeWorkspaceId) {
-            router.push('/onboarding')
-        }
-    }, [session, status, router])
-
-    if (status === 'loading') {
+    if (!isLoaded) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="animate-pulse font-mono text-xs tracking-widest text-primary">INITIALIZING NEURAL LINK...</div>
@@ -58,15 +54,14 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
 
                     <nav className="space-y-2">
                         <NavItem href="/artist/dashboard" icon={<LayoutDashboard size={20} />} label="VISÃO GERAL" active={pathname === '/artist/dashboard'} />
-                        <NavItem href="/artist/profile" icon={<User size={20} />} label="MEU PERFIL" active={pathname === '/artist/profile'} />
+                        <NavItem href="/artist/profile" icon={<UserIcon size={20} />} label="MEU PERFIL" active={pathname === '/artist/profile'} />
                         <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
                         <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
                         <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
                         <NavItem href="/artist/scanner" icon={<QrCode size={20} />} label="SCANNER" active={pathname === '/artist/scanner'} />
                         <NavItem href="/artist/inventory" icon={<ShoppingBag size={20} />} label="INVENTÁRIO" active={pathname === '/artist/inventory'} />
                         <NavItem href="/artist/clients" icon={<Users size={20} />} label="CLIENTES" active={pathname === '/artist/clients'} />
-                        {/* @ts-ignore */}
-                        {session?.user?.role === 'ADMIN' && (
+                        {user?.publicMetadata?.role === 'ADMIN' && (
                             <NavItem href="/artist/team" icon={<Shield size={20} />} label="EQUIPE" active={pathname === '/artist/team'} />
                         )}
                         <NavItem href="/artist/codex" icon={<BookOpen size={20} />} label="CODEX" active={pathname?.startsWith('/artist/codex')} />
@@ -134,19 +129,26 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
 
                     <div className="flex items-center justify-between mb-4 overflow-hidden group/user">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded bg-primary flex-shrink-0 flex items-center justify-center text-[10px] font-bold shadow-[0_0_10px_rgba(var(--primary-rgb),0.3)] text-black">
-                                {session?.user?.name?.charAt(0)}
-                            </div>
+                            <UserButton 
+                                appearance={{
+                                    elements: {
+                                        userButtonAvatarBox: "w-8 h-8 rounded border border-primary/20",
+                                        userButtonPopoverCard: "bg-gray-900 border border-white/10 text-white",
+                                        userButtonPopoverActionButtonText: "text-gray-300",
+                                        userButtonPopoverFooter: "hidden"
+                                    }
+                                }}
+                            />
                             <div className="hidden md:block">
-                                <p className="text-sm font-bold truncate max-w-[100px]">{session?.user?.name}</p>
+                                <p className="text-sm font-bold truncate max-w-[100px]">{user?.fullName}</p>
                                 <p className="text-xs text-gray-500 font-mono uppercase tracking-tighter">
-                                    {(session?.user as any)?.role}
+                                    {user?.publicMetadata?.role as string}
                                 </p>
                             </div>
                         </div>
 
                         <button
-                            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                            onClick={() => signOut({ redirectUrl: '/auth/signin' })}
                             className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all duration-300 group/logout"
                             title="ENCERRAR SESSÃO"
                         >

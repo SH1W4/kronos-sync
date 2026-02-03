@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { BrandLogo } from '@/components/ui/brand-logo'
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { X } from 'lucide-react'
 
@@ -69,7 +69,7 @@ const FEATURES = [
 ]
 
 export default function LandingPage() {
-    const { data: session } = useSession()
+    const { user, isSignedIn } = useUser()
     const [activeFeature, setActiveFeature] = useState<any>(null)
 
     return (
@@ -80,8 +80,8 @@ export default function LandingPage() {
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
                     <BrandLogo size={32} animated={false} />
                     <div className="flex items-center gap-8">
-                        {session ? (
-                            <Link href={((session.user as any).role === 'ARTIST' || (session.user as any).role === 'ADMIN') ? '/artist/dashboard' : '/kiosk'}>
+                        {isSignedIn ? (
+                            <Link href={((user.publicMetadata as any)?.role === 'ARTIST' || (user.publicMetadata as any)?.role === 'ADMIN') ? '/artist/dashboard' : '/kiosk'}>
                                 <Button variant="outline" className="border-white/20 text-white hover:bg-white hover:text-black font-medium tracking-wide text-xs h-9 px-6 uppercase transition-all">
                                     Meu Painel
                                 </Button>
@@ -130,9 +130,9 @@ export default function LandingPage() {
                     </p>
 
                     <div className="flex gap-4">
-                        <Link href={session ? (((session.user as any).role === 'ARTIST' || (session.user as any).role === 'ADMIN') ? '/artist/dashboard' : '/kiosk') : '/onboarding'}>
+                        <Link href={isSignedIn ? (((user.publicMetadata as any)?.role === 'ARTIST' || (user.publicMetadata as any)?.role === 'ADMIN') ? '/artist/dashboard' : '/kiosk') : '/onboarding'}>
                             <Button className="h-12 px-8 bg-white text-black hover:bg-zinc-200 text-xs font-bold font-orbitron tracking-widest uppercase rounded flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
-                                {session ? 'ENTRAR NO SISTEMA' : 'ACESSAR FLOW'}
+                                {isSignedIn ? 'ENTRAR NO SISTEMA' : 'ACESSAR FLOW'}
                             </Button>
                         </Link>
                     </div>

@@ -1,23 +1,7 @@
-'use client'
-
-import React, { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { Settings, User, Shield, Calendar, CreditCard, Bell, Link as LinkIcon, Copy, Check, Instagram, Sparkles, Users, Landmark, Trash2, Palette } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
-import { updateArtistSettings, updatePassword } from '@/app/actions/settings'
-import { updateWorkspaceFinance, updateWorkspaceBranding, updateWorkspaceCalendar } from '@/app/actions/workspaces'
-import { updateUserTheme, updateWorkspaceCapacity } from '@/app/actions/settings'
-import { useRouter } from 'next/navigation'
-import { InkPassCard } from '@/components/invites/InkPassCard'
-import { getInvites, createInvite, revokeInvite } from '@/app/actions/invites'
-import { useToast } from '@/components/ui/use-toast'
-
-import { useTheme } from '@/contexts/theme-context'
+import { useUser } from '@clerk/nextjs'
 
 export default function SettingsPage() {
-    const { data: session, update: updateSession } = useSession()
+    const { user } = useUser()
     const { theme, setTheme } = useTheme()
     const router = useRouter()
     const { toast } = useToast()
@@ -67,37 +51,42 @@ export default function SettingsPage() {
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        if (session?.user && !isInitialized) {
-            setName(session.user.name || '')
+        if (user && !isInitialized) {
+            setName(user.fullName || '')
             setIsInitialized(true)
-            if ((session.user as any).commissionRate !== undefined) {
-                setCommission(String((session.user as any).commissionRate * 100))
+            
+            // Clerk properties are in publicMetadata or on user object
+            const commissionRate = user.publicMetadata?.commissionRate as number | undefined
+            if (commissionRate !== undefined) {
+                setCommission(String(commissionRate * 100))
             }
-            if ((session.user as any).instagram) {
-                setInstagram((session.user as any).instagram)
+            
+            if (user.publicMetadata?.instagram) {
+                setInstagram(user.publicMetadata.instagram as string)
             }
-            if (session.user.image) {
-                setImage(session.user.image)
-            }
-
-            // Initialize PIX if available
-            const activeWsid = (session as any).activeWorkspaceId || (session?.user as any).activeWorkspaceId
-            const currentWorkspace = (session as any)?.workspaces?.find((w: any) => w.id === activeWsid)
-            if (currentWorkspace) {
-                setPixKey(currentWorkspace.pixKey || '')
-                setPixRecipient(currentWorkspace.pixRecipient || '')
-                setStudioName(currentWorkspace.name || '')
-                setStudioLogo(currentWorkspace.logoUrl || '')
-                setStudioColor(currentWorkspace.primaryColor || '#8B5CF6')
-                setStudioCapacity(currentWorkspace.capacity || 3)
-                setGoogleCalendarId(currentWorkspace.googleCalendarId || '')
+            
+            if (user.imageUrl) {
+                setImage(user.imageUrl)
             }
 
-            if ((session?.user as any).customColor) {
-                setPersonalColor((session.user as any).customColor)
+            // Initialize Workspace Stats from metadata if available
+            // For now, these might still need a direct DB call or are in metadata
+            const workspace = user.publicMetadata?.workspace as any
+            if (workspace) {
+                setPixKey(workspace.pixKey || '')
+                setPixRecipient(workspace.pixRecipient || '')
+                setStudioName(workspace.name || '')
+                setStudioLogo(workspace.logoUrl || '')
+                setStudioColor(workspace.primaryColor || '#8B5CF6')
+                setStudioCapacity(workspace.capacity || 3)
+                setGoogleCalendarId(workspace.googleCalendarId || '')
+            }
+
+            if (user.publicMetadata?.customColor) {
+                setPersonalColor(user.publicMetadata.customColor as string)
             }
         }
-    }, [session])
+    }, [user])
 
     const fetchInvites = async () => {
         setIsInvitesLoading(true)
@@ -124,7 +113,7 @@ export default function SettingsPage() {
             })
 
             if (result.success) {
-                await updateSession()
+                await user?.reload()
                 toast({
                     title: "Perfil Atualizado",
                     description: "Suas configurações foram salvas no Neural Link.",
@@ -149,7 +138,7 @@ export default function SettingsPage() {
     }
 
 
-    const clientLink = session?.user ? `${window.location.protocol}//${window.location.host}/onboarding` : '#'
+    const clientLink = user ? `${window.location.protocol}//${window.location.host}/onboarding` : '#'
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(clientLink)
@@ -236,7 +225,7 @@ export default function SettingsPage() {
                     title: "Estúdio Configurado",
                     description: "Configurações globais de workspace aplicadas.",
                 })
-                await updateSession()
+                await user?.reload()
             } else {
                 toast({
                     title: "Conflito Studio",
@@ -264,7 +253,7 @@ export default function SettingsPage() {
                     title: "Tema Aplicado",
                     description: "Assinatura cromática alterada.",
                 })
-                await updateSession()
+                await user?.reload()
             } else {
                 toast({
                     title: "Erro no Tema",
@@ -295,7 +284,7 @@ export default function SettingsPage() {
                     title: "Branding Atualizado",
                     description: "Identidade visual do estúdio sincronizada.",
                 })
-                await updateSession()
+                await user?.reload()
             } else {
                 toast({
                     title: "Erro Branding",
@@ -326,7 +315,7 @@ export default function SettingsPage() {
                     title: "HUD Atualizado",
                     description: "Seu tema pessoal foi aplicado com sucesso.",
                 })
-                await updateSession()
+                await user?.reload()
             } else {
                 toast({
                     title: "Erro Tema",
@@ -392,7 +381,7 @@ export default function SettingsPage() {
                     title: "PIX Configurado",
                     description: "Dados de recebimento salvos com sucesso.",
                 })
-                await updateSession()
+                await user?.reload()
             } else {
                 toast({
                     title: "Erro Financeiro",
@@ -447,7 +436,7 @@ export default function SettingsPage() {
         }
     }
 
-    const isAdmin = (session?.user as any)?.role === 'ADMIN'
+    const isAdmin = user?.publicMetadata?.role === 'ADMIN'
 
     return (
         <div className="min-h-screen bg-black text-white p-6 md:p-12 relative overflow-hidden data-pattern-grid">
@@ -718,7 +707,7 @@ export default function SettingsPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                                             <span className="font-mono text-xs text-white font-bold uppercase tracking-widest">
-                                                {(session as any)?.workspaces?.find((w: any) => w.id === (session?.user as any).activeWorkspaceId)?.name || 'ESTÚDIO KRONØS'}
+                                                {(user?.publicMetadata?.workspace as any)?.name || 'ESTÚDIO KRONØS'}
                                             </span>
                                         </div>
                                         <span className="text-[8px] font-black font-mono text-red-500/60 uppercase tracking-widest border border-red-500/30 px-2 py-1 rounded">VÍNCULO ATIVO</span>

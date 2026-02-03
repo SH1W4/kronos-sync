@@ -1,19 +1,24 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 
 export async function acceptArtistTerms() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.id) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { success: false, message: 'Não autorizado' }
         }
 
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user) return { success: false, message: 'Usuário não encontrado' }
+
         await prisma.artist.update({
-            where: { userId: session.user.id },
+            where: { userId: user.id },
             data: {
                 termsAcceptedAt: new Date()
             }
@@ -29,11 +34,17 @@ export async function acceptArtistTerms() {
 
 export async function checkTermsAcceptance() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.id) return { accepted: true } // Not an artist session or not logged in
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { accepted: true }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user) return { accepted: true }
 
         const artist = await prisma.artist.findUnique({
-            where: { userId: session.user.id },
+            where: { userId: user.id },
             select: { termsAcceptedAt: true }
         })
 
@@ -47,8 +58,16 @@ export async function checkTermsAcceptance() {
 
 export async function updateArtistCommission(artistId: string, newRate: number) {
     try {
-        const session = await getServerSession(authOptions)
-        if ((session?.user as any)?.role !== 'ADMIN') {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { success: false, message: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user || user.role !== 'ADMIN') {
             return { success: false, message: 'Apenas administradores podem alterar comissões.' }
         }
 

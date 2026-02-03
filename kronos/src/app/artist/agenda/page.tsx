@@ -1,18 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { Calendar, Plus, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { getMyBookings } from '@/app/actions/bookings'
-import { CalendarView } from '@/components/agenda/CalendarView'
-import { BookingModal } from '@/components/agenda/NewBookingModal'
-import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
-import { format, startOfWeek, endOfWeek, addDays, subDays } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+import { useUser } from '@clerk/nextjs'
 
 export default function AgendaPage() {
-    const { data: session } = useSession()
+    const { user } = useUser()
     const [view, setView] = useState<'day' | 'week'>('week')
     const [currentDate, setCurrentDate] = useState(new Date())
     const [bookings, setBookings] = useState<any[]>([])

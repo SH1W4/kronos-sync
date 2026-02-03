@@ -1,7 +1,5 @@
 'use server'
 
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
@@ -11,7 +9,8 @@ import { anamnesisSchema } from "@/lib/validations"
 
 export async function saveAnamnesis(bookingId: string, data: unknown) {
     try {
-        // Validar dados de entrada
+        const { userId: clerkUserId } = await auth()
+        // ... validacoes Zod ...
         const validated = anamnesisSchema.safeParse(data)
         if (!validated.success) {
             const firstError = validated.error.issues[0]
@@ -97,13 +96,20 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
 // --------------------------------------------------------------------------------
 // SMART ACTION: REUSE ANAMNESIS
 // Clona os dados médicos da última ficha válida do cliente para a sessão atual.
-// --------------------------------------------------------------------------------
+import { auth } from "@clerk/nextjs/server"
+
 export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             throw new Error('Não autorizado. Faça login novamente.')
         }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user) throw new Error('Usuário não encontrado.')
 
         console.log(`♻️ Clonando anamnese ${sourceAnamnesisId} para agendamento ${targetBookingId}`)
 
@@ -124,8 +130,8 @@ export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId:
         // - For ADMIN
         // - For o autor da ficha original
         // - A ficha permite compartilhamento (allowSharing: true)
-        const isOwner = source.booking?.artistId === session.user.id
-        const isAdmin = session.user.role === 'ADMIN'
+        const isOwner = source.booking?.artistId === user.id
+        const isAdmin = user.role === 'ADMIN'
         const canAccess = isAdmin || isOwner || (source as any).allowSharing
 
         if (!canAccess) {

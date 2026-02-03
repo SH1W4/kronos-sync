@@ -1,8 +1,6 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
 import { revalidatePath } from "next/cache"
 import { BUSINESS_RULES, calculateProductPrice } from "@/lib/business-rules"
 
@@ -33,13 +31,15 @@ export async function getProducts(typeFilter?: string) {
     }
 }
 
+import { auth } from "@clerk/nextjs/server"
+
 export async function getArtistInventory() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { success: false, message: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { success: false, message: 'Não autorizado' }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { clerkId: clerkUserId },
             include: {
                 artist: true,
                 ownedWorkspaces: { take: 1 }
@@ -71,11 +71,11 @@ export async function saveProduct(data: {
     isSold?: boolean
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { success: false, message: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { success: false, message: 'Não autorizado' }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { clerkId: clerkUserId },
             include: { artist: true, ownedWorkspaces: true }
         })
 
@@ -149,13 +149,13 @@ export async function createOrder(data: {
     couponCode?: string
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Faça login para finalizar a compra.' }
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { clerkId: clerkUserId },
             include: {
                 artist: true,
                 ownedWorkspaces: { take: 1 }

@@ -1,8 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, getGoogleCalendarClient } from "@/lib/google"
 import { bookingSchema } from "@/lib/validations"
@@ -22,8 +21,8 @@ export async function createBooking(data: {
     syncToGoogle?: boolean
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
@@ -35,15 +34,15 @@ export async function createBooking(data: {
 
         // Get artist from session
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
-            include: { artist: true }
+            where: { clerkId: clerkUserId },
+            include: { artist: true, memberships: true }
         })
 
         if (!user?.artist) {
             return { error: 'Apenas artistas podem criar agendamentos' }
         }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
+        const workspaceId = user.memberships[0]?.workspaceId
 
         if (!workspaceId) {
             return { error: 'Workspace não encontrado' }
@@ -224,13 +223,13 @@ export async function getMyBookings(data: {
     includeGoogleEvents?: boolean
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { clerkId: clerkUserId },
             include: { artist: true }
         })
 
@@ -318,13 +317,13 @@ export async function updateBookingStatus(data: {
     status: 'OPEN' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { clerkId: clerkUserId },
             include: { artist: true }
         })
 
@@ -341,7 +340,7 @@ export async function updateBookingStatus(data: {
             return { error: 'Agendamento não encontrado' }
         }
 
-        if (booking.artistId !== user.artist.id && (session.user as any).role !== 'ADMIN') {
+        if (booking.artistId !== user.artist.id && user.role !== 'ADMIN') {
             return { error: 'Você não tem permissão para alterar este agendamento' }
         }
 
@@ -387,13 +386,13 @@ export async function updateBookingStatus(data: {
  */
 export async function deleteBooking(bookingId: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
         const user = await prisma.user.findUnique({
-            where: { email: session.user.email },
+            where: { clerkId: clerkUserId },
             include: { artist: true }
         })
 
@@ -410,7 +409,7 @@ export async function deleteBooking(bookingId: string) {
             return { error: 'Agendamento não encontrado' }
         }
 
-        if (booking.artistId !== user.artist.id && (session.user as any).role !== 'ADMIN') {
+        if (booking.artistId !== user.artist.id && user.role !== 'ADMIN') {
             return { error: 'Você não tem permissão para deletar este agendamento' }
         }
 
@@ -445,10 +444,15 @@ export async function getWorkspaceBookings(data: {
     endDate: Date
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) return { error: 'Não autorizado' }
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
         if (!workspaceId) return { error: 'Workspace não selecionado' }
 
         // Fetch all bookings for this, regardless of artist

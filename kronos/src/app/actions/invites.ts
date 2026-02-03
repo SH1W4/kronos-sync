@@ -1,8 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { UserRole, ArtistPlan } from "@prisma/client"
 import { inviteSchema } from "@/lib/validations"
@@ -23,9 +22,16 @@ export async function createInvite(options: {
     durationDays?: number,
     customCode?: string
 }) {
-    const session = await getServerSession(authOptions) as any
+    const { userId: clerkUserId } = await auth()
 
-    if (!session?.user?.id || !session?.activeWorkspaceId) {
+    const user = await prisma.user.findUnique({
+        where: { clerkId: clerkUserId || undefined },
+        include: { memberships: true }
+    })
+
+    const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+    if (!user?.id || !activeWorkspaceId) {
         return { success: false, error: "Não autorizado ou sem workspace ativo" }
     }
 
@@ -37,10 +43,7 @@ export async function createInvite(options: {
 
     const { role, targetPlan, maxUses = 1, durationDays, customCode } = options
 
-    const creator = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        include: { artist: true }
-    })
+    const creator = user
 
     if (!creator) return { success: false, error: "Usuário não encontrado" }
 
@@ -66,7 +69,7 @@ export async function createInvite(options: {
                 maxUses,
                 durationDays,
                 creatorId: creator.id,
-                workspaceId: session.activeWorkspaceId,
+                workspaceId: activeWorkspaceId,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 dias
             }
         })
@@ -80,22 +83,36 @@ export async function createInvite(options: {
 }
 
 export async function getInvites() {
-    const session = await getServerSession(authOptions) as any
-    if (!session?.activeWorkspaceId) return []
+    const { userId: clerkUserId } = await auth()
+    
+    const user = await prisma.user.findUnique({
+        where: { clerkId: clerkUserId || undefined },
+        include: { memberships: true }
+    })
+
+    const activeWorkspaceId = user?.memberships[0]?.workspaceId
+    if (!activeWorkspaceId) return []
 
     return await prisma.inviteCode.findMany({
-        where: { workspaceId: session.activeWorkspaceId },
+        where: { workspaceId: activeWorkspaceId },
         orderBy: { createdAt: 'desc' }
     })
 }
 
 export async function revokeInvite(id: string) {
-    const session = await getServerSession(authOptions) as any
-    if (!session?.activeWorkspaceId) return { success: false, error: "Não autorizado" }
+    const { userId: clerkUserId } = await auth()
+    
+    const user = await prisma.user.findUnique({
+        where: { clerkId: clerkUserId || undefined },
+        include: { memberships: true }
+    })
+
+    const activeWorkspaceId = user?.memberships[0]?.workspaceId
+    if (!activeWorkspaceId) return { success: false, error: "Não autorizado" }
 
     try {
         await prisma.inviteCode.update({
-            where: { id, workspaceId: session.activeWorkspaceId },
+            where: { id, workspaceId: activeWorkspaceId },
             data: { isActive: false }
         })
         revalidatePath('/artist/invites')

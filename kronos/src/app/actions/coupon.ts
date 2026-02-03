@@ -1,13 +1,13 @@
 'use server'
 
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from 'next/cache'
 
+import { auth } from "@clerk/nextjs/server"
+
 export async function generateReferralCode(clientId: string) {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) return { success: false, error: "Não autorizado" }
+    const { userId: clerkUserId } = await auth()
+    if (!clerkUserId) return { success: false, error: "Não autorizado" }
 
     // Verificar se já existe um cupom ativo
     const existing = await prisma.coupon.findFirst({

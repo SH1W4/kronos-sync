@@ -27,8 +27,7 @@ export async function POST(req: NextRequest) {
 
         // 1. MASTER KEY CHECK (Environment Variable)
         if (process.env.KRONOS_TEAM_KEY && cleanCode === process.env.KRONOS_TEAM_KEY) {
-            const user = await prisma.user.findUnique({ where: { email: session.user.email! } })
-            if (!user) return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+            // Already checked above as 'user'
 
             // Busca ou Cria o Workspace principal
             let workspace = await prisma.workspace.findFirst({ where: { slug: 'kronos-studio' } })
@@ -97,7 +96,7 @@ export async function POST(req: NextRequest) {
         // Execute Transaction
         await prisma.$transaction(async (tx) => {
             const updatedUser = await tx.user.update({
-                where: { email: session.user.email! },
+                where: { id: user.id },
                 data: {
                     role: invite.role,
                     invitedById: invite.creatorId,
@@ -148,6 +147,14 @@ export async function POST(req: NextRequest) {
                         }
                     })
                 }
+            }
+        })
+
+        // 3. Update Clerk Metadata
+        const client = await clerkClient()
+        await client.users.updateUserMetadata(clerkUserId, {
+            publicMetadata: {
+                role: invite?.role || 'ADMIN' // Se for Master Key, role é ADMIN
             }
         })
 

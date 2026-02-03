@@ -1,12 +1,22 @@
 'use server'
 
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 
 export async function queryAgent(userQuery: string, history: any[]) {
-    const session = await getServerSession(authOptions) as any
-    if (!session?.user || !session?.activeWorkspaceId) {
+    const { userId: clerkUserId } = await auth()
+    if (!clerkUserId) {
+        return { text: "Preciso que você faça login primeiro.", role: 'KAI' }
+    }
+
+    const user = await prisma.user.findUnique({
+        where: { clerkId: clerkUserId },
+        include: { memberships: true }
+    })
+
+    const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+    if (!user || !activeWorkspaceId) {
         return { text: "Preciso que você selecione um workspace primeiro.", role: 'KAI' }
     }
 
@@ -15,14 +25,14 @@ export async function queryAgent(userQuery: string, history: any[]) {
     // 1. Identificar Contexto do Usuário no Workspace Ativo
     const artist = await prisma.artist.findFirst({
         where: {
-            userId: session.user.id,
-            workspaceId: session.activeWorkspaceId
+            userId: user.id,
+            workspaceId: activeWorkspaceId
         },
         include: {
             user: true,
             bookings: {
                 where: {
-                    workspaceId: session.activeWorkspaceId,
+                    workspaceId: activeWorkspaceId,
                     slot: {
                         startTime: { gte: new Date() }
                     }
@@ -105,7 +115,7 @@ export async function queryAgent(userQuery: string, history: any[]) {
     // Ex: "Quem trabalha aqui?", "Lista de artistas", "Instagram da galera"
     else if (/(quem|lista).*(equipe|trabalha|artistas)|instagram/i.test(query)) {
         const artistsInWorkspace = await prisma.artist.findMany({
-            where: { workspaceId: session.activeWorkspaceId },
+            where: { workspaceId: activeWorkspaceId },
             include: { user: true }
         })
         const count = artistsInWorkspace.length
@@ -153,8 +163,8 @@ export async function queryAgent(userQuery: string, history: any[]) {
     // Log Interaction
     await prisma.agentLog.create({
         data: {
-            userId: session.user.id,
-            workspaceId: session.activeWorkspaceId,
+            userId: user.id,
+            workspaceId: activeWorkspaceId,
             query: userQuery,
             response: responseText,
             intent: 'WORKSPACE_QUERY'

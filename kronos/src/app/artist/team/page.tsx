@@ -1,21 +1,7 @@
-'use client'
-
-import React, { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Users, Shield, Clock, Plus, Trash2, Key, Copy, Check, Ticket, X } from 'lucide-react'
-import Link from 'next/link'
-import { revokeArtistAccess } from '@/app/actions/workspaces'
-import { getInvites, revokeInvite } from '@/app/actions/invites'
-import { InkPassCard } from '@/components/invites/InkPassCard'
-import { updateArtistCommission } from '@/app/actions/artists'
-import { Input } from '@/components/ui/input'
-import { Edit2, Save } from 'lucide-react'
+import { useUser } from '@clerk/nextjs'
 
 export default function TeamPage() {
-    const { data: session } = useSession() as any
+    const { user } = useUser()
     const [members, setMembers] = useState<any[]>([])
     const [invites, setInvites] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -25,7 +11,8 @@ export default function TeamPage() {
     const [newCommission, setNewCommission] = useState<string>('')
 
     async function fetchData() {
-        if (!session?.user?.activeWorkspaceId && !(session as any)?.activeWorkspaceId) return
+        const workspaceId = user?.publicMetadata?.workspace ? (user.publicMetadata.workspace as any).id : null
+        if (!workspaceId) return
         setIsLoading(true)
         try {
             // Membros ativos
@@ -45,7 +32,7 @@ export default function TeamPage() {
 
     useEffect(() => {
         fetchData()
-    }, [session?.user?.activeWorkspaceId, (session as any)?.activeWorkspaceId])
+    }, [user?.publicMetadata])
 
     const handleRevokeMember = async (artistId: string, name: string) => {
         if (!confirm(`Tem certeza que deseja revogar o acesso de ${name}? Ela(e) perderá acesso ao estúdio imediatamente.`)) return
@@ -96,7 +83,7 @@ export default function TeamPage() {
         setTimeout(() => setCopiedId(null), 2000)
     }
 
-    if (session?.user?.role !== 'ADMIN') {
+    if (user?.publicMetadata?.role !== 'ADMIN') {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
                 <Shield className="w-16 h-16 text-red-500/50 mb-4" />
@@ -151,7 +138,7 @@ export default function TeamPage() {
                             <Card key={member.id} className="p-6 bg-gray-900/40 border-white/5 hover:border-primary/50 transition-all group overflow-hidden relative min-h-[160px] rounded-3xl backdrop-blur-sm">
                                 {/* Botão de Revogar (Reforçado) */}
                                 <div className="absolute top-0 right-0 p-1 z-[70]">
-                                    {member.user.id !== session?.user?.id && (
+                                    {member.user.id !== user?.id && (
                                         <button
                                             onClick={(e) => {
                                                 e.preventDefault();
@@ -335,8 +322,8 @@ export default function TeamPage() {
                             <InkPassCard
                                 code={selectedInvite.code}
                                 type={selectedInvite.targetPlan}
-                                studioName={(session?.user as any)?.workspaces?.find((w: any) => w.id === (session?.user as any)?.activeWorkspaceId)?.name || 'KRONØS'}
-                                primaryColor={(session?.user as any)?.workspaces?.find((w: any) => w.id === (session?.user as any)?.activeWorkspaceId)?.primaryColor || '#8B5CF6'}
+                                studioName={(user?.publicMetadata?.workspace as any)?.name || 'KRONØS'}
+                                primaryColor={(user?.publicMetadata?.workspace as any)?.primaryColor || '#8B5CF6'}
                             />
 
                             <div className="bg-white/5 border border-white/10 p-6 rounded-3xl space-y-4">

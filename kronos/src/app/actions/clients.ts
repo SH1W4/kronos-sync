@@ -1,20 +1,24 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 
 /**
  * Search for clients by name or phone
  */
 export async function searchClients(query: string) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
 
         if (!workspaceId) {
             return { error: 'Workspace não encontrado' }
@@ -61,8 +65,8 @@ export async function createQuickClient(data: {
     email?: string
 }) {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
@@ -113,12 +117,17 @@ export async function createQuickClient(data: {
  */
 export async function getWorkspaceClients() {
     try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.email) {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
             return { error: 'Não autorizado' }
         }
 
-        const workspaceId = (session.user as any).activeWorkspaceId
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
 
         if (!workspaceId) {
             return { error: 'Workspace não encontrado' }
