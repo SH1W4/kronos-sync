@@ -5,9 +5,11 @@ import { useUser } from '@clerk/nextjs'
 import { startOfWeek, endOfWeek, addDays, subDays, addWeeks, subWeeks, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getMyBookings } from '@/app/actions/bookings'
-import { Calendar, Plus } from 'lucide-react'
+import { Calendar, Plus, Loader2 } from 'lucide-react'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { Button } from '@/components/ui/button'
+import { CalendarView } from '@/components/agenda/CalendarView'
+import { NewBookingModal } from '@/components/agenda/NewBookingModal'
 
 export default function AgendaPage() {
     const { user } = useUser()
@@ -179,7 +181,7 @@ export default function AgendaPage() {
 
             {/* Booking Modal */}
             {showBookingModal && (
-                <BookingModal
+                <NewBookingModal
                     onClose={() => setShowBookingModal(false)}
                     onSuccess={handleBookingCreated}
                     initialDate={currentDate}
