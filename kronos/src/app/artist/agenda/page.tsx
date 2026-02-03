@@ -9,7 +9,7 @@ import { Calendar, Plus, Loader2 } from 'lucide-react'
 import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { Button } from '@/components/ui/button'
 import { CalendarView } from '@/components/agenda/CalendarView'
-import { NewBookingModal } from '@/components/agenda/NewBookingModal'
+import { BookingModal as NewBookingModal } from '@/components/agenda/NewBookingModal'
 
 export default function AgendaPage() {
     const { user } = useUser()
