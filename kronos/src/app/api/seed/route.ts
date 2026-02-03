@@ -1,21 +1,28 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
 export async function GET() {
-    const session = await getServerSession(authOptions)
+    const { userId: clerkUserId } = await auth()
 
-    if (!session?.user?.email) {
+    if (!clerkUserId) {
         return NextResponse.json({ error: "Faça login primeiro!" }, { status: 401 })
+    }
+
+    const currUser = await prisma.user.findUnique({
+        where: { clerkId: clerkUserId }
+    })
+
+    if (!currUser) {
+        return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 })
     }
 
     // 1. Promover Usuário Atual a Artista
     const artist = await prisma.artist.upsert({
-        where: { userId: session.user.id },
+        where: { userId: currUser.id },
         update: {},
         create: {
-            userId: session.user.id,
+            userId: currUser.id,
             plan: "RESIDENT",
             commissionRate: 50, // 50%
             isActive: true
