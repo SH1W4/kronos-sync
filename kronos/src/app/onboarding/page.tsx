@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+// import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BrandLogo } from '@/components/ui/brand-logo'
@@ -22,7 +22,7 @@ function OnboardingContent() {
     // Check if user is already authenticated to bypass onboarding
     React.useEffect(() => {
         if (isLoaded && isSignedIn && user) {
-            const role = user.publicMetadata?.role
+            const role = (user.publicMetadata as any)?.role
             if (role === 'ARTIST' || role === 'ADMIN') {
                 router.replace('/artist/dashboard')
             } else if (role === 'CLIENT') {
@@ -49,7 +49,7 @@ function OnboardingContent() {
 
     // Auto-validate if code is in URL and user just logged in
     React.useEffect(() => {
-        if (urlCode && status === 'authenticated' && !loading && !successMessage && !error) {
+        if (urlCode && isSignedIn && !loading && !successMessage && !error) {
             const autoValidate = async () => {
                 setLoading(true)
                 try {
@@ -60,7 +60,7 @@ function OnboardingContent() {
                     })
                     const data = await response.json()
                     if (response.ok) {
-                        await update()
+                        await user?.reload()
                         if (data.role === 'ARTIST' || data.role === 'ADMIN') {
                             router.push('/artist/dashboard')
                         } else {
@@ -88,7 +88,7 @@ function OnboardingContent() {
         e.preventDefault()
         if (!inviteCode) return
 
-        if (status === 'unauthenticated') {
+        if (!isSignedIn) {
             router.push(`/auth/signin?callbackUrl=/onboarding?inviteCode=${inviteCode}`)
             return
         }
@@ -106,7 +106,7 @@ function OnboardingContent() {
             const data = await response.json()
 
             if (response.ok) {
-                await update()
+                await user?.reload()
                 if (data.role === 'ARTIST' || data.role === 'ADMIN') {
                     router.push('/artist/dashboard')
                 } else {
