@@ -43,6 +43,7 @@ import {
     Loader2,
     Save
 } from 'lucide-react'
+import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 
 export default function SettingsPage() {
     const { user } = useUser()
