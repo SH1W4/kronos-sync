@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth, clerkClient } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { Clock, AlertCircle, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { redirect } from "next/navigation"
@@ -10,15 +9,15 @@ import DashboardCharts from "./DashboardCharts"
 export const dynamic = 'force-dynamic'
 
 export default async function ArtistDashboard() {
-    const session = await getServerSession(authOptions)
+    const { userId: clerkUserId } = await auth()
 
-    if (!session?.user) {
-        redirect('/auth/signin')
+    if (!clerkUserId) {
+        redirect('/sign-in')
     }
 
     // 1. Buscar Perfil de Artista
-    const artist = await prisma.artist.findUnique({
-        where: { userId: session.user.id },
+    const artist = await prisma.artist.findFirst({
+        where: { user: { clerkId: clerkUserId } },
         include: {
             user: true
         }
@@ -149,7 +148,7 @@ export default async function ArtistDashboard() {
     }))
 
     const monthlyEarnings = monthMetrics.reduce((acc, b) => acc + (b.artistShare || 0), 0)
-    const userName = session.user.name?.split(' ')[0] || 'Artista'
+    const userName = artist.user.name?.split(' ')[0] || 'Artista'
     const todayDate = now.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', timeZone: 'America/Sao_Paulo' }).toUpperCase()
 
     return (
