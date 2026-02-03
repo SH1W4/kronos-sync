@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import FinanceClient from "./FinanceClient"
@@ -10,19 +9,22 @@ export const dynamic = 'force-dynamic'
 export default async function FinancePage(props: { searchParams: Promise<{ date?: string }> }) {
     const searchParams = await props.searchParams
     try {
-        const session = await getServerSession(authOptions)
+        const { userId: clerkUserId } = await auth()
 
-        if (!session?.user) {
-            redirect('/auth/signin')
+        if (!clerkUserId) {
+            redirect('/sign-in')
         }
 
-        const user = session.user as any
-        const userId = user.id
+        const user = await prisma.user.findFirst({
+            where: { clerkId: clerkUserId }
+        })
 
-        if (!userId) {
+        if (!user) {
             console.error("❌ FinancePage: Session user missing ID")
-            redirect('/auth/signin')
+            redirect('/sign-in')
         }
+        
+        const userId = user.id
 
         // Parse Date from Search Params (Default to Current Month)
         // Parse Date with Brazil Timezone consideration
