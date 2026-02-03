@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
-import { startOfWeek, endOfWeek, addDays, format } from 'date-fns'
+import { startOfWeek, endOfWeek, addDays, subDays, addWeeks, subWeeks, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getMyBookings } from '@/app/actions/bookings'
 
