@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Loader2, Check, ArrowLeft } from 'lucide-react'
-import { signIn } from 'next-auth/react'
+// import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 interface VerifyCodeProps {
