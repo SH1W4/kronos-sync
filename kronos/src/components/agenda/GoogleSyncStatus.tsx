@@ -56,7 +56,7 @@ export function GoogleSyncStatus() {
              })
              
              if (externalAccount.verification?.externalVerificationRedirectURL) {
-                window.location.href = externalAccount.verification.externalVerificationRedirectURL
+                window.location.href = externalAccount.verification.externalVerificationRedirectURL.toString()
              }
          } catch (err) {
              console.error("Link google error:", err)
