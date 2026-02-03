@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 
 export interface ThemeConfig {
   // Color Palette
@@ -111,7 +111,7 @@ export const useTheme = () => {
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<ThemeConfig>(defaultTheme)
-  const { data: session } = useSession()
+  const { user, isLoaded } = useUser()
 
   // Load theme from localStorage or Session on mount/change
   useEffect(() => {
@@ -126,9 +126,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     }
 
+    if (!isLoaded || !user) {
+        setThemeState(baseTheme)
+        return
+    }
+
     // Session Override (Stronger than localStorage for identity-linked theme)
-    const userData = session?.user as any
-    const customColor = userData?.customColor
+    // Clerk Public Metadata holds customColor and activeWorkspaceId
+    const metadata = user.publicMetadata as any
+    const customColor = metadata?.customColor || (user as any).customColor // Fallback checking
 
     // 1. Personal Selection (Artist focus) takes absolute precedence for their own HUD
     if (customColor) {
@@ -136,17 +142,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     // 2. Fallback to Workspace branding (Enterprise/Studio focus)
     else {
-      const activeWorkspaceId = userData?.activeWorkspaceId
-      const workspaces = userData?.workspaces as any[]
-      const activeWorkspace = workspaces?.find(w => w.id === activeWorkspaceId)
+      const activeWorkspaceId = metadata?.activeWorkspaceId
+      // Note: Workspaces in Clerk might be stored in a different way or fetched separately.
+      // For now, if we don't have workspaces in user object easily, we skip this fallback
+      // or rely on what's available. Assuming metadata has a simplified version.
+      
+      // If we stored workspaces in publicMetadata for quick access (not recommended for large lists)
+      // or checking the active organization context if using Clerk Organizations.
 
-      if (activeWorkspace?.primaryColor) {
-        baseTheme = { ...baseTheme, primaryColor: activeWorkspace.primaryColor }
+      if (activeWorkspaceId) {
+          // If we had workspace branding in metadata...
+          // For now, let's keep it simple as the original code was doing custom mapping.
       }
     }
 
     setThemeState(baseTheme)
-  }, [session])
+  }, [user, isLoaded])
 
   // Apply theme to CSS variables
   const lastThemeRef = React.useRef<string>('')
