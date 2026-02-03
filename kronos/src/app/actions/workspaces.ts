@@ -394,3 +394,54 @@ export async function revokeArtistAccess(artistId: string) {
         return { error: 'Erro ao revogar acesso do artista.' }
     }
 }
+
+/**
+ * Atualiza a taxa de comissão de um artista.
+ * Apenas ADMINs podem realizar esta ação.
+ */
+export async function updateArtistCommission(artistId: string, rate: number) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true }
+        })
+
+        const activeWorkspaceId = user?.memberships[0]?.workspaceId
+
+        if (!user || !activeWorkspaceId) {
+            return { error: 'Não autorizado ou nenhum estúdio ativo.' }
+        }
+
+        // Verificar se quem está pedindo é ADMIN do workspace
+        const currentMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: activeWorkspaceId,
+                    userId: user.id
+                }
+            }
+        })
+
+        if (!currentMember || currentMember.role !== 'ADMIN') {
+            return { error: 'Permissão negada. Apenas mestres podem alterar comissões.' }
+        }
+
+        // Atualizar
+        await prisma.artist.update({
+            where: { id: artistId },
+            data: { commissionRate: rate / 100 } // Recebe em %, salva em decimal (0.50)
+        })
+
+        revalidatePath('/artist/team')
+        return { success: true, message: 'Comissão atualizada com sucesso.' }
+
+    } catch (error) {
+        console.error('Error updating commission:', error)
+        return { error: 'Erro ao atualizar comissão.' }
+    }
+}
