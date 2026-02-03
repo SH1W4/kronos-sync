@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useUser } from '@clerk/nextjs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,13 +21,14 @@ interface Feedback {
 }
 
 export default function FeedbackDashboard() {
-    const { data: session } = useSession()
+    const { user, isLoaded } = useUser()
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
     const [loading, setLoading] = useState(true)
     const [filter, setFilter] = useState<'ALL' | 'SUGGESTION' | 'BUG' | 'FEATURE'>('ALL')
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'REVIEWED' | 'IMPLEMENTED'>('ALL')
 
-    const isAdmin = session?.user?.role === 'ADMIN'
+    const isAdmin = (user?.publicMetadata as any)?.role === 'ADMIN'
+
 
     useEffect(() => {
         if (!isAdmin) return
