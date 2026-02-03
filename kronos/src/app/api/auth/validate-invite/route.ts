@@ -1,15 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { auth } from '@clerk/nextjs/server'
 
 export async function POST(req: NextRequest) {
     try {
-        const session = await getServerSession(authOptions)
+        const { userId: clerkUserId } = await auth()
 
         // Check if user is logged in
-        if (!session?.user?.email) {
+        if (!clerkUserId) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId }
+        })
+
+        if (!user) {
+            return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
         }
 
         const body = await req.json()
@@ -41,7 +48,7 @@ export async function POST(req: NextRequest) {
                     }
                 })
             }
-
+            
             // Update User and Membership
             await prisma.$transaction([
                 prisma.user.update({
