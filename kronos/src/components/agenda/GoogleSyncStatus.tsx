@@ -52,7 +52,7 @@ export function GoogleSyncStatus() {
          try {
              const externalAccount = await user.createExternalAccount({
                  strategy: 'oauth_google',
-                 redirectURL: window.location.href
+                 redirectUrl: window.location.href
              })
              
              if (externalAccount.verification?.externalVerificationRedirectURL) {
