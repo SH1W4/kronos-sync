@@ -1,3 +1,5 @@
+'use client'
+
 import { useUser, useClerk, UserButton } from '@clerk/nextjs'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
