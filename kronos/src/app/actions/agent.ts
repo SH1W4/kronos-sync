@@ -143,8 +143,8 @@ export async function queryAgent(userQuery: string, history: any[]) {
         } else {
             await prisma.agentLog.create({
                 data: {
-                    userId: session.user.id,
-                    workspaceId: session.activeWorkspaceId,
+                    userId: user.id,
+                    workspaceId: activeWorkspaceId,
                     query: userQuery,
                     response: "FEEDBACK_ACK",
                     intent: 'USER_FEEDBACK'
