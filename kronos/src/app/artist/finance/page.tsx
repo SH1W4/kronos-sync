@@ -15,8 +15,12 @@ export default async function FinancePage(props: { searchParams: Promise<{ date?
             redirect('/sign-in')
         }
 
-        const user = await prisma.user.findFirst({
-            where: { clerkId: clerkUserId }
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: {
+                ownedWorkspaces: { select: { id: true }, take: 1 },
+                memberships: { select: { workspaceId: true }, take: 1 }
+            }
         })
 
         if (!user) {
@@ -45,7 +49,7 @@ export default async function FinancePage(props: { searchParams: Promise<{ date?
 
         // ADMIN VIEW: Fetch all settlements for the Active Workspace
         if (user.role === 'ADMIN') {
-            const workspaceId = user.activeWorkspaceId
+            const workspaceId = user.ownedWorkspaces[0]?.id || user.memberships[0]?.workspaceId
 
             if (!workspaceId) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Selecione um Estúdio</div>
 
