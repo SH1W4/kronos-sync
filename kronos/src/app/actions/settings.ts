@@ -181,12 +181,9 @@ export async function updatePassword(data: any) {
 
         const { currentPassword, newPassword } = validated.data
 
-        // 1. Get User
-        const user = await prisma.user.findUnique({
-            where: { id: userId }
-        })
+        // 1. User already loaded above
+        // const user = ... (removed)
 
-        if (!user) return { error: 'Usuário não encontrado' }
 
         // 2. Verify Current Password
         if (user.password) {
