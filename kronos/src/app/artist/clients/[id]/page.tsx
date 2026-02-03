@@ -1,5 +1,4 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth-options"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import { Mail, Phone, Calendar, DollarSign, AlertTriangle, Activity, FileText } from 'lucide-react'
@@ -12,17 +11,18 @@ import { ClientDossierButton } from '@/components/clients/ClientDossierButton'
 export const dynamic = 'force-dynamic'
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) redirect('/auth/signin')
+    const { userId: clerkUserId } = await auth()
+    if (!clerkUserId) redirect('/sign-in')
 
     // Unwrap params in Next.js 15
     const { id } = await params
 
-    const artist = await prisma.artist.findUnique({
-        where: { userId: session.user.id }
+    const artist = await prisma.artist.findFirst({
+        where: { user: { clerkId: clerkUserId } },
+        include: { user: true }
     })
 
-    const isAdmin = session.user.role === 'ADMIN'
+    const isAdmin = artist?.user?.role === 'ADMIN'
     const artistId = artist?.id
 
     // 1. Verificar se este artista tem permissão para ver este cliente
