@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 // Definition of paths that SHOULD NOT be protected
+// We include / because it is the landing page
 const isPublicRoute = createRouteMatcher([
   '/',
   '/onboarding(.*)',
@@ -9,11 +10,11 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',
   '/api/health(.*)',
   '/api/health-check(.*)',
-  '/kiosk(.*)',
-  '/fichas(.*)',
-  '/auth(.*)',
   '/invite(.*)',
-  '/gift(.*)'
+  '/gift(.*)',
+  '/auth(.*)',
+  '/kiosk(.*)',
+  '/fichas(.*)'
 ])
 
 export default clerkMiddleware(async (auth, req) => {
@@ -22,13 +23,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 })
 
-// Compatibility with Next.js 16 "proxy" convention
-export const proxy = clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect()
-  }
-})
-
+// Although middleware.ts is standard, we keep the matcher config
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
