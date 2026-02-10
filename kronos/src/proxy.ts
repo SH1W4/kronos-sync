@@ -15,16 +15,14 @@ const isPublicRoute = createRouteMatcher([
 // Next.js 16 Proxy standard using ClerkMiddleware
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
-    const authObj = await auth()
-    authObj.protect()
+    await auth.protect()
   }
 })
 
 // Optional: Named export if Next.js 16 strictly requires it
 export const proxy = clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
-    const authObj = await auth()
-    authObj.protect()
+    await auth.protect()
   }
 })
 
