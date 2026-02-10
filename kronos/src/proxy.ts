@@ -6,10 +6,18 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',
   '/kiosk(.*)',
   '/fichas(.*)',
+  '/api/health(.*)',
+  '/api/health-check(.*)',
 ])
 
 // In Next.js 16, this file is named proxy.ts
-// The functionality remains similar to middleware, but it serves as a network boundary
+// It supports both default export and named export 'proxy'
+export async function proxy(auth: any, request: any) {
+  if (!isPublicRoute(request)) {
+    await auth().protect()
+  }
+}
+
 export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect()

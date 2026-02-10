@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getToken } from 'next-auth/jwt'
+import { auth } from '@clerk/nextjs/server'
 
 export async function GET(request: NextRequest) {
     try {
-        const token = await getToken({
-            req: request,
-            secret: process.env.NEXTAUTH_SECRET
-        })
+        const { userId } = await auth()
 
-        if (!token) {
+        if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
         const artist = await prisma.artist.findFirst({
             where: {
-                userId: token.sub
+                user: {
+                    clerkId: userId
+                }
             },
             include: {
                 user: {

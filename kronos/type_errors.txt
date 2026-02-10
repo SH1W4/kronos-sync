@@ -1,0 +1,2 @@
+.next/dev/types/validator.ts(287,39): error TS2307: Cannot find module '../../../src/app/api/auth/[...nextauth]/route.js' or its corresponding type declarations.
+.next/types/validator.ts(314,39): error TS2307: Cannot find module '../../src/app/api/auth/[...nextauth]/route.js' or its corresponding type declarations.
