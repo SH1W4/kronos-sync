@@ -8,19 +8,22 @@ const isPublicRoute = createRouteMatcher([
   '/fichas(.*)',
   '/api/health(.*)',
   '/api/health-check(.*)',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
 ])
 
-// In Next.js 16, this file is named proxy.ts
-// It supports both default export and named export 'proxy'
-export async function proxy(auth: any, request: any) {
+// Next.js 16 Proxy standard using ClerkMiddleware
+export default clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth().protect()
   }
-}
+})
 
-export default clerkMiddleware(async (auth, request) => {
+// Optional: Named export if Next.js 16 strictly requires it
+// Note: clerkMiddleware returns a function that matches the (req, event) signature
+export const proxy = clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
-    await auth.protect()
+    await auth().protect()
   }
 })
 

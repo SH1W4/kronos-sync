@@ -69,8 +69,10 @@ const FEATURES = [
 ]
 
 export default function LandingPage() {
-    const { user, isSignedIn } = useUser()
+    const { user, isLoaded, isSignedIn } = useUser()
     const [activeFeature, setActiveFeature] = useState<any>(null)
+
+    if (!isLoaded) return <div className="min-h-screen bg-black flex items-center justify-center"><BrandLogo size={60} animated={true} /></div>
 
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-white selection:text-black">
