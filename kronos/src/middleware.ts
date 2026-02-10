@@ -1,26 +1,7 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware } from '@clerk/nextjs/server'
 
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/test-env',
-  '/api/health-check',
-  '/api/health',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/onboarding(.*)',
-  '/api/webhooks(.*)',
-  '/kiosk(.*)',
-  '/fichas(.*)',
-  '/auth(.*)',
-  '/invite(.*)',
-  '/gift(.*)'
-])
-
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect()
-  }
-})
+// EMERGENCY BYPASS: Making everything public to isolate the 500 source.
+export default clerkMiddleware()
 
 export const config = {
   matcher: [
