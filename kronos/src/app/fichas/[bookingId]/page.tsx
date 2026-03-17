@@ -10,9 +10,9 @@ import { saveAnamnesis } from '@/app/actions/anamnesis'
 import { SignatureCanvas } from '@/components/SignatureCanvas'
 
 export default function FichaAnamnesePage() {
-    const params = useParams()
+    const rawParams = useParams()
     const router = useRouter()
-    const bookingId = params.bookingId as string
+    const bookingId = rawParams?.bookingId as string
 
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
