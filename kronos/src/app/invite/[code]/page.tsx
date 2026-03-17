@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/button'
 import { trackQrScan } from '@/app/actions/analytics'
 
 interface PageProps {
-    params: { code: string }
+    params: Promise<{ code: string }>
 }
 
 export default async function InvitePage({ params }: PageProps) {
-    const { code } = params
+    const { code } = await params
     const result = await getInviteByCode(code)
 
     // Track Scan (Analytics)
