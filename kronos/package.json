@@ -18,7 +18,6 @@
         "mcp:start": "ts-node src/mcp/server.ts"
     },
     "dependencies": {
-        "@auth/prisma-adapter": "^2.11.1",
         "@clerk/nextjs": "^6.37.1",
         "@modelcontextprotocol/sdk": "^1.6.0",
         "@prisma/client": "^5.22.0",
@@ -37,7 +36,6 @@
         "html5-qrcode": "^2.3.8",
         "lucide-react": "^0.542.0",
         "next": "^16.0.10",
-        "next-auth": "^4.24.5",
         "qrcode.react": "^4.2.0",
         "react": "19.1.0",
         "react-dom": "19.1.0",
