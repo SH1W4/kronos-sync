@@ -147,6 +147,16 @@ export default async function ArtistDashboard() {
         earnings: data.earnings
     }))
 
+    // 4. Buscar Gamificação (Soul Sync Engine)
+    const { getGamificationData } = await import('@/app/actions/gamification')
+    const gamification = await getGamificationData()
+    const { calculateLevel, calculateProgress, getLevelTitle } = await import('@/data/gamification/levels')
+
+    const currentXp = gamification?.xp || 0
+    const currentLevel = calculateLevel(currentXp)
+    const progressPercent = calculateProgress(currentXp)
+    const { label: levelTitle } = getLevelTitle(currentLevel)
+
     const monthlyEarnings = monthMetrics.reduce((acc, b) => acc + (b.artistShare || 0), 0)
     const userName = artist.user.name?.split(' ')[0] || 'Artista'
     const todayDate = now.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', timeZone: 'America/Sao_Paulo' }).toUpperCase()
@@ -157,12 +167,34 @@ export default async function ArtistDashboard() {
             <div className="absolute inset-0 data-pattern-grid opacity-30 pointer-events-none" />
 
             <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/5 pb-6">
-                <div>
+                <div className="w-full md:w-auto">
                     <h2 className="text-gray-400 font-mono text-xs uppercase tracking-widest mb-2">Painel de Controle</h2>
                     <h1 className="text-3xl font-orbitron font-bold tracking-tight pixel-text">
                         BEM-VINDO, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent uppercase">{userName}</span>
                     </h1>
-                    <p className="text-gray-500 font-mono text-xs uppercase tracking-widest mt-1">Status do Sistema: <span className="text-accent animate-pulse font-bold tracking-tighter">OPERACIONAL</span></p>
+                    <p className="text-gray-500 font-mono text-xs uppercase tracking-widest mt-1 mb-4">Status do Sistema: <span className="text-accent animate-pulse font-bold tracking-tighter">OPERACIONAL</span></p>
+
+                    {/* HUD Soul Sync Header */}
+                    <Link href="/artist/soul-sync">
+                        <div className="mt-2 bg-purple-900/10 border border-purple-500/20 p-3 rounded-xl flex flex-col gap-2 w-full max-w-sm hover:bg-purple-900/20 hover:border-purple-500/40 transition-all cursor-pointer group">
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 bg-purple-500/20 rounded flex items-center justify-center border border-purple-500/30 font-orbitron font-black text-[10px] text-purple-400 group-hover:text-purple-300 transition-colors">
+                                        L{currentLevel}
+                                    </div>
+                                    <span className="font-orbitron font-bold text-xs text-white uppercase italic tracking-wider">{levelTitle}</span>
+                                </div>
+                                <span className="font-mono text-[9px] text-purple-400 tracking-widest">{currentXp.toLocaleString()} XP</span>
+                            </div>
+                            {/* Animated Progress Bar */}
+                            <div className="h-1.5 w-full bg-black/50 rounded-full overflow-hidden border border-white/5 relative">
+                                <div 
+                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-600 to-accent shadow-[0_0_10px_rgba(139,92,246,0.8)] rounded-full transition-all duration-1000 ease-out" 
+                                    style={{ width: `${progressPercent}%` }}
+                                />
+                            </div>
+                        </div>
+                    </Link>
                 </div>
                 <div className="flex gap-4">
                     <div className="bg-gray-900/50 border border-white/5 px-4 py-2 rounded flex items-center gap-3 shadow-[0_0_10px_rgba(var(--primary-rgb),0.1)]">
@@ -208,8 +240,53 @@ export default async function ArtistDashboard() {
                     <h3 className="font-orbitron font-bold text-lg flex items-center gap-2 text-white italic tracking-widest">
                         <AlertCircle className="text-accent" size={20} /> LEMBRETES
                     </h3>
-                    <div className="bg-gray-900/30 border border-white/5 rounded-xl p-6 min-h-[200px] flex items-center justify-center font-mono text-[10px] text-gray-600 uppercase tracking-widest">
+                    <div className="bg-gray-900/30 border border-white/5 rounded-xl p-6 flex items-center justify-center font-mono text-[10px] text-gray-600 uppercase tracking-widest">
                         Sem pendências
+                    </div>
+
+                    <h3 className="font-orbitron font-bold text-lg flex items-center gap-2 text-white italic tracking-widest pt-4">
+                        🏆 ÚLTIMAS CONQUISTAS
+                    </h3>
+                    <div className="space-y-3">
+                        {gamification?.achievements && gamification.achievements.length > 0 ? (
+                            gamification.achievements
+                                .sort((a: any, b: any) => new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime())
+                                .slice(0, 3)
+                                .map((record: any) => {
+                                    const ach = record.achievement
+                                    const rarityColors: any = {
+                                        COMMON: 'border-white/10 text-gray-400 bg-white/5',
+                                        RARE: 'border-blue-500/30 text-blue-400 bg-blue-500/10',
+                                        EPIC: 'border-purple-500/30 text-purple-400 bg-purple-500/10 shadow-[0_0_15px_rgba(139,92,246,0.15)]',
+                                        LEGENDARY: 'border-amber-500/50 text-amber-400 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+                                    }
+                                    const rColor = rarityColors[ach.rarity] || rarityColors.COMMON
+                                    
+                                    return (
+                                        <div key={record.id} className={`flex items-center gap-4 p-4 rounded-xl border ${rColor} group hover:scale-[1.02] transition-transform cursor-default`}>
+                                            <div className="w-10 h-10 rounded-full bg-black/50 border border-inherit flex items-center justify-center font-bold text-lg">
+                                                ✧
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-orbitron font-bold text-sm tracking-widest uppercase italic">{ach.title}</h4>
+                                                <p className="font-mono text-[9px] opacity-80 mt-1 uppercase tracking-wider">{ach.description}</p>
+                                            </div>
+                                            <div className="font-mono text-[10px] font-bold text-emerald-400 tracking-widest">
+                                                +{ach.xpReward} XP
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                        ) : (
+                            <div className="bg-gray-900/30 border border-white/5 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+                                <div className="text-gray-600 mb-2 font-mono text-[10px] uppercase tracking-widest">Nenhuma conquista ainda</div>
+                                <Link href="/artist/soul-sync">
+                                    <Button variant="outline" className="h-8 px-4 border-primary/20 text-primary hover:bg-primary/10 font-orbitron font-black text-[9px] uppercase tracking-widest rounded-lg">
+                                        VER CATÁLOGO
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
