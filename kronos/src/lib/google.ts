@@ -109,14 +109,15 @@ export async function updateCalendarEvent(
         description?: string,
         startTime?: Date,
         endTime?: Date
-    }
+    },
+    calendarId: string = 'primary'
 ) {
     const calendar = await getGoogleCalendarClient(userId)
     if (!calendar) return { success: false, error: 'No Google Account' }
 
     try {
         const response = await calendar.events.patch({
-            calendarId: 'primary',
+            calendarId,
             eventId: googleEventId,
             requestBody: {
                 ...(eventData.summary && { summary: eventData.summary }),
@@ -137,13 +138,13 @@ export async function updateCalendarEvent(
 /**
  * Deletes an event from the user's Google Calendar.
  */
-export async function deleteCalendarEvent(userId: string, googleEventId: string) {
+export async function deleteCalendarEvent(userId: string, googleEventId: string, calendarId: string = 'primary') {
     const calendar = await getGoogleCalendarClient(userId)
     if (!calendar) return { success: false, error: 'No Google Account' }
 
     try {
         await calendar.events.delete({
-            calendarId: 'primary',
+            calendarId,
             eventId: googleEventId,
         })
         return { success: true }

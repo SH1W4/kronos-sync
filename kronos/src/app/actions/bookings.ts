@@ -155,8 +155,11 @@ export async function createBooking(data: {
         })
 
         // 3. Sync to Google Calendar
-        if (data.syncToGoogle) {
+        // Auto-sync se o workspace tem agenda compartilhada configurada OU se o artista pediu sync
+        const shouldSync = data.syncToGoogle || !!workspace.googleCalendarId
+        if (shouldSync) {
             try {
+                // 3a. Sync na agenda PESSOAL do artista
                 const googleResult = await createCalendarEvent(user.id, {
                     summary: `Tatuagem: ${(booking as any).client.name}`,
                     description: `Sessão agendada via KRONØS\n\nTipo: ${data.type}\nObs: ${data.notes || ''}`,
@@ -174,15 +177,17 @@ export async function createBooking(data: {
                     })
                 }
 
-                // 4. Mirror Sync to Studio Owner (Tower)
-                if (user.id !== workspace.ownerId) {
+                // 3b. Espelho na AGENDA COMPARTILHADA DO ESTUDIO (galeria.kronos@gmail.com)
+                // Sempre usa googleCalendarId do workspace configurado
+                if (workspace.googleCalendarId) {
                     await createCalendarEvent(workspace.ownerId, {
-                        summary: `[KRONØS] ${(booking as any).artist.user.name} - ${(booking as any).client.name}`,
-                        description: `Espelho de Agendamento\nArtista: ${(booking as any).artist.user.name}\nCliente: ${(booking as any).client.name}\nValor: R$ ${data.estimatedPrice}`,
+                        summary: `[KRONØS] ${user.name} - ${(booking as any).client.name}`,
+                        description: `Agendamento Kronos\nArtista: ${user.name}\nCliente: ${(booking as any).client.name}\nValor: R$ ${data.estimatedPrice}\nTipo: ${data.type}`,
                         startTime: data.scheduledFor,
                         endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000),
-                        calendarId: workspace.googleCalendarId || 'primary' // Fix: Target Studio Calendar
+                        calendarId: workspace.googleCalendarId
                     })
+                    console.log(`✅ Espelho criado na agenda compartilhada: ${workspace.googleCalendarId}`)
                 }
 
             } catch (syncError) {
@@ -401,13 +406,46 @@ export async function updateBookingStatus(data: {
             }
         })
 
-        // 3. Update Google Calendar event if synced
+        // 3. Atualizar evento no Google Calendar (agenda pessoal + agenda compartilhada)
         if (updatedBooking.syncedToGoogle && updatedBooking.googleEventId) {
             try {
-                await updateCalendarEvent(user.id, updatedBooking.googleEventId, {
-                    summary: `Tatuagem: ${updatedBooking.client.name} (${data.status})`,
-                    description: `Status atualizado para: ${data.status}\n\nObs: ${(updatedBooking as any).notes || ''}`
+                // Busca o workspace para saber se tem agenda compartilhada
+                const workspace = await prisma.workspace.findUnique({
+                    where: { id: booking.workspaceId },
+                    select: { ownerId: true, googleCalendarId: true }
                 })
+
+                const statusLabel = {
+                    COMPLETED: 'Concluído ✅',
+                    CANCELLED: 'Cancelado ❌',
+                    CONFIRMED: 'Confirmado 🟢',
+                    OPEN: 'Aberto'
+                }[data.status] || data.status
+
+                // Atualiza na agenda PESSOAL do artista
+                await updateCalendarEvent(user.id, updatedBooking.googleEventId, {
+                    summary: `Tatuagem: ${updatedBooking.client.name} (${statusLabel})`,
+                    description: `Status: ${statusLabel}\nObs: ${(updatedBooking as any).notes || ''}`
+                })
+
+                // Atualiza/Remove na AGENDA COMPARTILHADA do estúdio
+                if (workspace?.googleCalendarId && data.status === 'CANCELLED') {
+                    // Tenta deletar da agenda compartilhada ao cancelar
+                    await deleteCalendarEvent(
+                        workspace.ownerId,
+                        updatedBooking.googleEventId,
+                        workspace.googleCalendarId
+                    ).catch(e => console.warn('⚠️ Não foi possível remover da agenda compartilhada:', e))
+                } else if (workspace?.googleCalendarId) {
+                    // Atualiza o status na agenda compartilhada
+                    await updateCalendarEvent(
+                        workspace.ownerId,
+                        updatedBooking.googleEventId,
+                        { summary: `[KRONØS] ${user.name} → ${updatedBooking.client.name} (${statusLabel})` },
+                        workspace.googleCalendarId
+                    ).catch(e => console.warn('⚠️ Não foi possível atualizar agenda compartilhada:', e))
+                }
+
             } catch (syncError) {
                 console.warn('⚠️ Falha ao atualizar evento no Google:', syncError)
             }
@@ -475,12 +513,29 @@ export async function deleteBooking(bookingId: string) {
             where: { id: bookingId }
         })
 
-        // 3. Delete Google Calendar event if synced
+        // 3. Remover do Google Calendar (agenda pessoal + agenda compartilhada)
         if (booking.syncedToGoogle && booking.googleEventId) {
             try {
+                // Busca o workspace para saber se tem agenda compartilhada
+                const workspace = await prisma.workspace.findUnique({
+                    where: { id: booking.workspaceId },
+                    select: { ownerId: true, googleCalendarId: true }
+                })
+
+                // Remove da agenda PESSOAL do artista
                 await deleteCalendarEvent(user.id, booking.googleEventId)
+
+                // Remove da AGENDA COMPARTILHADA do estúdio
+                if (workspace?.googleCalendarId) {
+                    await deleteCalendarEvent(
+                        workspace.ownerId,
+                        booking.googleEventId,
+                        workspace.googleCalendarId
+                    ).catch(e => console.warn('⚠️ Não foi possível remover da agenda compartilhada:', e))
+                }
+
             } catch (syncError) {
-                console.warn('⚠️ Falha ao deletar evento no Google:', syncError)
+                console.warn('⚠️ Falha ao remover evento do Google:', syncError)
             }
         }
 
