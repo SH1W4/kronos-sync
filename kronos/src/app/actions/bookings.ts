@@ -192,7 +192,7 @@ export async function createBooking(data: {
 
         revalidatePath('/artist/agenda')
 
-        // 5. Notificar Cliente (Background)
+        // 5. Notificar Cliente (Background) via E-mail Clássico
         if (booking.client.email) {
             sendBookingConfirmation({
                 clientName: booking.client.name || 'Cliente',
@@ -205,6 +205,24 @@ export async function createBooking(data: {
                 bookingId: booking.id
             }).catch(e => console.error('⚠️ Erro ao enviar notificação:', e))
         }
+
+        // 6. Disparo de Automação n8n (WhatsApp / Fluxos Avançados)
+        import('@/lib/webhook').then(({ dispatchWebhook }) => {
+            dispatchWebhook({
+                event: 'BOOKING_CREATED',
+                data: {
+                    bookingId: booking.id,
+                    clientPhone: booking.client.phone,
+                    clientName: booking.client.name,
+                    artistName: user.name,
+                    scheduledFor: data.scheduledFor,
+                    duration: data.duration,
+                    value: data.estimatedPrice,
+                    type: data.type,
+                    notes: data.notes
+                }
+            })
+        }).catch(e => console.error('Failed to import webhook dispatcher', e))
 
         return { success: true, booking }
 
@@ -395,6 +413,22 @@ export async function updateBookingStatus(data: {
             }
         }
 
+        // 4. Disparo de Automação n8n (WhatsApp / Fluxos Avançados)
+        if (data.status === 'COMPLETED' || data.status === 'CANCELLED') {
+            import('@/lib/webhook').then(({ dispatchWebhook }) => {
+                dispatchWebhook({
+                    event: data.status === 'COMPLETED' ? 'BOOKING_COMPLETED' : 'BOOKING_CANCELLED',
+                    data: {
+                        bookingId: updatedBooking.id,
+                        clientPhone: updatedBooking.client.phone,
+                        clientName: updatedBooking.client.name,
+                        artistName: user.name,
+                        status: data.status
+                    }
+                })
+            }).catch(e => console.error('Failed to import webhook dispatcher', e))
+        }
+
         revalidatePath('/artist/agenda')
         return { success: true, booking: updatedBooking }
 
@@ -449,6 +483,18 @@ export async function deleteBooking(bookingId: string) {
                 console.warn('⚠️ Falha ao deletar evento no Google:', syncError)
             }
         }
+
+        // 4. Disparo de Automação n8n
+        import('@/lib/webhook').then(({ dispatchWebhook }) => {
+            dispatchWebhook({
+                event: 'BOOKING_CANCELLED',
+                data: {
+                    bookingId: booking.id,
+                    artistName: user.name,
+                    status: 'DELETED'
+                }
+            })
+        }).catch(e => console.error('Failed to import webhook dispatcher', e))
 
         revalidatePath('/artist/agenda')
         return { success: true }
