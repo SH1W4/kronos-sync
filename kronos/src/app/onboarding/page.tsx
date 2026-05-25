@@ -77,7 +77,7 @@ function OnboardingContent() {
             }
             autoValidate()
         }
-    }, [urlCode, status])
+    }, [urlCode, isSignedIn])
 
     const handleClientAccess = async () => {
         // Para clientes, o HUB central é o Kiosk (Ficha, Acompanhante, Loja)

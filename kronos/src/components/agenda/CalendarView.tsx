@@ -64,6 +64,16 @@ export function CalendarView({
                                                     <div className="w-1.5 h-1.5 rounded-full bg-gray-500" />
                                                     <span className="text-sm font-medium text-gray-400">Ocupado (Google Agenda)</span>
                                                 </div>
+                                            ) : booking.isStudioMate ? (
+                                                <div
+                                                    key={booking.id}
+                                                    className="flex items-center gap-2 p-3 bg-gray-800/50 border border-white/5 rounded-lg opacity-60 select-none"
+                                                >
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                                                    <span className="text-sm font-medium text-gray-400">
+                                                        Maca Ocupada <span className="text-xs opacity-50 ml-1">({booking.artist?.user?.name || 'Colega'})</span>
+                                                    </span>
+                                                </div>
                                             ) : (
                                                 <BookingCard
                                                     key={booking.id}
@@ -144,6 +154,15 @@ export function CalendarView({
                                                 >
                                                     <div className="w-1 h-1 rounded-full bg-gray-500" />
                                                     <span className="truncate">Ocupado</span>
+                                                </div>
+                                            ) : booking.isStudioMate ? (
+                                                <div
+                                                    key={booking.id}
+                                                    className="p-1 px-2 mb-1 bg-gray-800/50 border border-white/5 rounded text-[10px] text-gray-400 opacity-60 flex items-center gap-1"
+                                                    title={`Ocupado por ${booking.artist?.user?.name || 'Colega'}`}
+                                                >
+                                                    <div className="w-1 h-1 rounded-full bg-primary/50" />
+                                                    <span className="truncate">{booking.artist?.user?.name?.split(' ')[0] || 'Ocupado'}</span>
                                                 </div>
                                             ) : (
                                                 <BookingCard

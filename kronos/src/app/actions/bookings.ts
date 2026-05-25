@@ -230,21 +230,31 @@ export async function getMyBookings(data: {
 
         const user = await prisma.user.findUnique({
             where: { clerkId: clerkUserId },
-            include: { artist: true }
+            include: { artist: true, memberships: true }
         })
 
         if (!user?.artist) {
             return { error: 'Apenas artistas podem ver agendamentos' }
         }
+        
+        const workspaceId = user.memberships?.[0]?.workspaceId || user.artist?.workspaceId;
 
-        const bookings = await prisma.booking.findMany({
-            where: {
-                artistId: user.artist.id,
-                scheduledFor: {
-                    gte: data.startDate,
-                    lte: data.endDate
-                }
+        const whereClause: any = {
+            scheduledFor: {
+                gte: data.startDate,
+                lte: data.endDate
             },
+            status: { not: 'CANCELLED' } // Ocultar os cancelados da view
+        };
+
+        if (workspaceId) {
+            whereClause.workspaceId = workspaceId; // Traz de todos do estúdio
+        } else {
+            whereClause.artistId = user.artist.id; // Fallback: só o dele
+        }
+
+        const rawBookings = await prisma.booking.findMany({
+            where: whereClause,
             include: {
                 client: {
                     select: {
@@ -254,12 +264,25 @@ export async function getMyBookings(data: {
                         phone: true,
                         image: true
                     }
+                },
+                artist: {
+                    include: {
+                        user: {
+                            select: { name: true }
+                        }
+                    }
                 }
             },
             orderBy: {
                 scheduledFor: 'asc'
             }
         })
+        
+        // Identifica quais bookings pertencem a companheiros de estúdio 
+        const bookings = rawBookings.map(b => ({
+            ...b,
+            isStudioMate: b.artistId !== user.artist?.id
+        }));
 
         // 3. Merge with Google Calendar events if requested
         let unifiedEvents: any[] = [...bookings]
