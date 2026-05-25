@@ -40,9 +40,10 @@ KRONØS SYNC is architected as a **Professional-First Operating System** for tat
 
 ## 🏗️ 03. ARCHITECTURAL MODULES
 
-### **1. Management Dashboard (`/artist/*`)**
-- High-level metrics visualization.
-- **Optional Google Calendar Sync:** Artists can choose to link their personal calendar (One-way Sync from Kronos -> Google).
+### 1. Management Dashboard (`/artist/*`)
+- High-level metrics visualization, gamification HUD (XP, achievements, skins shop).
+- **Google Calendar Sync (Clerk Integrated):** Artists link their accounts via Clerk OAuth. Sincronização automática para a agenda pessoal do artista e espelhamento em tempo real na agenda compartilhada do estúdio (`googleCalendarId` do Workspace) com propagação de updates/deletes.
+- **n8n Webhook Automations:** Real-time Webhook dispatching inside Server Actions for booking notifications and statuses.
 - Artist profile and portfolio management.
 
 ### **2. Financial Vault (`Settlements System`)**
