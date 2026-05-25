@@ -410,10 +410,10 @@ export async function updateBookingStatus(data: {
         if (updatedBooking.syncedToGoogle && updatedBooking.googleEventId) {
             try {
                 // Busca o workspace para saber se tem agenda compartilhada
-                const workspace = await prisma.workspace.findUnique({
+                const workspace = booking.workspaceId ? await prisma.workspace.findUnique({
                     where: { id: booking.workspaceId },
                     select: { ownerId: true, googleCalendarId: true }
-                })
+                }) : null;
 
                 const statusLabel = {
                     COMPLETED: 'Concluído ✅',
@@ -517,10 +517,10 @@ export async function deleteBooking(bookingId: string) {
         if (booking.syncedToGoogle && booking.googleEventId) {
             try {
                 // Busca o workspace para saber se tem agenda compartilhada
-                const workspace = await prisma.workspace.findUnique({
+                const workspace = booking.workspaceId ? await prisma.workspace.findUnique({
                     where: { id: booking.workspaceId },
                     select: { ownerId: true, googleCalendarId: true }
-                })
+                }) : null;
 
                 // Remove da agenda PESSOAL do artista
                 await deleteCalendarEvent(user.id, booking.googleEventId)
