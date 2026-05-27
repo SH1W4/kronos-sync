@@ -44,5 +44,61 @@ describe('validations', () => {
             const result = bookingSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
         });
+
+        it('should validate successfully with a valid macaId', () => {
+            const validData = {
+                clientId: 'client-1234567890',
+                scheduledFor: new Date().toISOString(),
+                duration: 240,
+                estimatedPrice: 1200,
+                type: 'TATTOO',
+                macaId: 3
+            };
+
+            const result = bookingSchema.safeParse(validData);
+            expect(result.success).toBe(true);
+        });
+
+        it('should fail if macaId is less than 1', () => {
+            const invalidData = {
+                clientId: 'client-1234567890',
+                scheduledFor: new Date().toISOString(),
+                duration: 240,
+                estimatedPrice: 1200,
+                type: 'TATTOO',
+                macaId: 0
+            };
+
+            const result = bookingSchema.safeParse(invalidData);
+            expect(result.success).toBe(false);
+        });
+
+        it('should fail if macaId is greater than 20', () => {
+            const invalidData = {
+                clientId: 'client-1234567890',
+                scheduledFor: new Date().toISOString(),
+                duration: 240,
+                estimatedPrice: 1200,
+                type: 'TATTOO',
+                macaId: 21
+            };
+
+            const result = bookingSchema.safeParse(invalidData);
+            expect(result.success).toBe(false);
+        });
+
+        it('should fail if macaId is a decimal', () => {
+            const invalidData = {
+                clientId: 'client-1234567890',
+                scheduledFor: new Date().toISOString(),
+                duration: 240,
+                estimatedPrice: 1200,
+                type: 'TATTOO',
+                macaId: 2.5
+            };
+
+            const result = bookingSchema.safeParse(invalidData);
+            expect(result.success).toBe(false);
+        });
     });
 });
