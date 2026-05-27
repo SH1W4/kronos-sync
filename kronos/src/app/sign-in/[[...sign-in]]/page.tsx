@@ -29,10 +29,18 @@ export default function CustomSignInPage() {
         setError('')
 
         try {
-            const result = await signIn.create({
+            // 1. Iniciar a tentativa de login com o e-mail
+            let result = await signIn.create({
                 identifier: email,
-                password: password,
             })
+
+            // 2. Se o Clerk exigir o primeiro fator (senha), tenta autenticar com a senha fornecida
+            if (result.status === 'needs_first_factor') {
+                result = await signIn.attemptFirstFactor({
+                    strategy: 'password',
+                    password: password,
+                })
+            }
 
             if (result.status === 'complete') {
                 await setActive({ session: result.createdSessionId })
