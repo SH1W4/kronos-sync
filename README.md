@@ -129,19 +129,25 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 - 📦 Order management with artist commission tracking
 - 🎨 Artist-specific product listings
 
-### 4. **Financial System**
-- 💸 Unified settlement flow (tattoos + marketplace)
-- 🤖 AI-powered receipt validation
-- 📈 Revenue projections and analytics
-- 🏦 PIX integration for instant payments
-- 📊 Artist vs. Studio commission breakdown
+### 4. **Financial System & Mathematical Split**
+- 💸 **Unified Settlement Flow** (tattoos + marketplace)
+- 📊 **Dynamic Commission Rate**:
+  - **Resident Artists**: 30% baseline commission for the studio, dynamically dropping to **20%** once the artist accumulates R$ 10.000,00 in monthly earnings.
+  - **Guest/Associated Artists**: Locked at **30%** fixed commission rate, matching the initial resident rate.
+- 🤖 **AI-Powered Receipt Validation** (Vision Agent simulation)
+- 🏦 **PIX Integration** for instant payment tracking and settlement approvals
 
-### 5. **Booking & Scheduling**
-- 📅 Multi-artist calendar management
-- ⏰ Slot-based scheduling with conflict prevention
-- 📋 Integrated anamnesis forms
-- 🔔 WhatsApp notifications (planned)
-- 🎫 QR code check-in system
+### 5. **Booking & Stretcher Management (Studio Capacity)**
+- 📅 **Multi-Artist Studio Timeline**: Slot-based calendar layout checking workspace bounds (max capacity $\le 3$ active stretchers).
+- 🛏️ **Physical Stretcher Selection (`macaId` 1-20)**: Artists can manually choose a physical stretcher when creating appointments via `createBooking` with synchronous conflict detection.
+- 🔄 **Intelligent Auto-Allocation Fallback**: Seamless automatic slot selection for clients, finding the first available physical stretcher sequence.
+- 📋 **Integrated Anamnesis Forms** linked to booking context via dynamic QR codes.
+
+### 6. **Gamification: Soul Sync Engine**
+- 🏅 **Liquid Chrome / Metallic Achievements**: 3D high-fidelity metallic badges representing real milestones (`FIRST_INK`, `HIGH_ROLLER`, `PERFECT_WEEK`, `LEGENDARY_ARTIST`).
+- 📈 **RPG Progression Engine**: Core square-root level progression model:
+  $$Level = \lfloor\sqrt{XP/100}\rfloor + 1$$
+- 🏆 **Dynamic Custom Ranks** (e.g., *Iniciado da Tinta*, *Tecelão do Tempo*, *Titã do Kronos*) with dedicated badge designs in `/public/assets/gamification/badges`.
 
 ---
 
@@ -154,17 +160,33 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 - **Framer Motion** (Animations)
 - **Lucide Icons** (UI icons)
 
-### **Backend**
+### **Backend & Authentication**
 - **Prisma ORM** (PostgreSQL)
-- **NextAuth.js** (Authentication)
+- **Clerk Authentication** (SSO-first entry gate)
+  - Anti-friction onboarding gate collecting and normalizing artist details without Brazilian carrier SMS barriers.
+  - Synchronous custom auth sync to prevent phantom administrative entries.
 - **Server Actions** (Type-safe API)
 - **Resend** (Email delivery)
 
-### **Infrastructure**
-- **Vercel** (Deployment & hosting)
-- **PostgreSQL** (Database)
-- **Google Calendar API** (Sync)
-- **WhatsApp Business API** (Notifications - planned)
+### **Testing & Quality Assurance**
+- **Vitest** (Unit testing engine)
+- **55 automated unit tests** protecting:
+  - Financial splits, product markups, and coupon deduction mathematics.
+  - Gamification XP scaling, level boundaries, and achievements.
+  - Dynamic `macaId` input integrity and validations on `bookingSchema` (Zod).
+
+---
+
+## 🧪 Testing and Quality Gates
+
+The core business logic is heavily audited and guarded by Vitest. To run the full test suite in isolation:
+
+```bash
+# Run unit tests
+npx vitest run --root .
+```
+
+All 55 core operations will be checked, including edge-case limits, decimal divisions, and validation schemas.
 
 ---
 
@@ -173,7 +195,7 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 ### Prerequisites
 - Node.js 18+ 
 - PostgreSQL database
-- Google OAuth credentials (optional)
+- Clerk Account (for auth)
 - Resend API key (for emails)
 
 ### Setup
@@ -197,16 +219,12 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
    Required variables:
    ```env
    DATABASE_URL="postgresql://..."
-   NEXTAUTH_SECRET="your-secret-key"
-   NEXTAUTH_URL="http://localhost:3000"
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
+   CLERK_SECRET_KEY="sk_..."
    
    # Email (Resend)
    RESEND_API_KEY="re_..."
    RESEND_FROM_EMAIL="KRONOS SYNC <acesso@yourdomain.com>"
-   
-   # Google OAuth (optional)
-   GOOGLE_CLIENT_ID="..."
-   GOOGLE_CLIENT_SECRET="..."
    ```
 
 4. **Initialize database**
@@ -223,187 +241,6 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 6. **Access the application**
    - App: `http://localhost:3000`
    - Kiosk: `http://localhost:3000/kiosk`
-   - Admin: Login with dev credentials or create invite
-
----
-
-## 🔐 Authentication System
-
-### **Magic Link (Primary)**
-1. User enters email
-2. System sends 6-digit code
-3. User verifies code
-4. System checks:
-   - Is user an existing Artist/Admin? → **Grant access**
-   - Is there an invite code in URL? → **Create as Artist**
-   - Neither? → **Reject with error**
-
-### **Google OAuth (Optional)**
-- One-click login for team members
-- Automatically syncs with Google Calendar
-- Requires pre-existing account or invite
-
-### **Dev Mode (Development Only)**
-- Username: `dev` → Creates artist account
-- Username: `master` → Creates admin account with demo data
-
----
-
-## 🎨 Design System
-
-### **Color Palette**
-```css
---primary: #8B5CF6      /* Purple - Professional actions */
---secondary: #FF64FF    /* Magenta - Artist highlights */
---accent: #00FF88       /* Cyan - Client interactions */
---background: #000000   /* Pure black */
---foreground: #FFFFFF   /* Pure white */
-```
-
-### **Typography**
-- **Headings**: Orbitron (Futuristic, bold)
-- **Body**: Inter (Clean, readable)
-- **Mono**: JetBrains Mono (Code, data)
-
-### **UI Principles**
-- **Cyber-minimalism**: Clean interfaces with subtle neon accents
-- **Data-driven**: Real-time metrics and progress indicators
-- **Gesture-first**: Optimized for touch (Kiosk) and desktop
-- **Accessibility**: WCAG 2.1 AA compliant
-
----
-
-## 📊 Database Schema Highlights
-
-### **Core Models**
-
-```prisma
-model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
-  name     String
-  role     UserRole @default(CLIENT)
-  artist   Artist?
-  // ... relations
-}
-
-model Artist {
-  id           String      @id @default(cuid())
-  userId       String      @unique
-  workspaceId  String
-  plan         ArtistPlan  // RESIDENT | GUEST
-  validUntil   DateTime?   // For GUEST artists
-  // ... relations
-}
-
-model InviteCode {
-  id           String      @id @default(cuid())
-  code         String      @unique
-  role         UserRole    @default(CLIENT)
-  targetPlan   ArtistPlan? // For artist invites
-  workspaceId  String?
-  maxUses      Int         @default(1)
-  currentUses  Int         @default(0)
-  expiresAt    DateTime?
-  // ... relations
-}
-
-model KioskEntry {
-  id             String   @id @default(cuid())
-  name           String
-  phone          String
-  instagram      String?
-  barrier        String?  // PRECO | DOR | ESTILO
-  intent         String?  // Dream tattoo description
-  type           String   // COMPANION | WALK_IN
-  marketingOptIn Boolean  @default(false)
-  artistId       String
-  workspaceId    String
-  // ... relations
-}
-```
-
----
-
-## 🔄 Workflows
-
-### **Invite New Artist**
-
-1. Admin generates invite code:
-   ```typescript
-   const invite = await prisma.inviteCode.create({
-     data: {
-       code: generateUniqueCode(),
-       role: 'ARTIST',
-       targetPlan: 'RESIDENT',
-       workspaceId: workspace.id,
-       creatorId: admin.id,
-       maxUses: 1,
-       expiresAt: addDays(new Date(), 7)
-     }
-   })
-   ```
-
-2. Share invite link:
-   ```
-   https://kronos-sync.vercel.app/auth/signin?invite=ABC123XYZ
-   ```
-
-3. New artist:
-   - Enters email
-   - Receives 6-digit code
-   - Verifies code
-   - System creates Artist account automatically
-   - Redirected to onboarding
-
-### **Client Check-In (Kiosk)**
-
-1. Client scans QR code → Lands on `/kiosk`
-2. Clicks "Sou Acompanhante" (I'm a companion)
-3. Fills form:
-   - Name, Phone, Instagram
-   - Barrier (Price, Pain, Style)
-   - Dream tattoo description
-   - Artist PIN (last 4 digits of artist's phone)
-4. System validates PIN
-5. Creates `KioskEntry` record
-6. Generates coupon: `TATTOO10_FIRSTNAME`
-7. Shows success screen with QR code
-
-### **Financial Settlement**
-
-1. Artist completes tattoos/sells products
-2. Views pending revenue in Finance page
-3. Selects items to settle
-4. Transfers commission to studio (PIX)
-5. Uploads receipt proof
-6. Admin validates in Finance Dashboard
-7. AI analyzes receipt for fraud
-8. Admin approves/rejects settlement
-9. Items marked as settled
-
----
-
-## 🚧 Roadmap
-
-### **Q1 2025**
-- [x] Professional Gate implementation
-- [x] Kiosk lead capture system
-- [x] Unified financial settlement
-- [ ] WhatsApp notification system
-- [ ] Advanced BI dashboard
-
-### **Q2 2025**
-- [ ] Mobile app (React Native)
-- [ ] Multi-studio franchise mode
-- [ ] AI-powered scheduling optimization
-- [ ] Inventory management
-
-### **Q3 2025**
-- [ ] Client loyalty program
-- [ ] Automated marketing campaigns
-- [ ] Advanced analytics & reporting
-- [ ] API for third-party integrations
 
 ---
 
