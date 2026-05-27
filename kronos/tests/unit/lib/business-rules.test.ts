@@ -21,10 +21,9 @@ describe('Regras Financeiras do Estúdio KRONØS', () => {
     })
 
     describe('calculateCommission() — Taxa de Comissão por Plano', () => {
-        it('artista GUEST deve ter taxa de comissão fixa', () => {
+        it('artista GUEST deve ter taxa de comissão fixa em 30%', () => {
             const rate = calculateCommission('GUEST', 0)
-            expect(rate).toBeGreaterThan(0)
-            expect(rate).toBeLessThanOrEqual(1)
+            expect(rate).toBe(0.30)
         })
 
         it('artista ASSOCIATED deve ter a mesma taxa que GUEST', () => {
