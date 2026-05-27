@@ -25,12 +25,14 @@
 - **Flow:** Captura de Lead -> Validação por PIN do Artista -> Geração de Cupom.
 
 ### 3. Booking & Scheduling
-- **Core:** Calendário multi-artista com detecção de conflitos.
-- **Sync:** Integração Opcional com Google Calendar (Manual Connect).
+- **Core:** Calendário multi-artista com detecção de conflitos de macas físicas.
+- **Sync:** Integração híbrida via Clerk OAuth2. Sincronização automática para a agenda pessoal do artista e espelhamento em tempo real na agenda compartilhada do estúdio (`googleCalendarId` do Workspace) usando a conta do proprietário. Propagação completa de atualizações de status e exclusões física.
+- **Automations:** Disparo automático de webhooks (`BOOKING_COMPLETED`, `BOOKING_CANCELLED`, etc.) para n8n para disparo de notificações via WhatsApp Gateway.
 
 ### 4. Financeiro & Settlement
 - **State Machine:** `PENDING` -> `VALIDATING` -> `APPROVED` -> `RESOLVED`.
 - **Workflow:** Upload de comprovante PIX -> Validação IA/Admin.
+
 
 ### 5. Governança & IP
 

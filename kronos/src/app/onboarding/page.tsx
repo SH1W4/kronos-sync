@@ -210,7 +210,7 @@ function OnboardingContent() {
                                 variant="outline"
                                 className="border-primary/20 text-primary/80 hover:bg-primary/10 hover:border-primary/40 hover:text-primary h-10 px-8 rounded-xl font-bold font-orbitron text-[10px] tracking-widest uppercase transition-all duration-300 shadow-[0_0_20px_rgba(0,255,136,0.02)] hover:shadow-[0_0_25px_rgba(0,255,136,0.1)]"
                             >
-                                Ir direto para o Login (E-mail)
+                                Ir direto para o Login (Google)
                             </Button>
                         </div>
                     </div>

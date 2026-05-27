@@ -8,6 +8,8 @@ import { BrandLogo } from '@/components/ui/brand-logo'
 import { useUser } from '@clerk/nextjs'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { X } from 'lucide-react'
+import { motion } from 'framer-motion'
+
 
 // --- CONTENT CONFIGURATION ---
 const FEATURES = [
@@ -101,14 +103,21 @@ export default function LandingPage() {
 
             {/* Elegant Hero with ORIGINAL WALLPAPER & FONTS */}
             <section className="relative pt-40 pb-24 px-6 md:pt-52 md:pb-40 overflow-hidden">
-                {/* RESTORED BACKGROUND IMAGE */}
-                <Image
-                    src="/hero-bg.png"
-                    alt="Abstract Liquid Background"
-                    fill
-                    className="object-cover opacity-40 mix-blend-screen pointer-events-none"
-                    priority
-                />
+                {/* RESTORED BACKGROUND IMAGE (OPTIMIZED WEBP) */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.4 }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                >
+                    <Image
+                        src="/hero-bg.webp"
+                        alt="Abstract Liquid Background"
+                        fill
+                        className="object-cover mix-blend-screen pointer-events-none"
+                        priority
+                    />
+                </motion.div>
 
                 {/* Background Noise/Texture Overlay */}
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-soft-light"></div>
@@ -116,29 +125,66 @@ export default function LandingPage() {
                 {/* Subtle spotlight */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/5 blur-[100px] rounded-full pointer-events-none opacity-40"></div>
 
-                <div className="container mx-auto max-w-4xl relative z-10 flex flex-col items-center text-center">
-                    <div className="mb-8">
+                <motion.div 
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                            opacity: 1,
+                            transition: {
+                                staggerChildren: 0.15
+                            }
+                        }
+                    }}
+                    className="container mx-auto max-w-4xl relative z-10 flex flex-col items-center text-center"
+                >
+                    <motion.div 
+                        variants={{
+                            hidden: { opacity: 0, scale: 0.8 },
+                            visible: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } }
+                        }}
+                        className="mb-8"
+                    >
                         <BrandLogo size={140} variant="icon" animated={true} />
-                    </div>
+                    </motion.div>
 
-                    <h1 className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight">
+                    <motion.h1 
+                        variants={{
+                            hidden: { opacity: 0, y: 30 },
+                            visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                        }}
+                        className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight"
+                    >
                         Controle absoluto para <br />
                         <span className="font-orbitron font-light text-zinc-400">estúdios profissionais.</span>
-                    </h1>
+                    </motion.h1>
 
-                    <p className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10">
+                    <motion.p 
+                        variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                        }}
+                        className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10"
+                    >
                         Soberania financeira e inteligência de dados.
                         <br />Silencie o caos operacional e foque no que importa: seu legado.
-                    </p>
+                    </motion.p>
 
-                    <div className="flex gap-4">
+                    <motion.div 
+                        variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+                        }}
+                        className="flex gap-4"
+                    >
                         <Link href={isSignedIn ? (((user.publicMetadata as any)?.role === 'ARTIST' || (user.publicMetadata as any)?.role === 'ADMIN') ? '/artist/dashboard' : '/kiosk') : '/onboarding'}>
                             <Button className="h-12 px-8 bg-white text-black hover:bg-zinc-200 text-xs font-bold font-orbitron tracking-widest uppercase rounded flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all">
                                 {isSignedIn ? 'ENTRAR NO SISTEMA' : 'ACESSAR FLOW'}
                             </Button>
                         </Link>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </section>
 
             {/* PHILOSOPHY SECTION */}

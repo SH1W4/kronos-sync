@@ -62,11 +62,17 @@ Transformar o KRONOS em um ecossistema **Multitenant**. O sistema agora não ate
   - [x] Sincronização de campos pessoais (Nome, WhatsApp, Nascimento).
   - [x] Assinatura Digital offline-safe via Canvas.
   - [x] Painel do artista com Alertas de Saúde automáticos.
-- [x] **Estabilidade do Núcleo**
+- [x] **Estabilidade do Núcleo & Integrações**
   - [x] Otimização de scanning do Turbopack (Fim dos travamentos de server).
   - [x] Correção de componentes Server/Client (Crash de hidratração).
   - [x] Padronização Prisma v5.22.0 para Windows.
+  - [x] Integração Google Calendar (Clerk OAuth, auto-sync no Workspace e propagação de updates/deletes).
+  - [x] Webhooks em tempo real (`bookings.ts`) para automação via n8n (ex: alertas de WhatsApp).
+- [x] **Gamificação & UX Premium (Soul Sync)**
+  - [x] HUD de Gamificação na Dashboard do Artista (XP, Conquistas e Badges).
+  - [x] Integração da Loja de Skins (Alchemy Avatar Shop).
 
 ---
-**Status Atual:** 🚀 Sistema de Anamnese e Estabilidade de núcleo concluídos.
-**Próximo foco:** Customização de marca (Dynamic Branding) e Switcher interativo de Workspaces.
+**Status Atual:** 🚀 Sistema de Anamnese, Gamificação (Soul Sync) e Integração Google Calendar / Webhooks concluídos.
+**Próximo foco:** Otimização de performance da Home (Textura Pipeline) e lançamento do funil `/landing/artista`.
+

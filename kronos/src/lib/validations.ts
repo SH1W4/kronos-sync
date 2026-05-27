@@ -130,7 +130,8 @@ export const bookingSchema = z.object({
     estimatedPrice: moneySchema.min(50, 'Valor mínimo: R$ 50'),
     notes: z.string().max(1000, 'Descrição muito longa').optional(),
     status: z.enum(['OPEN', 'CONFIRMED', 'COMPLETED', 'CANCELLED']).optional(),
-    syncToGoogle: z.boolean().optional()
+    syncToGoogle: z.boolean().optional(),
+    macaId: z.number().int().min(1).max(20).optional()
 })
 
 export const kioskEntrySchema = z.object({

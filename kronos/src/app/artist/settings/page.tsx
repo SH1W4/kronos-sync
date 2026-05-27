@@ -12,6 +12,7 @@ import {
     updateUserTheme,
     updateWorkspaceCapacity,
     getWorkspaceSettings,
+    getArtistProfile,
     updatePassword,
     updateWorkspaceBranding,
     updateWorkspaceCalendar,
@@ -97,8 +98,17 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (user && !isInitialized) {
-            setName(user.fullName || '')
             setIsInitialized(true)
+
+            // Buscar o nome real do banco (não do perfil Google/Clerk)
+            getArtistProfile().then(res => {
+                if (res.success && res.name) {
+                    setName(res.name)
+                } else {
+                    // Fallback para o nome do Clerk se o banco não retornar
+                    setName(user.fullName || '')
+                }
+            })
             
             // Clerk properties are in publicMetadata or on user object
             const commissionRate = user.publicMetadata?.commissionRate as number | undefined

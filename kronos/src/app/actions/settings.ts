@@ -101,6 +101,25 @@ export async function updateUserTheme(color: string) {
     }
 }
 
+export async function getArtistProfile() {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            select: { name: true, image: true }
+        })
+
+        if (!user) return { error: 'Usuário não encontrado' }
+
+        return { success: true, name: user.name, image: user.image }
+    } catch (error) {
+        console.error('Erro ao buscar perfil do artista:', error)
+        return { error: 'Erro ao buscar perfil' }
+    }
+}
+
 export async function updateArtistSettings(data: { name?: string; commissionRate?: number; instagram?: string; image?: string; calendarSyncEnabled?: boolean }) {
     try {
         const { userId: clerkUserId } = await auth()
@@ -133,6 +152,23 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
                     ...(data.image && { image: data.image })
                 }
             })
+
+            // Sincronizar com o Clerk para refletir no useUser() e evitar resets do webhook
+            if (data.name) {
+                try {
+                    const { clerkClient } = await import('@clerk/nextjs/server')
+                    const names = data.name.trim().split(/\s+/)
+                    const firstName = names[0] || ''
+                    const lastName = names.slice(1).join(' ') || ''
+                    const client = await clerkClient()
+                    await client.users.updateUser(clerkUserId, {
+                        firstName,
+                        lastName
+                    })
+                } catch (clerkErr) {
+                    console.error("Erro ao sincronizar nome com Clerk:", clerkErr)
+                }
+            }
         }
 
         // Update Artist profile (commissionRate restricted to ADMIN, instagram, calendarSyncEnabled)

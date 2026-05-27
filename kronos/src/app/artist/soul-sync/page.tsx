@@ -40,11 +40,12 @@ export default async function SoulSyncPage() {
     }, {} as Record<SkinSlot, SkinItem[]>)
 
     // Currently equipped
-    const equipped = {
+    const equipped: Record<SkinSlot, string | null> = {
         BASE: gamification.baseSkinId,
         AURA: gamification.auraSkinId,
         MASK: gamification.maskSkinId,
-        ARTIFACT: gamification.artifactSkinId
+        ARTIFACT: gamification.artifactSkinId,
+        TATTOO: null
     }
 
     // Function to check if unlocked

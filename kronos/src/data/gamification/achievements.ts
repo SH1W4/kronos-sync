@@ -12,7 +12,7 @@ export const ACHIEVEMENTS: AchievementItem[] = [
         code: 'FIRST_INK',
         title: 'Primeiro Traço',
         description: 'Concluiu o primeiro agendamento pela plataforma.',
-        icon: 'Droplet',
+        icon: '/assets/gamification/badges/achievement_first_ink.png',
         xpReward: 100,
         rarity: 'COMMON'
     },
@@ -20,7 +20,7 @@ export const ACHIEVEMENTS: AchievementItem[] = [
         code: 'HIGH_ROLLER',
         title: 'Aposta Alta',
         description: 'Realizou um agendamento com valor acima de R$ 2.000.',
-        icon: 'BadgeDollarSign',
+        icon: '/assets/gamification/badges/achievement_high_roller.png',
         xpReward: 500,
         rarity: 'RARE'
     },
@@ -28,7 +28,7 @@ export const ACHIEVEMENTS: AchievementItem[] = [
         code: 'PERFECT_WEEK',
         title: 'Semana Perfeita',
         description: 'Manteve a agenda cheia por 5 dias consecutivos.',
-        icon: 'CalendarCheck',
+        icon: '/assets/gamification/badges/achievement_perfect_week.png',
         xpReward: 300,
         rarity: 'EPIC'
     },
@@ -36,7 +36,7 @@ export const ACHIEVEMENTS: AchievementItem[] = [
         code: 'LEGENDARY_ARTIST',
         title: 'Lenda Viva',
         description: 'Alcançou o Nível 50 na plataforma.',
-        icon: 'Crown',
+        icon: '/assets/gamification/badges/achievement_legendary_artist.png',
         xpReward: 5000,
         rarity: 'LEGENDARY'
     }

@@ -60,3 +60,16 @@ Redeploy o projeto (ou aguarde o próximo push) para as variáveis entrarem em v
 ### Onde comprar?
 *   **Vercel:** Mais fácil. Você compra direto no dashboard e ele já configura tudo (DNS, SSL).
 *   **Registro.br / Namecheap:** Mais barato, mas exige configuração de DNS manual (apontar para Vercel).
+
+---
+
+## ⚙️ Sincronização e Espelhamento Automático
+
+A sincronização de agenda no KRONØS opera de forma automática e integrada:
+
+1. **Agenda do Artista (Unit):** Cada artista autentica individualmente sua conta pelo Clerk. Os agendamentos criados geram eventos na agenda pessoal (`primary`) do artista.
+2. **Agenda Compartilhada (Torre):** Caso o administrador defina o `googleCalendarId` nas configurações do Workspace (ex: `galeria.kronos@gmail.com`), o sistema **espelha e sincroniza automaticamente** cada agendamento nessa agenda central usando a conta do proprietário do Workspace.
+3. **Eventos de Ciclo de Vida:**
+   - **Atualizações de Status:** Qualquer mudança de status ("Confirmado", "Concluído", "Cancelado") atualiza o título e descrição do evento correspondente nas duas agendas.
+   - **Cancelamentos e Exclusão:** Se um agendamento for cancelado (`CANCELLED`) ou deletado no dashboard do artista, ele é removido de forma limpa da agenda compartilhada do estúdio e da agenda pessoal do artista.
+

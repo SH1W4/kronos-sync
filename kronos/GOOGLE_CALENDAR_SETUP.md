@@ -100,15 +100,18 @@ npm run dev
 - O usuário precisa fazer login com Google, não apenas Magic Link
 - Verifique se `session.accessToken` está sendo salvo no callback JWT
 
+## 📝 Notas Técnicas e Fluxo de Sincronização
+
+- **Autenticação:** O sistema utiliza tokens de acesso OAuth2 integrados via Clerk (`src/lib/google.ts`). Cada artista autoriza sua conta Google de forma individual no seu painel.
+- **Sincronização Híbrida (Individual + Estúdio):**
+  - **Agenda do Artista (Unit):** Os agendamentos são criados na agenda `primary` do artista se ele solicitar ou se a agenda compartilhada estiver ativa.
+  - **Agenda do Estúdio (Torre/Compartilhada):** Se o Workspace tiver um `googleCalendarId` configurado (ex: `galeria.kronos@gmail.com`), o agendamento é **sincronizado automaticamente** como um espelho direto nela, utilizando o token do proprietário do Workspace (`workspace.ownerId`).
+- **Propagação de Atualizações:**
+  - Em atualizações de status (ex: "Confirmado", "Concluído", "Cancelado"), os títulos e descrições dos eventos correspondentes são atualizados em ambas as agendas.
+  - Em caso de cancelamento (`CANCELLED`) ou exclusão do agendamento, o evento é automaticamente removido da agenda compartilhada do estúdio e da agenda do artista.
+- **Checagem de Conflitos:** Ao criar novos agendamentos, o estúdio valida a disponibilidade contra a agenda configurada no `googleCalendarId` (ou a `primary` do dono) para evitar conflitos de macas físicas.
+
 ---
 
-## 📝 Notas Técnicas
+**Última atualização:** Maio de 2026
 
-- O código atual (`google-calendar.ts`) usa **User OAuth**, não Service Account
-- Cada artista precisa autorizar individualmente
-- O token é armazenado na sessão JWT
-- Sincronização é **unidirecional**: KRONOS → Google Calendar
-
----
-
-**Última atualização:** 26 de Dezembro de 2025
