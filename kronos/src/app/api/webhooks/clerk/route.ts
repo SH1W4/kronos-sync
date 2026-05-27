@@ -52,18 +52,30 @@ export async function POST(req: Request) {
     }
 
     try {
+      // 1. Buscar usuário existente para preservar nome customizado
+      const existingUser = await prisma.user.findFirst({
+        where: { OR: [{ email }, { clerkId: id }] }
+      })
+
+      const clerkName = `${first_name || ''} ${last_name || ''}`.trim() || email.split('@')[0]
+
+      // Preserva o nome customizado se já existir — apenas sobrescreve com dado do Clerk se ainda não há nome no banco
+      const nameToSave = (existingUser?.name && existingUser.name !== email.split('@')[0])
+        ? existingUser.name
+        : clerkName
+
       // 1. Sync with Prisma
       const dbUser = await prisma.user.upsert({
         where: { email },
         update: {
           clerkId: id,
-          name: `${first_name || ''} ${last_name || ''}`.trim() || email.split('@')[0],
+          name: nameToSave,
           image: image_url,
         },
         create: {
           email,
           clerkId: id,
-          name: `${first_name || ''} ${last_name || ''}`.trim() || email.split('@')[0],
+          name: clerkName,
           image: image_url,
           role: 'ARTIST',
         },

@@ -101,6 +101,25 @@ export async function updateUserTheme(color: string) {
     }
 }
 
+export async function getArtistProfile() {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            select: { name: true, image: true }
+        })
+
+        if (!user) return { error: 'Usuário não encontrado' }
+
+        return { success: true, name: user.name, image: user.image }
+    } catch (error) {
+        console.error('Erro ao buscar perfil do artista:', error)
+        return { error: 'Erro ao buscar perfil' }
+    }
+}
+
 export async function updateArtistSettings(data: { name?: string; commissionRate?: number; instagram?: string; image?: string; calendarSyncEnabled?: boolean }) {
     try {
         const { userId: clerkUserId } = await auth()
