@@ -7,7 +7,7 @@ import { BrandLogo } from '@/components/ui/brand-logo'
 import { Loader2 } from 'lucide-react'
 
 function SSOCallbackContent() {
-    const { handleRedirectCallback } = useClerk()
+    const { handleRedirectCallback, signOut } = useClerk()
     const router = useRouter()
     const searchParams = useSearchParams()
     const inviteCode = searchParams.get('invite')
@@ -37,7 +37,19 @@ function SSOCallbackContent() {
                     }
                 }
 
-                // 3. Redireciona para o dashboard
+                // 3. Verificar se o usuário possui acesso válido (está cadastrado em algum workspace)
+                const verifyRes = await fetch('/api/auth/verify-access')
+                const verifyData = await verifyRes.json()
+
+                if (!verifyRes.ok || !verifyData.authorized) {
+                    const errMsg = verifyData.error || 'Acesso não autorizado ao ecossistema KRONØS.'
+                    // Desconectar o usuário imediatamente no Clerk
+                    await signOut()
+                    router.push(`/sign-in?error=${encodeURIComponent(errMsg)}`)
+                    return
+                }
+
+                // 4. Redireciona para o dashboard
                 router.push('/artist/dashboard')
             } catch (err) {
                 console.error('SSO Callback Error:', err)
@@ -46,7 +58,7 @@ function SSOCallbackContent() {
         }
 
         process()
-    }, [handleRedirectCallback, router, inviteCode])
+    }, [handleRedirectCallback, signOut, router, inviteCode])
 
     return (
         <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">

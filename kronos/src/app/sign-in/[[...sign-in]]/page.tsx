@@ -11,10 +11,18 @@ function SignInContent() {
     const { isLoaded, signIn } = useSignIn()
     const searchParams = useSearchParams()
     const inviteCode = searchParams.get('invite')
+    const urlError = searchParams.get('error')
     const callbackUrl = '/artist/dashboard'
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    // Ler erros passados via parâmetro de URL (ex: acessos bloqueados)
+    useEffect(() => {
+        if (urlError) {
+            setError(urlError)
+        }
+    }, [urlError])
 
     // Salvar o código de convite no sessionStorage para ser resgatado após o OAuth
     useEffect(() => {
