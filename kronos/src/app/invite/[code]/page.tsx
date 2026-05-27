@@ -78,7 +78,7 @@ export default async function InvitePage({ params }: PageProps) {
                     </div>
 
                     <div className="space-y-4">
-                        <Link href={`/auth/register?invite=${invite.code}`}>
+                        <Link href={`/sign-in?invite=${invite.code}`}>
                             <Button className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-black px-12 h-14 rounded-2xl text-lg flex items-center justify-center gap-4 group transition-all">
                                 RECLAMAR ACESSO
                                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />

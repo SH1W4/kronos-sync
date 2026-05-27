@@ -1,26 +1,42 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSignIn } from '@clerk/nextjs'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { Loader2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function CustomSignInPage() {
+function SignInContent() {
     const { isLoaded, signIn } = useSignIn()
+    const searchParams = useSearchParams()
+    const inviteCode = searchParams.get('invite')
     const callbackUrl = '/artist/dashboard'
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    // Salvar o código de convite no sessionStorage para ser resgatado após o OAuth
+    useEffect(() => {
+        if (inviteCode) {
+            sessionStorage.setItem('pendingInviteCode', inviteCode)
+        }
+    }, [inviteCode])
 
     const handleGoogleSignIn = async () => {
         if (!isLoaded) return
         setLoading(true)
         setError('')
         try {
+            // Passa o código de convite na URL de retorno para que o sso-callback possa resgatá-lo
+            const redirectComplete = inviteCode 
+                ? `/sso-callback?invite=${inviteCode}`
+                : callbackUrl
+
             await signIn.authenticateWithRedirect({
                 strategy: 'oauth_google',
                 redirectUrl: '/sso-callback',
-                redirectUrlComplete: callbackUrl
+                redirectUrlComplete: redirectComplete
             })
         } catch (err: any) {
             console.error('Google Sign In error:', err)
@@ -81,6 +97,14 @@ export default function CustomSignInPage() {
                         )}
                     </button>
 
+                    {/* Invite Badge */}
+                    {inviteCode && (
+                        <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-emerald-400 text-xs text-center font-mono tracking-wider">
+                            🎟 CONVITE DETECTADO: <strong>{inviteCode}</strong><br />
+                            <span className="text-emerald-600 text-[10px]">Sua conta será configurada automaticamente após o login.</span>
+                        </div>
+                    )}
+
                     {/* Error Alert */}
                     {error && (
                         <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-xs text-center font-mono uppercase tracking-wider">
@@ -90,5 +114,13 @@ export default function CustomSignInPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function CustomSignInPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black" />}>
+            <SignInContent />
+        </Suspense>
     )
 }
