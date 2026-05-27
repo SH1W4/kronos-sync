@@ -39,7 +39,7 @@ export default function CustomSignInPage() {
                 router.push(callbackUrl)
             } else {
                 console.log('SignIn status not complete:', result)
-                setError('Verifique seu e-mail para continuar ou tente outro método.')
+                setError(`Login incompleto. Status: ${result.status}. Fatores pendentes: ${JSON.stringify(result.supportedFirstFactors || result)}`)
             }
         } catch (err: any) {
             console.error('Error signing in:', err)
