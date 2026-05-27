@@ -244,6 +244,27 @@ All 55 core operations will be checked, including edge-case limits, decimal divi
 
 ---
 
+## 🚧 Operational Roadmap
+
+### **Phase 1: Foundation & Sovereignty (Q1-Q2 2025) — Done ✅**
+- [x] **Professional Gate**: Invitation-only Clerk SSO onboarding bypass.
+- [x] **Kiosk Lead Capture System**: Gamified "INK PASS" lead entry & coupon generator.
+- [x] **Gamification Core (Soul Sync)**: Square-root progression engine.
+- [x] **Liquid Chrome Achievement Assets**: Metallic 3D achievements integrated.
+
+### **Phase 2: Capacity & Financial Control (Q3-Q4 2025) — Done ✅**
+- [x] **Studio Capacity Management**: Physical stretcher allocation (`macaId` 1-20) and calendar booking conflict checks.
+- [x] **Dynamic Commission Split**: Automated resident commission scaling (30% $\rightarrow$ 20% over R$ 10k) and guest fixed 30% rate.
+- [x] **Vitest Quality Gate**: 55 automated unit tests protecting formulas.
+- [x] **AI Vision Simulation**: Dynamic settlement validation OCR logic.
+
+### **Phase 3: Integration & Expansion (Q1-Q2 2026) — Active 🚀**
+- [ ] **Omnichannel WhatsApp CRM**: Trigger automated notifications, coupons, and check-in confirmation dynamically.
+- [ ] **Sovereign Wallet & Real PIX Split**: Instant PIX payout integrations.
+- [ ] **Extended BI Dashboard**: Operational analytics, heatmaps of studio capacity, and artist rankings.
+
+---
+
 ## 📄 License
 
 This project is proprietary software. All rights reserved.
