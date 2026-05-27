@@ -19,6 +19,7 @@ export async function createBooking(data: {
     notes?: string
     status?: 'OPEN' | 'CONFIRMED'
     syncToGoogle?: boolean
+    macaId?: number
 }) {
     try {
         const { userId: clerkUserId } = await auth()
@@ -88,11 +89,16 @@ export async function createBooking(data: {
         }
         // Duplicate check removed.
 
-        for (let i = 1; i <= TOTAL_MACAS; i++) {
+        if (data.macaId !== undefined && data.macaId !== null) {
+            // Se o artista escolheu uma maca manualmente
+            if (data.macaId < 1 || data.macaId > TOTAL_MACAS) {
+                return { error: `Maca inválida. O estúdio possui capacidade para até ${TOTAL_MACAS} macas.` }
+            }
+
             const conflict = await prisma.slot.findFirst({
                 where: {
                     workspaceId,
-                    macaId: i,
+                    macaId: data.macaId,
                     isActive: true,
                     OR: [
                         {
@@ -103,9 +109,32 @@ export async function createBooking(data: {
                 }
             })
 
-            if (!conflict) {
-                availableMacaId = i
-                break
+            if (conflict) {
+                return { error: `A Maca ${data.macaId} já está ocupada neste horário.` }
+            }
+
+            availableMacaId = data.macaId
+        } else {
+            // Auto-seleção clássica
+            for (let i = 1; i <= TOTAL_MACAS; i++) {
+                const conflict = await prisma.slot.findFirst({
+                    where: {
+                        workspaceId,
+                        macaId: i,
+                        isActive: true,
+                        OR: [
+                            {
+                                startTime: { lt: end },
+                                endTime: { gt: start }
+                            }
+                        ]
+                    }
+                })
+
+                if (!conflict) {
+                    availableMacaId = i
+                    break
+                }
             }
         }
 
