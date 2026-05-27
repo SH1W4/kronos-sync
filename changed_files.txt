@@ -1,1 +1,0 @@
-kronos/src/app/artist/anamnese/[bookingId]/page.tsx
