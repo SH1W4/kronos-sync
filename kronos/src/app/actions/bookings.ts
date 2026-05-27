@@ -411,7 +411,7 @@ export async function updateBookingStatus(data: {
             try {
                 // Busca o workspace para saber se tem agenda compartilhada
                 const workspace = booking.workspaceId ? await prisma.workspace.findUnique({
-                    where: { id: booking.workspaceId },
+                    where: { id: booking.workspaceId as string },
                     select: { ownerId: true, googleCalendarId: true }
                 }) : null;
 
