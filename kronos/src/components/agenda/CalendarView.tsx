@@ -67,11 +67,17 @@ export function CalendarView({
                                             ) : booking.isStudioMate ? (
                                                 <div
                                                     key={booking.id}
-                                                    className="flex items-center gap-2 p-3 bg-gray-800/50 border border-white/5 rounded-lg opacity-60 select-none"
+                                                    className="flex flex-col gap-1 p-3 bg-gray-800/50 border border-white/5 rounded-lg opacity-80 select-none"
+                                                    title={`Maca ${booking.macaId || '?'} - Ocupado por ${booking.artist?.user?.name || 'Colega'}`}
                                                 >
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-                                                    <span className="text-sm font-medium text-gray-400">
-                                                        Maca Ocupada <span className="text-xs opacity-50 ml-1">({booking.artist?.user?.name || 'Colega'})</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                                                        <span className="text-sm font-bold text-white uppercase">
+                                                            Maca {booking.macaId || '?'}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-gray-400 ml-3.5">
+                                                        {booking.artist?.user?.name || 'Colega'}
                                                     </span>
                                                 </div>
                                             ) : (
@@ -158,11 +164,14 @@ export function CalendarView({
                                             ) : booking.isStudioMate ? (
                                                 <div
                                                     key={booking.id}
-                                                    className="p-1 px-2 mb-1 bg-gray-800/50 border border-white/5 rounded text-[10px] text-gray-400 opacity-60 flex items-center gap-1"
-                                                    title={`Ocupado por ${booking.artist?.user?.name || 'Colega'}`}
+                                                    className="p-1 px-2 mb-1 bg-gray-800/50 border border-white/5 rounded text-[10px] text-gray-400 opacity-80 flex flex-col gap-0.5"
+                                                    title={`Maca ${booking.macaId || '?'} - Ocupado por ${booking.artist?.user?.name || 'Colega'}`}
                                                 >
-                                                    <div className="w-1 h-1 rounded-full bg-primary/50" />
-                                                    <span className="truncate">{booking.artist?.user?.name?.split(' ')[0] || 'Ocupado'}</span>
+                                                    <div className="flex items-center gap-1">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                                                        <span className="font-bold text-white truncate">MACA {booking.macaId || '?'}</span>
+                                                    </div>
+                                                    <span className="truncate text-[9px] ml-2.5">{booking.artist?.user?.name?.split(' ')[0] || 'Colega'}</span>
                                                 </div>
                                             ) : (
                                                 <BookingCard

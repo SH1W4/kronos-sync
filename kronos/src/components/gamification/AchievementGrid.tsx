@@ -64,8 +64,16 @@ export function AchievementGrid({ allAchievements, unlockedCodes }: AchievementG
                         )}
 
                         <div className="flex items-start gap-4">
-                            <div className={`p-3 rounded-lg ${isUnlocked ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
-                                <IconComponent className="w-6 h-6" />
+                            <div className={`w-14 h-14 shrink-0 rounded-lg flex items-center justify-center overflow-hidden ${isUnlocked ? 'bg-primary/5 border border-primary/20' : 'bg-zinc-800 border border-zinc-700'}`}>
+                                {ach.icon.startsWith('/') ? (
+                                    <img 
+                                        src={ach.icon} 
+                                        alt={ach.title} 
+                                        className={`w-full h-full object-cover ${!isUnlocked ? 'opacity-30 grayscale' : ''}`}
+                                    />
+                                ) : (
+                                    <IconComponent className="w-6 h-6" />
+                                )}
                             </div>
 
                             <div className="flex-1">
