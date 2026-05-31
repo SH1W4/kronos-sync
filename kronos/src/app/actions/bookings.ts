@@ -210,8 +210,8 @@ export async function createBooking(data: {
                 // Sempre usa googleCalendarId do workspace configurado
                 if (workspace.googleCalendarId) {
                     await createCalendarEvent(workspace.ownerId, {
-                        summary: `[KRONØS] ${user.name} - ${(booking as any).client.name}`,
-                        description: `Agendamento Kronos\nArtista: ${user.name}\nCliente: ${(booking as any).client.name}\nValor: R$ ${data.estimatedPrice}\nTipo: ${data.type}`,
+                        summary: `[MACA ${data.macaId}] ${user.name} - ${(booking as any).client.name}`,
+                        description: `🎫 KRONØS OS\n\n🛏️ Maca Reservada: ${data.macaId}\n👨‍🎨 Artista: ${user.name}\n👤 Cliente: ${(booking as any).client.name}\n📝 Tipo: ${data.type}\n\n*Agendamento gerado automaticamente.*`,
                         startTime: data.scheduledFor,
                         endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000),
                         calendarId: workspace.googleCalendarId
