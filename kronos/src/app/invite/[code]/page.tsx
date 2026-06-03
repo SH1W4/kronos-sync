@@ -5,6 +5,7 @@ import { ShieldAlert, ArrowRight, Sparkles, Zap, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { trackQrScan } from '@/app/actions/analytics'
+import { SignInButton } from '@clerk/nextjs'
 
 interface PageProps {
     params: Promise<{ code: string }>
@@ -78,14 +79,19 @@ export default async function InvitePage({ params }: PageProps) {
                     </div>
 
                     <div className="space-y-4">
-                        <Link href={`/sign-in?invite=${invite.code}`}>
+                        {/* Redireciona para onboarding com o código na URL para auto-resgate após login Google */}
+                        <Link href={`/onboarding?inviteCode=${invite.code}&mode=CODE`}>
                             <Button className="w-full md:w-auto bg-white text-black hover:bg-gray-200 font-black px-12 h-14 rounded-2xl text-lg flex items-center justify-center gap-4 group transition-all">
                                 RECLAMAR ACESSO
                                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </Button>
                         </Link>
 
-                        <div className="flex items-center justify-center md:justify-start gap-6 pt-4 text-gray-600">
+                        <p className="text-[9px] font-mono text-gray-600 uppercase tracking-widest text-center md:text-left">
+                            ↑ Faça login com Google na próxima tela
+                        </p>
+
+                        <div className="flex items-center justify-center md:justify-start gap-6 pt-2 text-gray-600">
                             <div className="flex items-center gap-1.5">
                                 <Zap size={12} />
                                 <span className="text-[8px] font-mono uppercase tracking-widest">Setup Instantâneo</span>
