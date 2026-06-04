@@ -15,29 +15,13 @@ export async function GET(req: NextRequest) {
             include: { memberships: true }
         })
 
-        // 2. Se não existir no banco ou não tiver nenhum workspace associado, revoga acesso
+        // 2. Se não existir no banco ou não tiver nenhum workspace associado, retorna não autorizado
+        // NOTA: Não deletamos o usuário aqui — pode ser uma race condition com o webhook do Clerk
         if (!user || user.memberships.length === 0) {
-            console.log(`[AUTH] Acesso negado para usuário ${userId}. Nenhuma credencial/workspace encontrada.`);
-
-            // Limpa o registro do banco se ele existir sem workspace
-            if (user) {
-                await prisma.user.delete({
-                    where: { id: user.id }
-                })
-            }
-
-            // Exclui do Clerk para evitar poluição de contas não autorizadas
-            try {
-                const client = await clerkClient()
-                await client.users.deleteUser(userId)
-                console.log(`[AUTH] Usuário ${userId} excluído do Clerk com sucesso.`);
-            } catch (clerkErr) {
-                console.error('[AUTH] Erro ao excluir usuário do Clerk:', clerkErr)
-            }
-
+            console.log(`[AUTH] Acesso negado para usuário ${userId}. Nenhum workspace encontrado.`);
             return NextResponse.json({
                 authorized: false,
-                error: 'Sua conta Google não possui acesso ao KRONØS. Solicite um convite ao administrador.'
+                error: 'Sua conta Google não possui acesso ao KAIRØS. Solicite um convite ao administrador.'
             })
         }
 
