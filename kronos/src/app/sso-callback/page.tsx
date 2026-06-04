@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, Suspense } from 'react'
-import { useClerk } from '@clerk/nextjs'
+import { useClerk, useUser } from '@clerk/nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { Loader2 } from 'lucide-react'
 
 function SSOCallbackContent() {
-    const { handleRedirectCallback, signOut } = useClerk()
+    const { handleRedirectCallback } = useClerk()
+    const { user, isLoaded } = useUser()
     const router = useRouter()
     const searchParams = useSearchParams()
     const inviteCode = searchParams.get('invite')
@@ -18,47 +19,64 @@ function SSOCallbackContent() {
                 // 1. Finaliza o handshake OAuth do Clerk
                 await handleRedirectCallback({})
 
-                // 2. Se há convite, resgata via API
-                const codeToRedeem = inviteCode || sessionStorage.getItem('pendingInviteCode')
+                // Aguarda o Clerk carregar o usuário atualizado
+                // (dá tempo ao webhook de sincronizar com o Prisma)
+                await new Promise(resolve => setTimeout(resolve, 1500))
 
-                if (codeToRedeem) {
-                    sessionStorage.removeItem('pendingInviteCode')
-
-                    const res = await fetch('/api/auth/redeem-invite', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ inviteCode: codeToRedeem })
-                    })
-
-                    if (!res.ok) {
-                        console.error('Failed to redeem invite:', await res.text())
-                    } else {
-                        console.log('✅ Invite redeemed successfully')
-                    }
-                }
-
-                // 3. Verificar se o usuário possui acesso válido (está cadastrado em algum workspace)
-                const verifyRes = await fetch('/api/auth/verify-access')
-                const verifyData = await verifyRes.json()
-
-                if (!verifyRes.ok || !verifyData.authorized) {
-                    const errMsg = verifyData.error || 'Acesso não autorizado ao ecossistema KRONØS.'
-                    // Desconectar o usuário imediatamente no Clerk
-                    await signOut()
-                    router.push(`/sign-in?error=${encodeURIComponent(errMsg)}`)
-                    return
-                }
-
-                // 4. Redireciona para o dashboard
-                router.push('/artist/dashboard')
             } catch (err) {
                 console.error('SSO Callback Error:', err)
                 router.push('/sign-in')
             }
         }
-
         process()
-    }, [handleRedirectCallback, signOut, router, inviteCode])
+    }, [handleRedirectCallback, router])
+
+    // Executa após o Clerk ter o usuário carregado na memória
+    useEffect(() => {
+        if (!isLoaded || !user) return
+
+        async function finalizeSession() {
+            try {
+                // 2. Se há convite, resgata via API (novo artista)
+                const codeToRedeem = inviteCode || sessionStorage.getItem('pendingInviteCode')
+
+                if (codeToRedeem) {
+                    sessionStorage.removeItem('pendingInviteCode')
+                    const res = await fetch('/api/auth/redeem-invite', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ inviteCode: codeToRedeem })
+                    })
+                    if (!res.ok) {
+                        console.error('Failed to redeem invite:', await res.text())
+                    } else {
+                        // Recarrega o usuário para obter o role atualizado
+                        await user?.reload()
+                        console.log('✅ Invite redeemed successfully')
+                    }
+                }
+
+                // 3. Lê o role do publicMetadata do Clerk (já disponível, sem precisar do DB)
+                const role = (user?.publicMetadata as any)?.role
+
+                if (role === 'ARTIST' || role === 'ADMIN') {
+                    // ✅ Artista/Admin existente → vai direto pro dashboard
+                    router.push('/artist/dashboard')
+                } else if (role === 'CLIENT') {
+                    router.push('/kiosk')
+                } else {
+                    // Role ainda não definido (usuário novo sem invite ou webhook em processamento)
+                    // Redireciona para onboarding para completar o processo de convite
+                    router.push('/onboarding')
+                }
+            } catch (err) {
+                console.error('SSO Finalize Error:', err)
+                router.push('/sign-in')
+            }
+        }
+
+        finalizeSession()
+    }, [isLoaded, user, inviteCode, router])
 
     return (
         <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
@@ -66,7 +84,7 @@ function SSOCallbackContent() {
             <div className="flex items-center gap-3 text-zinc-400">
                 <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
                 <span className="font-mono text-xs uppercase tracking-widest">
-                    {inviteCode ? 'Ativando Credencial...' : 'Estabelecendo Sessão Soberana...'}
+                    {inviteCode ? 'Ativando Credencial...' : 'Estabelecendo Sessão...'}
                 </span>
             </div>
             {inviteCode && (
@@ -89,3 +107,4 @@ export default function SSOCallbackPage() {
         </Suspense>
     )
 }
+
