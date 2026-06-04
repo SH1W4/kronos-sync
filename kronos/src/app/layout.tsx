@@ -25,13 +25,13 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "KRONOS SYNC",
-  description: "Sistema Operacional do Kronos Tattoo Studio",
+  title: "KAIRØS OS",
+  description: "Sistema Operacional Definitivo para Estúdios de Tatuagem",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Kronos",
+    title: "Kairøs",
   },
   formatDetection: {
     telephone: false,
