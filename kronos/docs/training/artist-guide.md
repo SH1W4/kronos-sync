@@ -26,18 +26,39 @@ O KAIRØS OS utiliza o **Clerk** para fornecer uma camada de segurança robusta 
 
 ---
 
-## 🗓️ 2. Agenda Inteligente & Sincronização Google Calendar
+## 🗓️ 2. Agenda & Sincronização com Google Calendar
 
-O KAIRØS OS sincroniza sua agenda profissional diretamente com o seu **Google Calendar** pessoal de forma segura e privada.
+O KAIRØS OS adota um modelo de agenda **Studio-First**: a disponibilidade de macas é calculada exclusivamente pelos slots internos do sistema. Sua agenda pessoal do Google fica 100% privada.
 
-*   **Privacidade de Dados:** O estúdio consegue visualizar sua grade de horários ocupados para evitar conflitos de agendamento nas macas físicas do estúdio, mas **nunca verá os detalhes dos seus compromissos pessoais** (eles aparecem apenas como "Ocupado").
-*   **Como Ativar a Sincronização:**
-    1. Acesse **Configurações > Integrações** no seu painel.
-    2. Clique em **"Entrar com Google"** (Certifique-se de usar a conta do Google correspondente ao e-mail cadastrado).
-    3. Conceda permissão de acesso ao escopo de **Google Calendar** na tela de consentimento.
-    4. Uma vez conectado, qualquer agendamento criado no Kairøs será espelhado na sua agenda do Google, e seus bloqueios pessoais do Google bloquearão novos agendamentos no estúdio.
+### 🔒 Privacidade Total — Como Funciona
+
+| | Visível no KAIRØS | Bloqueia Macas |
+|---|---|---|
+| **Agendamentos de tattoo** (criados no KAIRØS) | ✅ Sim | ✅ Sim |
+| **Eventos pessoais** do Google (médico, academia...) | ❌ Nunca | ❌ Nunca |
+
+> Seus compromissos pessoais **nunca são lidos** pelo sistema e **nunca interferem** na disponibilidade do estúdio. Você tem privacidade total.
+
+### ⚡ Ativar Sincronização com o Estúdio (Opcional)
+
+Você pode optar por espelhar seus agendamentos de tattoo na **agenda compartilhada do estúdio**. Isso permite que o administrador e a equipe vejam a sua grade de sessões no Google Calendar do estúdio.
+
+**Como ativar:**
+1. Acesse **Configurações → Sincronização**.
+2. Conecte sua conta Google clicando em **"Entrar com Google"** (use o mesmo e-mail cadastrado no KAIRØS).
+3. Ative o toggle **"Compartilhar com o Estúdio"**.
+
+**Comportamento do toggle:**
+
+| Toggle | O que acontece |
+|---|---|
+| **ON** | Novo agendamento criado no KAIRØS → espelhado na **agenda compartilhada do estúdio** + na **sua agenda pessoal do Google** automaticamente. |
+| **OFF** | Agendamentos ficam apenas no banco interno do KAIRØS. Nada é enviado ao Google Calendar. |
+
+> ⚠️ **Atenção:** O espelho na agenda do estúdio só funciona se o administrador configurou um calendário compartilhado em **Configurações → Estúdio → Integração Google Calendar**. O espelho na sua agenda pessoal funciona independentemente.
 
 ---
+
 
 ## 📋 3. Fluxo de Agendamento e Anamnese Digital (LGPD)
 

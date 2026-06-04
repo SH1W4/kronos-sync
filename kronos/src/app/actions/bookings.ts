@@ -36,7 +36,10 @@ export async function createBooking(data: {
         // Get artist from session
         const user = await prisma.user.findUnique({
             where: { clerkId: clerkUserId },
-            include: { artist: true, memberships: true }
+            include: {
+                artist: true,
+                memberships: true
+            }
         })
 
         if (!user?.artist) {
@@ -65,29 +68,9 @@ export async function createBooking(data: {
         const start = data.scheduledFor
         const end = new Date(start.getTime() + data.duration * 60000)
 
-        // 0. Pre-flight Check: Google Calendar Availability (Hybrid: Unit + Tower)
-        try {
-            const { checkGoogleAvailability } = await import('@/app/actions/calendar')
-
-            // Check Unit (Artist) - REMOVED for Studio-First Strategy
-            // Personal events should NOT block studio bookings.
-
-
-            // Check Tower (Studio Owner) - if different person
-            if (user.id !== workspace.ownerId) {
-                // Se houver calendario do workspace configurado, usa ele. Senao usa o 'primary' do dono.
-                const calendarToCheck = workspace.googleCalendarId || 'primary'
-
-                const isStudioAvailable = await checkGoogleAvailability(workspace.ownerId, start, end, calendarToCheck)
-                if (!isStudioAvailable) {
-                    return { error: 'Agenda do Estúdio está bloqueada neste horário.' }
-                }
-            }
-
-        } catch (err) {
-            console.warn('⚠️ Google Availability Check Failed (Fail Open)', err)
-        }
-        // Duplicate check removed.
+        // 0. Disponibilidade verificada APENAS contra slots internos do banco.
+        // Eventos pessoais do Google Calendar do artista NÃO bloqueiam a agenda do estúdio.
+        // A agenda compartilhada do estúdio recebe espelhos — não é consultada para disponibilidade.
 
         if (data.macaId !== undefined && data.macaId !== null) {
             // Se o artista escolheu uma maca manualmente
@@ -183,44 +166,78 @@ export async function createBooking(data: {
             }
         })
 
-        // 3. Sync to Google Calendar
-        // Auto-sync se o workspace tem agenda compartilhada configurada OU se o artista pediu sync
-        const shouldSync = data.syncToGoogle || !!workspace.googleCalendarId
-        if (shouldSync) {
-            try {
-                // 3a. Sync na agenda PESSOAL do artista
-                const googleResult = await createCalendarEvent(user.id, {
-                    summary: `Tatuagem: ${(booking as any).client.name}`,
-                    description: `Sessão agendada via KRONØS\n\nTipo: ${data.type}\nObs: ${data.notes || ''}`,
-                    startTime: data.scheduledFor,
-                    endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000)
-                })
+        // 3. Sync to Google Calendar — Duplo espelho: agenda do estúdio + agenda pessoal do artista
+        // Regras:
+        //   • O artista deve ter calendarSyncEnabled = true
+        //   • O workspace deve ter um googleCalendarId configurado para o espelho do estúdio
+        //   • Eventos pessoais do Google do artista NÃO interferem na disponibilidade de macas
+        //   • As macas são gerenciadas internamente no banco — não aparecem no Google Calendar
+        const artistSyncEnabled = user.artist?.calendarSyncEnabled === true
+        const studioCalendarId = workspace.googleCalendarId
 
-                if (googleResult.success && googleResult.eventId) {
-                    await prisma.booking.update({
-                        where: { id: booking.id },
-                        data: {
-                            googleEventId: googleResult.eventId,
-                            syncedToGoogle: true
-                        }
+        if (artistSyncEnabled) {
+            const eventStart = data.scheduledFor
+            const eventEnd = new Date(data.scheduledFor.getTime() + data.duration * 60000)
+            const eventSummary = `🎨 ${(booking as any).client.name} — ${data.type}`
+            const eventDescription = [
+                `🎫 KRONØS OS`,
+                ``,
+                `👨‍🎨 Artista: ${user.name}`,
+                `👤 Cliente: ${(booking as any).client.name}`,
+                `📝 Tipo: ${data.type}`,
+                `💬 Obs: ${data.notes || 'Nenhuma'}`,
+                ``,
+                `*Gerado automaticamente pelo KRONØS.*`
+            ].join('\n')
+
+            try {
+                // 3a. Espelho na agenda COMPARTILHADA do estúdio (se configurada)
+                if (studioCalendarId) {
+                    const studioResult = await createCalendarEvent(workspace.ownerId, {
+                        summary: eventSummary,
+                        description: eventDescription,
+                        startTime: eventStart,
+                        endTime: eventEnd,
+                        calendarId: studioCalendarId
                     })
+
+                    if (studioResult.success && studioResult.eventId) {
+                        await prisma.booking.update({
+                            where: { id: booking.id },
+                            data: {
+                                googleEventId: studioResult.eventId,
+                                syncedToGoogle: true
+                            }
+                        })
+                        console.log(`✅ Espelho criado na agenda do estúdio: ${studioCalendarId}`)
+                    }
                 }
 
-                // 3b. Espelho na AGENDA COMPARTILHADA DO ESTUDIO (galeria.kronos@gmail.com)
-                // Sempre usa googleCalendarId do workspace configurado
-                if (workspace.googleCalendarId) {
-                    await createCalendarEvent(workspace.ownerId, {
-                        summary: `[MACA ${data.macaId}] ${user.name} - ${(booking as any).client.name}`,
-                        description: `🎫 KRONØS OS\n\n🛏️ Maca Reservada: ${data.macaId}\n👨‍🎨 Artista: ${user.name}\n👤 Cliente: ${(booking as any).client.name}\n📝 Tipo: ${data.type}\n\n*Agendamento gerado automaticamente.*`,
-                        startTime: data.scheduledFor,
-                        endTime: new Date(data.scheduledFor.getTime() + data.duration * 60000),
-                        calendarId: workspace.googleCalendarId
-                    })
-                    console.log(`✅ Espelho criado na agenda compartilhada: ${workspace.googleCalendarId}`)
+                // 3b. Espelho na agenda PESSOAL do artista (calendar 'primary')
+                const personalResult = await createCalendarEvent(user.id, {
+                    summary: eventSummary,
+                    description: eventDescription,
+                    startTime: eventStart,
+                    endTime: eventEnd
+                    // calendarId omitido → usa 'primary' (agenda pessoal padrão)
+                })
+
+                if (personalResult.success) {
+                    console.log(`✅ Espelho criado na agenda pessoal do artista: ${user.name}`)
+                    // Se não tiver ainda salvo o googleEventId (ex: studio não configurado), salva o pessoal
+                    if (!studioCalendarId && personalResult.eventId) {
+                        await prisma.booking.update({
+                            where: { id: booking.id },
+                            data: {
+                                googleEventId: personalResult.eventId,
+                                syncedToGoogle: true
+                            }
+                        })
+                    }
                 }
 
             } catch (syncError) {
-                console.warn('⚠️ Falha no sync inicial com Google:', syncError)
+                console.warn('⚠️ Falha no sync Google Calendar (falha silenciosa — booking salvo):', syncError)
             }
         }
 
@@ -453,8 +470,18 @@ export async function updateBookingStatus(data: {
 
                 // Atualiza na agenda PESSOAL do artista
                 await updateCalendarEvent(user.id, updatedBooking.googleEventId, {
-                    summary: `Tatuagem: ${updatedBooking.client.name} (${statusLabel})`,
-                    description: `Status: ${statusLabel}\nObs: ${(updatedBooking as any).notes || ''}`
+                    summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
+                    description: [
+                        `🎫 KRONØS OS`,
+                        ``,
+                        `👨‍🎨 Artista: ${user.name}`,
+                        `👤 Cliente: ${updatedBooking.client.name}`,
+                        `📝 Tipo: ${(updatedBooking as any).type || ''}`,
+                        `💬 Obs: ${(updatedBooking as any).notes || 'Nenhuma'}`,
+                        `ℹ️ Status: ${statusLabel}`,
+                        ``,
+                        `*Atualizado automaticamente pelo KRONØS.*`
+                    ].join('\n')
                 })
 
                 // Atualiza/Remove na AGENDA COMPARTILHADA do estúdio
@@ -470,7 +497,19 @@ export async function updateBookingStatus(data: {
                     await updateCalendarEvent(
                         workspace.ownerId,
                         updatedBooking.googleEventId,
-                        { summary: `[KRONØS] ${user.name} → ${updatedBooking.client.name} (${statusLabel})` },
+                        {
+                            summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
+                            description: [
+                                `🎫 KRONØS OS`,
+                                ``,
+                                `👨‍🎨 Artista: ${user.name}`,
+                                `👤 Cliente: ${updatedBooking.client.name}`,
+                                `📝 Tipo: ${(updatedBooking as any).type || ''}`,
+                                `ℹ️ Status: ${statusLabel}`,
+                                ``,
+                                `*Atualizado automaticamente pelo KRONØS.*`
+                            ].join('\n')
+                        },
                         workspace.googleCalendarId
                     ).catch(e => console.warn('⚠️ Não foi possível atualizar agenda compartilhada:', e))
                 }

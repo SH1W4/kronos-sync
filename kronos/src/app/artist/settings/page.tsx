@@ -16,7 +16,9 @@ import {
     updatePassword,
     updateWorkspaceBranding,
     updateWorkspaceCalendar,
-    updateWorkspacePix
+    updateWorkspacePix,
+    updateCalendarSync,
+    getCalendarSyncStatus
 } from '@/app/actions/settings'
 import {
     createInvite,
@@ -79,6 +81,12 @@ export default function SettingsPage() {
     // Google Calendar State
     const [googleCalendarId, setGoogleCalendarId] = useState('')
 
+    // Calendar Sync State
+    const [calendarSyncEnabled, setCalendarSyncEnabled] = useState(false)
+    const [syncLoading, setSyncLoading] = useState(false)
+    const [studioCalendarConfigured, setStudioCalendarConfigured] = useState(false)
+    const [studioCalendarName, setStudioCalendarName] = useState('')
+
     // Invite/Team State
     const [invites, setInvites] = useState<any[]>([])
     const [isInvitesLoading, setIsInvitesLoading] = useState(false)
@@ -98,6 +106,14 @@ export default function SettingsPage() {
 
     useEffect(() => {
         if (user && !isInitialized) {
+            // Buscar status do sync de agenda
+            getCalendarSyncStatus().then(result => {
+                if (result.success) {
+                    setCalendarSyncEnabled(result.calendarSyncEnabled ?? false)
+                    setStudioCalendarConfigured(result.studioCalendarConfigured ?? false)
+                    setStudioCalendarName(result.studioName ?? '')
+                }
+            }).catch(() => {})
             setIsInitialized(true)
 
             // Buscar o nome real do banco (não do perfil Google/Clerk)
@@ -717,15 +733,106 @@ export default function SettingsPage() {
                             <section className="bg-gray-900/40 border border-white/5 p-6 rounded-2xl space-y-6">
                                 <div className="flex items-center gap-2 mb-4">
                                     <Calendar className="text-primary" size={20} />
-                                    <h2 className="font-bold uppercase tracking-wider text-sm">Sincronização</h2>
+                                    <h2 className="font-bold uppercase tracking-wider text-sm">Sincronização de Agenda</h2>
                                 </div>
 
+                                {/* Card: Conexão Google */}
                                 <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-4">
-                                    <p className="text-xs text-gray-400 leading-relaxed">
-                                        Conecte sua conta Google para sincronizar automaticamente seus agendamentos no KRONØS com sua agenda pessoal.
-                                    </p>
+                                    <p className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Conta Google Conectada</p>
                                     <div className="flex justify-start">
                                         <GoogleSyncStatus />
+                                    </div>
+                                </div>
+
+                                {/* Card: Toggle de Compartilhamento */}
+                                <div className={`p-5 rounded-xl border transition-all duration-300 ${
+                                    calendarSyncEnabled
+                                        ? 'bg-primary/5 border-primary/30'
+                                        : 'bg-white/5 border-white/10'
+                                }`}>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Calendar size={16} className={calendarSyncEnabled ? 'text-primary' : 'text-gray-500'} />
+                                                <span className="font-mono text-xs font-bold uppercase tracking-widest"
+                                                    style={{ color: calendarSyncEnabled ? 'var(--primary)' : '#6b7280' }}
+                                                >
+                                                    Compartilhar com o Estúdio
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] text-gray-400 leading-relaxed">
+                                                Quando ativo, cada agendamento de tattoo criado no KAIRØS é espelhado automaticamente em <strong className="text-white">dois lugares</strong>: na <strong className="text-white">agenda compartilhada do estúdio</strong> e na <strong className="text-white">sua agenda pessoal do Google</strong>.
+                                            </p>
+                                            <div className="mt-3 p-3 bg-black/30 rounded-lg border border-white/5">
+                                                <p className="text-[10px] font-mono text-gray-500 leading-relaxed">
+                                                    <span className="text-green-400 font-bold">✓ Privacidade garantida</span> — seus eventos pessoais do Google Calendar (médico, academia, etc.) <span className="text-white">nunca são lidos nem bloqueiam</span> a disponibilidade do estúdio.
+                                                </p>
+                                            </div>
+                                            {!studioCalendarConfigured && (
+                                                <div className="mt-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                                    <p className="text-[10px] font-mono text-yellow-400 leading-relaxed">
+                                                        ⚠️ O administrador do estúdio ainda não configurou uma agenda compartilhada. O sync ficará inativo até que isso seja feito.
+                                                    </p>
+                                                </div>
+                                            )}
+                                            {studioCalendarConfigured && (
+                                                <p className="text-[10px] font-mono text-gray-600 mt-2">
+                                                    Estúdio: <span className="text-gray-400">{studioCalendarName}</span>
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Toggle Switch */}
+                                        <button
+                                            id="calendar-sync-toggle"
+                                            onClick={async () => {
+                                                setSyncLoading(true)
+                                                try {
+                                                    const newVal = !calendarSyncEnabled
+                                                    const result = await updateCalendarSync(newVal)
+                                                    if (result.success) {
+                                                        setCalendarSyncEnabled(newVal)
+                                                        toast({
+                                                            title: newVal ? 'Sync Ativado' : 'Sync Desativado',
+                                                            description: newVal
+                                                                ? 'Seus agendamentos serão espelhados no estúdio e na sua agenda pessoal.'
+                                                                : 'Agendamentos não serão mais espelhados no Google Calendar.'
+                                                        })
+                                                    } else {
+                                                        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+                                                    }
+                                                } finally {
+                                                    setSyncLoading(false)
+                                                }
+                                            }}
+                                            disabled={syncLoading}
+                                            className={`relative shrink-0 w-14 h-7 rounded-full border-2 transition-all duration-300 focus:outline-none ${
+                                                calendarSyncEnabled
+                                                    ? 'bg-primary border-primary shadow-[0_0_12px_var(--primary-glow)]'
+                                                    : 'bg-gray-800 border-gray-700'
+                                            }`}
+                                            aria-label="Toggle calendar sync"
+                                        >
+                                            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-all duration-300 flex items-center justify-center ${
+                                                calendarSyncEnabled ? 'translate-x-7' : 'translate-x-0'
+                                            }`}>
+                                                {syncLoading && (
+                                                    <Loader2 size={10} className="animate-spin text-gray-500" />
+                                                )}
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Legenda */}
+                                <div className="grid grid-cols-2 gap-3 text-[10px] font-mono">
+                                    <div className="p-3 bg-white/3 rounded-lg border border-white/5">
+                                        <p className="text-gray-500 uppercase tracking-widest mb-1">Sync ON</p>
+                                        <p className="text-gray-400 leading-relaxed">Tattoo agendada → aparece na agenda do estúdio <strong className="text-white">e</strong> na sua agenda pessoal do Google.</p>
+                                    </div>
+                                    <div className="p-3 bg-white/3 rounded-lg border border-white/5">
+                                        <p className="text-gray-500 uppercase tracking-widest mb-1">Sync OFF</p>
+                                        <p className="text-gray-400 leading-relaxed">Agendamentos ficam apenas no banco interno do KAIRØS. Nada é enviado ao Google.</p>
                                     </div>
                                 </div>
                             </section>

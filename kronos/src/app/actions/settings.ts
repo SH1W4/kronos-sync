@@ -315,6 +315,74 @@ export async function updateWorkspaceCalendar(data: { googleCalendarId?: string 
     }
 }
 
+// ─── Controle de Sincronização de Agenda ─────────────────────────────────────────
+
+/**
+ * Ativa ou desativa o espelho dos agendamentos do artista na agenda compartilhada do estúdio.
+ * Eventos pessoais do Google Calendar do artista NUNCA bloqueiam a agenda do estúdio.
+ */
+export async function updateCalendarSync(enabled: boolean) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user?.artist) {
+            return { error: 'Perfil de artista não encontrado' }
+        }
+
+        await prisma.artist.update({
+            where: { id: user.artist.id },
+            data: { calendarSyncEnabled: enabled }
+        })
+
+        revalidatePath('/artist/settings')
+        return { success: true, calendarSyncEnabled: enabled }
+    } catch (error) {
+        console.error('Erro ao atualizar sync de agenda:', error)
+        return { error: 'Erro ao salvar configuração de agenda' }
+    }
+}
+
+export async function getCalendarSyncStatus() {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: {
+                artist: { select: { calendarSyncEnabled: true } },
+                memberships: {
+                    include: {
+                        workspace: { select: { googleCalendarId: true, name: true } }
+                    }
+                }
+            }
+        })
+
+        if (!user?.artist) return { error: 'Artista não encontrado' }
+
+        const workspace = user.memberships[0]?.workspace
+        return {
+            success: true,
+            calendarSyncEnabled: user.artist.calendarSyncEnabled,
+            studioCalendarConfigured: !!workspace?.googleCalendarId,
+            studioName: workspace?.name
+        }
+    } catch (error) {
+        return { error: 'Erro ao buscar status do sync' }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function updateWorkspacePix(data: { pixKey: string; pixRecipient: string }) {
     try {
         const { userId: clerkUserId } = await auth()
