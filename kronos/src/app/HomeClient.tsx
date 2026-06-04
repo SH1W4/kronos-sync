@@ -157,7 +157,7 @@ export default function LandingPage() {
                         className="text-4xl md:text-6xl font-orbitron font-bold tracking-tight text-white mb-6 leading-tight"
                     >
                         Controle absoluto para <br />
-                        <span className="font-orbitron font-light text-zinc-400">estúdios profissionais.</span>
+                        <span className="font-orbitron font-light text-zinc-400">seu estúdio de tatuagem.</span>
                     </motion.h1>
 
                     <motion.p 
@@ -167,8 +167,8 @@ export default function LandingPage() {
                         }}
                         className="text-sm md:text-base text-zinc-400 max-w-xl font-mono leading-relaxed mb-10"
                     >
-                        Soberania financeira e inteligência de dados.
-                        <br />Silencie o caos operacional e foque no que importa: seu legado.
+                        Agenda inteligente, gestão financeira e recepção digital.
+                        <br />Uma plataforma. Todos os seus estúdios. Zero caos.
                     </motion.p>
 
                     <motion.div 
@@ -192,10 +192,13 @@ export default function LandingPage() {
                 <div className="container mx-auto max-w-3xl text-center relative z-10">
                     <h2 className="text-xs font-mono text-primary tracking-[0.5em] uppercase mb-6 opacity-70">Manifesto</h2>
                     <h3 className="text-2xl md:text-3xl font-orbitron font-medium text-white mb-8">
-                        O GUARDIÃO DO FOCO
+                        SEU ESTÚDIO. SUA SOBERANIA.
                     </h3>
                     <p className="text-zinc-400 font-light leading-loose text-lg font-sans">
-                        Para o artista, o tempo não se gasta; se investe. O KRONØS opera como a barreira definitiva entre sua arte e o ruído do mundo. Absorvemos a complexidade administrativa para que você habite permanentemente o <span className="text-white font-medium">Estado de Flow</span>. Foque na sua arte. O sistema blinda o seu tempo.
+                        O KAIRØS foi projetado para estúdios de tatuagem que querem operar com excelência.
+                        Agenda, finanças, recepção, loja e gamificação — tudo integrado em uma plataforma
+                        que se adapta ao <span className="text-white font-medium">seu fluxo de trabalho</span>,
+                        não o contrário. De estúdios boutique a redes com múltiplas unidades.
                     </p>
                     <div className="w-px h-16 bg-gradient-to-b from-primary/50 to-transparent mx-auto mt-12"></div>
                 </div>
@@ -248,7 +251,7 @@ export default function LandingPage() {
             </section>
 
             <footer className="py-12 border-t border-white/5 text-center text-zinc-600 text-xs tracking-widest uppercase">
-                <p>Kairøs OS &copy; {new Date().getFullYear()} // Estúdio Inteligente</p>
+                <p>Kairøs OS &copy; {new Date().getFullYear()} // Plataforma de Gestão para Estúdios de Tatuagem</p>
             </footer>
 
             {/* Feature Details Modal */}
