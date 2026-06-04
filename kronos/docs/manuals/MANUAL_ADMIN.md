@@ -17,7 +17,7 @@ O acesso administrativo total é gerenciado através do sistema de autenticaçã
 ---
 
 ## 👥 2. Gestão de Equipe (Invite System)
-O Kronos é um sistema de onboarding fechado. Ninguém cria conta sem autorização explícita. Você deve gerar um convite.
+O Kairøs é um sistema de onboarding fechado. Ninguém cria conta sem autorização explícita. Você deve gerar um convite.
 
 ### Como Gerar um Novo Convite:
 1. Navegue até o painel administrativo de **Configurações > Equipe**.
@@ -25,7 +25,7 @@ O Kronos é um sistema de onboarding fechado. Ninguém cria conta sem autorizaç
 3. Defina as especificações do perfil:
     - **Residente (Artist Resident):** Acesso permanente ao sistema, comissão padrão do estúdio (ex: 70/30).
     - **Guest (Artist Guest):** Acesso por período temporário delimitado em dias, comissão customizada.
-4. Clique em gerar e **Envie o Código gerado** (ex: `KRONOS-XYZ123`) para o artista convidado. Ele utilizará este código no momento do cadastro.
+4. Clique em gerar e **Envie o Código gerado** (ex: `KAIRØS-XYZ123`) para o artista convidado. Ele utilizará este código no momento do cadastro.
 
 ---
 

@@ -13,13 +13,13 @@ export async function sendVerificationCode(email: string, code: string) {
 
   try {
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'KRONOS SYNC <acesso@kronosync.com.br>',
+      from: process.env.RESEND_FROM_EMAIL || 'KAIRØS OS <acesso@kairos-os.com.br>',
       to: email,
-      subject: 'Seu código de acesso - KRONOS SYNC',
+      subject: 'Seu código de acesso - KAIRØS OS',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #000; color: #fff;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #8B5CF6; margin: 0;">KRONOS SYNC</h1>
+            <h1 style="color: #8B5CF6; margin: 0;">KAIRØS OS</h1>
             <p style="color: #999; font-size: 12px; margin-top: 5px;">Sistema de Gestão para Estúdios de Tatuagem</p>
           </div>
           
@@ -38,7 +38,7 @@ export async function sendVerificationCode(email: string, code: string) {
           
           <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
             <p style="color: #666; font-size: 12px;">
-              © 2025 KRONOS SYNC. Todos os direitos reservados.
+              © 2025 KAIRØS OS. Todos os direitos reservados.
             </p>
           </div>
         </div>
@@ -65,13 +65,13 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 
   try {
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'KRONOS SYNC <acesso@kronosync.com.br>',
+      from: process.env.RESEND_FROM_EMAIL || 'KAIRØS OS <acesso@kairos-os.com.br>',
       to: email,
-      subject: 'Recuperação de Acesso - KRONOS SYNC',
+      subject: 'Recuperação de Acesso - KAIRØS OS',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #000; color: #fff;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #8B5CF6; margin: 0;">KRONOS SYNC</h1>
+            <h1 style="color: #8B5CF6; margin: 0;">KAIRØS OS</h1>
             <p style="color: #999; font-size: 12px; margin-top: 5px;">Recuperação de Credencial</p>
           </div>
           

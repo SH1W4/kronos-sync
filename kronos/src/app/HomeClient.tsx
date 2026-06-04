@@ -248,7 +248,7 @@ export default function LandingPage() {
             </section>
 
             <footer className="py-12 border-t border-white/5 text-center text-zinc-600 text-xs tracking-widest uppercase">
-                <p>Kronos Sync &copy; {new Date().getFullYear()} // Estúdio Inteligente</p>
+                <p>Kairøs OS &copy; {new Date().getFullYear()} // Estúdio Inteligente</p>
             </footer>
 
             {/* Feature Details Modal */}

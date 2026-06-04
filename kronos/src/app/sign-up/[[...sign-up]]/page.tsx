@@ -33,7 +33,7 @@ export default function CustomSignUpPage() {
                         </h2>
                         
                         <p className="text-zinc-400 text-[11px] font-mono leading-relaxed tracking-wider uppercase">
-                            O ecossistema Kronos opera sob regime de 
+                            O ecossistema Kairøs opera sob regime de 
                             <span className="text-red-400 font-bold block mt-1">Soberania Fechada</span>
                         </p>
                     </div>

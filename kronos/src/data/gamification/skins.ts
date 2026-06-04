@@ -107,7 +107,7 @@ export const SKIN_CATALOG: SkinItem[] = [
         id: 'mask_headset',
         slot: 'MASK',
         name: 'Headset',
-        description: 'Foco total nas batidas do Kronos.',
+        description: 'Foco total nas batidas do Kairøs.',
         rarity: 'COMMON',
         visualAsset: '/assets/gamification/avatars/masks/fem_1_1.png'
     },

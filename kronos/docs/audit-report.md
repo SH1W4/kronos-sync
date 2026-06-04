@@ -17,7 +17,7 @@ docsync:
 
 ### 1. Autenticação & Soberania de Acesso (100% Coberto)
 - [x] **Arquitetura de Autenticação Segura (Clerk)**: O sistema utiliza o Clerk para gerenciamento de identidade robusto de alta performance, garantindo segurança a nível bancário de sessões e integridade total dos tokens de sincronização do Google Calendar OAuth.
-- [x] **Gatekeeper de Convites Mandatórios**: Nenhum usuário pode se registrar no sistema sem um código de convite ativo no banco de dados (`InviteCode`) ou a Chave Mestra administrativa (`KRONOS_TEAM_KEY`).
+- [x] **Gatekeeper de Convites Mandatórios**: Nenhum usuário pode se registrar no sistema sem um código de convite ativo no banco de dados (`InviteCode`) ou a Chave Mestra administrativa (`KAIRØS_TEAM_KEY`).
 - [x] **Vinculação Física de Identidade**: Coleta e associação do celular (`phone`) do artista no momento do onboarding como segunda chave física de validação e PIN de assinatura no Kiosk do tablet.
 
 ### 2. Agendamento & Capacidade Física (100% Coberto)

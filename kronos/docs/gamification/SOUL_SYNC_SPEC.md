@@ -7,7 +7,7 @@
 ---
 
 ## 1. Filosofia: "Evolução Profissional"
-A gamificação no Kronos não é sobre "jogar", é sobre **reconhecer a senioridade e a contribuição** do artista para o estúdio.
+A gamificação no Kairøs não é sobre "jogar", é sobre **reconhecer a senioridade e a contribuição** do artista para o estúdio.
 - **XP (Experiência):** Representa o tempo de voo e a atividade do artista.
 - **Glyphs (Conquistas):** Representam marcos históricos na carreira (Primeiro 10k, 100 Tattoos, etc).
 
@@ -27,7 +27,7 @@ $$ Nível = \lfloor \sqrt{\frac{XP}{100}} \rfloor + 1 $$
 | 10.000    | 11    | **Arquiteto de Pele** 📐   | Domínio da estrutura e anatomia. Construção sólida.      |
 | 40.000    | 21    | **Tecelão do Tempo** ⏳    | Controle do ritmo e da sessão. O tempo trabalha a favor. |
 | 250.000   | 51    | **Escultor de Almas** 🔥   | A arte transcende a pele e marca a essência.             |
-| 1.000.000 | 101   | **Titã do Kronos** ⚡      | Lenda viva. Um pilar do ecossistema.                     |
+| 1.000.000 | 101   | **Titã do Kairøs** ⚡      | Lenda viva. Um pilar do ecossistema.                     |
 
 ---
 

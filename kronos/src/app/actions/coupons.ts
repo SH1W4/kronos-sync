@@ -7,8 +7,8 @@ export async function validateCoupon(code: string) {
     try {
         if (!code) return { valid: false, message: 'Código não fornecido.' }
 
-        // Caso especial: Cupons de Leads (KRONOS10_...)
-        if (code.startsWith('KRONOS10_')) {
+        // Caso especial: Cupons de Leads (KAIRØS10_...)
+        if (code.startsWith('KAIRØS10_')) {
             return {
                 valid: true,
                 discountPercent: 10,

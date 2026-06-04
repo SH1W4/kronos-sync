@@ -5,7 +5,7 @@ const resend = process.env.RESEND_API_KEY
     ? new Resend(process.env.RESEND_API_KEY)
     : null
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'KRONOS SYNC <contato@kronosync.com.br>'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'KAIRØS OS <contato@kronosync.com.br>'
 
 interface BookingNotificationData {
     clientName: string

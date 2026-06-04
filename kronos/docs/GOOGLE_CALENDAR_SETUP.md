@@ -14,7 +14,7 @@ O sistema KRONØS já possui toda a lógica de sincronização implementada (`sr
 1.  Vá em **APIs & Services > OAuth consent screen**.
 2.  Escolha **External** e clique em Create.
 3.  Preencha:
-    *   **App Name:** Kronos Sync
+    *   **App Name:** Kairøs OS
     *   **Support Email:** Seu email
     *   **Developer Contact:** Seu email
 4.  Em **Scopes**, adicione:

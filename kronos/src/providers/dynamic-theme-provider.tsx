@@ -7,7 +7,7 @@ export function DynamicThemeProvider({ children }: { children: React.ReactNode }
     const { user } = useUser()
 
     useEffect(() => {
-        // Default Color (KRONOS Purple)
+        // Default Color (KAIRØS Purple)
         let primaryColor = '#8B5CF6'
 
         const workspace = user?.publicMetadata?.workspace as any
