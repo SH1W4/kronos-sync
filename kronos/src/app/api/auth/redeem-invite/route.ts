@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(req: NextRequest) {
@@ -17,13 +17,35 @@ export async function POST(req: NextRequest) {
         }
 
         // 1. Buscar o usuário atual pelo clerkId
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
             where: { clerkId: userId },
             include: { memberships: true, artist: true }
         })
 
         if (!user) {
-            return NextResponse.json({ error: 'Usuário não encontrado no banco' }, { status: 404 })
+            // Sincronização sob demanda (on-the-fly) para evitar race conditions com o webhook do Clerk
+            const client = await clerkClient()
+            const clerkUser = await client.users.getUser(userId)
+            const email = clerkUser.emailAddresses[0]?.emailAddress
+            
+            if (!email) {
+                return NextResponse.json({ error: 'E-mail do Clerk não encontrado' }, { status: 400 })
+            }
+            
+            const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0]
+            const imageUrl = clerkUser.imageUrl
+
+            user = await prisma.user.create({
+                data: {
+                    email,
+                    clerkId: userId,
+                    name,
+                    image: imageUrl,
+                    role: 'ARTIST'
+                },
+                include: { memberships: true, artist: true }
+            })
+            console.log(`[redeem-invite] Usuário ${userId} sincronizado dinamicamente.`)
         }
 
         // 2. Validar o convite

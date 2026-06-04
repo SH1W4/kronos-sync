@@ -11,12 +11,33 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
         }
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
             where: { clerkId: clerkUserId }
         })
 
         if (!user) {
-            return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 })
+            // Sincronização sob demanda (on-the-fly) para evitar race conditions com o webhook do Clerk
+            const client = await clerkClient()
+            const clerkUser = await client.users.getUser(clerkUserId)
+            const email = clerkUser.emailAddresses[0]?.emailAddress
+            
+            if (!email) {
+                return NextResponse.json({ error: 'E-mail do Clerk não encontrado' }, { status: 400 })
+            }
+            
+            const name = `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0]
+            const imageUrl = clerkUser.imageUrl
+
+            user = await prisma.user.create({
+                data: {
+                    email,
+                    clerkId: clerkUserId,
+                    name,
+                    image: imageUrl,
+                    role: 'ARTIST'
+                }
+            })
+            console.log(`[validate-invite] Usuário ${clerkUserId} sincronizado dinamicamente.`)
         }
 
         const body = await req.json()
