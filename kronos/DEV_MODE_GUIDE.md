@@ -14,7 +14,7 @@ O botão "🐛 DEV MODE" deve aparecer na tela de login (`/auth/signin`) logo ab
 **Solução:**
 - Abra uma **aba anônima** (Ctrl + Shift + N)
 - Ou limpe o cache: Ctrl + Shift + Delete
-- Acesse: https://kronos-sync.vercel.app/auth/signin
+- Acesse: https://kairos-os-app.vercel.app/auth/signin
 
 ### 2. Deploy Ainda Não Concluído
 **Sintoma:** Mudanças não refletidas  

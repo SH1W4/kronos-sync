@@ -1,5 +1,5 @@
-// Service Worker for KRONOS SYNC PWA
-const CACHE_NAME = 'kronos-sync-v1'
+// Service Worker for KAIRØS OS PWA
+const CACHE_NAME = 'kairos-os-v1'
 const urlsToCache = [
     '/',
     '/artist',

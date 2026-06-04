@@ -38,8 +38,8 @@ Caso a interface de criação não esteja completa, você pode solicitar a cria�
 
 ### Passo 3: Enviar o Convite
 Envie o seguinte para o seu tester:
-> "Olá! Você foi selecionado para o Beta do Kronos.
-> 1. Acesse: `https://kronos-sync.vercel.app/invite/[CÓDIGO]` (ou o link local se estiver testando localmente).
+> "Olá! Você foi selecionado para o Beta do Kairøs OS.
+> 1. Acesse: `https://kairos-os-app.vercel.app/invite/[CÓDIGO]` (ou o link local se estiver testando localmente).
 > 2. Crie sua conta ou faça login com Google.
 > 3. Você será automaticamente vinculado ao estúdio."
 
