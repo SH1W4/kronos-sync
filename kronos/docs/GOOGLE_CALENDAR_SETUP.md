@@ -1,6 +1,6 @@
 # Configuração da Integração Google Calendar 📅
 
-O sistema KRONØS já possui toda a lógica de sincronização implementada (`src/app/actions/calendar.ts`). Para ativá-la, você precisa configurar um projeto no Google Cloud e adicionar as credenciais na Vercel.
+O sistema KAIRØS OS já possui toda a lógica de sincronização implementada (`src/app/actions/calendar.ts`). Para ativá-la, você precisa configurar um projeto no Google Cloud e adicionar as credenciais na Vercel.
 
 ## Passo 1: Google Cloud Console
 
@@ -29,10 +29,10 @@ O sistema KRONØS já possui toda a lógica de sincronização implementada (`sr
 2.  Clique em **Create Credentials > OAuth client ID**.
 3.  Application Type: **Web application**.
 4.  **Authorized JavaScript origins:**
-    *   `https://kronos-sync.vercel.app` (Seu domínio Vercel)
+    *   `https://kairos-os-app.vercel.app` (Seu domínio Vercel)
     *   `http://localhost:3000` (Para testes locais)
 5.  **Authorized redirect URIs:**
-    *   `https://kronos-sync.vercel.app/api/auth/callback/google`
+    *   `https://kairos-os-app.vercel.app/api/auth/callback/google`
     *   `http://localhost:3000/api/auth/callback/google`
 6.  Copie o **Client ID** e o **Client Secret**.
 
@@ -65,7 +65,7 @@ Redeploy o projeto (ou aguarde o próximo push) para as variáveis entrarem em v
 
 ## ⚙️ Sincronização e Espelhamento Automático
 
-A sincronização de agenda no KRONØS opera de forma automática e integrada:
+A sincronização de agenda no KAIRØS OS opera de forma automática e integrada:
 
 1. **Agenda do Artista (Unit):** Cada artista autentica individualmente sua conta pelo Clerk. Os agendamentos criados geram eventos na agenda pessoal (`primary`) do artista.
 2. **Agenda Compartilhada (Torre):** Caso o administrador defina o `googleCalendarId` nas configurações do Workspace (ex: `galeria.kronos@gmail.com`), o sistema **espelha e sincroniza automaticamente** cada agendamento nessa agenda central usando a conta do proprietário do Workspace.

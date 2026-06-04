@@ -6,6 +6,6 @@ export async function GET() {
     return NextResponse.json({
         status: 'online',
         timestamp: new Date().toISOString(),
-        service: 'kronos-sync-core'
+        service: 'kairos-os-core'
     }, { status: 200 })
 }

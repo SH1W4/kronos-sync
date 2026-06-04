@@ -17,7 +17,7 @@ Implementei as correções necessárias para alinhar o ambiente com sua visão d
 - **Consolidação:** Limpeza total de arquivos obsoletos (`extracted` folder) e remoção de redundâncias de UI.
 
 ### 3. Verificação em Produção
-Acesse: [kronos-sync.vercel.app](https://kronos-sync.vercel.app) (Trilha especializada `/kiosk` verificada)
+Acesse: [kairos-os-app.vercel.app](https://kairos-os-app.vercel.app) (Trilha especializada `/kiosk` verificada)
 
 ### 4. Limpeza do Repositório
 - Removi o diretório `KRONOS_SYNC_extracted` e o arquivo `.zip` antigo, garantindo que o repositório contenha apenas a versão estável **2.0.0**.

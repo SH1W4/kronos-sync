@@ -1,8 +1,8 @@
-voc# KRONØS SYNC
+# KAIRØS OS
 
 <div align="center">
 
-![KRONØS SYNC](./public/brand/logo-neon.png)
+![KAIRØS OS](./public/brand/logo-neon.png)
 
 > **Enterprise-Grade Tattoo Studio Management Platform**  
 > Built with Next.js 15, Prisma, NextAuth, and cutting-edge UX design.
@@ -13,7 +13,7 @@ voc# KRONØS SYNC
 
 ## 🎯 Vision
 
-KRONØS SYNC is a **professional-first SaaS platform** designed exclusively for tattoo studios, artists, and administrators. Unlike traditional booking systems, we've architected a **sovereign ecosystem** where:
+KAIRØS OS is a **professional-first SaaS platform** designed exclusively for tattoo studios, artists, and administrators. Unlike traditional booking systems, we've architected a **sovereign ecosystem** where:
 
 - **Professionals** (Artists & Admins) have full access to the management dashboard
 - **Clients** interact through frictionless, guest-first experiences (Kiosk, Marketplace, Forms)
@@ -25,7 +25,7 @@ KRONØS SYNC is a **professional-first SaaS platform** designed exclusively for 
 
 ### **The Professional Gate**
 
-KRONØS implements a **strict invite-only authentication system** for professional access:
+KAIRØS implements a **strict invite-only authentication system** for professional access:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -202,7 +202,7 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
    
    # Email (Resend)
    RESEND_API_KEY="re_..."
-   RESEND_FROM_EMAIL="KRONOS SYNC <acesso@yourdomain.com>"
+   RESEND_FROM_EMAIL="KAIRØS OS <acesso@yourdomain.com>"
    
    # Google OAuth (optional)
    GOOGLE_CLIENT_ID="..."
@@ -346,7 +346,7 @@ model KioskEntry {
 
 2. Share invite link:
    ```
-   https://kronos-sync.vercel.app/auth/signin?invite=ABC123XYZ
+   https://kairos-os-app.vercel.app/auth/signin?invite=ABC123XYZ
    ```
 
 3. New artist:
@@ -431,7 +431,7 @@ For inquiries: [Contact](mailto:contact@symbeon.dev)
 
 <div align="center">
 
-**KRONØS SYNC** - *Where Art Meets Technology*
+**KAIRØS OS** - *Where Art Meets Technology*
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SH1W4/kronos-sync)
 

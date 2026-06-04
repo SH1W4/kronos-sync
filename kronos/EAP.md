@@ -1,4 +1,4 @@
-# EAP: KRONØS SYNC
+# EAP: KAIRØS OS
 **Execution and Architecture Plan**
 
 ---
@@ -16,7 +16,7 @@
 
 ## 🎯 Visão Geral
 
-O KRONØS SYNC é um sistema operacional completo para estúdios de tatuagem de elite, oferecendo:
+O KAIRØS OS é um sistema operacional completo para estúdios de tatuagem de elite, oferecendo:
 - Agendamento inteligente com Google Sync (Studio-First)
 - Anamnese digital com assinatura biométrica
 - Kiosk de captura de leads gamificado
@@ -55,7 +55,7 @@ PWA:       Service Worker + Manifest
 - [x] Autenticação & Sessão (NextAuth v4 - Google/Credentials)
 - [x] Arquitetura de Dados (Prisma + PostgreSQL/Docker Local)
 - [x] Design System Cyberpunk (Shadcn/Custom + HUD Dinâmico)
-- [x] Branding: Logo Final "Kronos Sync" (B&W + Color)
+- [x] Branding: Logo Final "Kairøs OS" (B&W + Color)
 - [x] **Segurança:** Alteração de Senha (Sovereign Login) implementada
 
 ## 🎮 7. Soul Sync Engine (Gamification)
@@ -75,7 +75,7 @@ PWA:       Service Worker + Manifest
 
 ## 🔜 8. Backlog
 - [ ] Notificações WhatsApp (N8N Integration)
-- [ ] Sistema de Fidelidade P2P (Tokens KRONOS)
+- [ ] Sistema de Fidelidade P2P (Tokens KAIRØS)
 - [ ] Galeria Digital por Artista
 - [ ] Dashboard de Cliente (Visualização de Pontos/XP)
 - [x] **Personalização de Cores** - ThemeCustomizer + Settings
@@ -286,5 +286,5 @@ PWA:       Service Worker + Manifest
 
 ---
 
-*KRONØS // Execution Architecture Protocol*
+*KAIRØS // Execution Architecture Protocol*
 *Developed by SH1W4 // Symbeon Labs*
