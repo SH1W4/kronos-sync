@@ -10,6 +10,7 @@ interface CalendarViewProps {
     currentDate: Date
     bookings: any[]
     onBookingClick: (booking: any) => void
+    onEmptySlotClick?: (date: Date) => void
     onRefresh: () => void
 }
 
@@ -80,7 +81,7 @@ function EventChip({ booking, compact, onClick }: { booking: any; compact?: bool
     )
 }
 
-export function CalendarView({ view, currentDate, bookings, onBookingClick, onRefresh }: CalendarViewProps) {
+export function CalendarView({ view, currentDate, bookings, onBookingClick, onEmptySlotClick, onRefresh }: CalendarViewProps) {
     const hours = Array.from({ length: 14 }, (_, i) => i + 7) // 07h–20h
 
     const getBookingsForSlot = (date: Date, hour: number) =>
@@ -88,6 +89,13 @@ export function CalendarView({ view, currentDate, bookings, onBookingClick, onRe
             const d = new Date(b.scheduledFor)
             return isSameDay(d, date) && d.getHours() === hour
         })
+
+    const handleEmptyClick = (date: Date, hour: number) => {
+        if (!onEmptySlotClick) return
+        const slotDate = new Date(date)
+        slotDate.setHours(hour, 0, 0, 0)
+        onEmptySlotClick(slotDate)
+    }
 
     // ── Day View ────────────────────────────────────────────────────────────────
     if (view === 'day') {
@@ -108,7 +116,11 @@ export function CalendarView({ view, currentDate, bookings, onBookingClick, onRe
                         const slotBookings = getBookingsForSlot(currentDate, hour)
                         const hasEvents = slotBookings.length > 0
                         return (
-                            <div key={hour} className={`flex gap-4 px-4 py-3 ${hasEvents ? '' : 'hover:bg-white/3'} transition-colors min-h-[56px]`}>
+                            <div
+                                key={hour}
+                                className={`flex gap-4 px-4 py-3 ${hasEvents ? '' : 'hover:bg-white/3 cursor-pointer'} transition-colors min-h-[56px]`}
+                                onClick={() => !hasEvents && handleEmptyClick(currentDate, hour)}
+                            >
                                 {/* Hour label */}
                                 <div className="w-16 flex-shrink-0 pt-0.5">
                                     <span className="text-xs font-mono text-gray-500">
@@ -131,7 +143,9 @@ export function CalendarView({ view, currentDate, bookings, onBookingClick, onRe
                                             />
                                         )
                                     ) : (
-                                        <span className="text-xs text-gray-700 italic">Disponível</span>
+                                        <div className="flex items-center h-full">
+                                            <span className="text-xs text-gray-700 italic pointer-events-none">+ Novo Agendamento</span>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -185,7 +199,10 @@ export function CalendarView({ view, currentDate, bookings, onBookingClick, onRe
                                 return (
                                     <div
                                         key={`${day.toISOString()}-${hour}`}
-                                        className="px-1 py-1 border-l border-white/5 hover:bg-white/3 transition-colors"
+                                        className={`px-1 py-1 border-l border-white/5 transition-colors ${
+                                            slotBookings.length === 0 ? 'hover:bg-white/3 cursor-pointer' : ''
+                                        }`}
+                                        onClick={() => slotBookings.length === 0 && handleEmptyClick(day, hour)}
                                     >
                                         {slotBookings.map(booking =>
                                             <EventChip

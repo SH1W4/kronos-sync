@@ -18,6 +18,14 @@ export default function AgendaPage() {
     const [bookings, setBookings] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [showBookingModal, setShowBookingModal] = useState(false)
+    const [modalDate, setModalDate] = useState<Date | null>(null)
+
+    // Mobile responsiveness
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setView('day')
+        }
+    }, [])
 
     // Load bookings
     useEffect(() => {
@@ -96,7 +104,10 @@ export default function AgendaPage() {
                     <div className="flex items-center gap-3">
                         <GoogleSyncStatus />
                         <Button
-                            onClick={() => setShowBookingModal(true)}
+                            onClick={() => {
+                                setModalDate(currentDate)
+                                setShowBookingModal(true)
+                            }}
                             className="bg-primary hover:opacity-90 text-background gap-2 font-bold"
                         >
                             <Plus size={18} />
@@ -174,6 +185,10 @@ export default function AgendaPage() {
                             // TODO: Show booking details
                             console.log('Booking clicked:', booking)
                         }}
+                        onEmptySlotClick={(date) => {
+                            setModalDate(date)
+                            setShowBookingModal(true)
+                        }}
                         onRefresh={loadBookings}
                     />
                 )}
@@ -182,9 +197,12 @@ export default function AgendaPage() {
             {/* Booking Modal */}
             {showBookingModal && (
                 <NewBookingModal
-                    onClose={() => setShowBookingModal(false)}
+                    onClose={() => {
+                        setShowBookingModal(false)
+                        setModalDate(null)
+                    }}
                     onSuccess={handleBookingCreated}
-                    initialDate={currentDate}
+                    initialDate={modalDate || currentDate}
                 />
             )}
         </div>

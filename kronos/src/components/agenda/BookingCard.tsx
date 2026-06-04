@@ -75,13 +75,14 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
     // ── Full (day view card) ─────────────────────────────────────────────────
     return (
         <div
-            className={`flex gap-3 p-4 rounded-xl border cursor-pointer transition-all hover:brightness-110 ${styles.border} ${styles.bg}`}
+            className={`flex flex-col gap-3 p-4 rounded-xl border cursor-pointer transition-all hover:brightness-110 ${styles.border} ${styles.bg}`}
             onClick={onClick}
         >
-            {/* Color bar */}
-            <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${barColor}`} />
+            <div className="flex gap-3 w-full">
+                {/* Color bar */}
+                <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${barColor}`} />
 
-            <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0">
                 {/* Artist name — destaque principal */}
                 {artistName && (
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -127,14 +128,43 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                     {styles.label}
                 </span>
             </div>
+            </div>
 
             {/* Action buttons */}
             {booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
                 <div
-                    className="flex gap-1.5 pt-2 border-t border-white/5 col-span-full"
+                    className="flex gap-2 pt-3 border-t border-white/5 mt-1"
                     onClick={e => e.stopPropagation()}
-                    style={{ display: 'none' }}
-                />
+                >
+                    {booking.status === 'OPEN' && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleStatusChange('CONFIRMED')}
+                            className="flex-1 text-xs bg-white/5 hover:bg-white/10 text-white border-white/10 h-8"
+                        >
+                            Confirmar
+                        </Button>
+                    )}
+                    {booking.status === 'CONFIRMED' && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleStatusChange('COMPLETED')}
+                            className="flex-1 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/20 h-8"
+                        >
+                            Concluir
+                        </Button>
+                    )}
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleStatusChange('CANCELLED')}
+                        className="flex-1 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 h-8"
+                    >
+                        Cancelar
+                    </Button>
+                </div>
             )}
         </div>
     )
