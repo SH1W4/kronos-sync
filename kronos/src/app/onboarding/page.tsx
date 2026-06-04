@@ -2,16 +2,13 @@
 
 import React, { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-// Onboarding logic purged of NextAuth references
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BrandLogo } from '@/components/ui/brand-logo'
-import { User, ShieldCheck, ArrowRight, Loader2, Rocket, Palette, MessageSquare, Users as UsersIcon, CheckCircle2 } from 'lucide-react'
-import { submitWorkspaceRequest } from '@/app/actions/workspaces'
+import { ArrowRight, Loader2, Key } from 'lucide-react'
+import { useUser, useAuth } from '@clerk/nextjs'
 
 export const dynamic = 'force-dynamic'
-
-import { useUser, useAuth } from '@clerk/nextjs'
 
 function OnboardingContent() {
     const { user, isLoaded, isSignedIn } = useUser()
@@ -19,9 +16,9 @@ function OnboardingContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    // Check if user is already authenticated to bypass onboarding
+    // Redirecionamento automático se já estiver logado (e sem código de convite)
     React.useEffect(() => {
-        if (isLoaded && isSignedIn && user) {
+        if (isLoaded && isSignedIn && user && !searchParams.get('inviteCode')) {
             const role = (user.publicMetadata as any)?.role
             if (role === 'ARTIST' || role === 'ADMIN') {
                 router.replace('/artist/dashboard')
@@ -29,25 +26,20 @@ function OnboardingContent() {
                 router.replace('/kiosk')
             }
         }
-    }, [user, isLoaded, isSignedIn, router])
+    }, [user, isLoaded, isSignedIn, router, searchParams])
 
-    const initialRole = searchParams.get('role')
-    const initialMode = searchParams.get('mode')
     const urlCode = searchParams.get('inviteCode')
-
-    const [mode, setMode] = useState<'SELECT' | 'CODE' | 'REQUEST' | 'SUCCESS'>(
-        (urlCode || initialMode === 'CODE') ? 'CODE' : (initialRole === 'artist' ? 'CODE' : 'SELECT')
-    )
+    
+    // Mode 'RESTRICTED' = Sem convite na URL, porta fechada.
+    // Mode 'CODE' = Com convite na URL, permite resgate.
+    const [mode, setMode] = useState<'RESTRICTED' | 'CODE'>(urlCode ? 'CODE' : 'RESTRICTED')
     const [inviteCode, setInviteCode] = useState(urlCode || '')
-    const [studioName, setStudioName] = useState('')
-    const [motivation, setMotivation] = useState('')
-    const [teamDetails, setTeamDetails] = useState('')
     const [phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
 
-    // Auto-validate if code is in URL and user just logged in
+    // Validação automática se logou após clicar no convite
     React.useEffect(() => {
         if (urlCode && isSignedIn && !loading && !successMessage && !error) {
             const autoValidate = async () => {
@@ -68,9 +60,11 @@ function OnboardingContent() {
                         }
                     } else {
                         setError(data.error || 'Código expirado ou inválido')
+                        setMode('CODE') // Mostra o formulário para ele tentar de novo
                     }
                 } catch (err) {
                     setError('Erro na auto-validação.')
+                    setMode('CODE')
                 } finally {
                     setLoading(false)
                 }
@@ -79,16 +73,12 @@ function OnboardingContent() {
         }
     }, [urlCode, isSignedIn])
 
-    const handleClientAccess = async () => {
-        // Para clientes, o HUB central é o Kiosk (Ficha, Acompanhante, Loja)
-        router.push('/kiosk')
-    }
-
     const handleArtistAccess = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!inviteCode) return
 
         if (!isSignedIn) {
+            // Joga para a tela de signin do Clerk e manda voltar com o código
             router.push(`/auth/signin?callbackUrl=/onboarding?inviteCode=${inviteCode}`)
             return
         }
@@ -122,109 +112,58 @@ function OnboardingContent() {
         }
     }
 
-    const handleRequestAccess = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!studioName || !motivation) return
-
-        setLoading(true)
-        setError('')
-
-        try {
-            const result = await submitWorkspaceRequest({
-                studioName,
-                teamDetails,
-                motivation
-            })
-
-            if (result.success) {
-                setSuccessMessage(result.message || '')
-                setMode('SUCCESS')
-            } else {
-                setError(result.error || 'Erro ao enviar solicitação')
-            }
-        } catch (err) {
-            setError('Falha de conexão com o servidor.')
-        } finally {
-            setLoading(false)
-        }
-    }
-
     return (
         <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
-            {/* Background FX */}
-            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900/40 via-black to-black -z-10"></div>
+            {/* Background Minimalista */}
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-neutral-900/40 via-black to-black -z-10"></div>
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none"></div>
 
-            <div className="max-w-2xl w-full relative z-10">
+            <div className="max-w-md w-full relative z-10">
                 <div className="flex justify-center mb-12">
-                    <BrandLogo size={80} animated={true} />
+                    <BrandLogo size={100} animated={true} />
                 </div>
 
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-orbitron font-bold mb-4 tracking-tight">BOAS-VINDAS</h1>
-                    <p className="text-gray-400 font-mono text-sm md:text-base">Escolha como você vai usar a plataforma.</p>
-                </div>
-
-                {mode === 'SELECT' ? (
-                    <div className="flex flex-col gap-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* CLIENTE CARD */}
-                            <button
-                                onClick={handleClientAccess}
-                                className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-accent/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
-                            >
-                                <div className="absolute top-4 right-4 text-gray-600 group-hover:text-accent transition-colors">
-                                    <User size={24} />
-                                </div>
-                                <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-accent">CLIENTE</h3>
-                                <p className="text-sm text-gray-500 font-mono leading-relaxed">
-                                    Quero agendar sessões, acompanhar meus projetos e ver meu histórico.
-                                </p>
-                                <div className="mt-6 flex items-center text-sm font-bold text-gray-500 group-hover:text-white transition-colors">
-                                    ACESSAR PAINEL <ArrowRight size={16} className="ml-2" />
-                                </div>
-                            </button>
-
-                            {/* PROFISSIONAL CARD */}
-                            <button
-                                onClick={() => setMode('CODE')}
-                                className="group relative p-8 bg-gray-900/30 border border-white/10 hover:border-primary/50 hover:bg-gray-900/50 rounded-xl transition-all duration-300 text-left"
-                            >
-                                <div className="absolute top-4 right-4 text-gray-600 group-hover:text-primary transition-colors">
-                                    <ShieldCheck size={24} />
-                                </div>
-                                <h3 className="text-xl font-bold font-orbitron mb-2 group-hover:text-primary">PROFISSIONAL</h3>
-                                <p className="text-sm text-gray-500 font-mono leading-relaxed">
-                                    Sou tatuador, guest ou staff. Tenho um código de acesso ou convite.
-                                </p>
-                                <div className="mt-6 flex items-center text-sm font-bold text-gray-500 group-hover:text-white transition-colors">
-                                    INSERIR CÓDIGO <ArrowRight size={16} className="ml-2" />
-                                </div>
-                            </button>
+                {mode === 'RESTRICTED' ? (
+                    <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-mono mb-8 uppercase tracking-widest">
+                            <Key size={12} /> Acesso Restrito
                         </div>
+                        
+                        <h1 className="text-3xl font-orbitron font-bold mb-4 tracking-tight">PLATAFORMA PRIVADA</h1>
+                        <p className="text-neutral-400 font-mono text-sm leading-relaxed mb-10">
+                            O acesso ao KAIRØS OS é exclusivo para estúdios parceiros e artistas convidados. 
+                        </p>
 
-                        <div className="mt-8 text-center">
-                            <p className="text-[10px] font-mono text-primary/60 uppercase tracking-widest mb-4">Já é da casa?</p>
+                        <div className="space-y-4">
                             <Button
                                 onClick={() => router.push('/auth/signin')}
-                                variant="outline"
-                                className="border-primary/20 text-primary/80 hover:bg-primary/10 hover:border-primary/40 hover:text-primary h-10 px-8 rounded-xl font-bold font-orbitron text-[10px] tracking-widest uppercase transition-all duration-300 shadow-[0_0_20px_rgba(0,255,136,0.02)] hover:shadow-[0_0_25px_rgba(0,255,136,0.1)]"
+                                className="w-full bg-white hover:bg-neutral-200 text-black h-12 rounded-xl font-bold font-orbitron text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                             >
-                                Ir direto para o Login (Google)
+                                SOU MEMBRO E TENHO ACESSO
+                            </Button>
+                            
+                            <Button
+                                onClick={() => setMode('CODE')}
+                                variant="outline"
+                                className="w-full border-neutral-800 text-neutral-400 hover:bg-neutral-900 hover:text-white h-12 rounded-xl font-mono text-xs tracking-widest uppercase transition-all"
+                            >
+                                TENHO UM CÓDIGO VIP
                             </Button>
                         </div>
                     </div>
-                ) : mode === 'CODE' ? (
-                    <div className="max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="bg-gray-900/50 border border-white/10 p-8 rounded-xl backdrop-blur-sm">
-                            <h3 className="text-xl font-orbitron font-bold mb-6 text-center">VALIDAÇÃO DE ACESSO</h3>
+                ) : (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="bg-neutral-900/50 border border-white/10 p-8 rounded-xl backdrop-blur-sm">
+                            <h3 className="text-xl font-orbitron font-bold mb-2 text-center">VALIDAR CREDENCIAL</h3>
+                            <p className="text-[10px] text-neutral-500 font-mono text-center mb-8 uppercase tracking-widest">
+                                Insira a chave mestra fornecida pelo seu estúdio
+                            </p>
 
-                            <form onSubmit={handleArtistAccess} className="space-y-4">
+                            <form onSubmit={handleArtistAccess} className="space-y-5">
                                 <div>
-                                    <label className="text-xs font-mono uppercase text-gray-500 mb-2 block">Código de Convite ou Chave Mestra</label>
                                     <Input
-                                        className="bg-black/50 border-white/10 text-center font-mono text-lg tracking-widest uppercase h-12"
-                                        placeholder="XXXX-XXXX"
+                                        className="bg-black/50 border-white/10 text-center font-mono text-xl tracking-widest uppercase h-14"
+                                        placeholder="CÓDIGO (EX: KRN-123)"
                                         value={inviteCode}
                                         onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                                         autoFocus
@@ -233,16 +172,15 @@ function OnboardingContent() {
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-mono uppercase text-gray-500 mb-2 block">Seu Celular (Proteção de Identidade)</label>
                                     <Input
                                         className="bg-black/50 border-white/10 text-center font-mono text-lg h-12"
-                                        placeholder="(00) 00000-0000"
+                                        placeholder="CELULAR (00) 00000-0000"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
                                         required
                                     />
-                                    <p className="text-[9px] text-gray-600 font-mono mt-2 uppercase tracking-tight">
-                                        * Este número será vinculado à sua credencial para evitar vazamentos.
+                                    <p className="text-[9px] text-neutral-600 font-mono mt-2 uppercase tracking-tight text-center">
+                                        Vinculação de segurança
                                     </p>
                                 </div>
 
@@ -252,122 +190,32 @@ function OnboardingContent() {
                                     </p>
                                 )}
 
-                                <div className="flex gap-3 pt-2">
-                                    <Button type="button" variant="outline" onClick={() => setMode('SELECT')} className="flex-1">
-                                        Voltar
-                                    </Button>
-                                    <Button type="submit" disabled={loading} className="flex-1 bg-primary hover:bg-primary/80 text-white">
+                                <div className="flex gap-3 pt-4">
+                                    {!urlCode && (
+                                        <Button type="button" variant="outline" onClick={() => setMode('RESTRICTED')} className="flex-1 h-12 border-neutral-800 rounded-lg hover:bg-neutral-900">
+                                            VOLTAR
+                                        </Button>
+                                    )}
+                                    <Button type="submit" disabled={loading} className="flex-[2] h-12 rounded-lg bg-white hover:bg-neutral-200 text-black font-bold">
                                         {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
-                                        VALIDAR
+                                        AUTENTICAR
                                     </Button>
                                 </div>
                             </form>
                         </div>
                     </div>
-                ) : mode === 'REQUEST' ? (
-                    <div className="max-w-md mx-auto animate-in fade-in slide-in-from-right-4 duration-500">
-                        <div className="bg-gray-900/50 border border-primary/20 p-8 rounded-3xl backdrop-blur-md shadow-[0_0_50px_var(--primary-glow)]">
-                            <div className="flex justify-center mb-6">
-                                <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20">
-                                    <Rocket className="text-primary animate-bounce" size={32} />
-                                </div>
-                            </div>
-
-                            <h3 className="text-2xl font-orbitron font-bold mb-2 text-center text-white">SOLICITAR ACESSO</h3>
-                            <p className="text-[10px] text-gray-500 font-mono text-center mb-8 uppercase tracking-widest leading-relaxed">
-                                Conte mais sobre seu estúdio para construirmos o alicerce do KRONØS juntos.
-                            </p>
-
-                            <form onSubmit={handleRequestAccess} className="space-y-4 text-left">
-                                <div>
-                                    <label className="text-[10px] font-mono uppercase text-gray-400 mb-2 block tracking-widest">Nome do Estúdio</label>
-                                    <Input
-                                        className="bg-black/50 border-white/10 h-10 font-bold placeholder:text-gray-700 uppercase"
-                                        placeholder="NOME DO SEU ESPAÇO"
-                                        value={studioName}
-                                        onChange={(e) => setStudioName(e.target.value.toUpperCase())}
-                                        autoFocus
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-mono uppercase text-gray-400 mb-2 block tracking-widest flex items-center gap-2 text-gray-400">
-                                        <UsersIcon size={12} /> Equipe (Artistas/Staff)
-                                    </label>
-                                    <textarea
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-primary outline-none min-h-[80px] text-white"
-                                        placeholder="Ex: 3 artistas residentes, 1 recepcionista..."
-                                        value={teamDetails}
-                                        onChange={(e) => setTeamDetails(e.target.value)}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="text-[10px] font-mono uppercase text-gray-400 mb-2 block tracking-widest flex items-center gap-2 text-gray-400">
-                                        <MessageSquare size={12} /> Por que o KRONØS?
-                                    </label>
-                                    <textarea
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-sm font-mono focus:border-primary outline-none min-h-[100px] text-white"
-                                        placeholder="Como o KRONOS seria útil para sua equipe hoje?"
-                                        value={motivation}
-                                        onChange={(e) => setMotivation(e.target.value)}
-                                        required
-                                    />
-                                </div>
-
-                                {error && (
-                                    <p className="text-red-500 text-[10px] font-mono text-center bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-                                        {error}
-                                    </p>
-                                )}
-
-                                <div className="flex gap-3 pt-2">
-                                    <Button type="button" variant="outline" onClick={() => setMode('CODE')} className="flex-1 rounded-xl font-bold">
-                                        VOLTAR
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        disabled={loading || !studioName || !motivation}
-                                        className="flex-[2] bg-primary hover:opacity-90 text-black rounded-xl shadow-[0_0_20px_var(--primary-glow)] font-bold transition-all hover:scale-[1.02]"
-                                    >
-                                        {loading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
-                                        ENVIAR SOLICITAÇÃO
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                ) : (
-                    /* SUCCESS MODE */
-                    <div className="max-w-md mx-auto animate-in zoom-in-95 duration-500 text-center">
-                        <div className="bg-gray-900/50 border border-[#00FF88]/20 p-12 rounded-3xl backdrop-blur-md shadow-[0_0_50px_rgba(0,255,136,0.05)]">
-                            <div className="flex justify-center mb-6">
-                                <div className="w-20 h-20 bg-[#00FF88]/10 rounded-full flex items-center justify-center border border-[#00FF88]/20 shadow-[0_0_30px_rgba(0,255,136,0.1)]">
-                                    <CheckCircle2 className="text-[#00FF88]" size={40} />
-                                </div>
-                            </div>
-                            <h3 className="text-2xl font-orbitron font-bold mb-4 text-white uppercase tracking-tight">Solicitação Recebida</h3>
-                            <p className="text-gray-400 font-mono text-xs leading-relaxed mb-8">
-                                {successMessage}
-                            </p>
-                            <Button onClick={() => setMode('SELECT')} variant="outline" className="w-full rounded-xl border-[#00FF88]/20 hover:bg-[#00FF88]/10 hover:text-[#00FF88] font-bold">
-                                VOLTAR AO INÍCIO
-                            </Button>
-                        </div>
-                    </div>
-                )
-                }
-            </div >
-        </div >
+                )}
+            </div>
+        </div>
     )
 }
 
 export default function OnboardingPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>}>
+        <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="animate-spin text-white" /></div>}>
             <OnboardingContent />
         </Suspense>
     )
 }
+
 
