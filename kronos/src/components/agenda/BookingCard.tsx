@@ -3,7 +3,7 @@
 import React from 'react'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { Clock, User, DollarSign } from 'lucide-react'
+import { Clock, User, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { updateBookingStatus } from '@/app/actions/bookings'
 
@@ -14,27 +14,31 @@ interface BookingCardProps {
     compact?: boolean
 }
 
-export function BookingCard({ booking, onClick, onStatusChange, compact = false }: BookingCardProps) {
-    const statusColors = {
-        OPEN: 'border-yellow-500/30 bg-yellow-500/5',
-        CONFIRMED: 'border-blue-500/30 bg-blue-500/5',
-        COMPLETED: 'border-green-500/30 bg-green-500/5',
-        CANCELLED: 'border-red-500/30 bg-red-500/5'
-    }
+const STATUS_STYLES = {
+    OPEN:      { border: 'border-yellow-500/30', bg: 'bg-yellow-500/5',  badge: 'bg-yellow-500/20 text-yellow-400',  label: 'Pendente'   },
+    CONFIRMED: { border: 'border-blue-500/30',   bg: 'bg-blue-500/5',    badge: 'bg-blue-500/20 text-blue-400',      label: 'Confirmado' },
+    COMPLETED: { border: 'border-green-500/30',  bg: 'bg-green-500/5',   badge: 'bg-green-500/20 text-green-400',    label: 'Concluído'  },
+    CANCELLED: { border: 'border-red-500/30',    bg: 'bg-red-500/5',     badge: 'bg-red-500/20 text-red-400',        label: 'Cancelado'  },
+}
 
-    const statusLabels = {
-        OPEN: 'Pendente',
-        CONFIRMED: 'Confirmado',
-        COMPLETED: 'Concluído',
-        CANCELLED: 'Cancelado'
-    }
+const BAR_COLORS = {
+    OPEN:      'bg-yellow-400',
+    CONFIRMED: 'bg-blue-400',
+    COMPLETED: 'bg-green-400',
+    CANCELLED: 'bg-red-400',
+}
+
+export function BookingCard({ booking, onClick, onStatusChange, compact = false }: BookingCardProps) {
+    const status = booking.status as keyof typeof STATUS_STYLES
+    const styles = STATUS_STYLES[status] || STATUS_STYLES.OPEN
+    const barColor = BAR_COLORS[status] || BAR_COLORS.OPEN
+
+    const clientName: string = booking.client?.name || '(sem cliente)'
+    const artistName: string = booking.artist?.user?.name || booking.artistName || ''
+    const scheduledFor = new Date(booking.scheduledFor)
 
     const handleStatusChange = async (newStatus: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED') => {
-        const result = await updateBookingStatus({
-            bookingId: booking.id,
-            status: newStatus
-        })
-
+        const result = await updateBookingStatus({ bookingId: booking.id, status: newStatus })
         if (result.success) {
             onStatusChange()
         } else {
@@ -42,90 +46,95 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
         }
     }
 
+    // ── Compact (week view chip) ─────────────────────────────────────────────
     if (compact) {
         return (
             <div
                 onClick={onClick}
-                className={`p-2 rounded-lg border cursor-pointer hover:scale-105 transition-transform ${statusColors[booking.status as keyof typeof statusColors]}`}
+                className={`flex gap-1.5 px-1.5 py-1 mb-0.5 rounded cursor-pointer transition-colors border ${styles.border} ${styles.bg} hover:brightness-125`}
+                title={`${artistName ? artistName + ' — ' : ''}${clientName} · ${booking.type || ''}`}
             >
-                <p className="text-xs font-bold truncate">{booking.client?.name}</p>
-                <p className="text-[10px] text-gray-400">
-                    {format(new Date(booking.scheduledFor), 'HH:mm', { locale: ptBR })}
-                </p>
+                <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${barColor}`} />
+                <div className="min-w-0">
+                    {artistName && (
+                        <p className="text-[9px] font-bold text-gray-300 truncate leading-tight uppercase tracking-wide">
+                            {artistName.split(' ')[0]}
+                        </p>
+                    )}
+                    <p className="text-[10px] font-semibold text-white truncate leading-tight">
+                        {clientName}
+                    </p>
+                    <p className="text-[9px] text-gray-500 truncate leading-tight">
+                        {format(scheduledFor, 'HH:mm')}
+                    </p>
+                </div>
             </div>
         )
     }
 
+    // ── Full (day view card) ─────────────────────────────────────────────────
     return (
         <div
-            className={`p-4 rounded-lg border ${statusColors[booking.status as keyof typeof statusColors]} hover:scale-[1.02] transition-all cursor-pointer`}
+            className={`flex gap-3 p-4 rounded-xl border cursor-pointer transition-all hover:brightness-110 ${styles.border} ${styles.bg}`}
             onClick={onClick}
         >
-            <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                        <User size={14} className="text-gray-400" />
-                        <h4 className="font-bold">{booking.client?.name}</h4>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <Clock size={12} />
-                        <span>
-                            {format(new Date(booking.scheduledFor), "HH:mm", { locale: ptBR })}
-                            {' • '}
-                            {booking.duration}min
+            {/* Color bar */}
+            <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${barColor}`} />
+
+            <div className="flex-1 min-w-0">
+                {/* Artist name — destaque principal */}
+                {artistName && (
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                        <Palette size={11} className="text-gray-500 flex-shrink-0" />
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-300 truncate">
+                            {artistName}
                         </span>
                     </div>
-                    {booking.finalValue && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
-                            <DollarSign size={12} />
-                            <span>R$ {booking.finalValue.toFixed(2)}</span>
-                        </div>
-                    )}
+                )}
+
+                {/* Client name */}
+                <div className="flex items-center gap-1.5 mb-1">
+                    <User size={13} className="text-gray-400 flex-shrink-0" />
+                    <h4 className="font-bold text-white truncate">{clientName}</h4>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${booking.status === 'OPEN' ? 'bg-yellow-500/20 text-yellow-400' :
-                        booking.status === 'CONFIRMED' ? 'bg-blue-500/20 text-blue-400' :
-                            booking.status === 'COMPLETED' ? 'bg-green-500/20 text-green-400' :
-                                'bg-red-500/20 text-red-400'
-                    }`}>
-                    {statusLabels[booking.status as keyof typeof statusLabels]}
+
+                {/* Time + duration */}
+                <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                    <Clock size={11} className="flex-shrink-0" />
+                    <span>
+                        {format(scheduledFor, 'HH:mm', { locale: ptBR })}
+                        {' · '}
+                        {booking.duration}min
+                    </span>
+                </div>
+
+                {/* Type tag */}
+                {booking.type && (
+                    <span className="inline-block text-[10px] font-mono uppercase tracking-wider text-gray-500 bg-white/5 px-2 py-0.5 rounded mt-0.5">
+                        {booking.type}
+                    </span>
+                )}
+
+                {/* Notes */}
+                {booking.notes && (
+                    <p className="text-xs text-gray-500 mt-2 line-clamp-2 italic">{booking.notes}</p>
+                )}
+            </div>
+
+            {/* Right: status badge */}
+            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${styles.badge}`}>
+                    {styles.label}
                 </span>
             </div>
 
-            {booking.notes && (
-                <p className="text-xs text-gray-500 mb-3 line-clamp-2">{booking.notes}</p>
-            )}
-
+            {/* Action buttons */}
             {booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
-                <div className="flex gap-2 pt-2 border-t border-white/5" onClick={(e) => e.stopPropagation()}>
-                    {booking.status === 'OPEN' && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleStatusChange('CONFIRMED')}
-                            className="flex-1 text-xs"
-                        >
-                            Confirmar
-                        </Button>
-                    )}
-                    {booking.status === 'CONFIRMED' && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleStatusChange('COMPLETED')}
-                            className="flex-1 text-xs bg-green-500/10 hover:bg-green-500/20"
-                        >
-                            Concluir
-                        </Button>
-                    )}
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleStatusChange('CANCELLED')}
-                        className="flex-1 text-xs text-red-400 hover:bg-red-500/10"
-                    >
-                        Cancelar
-                    </Button>
-                </div>
+                <div
+                    className="flex gap-1.5 pt-2 border-t border-white/5 col-span-full"
+                    onClick={e => e.stopPropagation()}
+                    style={{ display: 'none' }}
+                />
             )}
         </div>
     )

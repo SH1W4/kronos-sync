@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { format, isSameDay, isToday } from 'date-fns'
+import { format, isSameDay, isToday, startOfWeek, addDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { BookingCard } from './BookingCard'
 
@@ -13,86 +13,125 @@ interface CalendarViewProps {
     onRefresh: () => void
 }
 
-export function CalendarView({
-    view,
-    currentDate,
-    bookings,
-    onBookingClick,
-    onRefresh
-}: CalendarViewProps) {
-    const hours = Array.from({ length: 13 }, (_, i) => i + 8) // 8am to 8pm
+// Cores por status — estilo Google Calendar
+const STATUS_COLORS: Record<string, { bg: string; bar: string; text: string }> = {
+    OPEN:      { bg: 'bg-yellow-500/15 hover:bg-yellow-500/25', bar: 'bg-yellow-400',  text: 'text-yellow-100' },
+    CONFIRMED: { bg: 'bg-blue-500/15   hover:bg-blue-500/25',   bar: 'bg-blue-400',    text: 'text-blue-100'   },
+    COMPLETED: { bg: 'bg-green-500/15  hover:bg-green-500/25',  bar: 'bg-green-400',   text: 'text-green-100'  },
+    CANCELLED: { bg: 'bg-red-500/10    hover:bg-red-500/20',    bar: 'bg-red-400',     text: 'text-red-200 line-through opacity-60' },
+}
 
-    const getBookingsForTimeSlot = (date: Date, hour: number) => {
-        return bookings.filter(booking => {
-            const bookingDate = new Date(booking.scheduledFor)
-            return (
-                isSameDay(bookingDate, date) &&
-                bookingDate.getHours() === hour
-            )
-        })
+// Chip de evento no estilo Google Calendar
+function EventChip({ booking, compact, onClick }: { booking: any; compact?: boolean; onClick: () => void }) {
+    const isOwn = !booking.isStudioMate && !booking.isExternal
+    const artistName: string = booking.artist?.user?.name || booking.artistName || ''
+    const clientName: string = booking.client?.name || booking.clientName || '(sem cliente)'
+    const status = booking.status || 'OPEN'
+    const colors = STATUS_COLORS[status] || STATUS_COLORS.OPEN
+
+    if (booking.isExternal) {
+        return (
+            <div className="flex items-center gap-1.5 px-2 py-1 mb-1 rounded bg-gray-700/30 border border-white/5 opacity-50 cursor-default">
+                <div className="w-1.5 h-full min-h-[16px] rounded-full bg-gray-500 flex-shrink-0" />
+                <span className="text-[10px] text-gray-400 truncate">Ocupado</span>
+            </div>
+        )
     }
 
+    if (compact) {
+        return (
+            <div
+                onClick={onClick}
+                className={`flex gap-1.5 px-1.5 py-1 mb-0.5 rounded cursor-pointer transition-colors ${colors.bg}`}
+                title={isOwn ? clientName : `${artistName} — ${clientName}`}
+            >
+                <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${colors.bar}`} />
+                <div className="min-w-0">
+                    <p className={`text-[10px] font-semibold truncate leading-tight ${colors.text}`}>
+                        {isOwn ? clientName : artistName}
+                    </p>
+                    {!isOwn && (
+                        <p className="text-[9px] text-gray-400 truncate leading-tight">{clientName}</p>
+                    )}
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div
+            onClick={onClick}
+            className={`flex gap-2 px-3 py-2 mb-1 rounded-lg cursor-pointer transition-colors border border-white/5 ${colors.bg}`}
+            title={isOwn ? `${clientName} • ${booking.type}` : `${artistName} — ${clientName}`}
+        >
+            <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${colors.bar}`} />
+            <div className="min-w-0 flex-1">
+                <p className={`text-sm font-semibold truncate leading-snug ${colors.text}`}>
+                    {isOwn ? clientName : artistName}
+                </p>
+                <p className="text-[11px] text-gray-400 truncate leading-snug">
+                    {isOwn
+                        ? `${format(new Date(booking.scheduledFor), 'HH:mm')} · ${booking.type || ''}`
+                        : clientName
+                    }
+                </p>
+            </div>
+        </div>
+    )
+}
+
+export function CalendarView({ view, currentDate, bookings, onBookingClick, onRefresh }: CalendarViewProps) {
+    const hours = Array.from({ length: 14 }, (_, i) => i + 7) // 07h–20h
+
+    const getBookingsForSlot = (date: Date, hour: number) =>
+        bookings.filter(b => {
+            const d = new Date(b.scheduledFor)
+            return isSameDay(d, date) && d.getHours() === hour
+        })
+
+    // ── Day View ────────────────────────────────────────────────────────────────
     if (view === 'day') {
         return (
             <div className="bg-gray-900/50 rounded-xl border border-white/10 overflow-hidden">
-                <div className="p-4 border-b border-white/10">
-                    <h3 className="font-bold text-lg">
+                {/* Day header */}
+                <div className={`p-4 border-b border-white/10 ${isToday(currentDate) ? 'bg-primary/5' : ''}`}>
+                    <h3 className="font-bold text-lg capitalize">
                         {format(currentDate, "EEEE, d 'de' MMMM", { locale: ptBR })}
                     </h3>
+                    {isToday(currentDate) && (
+                        <span className="text-xs font-mono text-primary uppercase tracking-widest">Hoje</span>
+                    )}
                 </div>
+
                 <div className="divide-y divide-white/5">
                     {hours.map(hour => {
-                        const slotBookings = getBookingsForTimeSlot(currentDate, hour)
+                        const slotBookings = getBookingsForSlot(currentDate, hour)
+                        const hasEvents = slotBookings.length > 0
                         return (
-                            <div
-                                key={hour}
-                                className="flex gap-4 p-4 hover:bg-white/5 transition-colors"
-                            >
-                                <div className="w-20 flex-shrink-0">
-                                    <span className="text-sm font-mono text-gray-400">
+                            <div key={hour} className={`flex gap-4 px-4 py-3 ${hasEvents ? '' : 'hover:bg-white/3'} transition-colors min-h-[56px]`}>
+                                {/* Hour label */}
+                                <div className="w-16 flex-shrink-0 pt-0.5">
+                                    <span className="text-xs font-mono text-gray-500">
                                         {String(hour).padStart(2, '0')}:00
                                     </span>
                                 </div>
-                                <div className="flex-1 space-y-2">
-                                    {slotBookings.length > 0 ? (
-                                        slotBookings.map(booking => (
-                                            booking.isExternal ? (
-                                                <div
-                                                    key={booking.id}
-                                                    className="flex items-center gap-2 p-3 bg-gray-800/50 border border-white/5 rounded-lg opacity-60"
-                                                >
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-gray-500" />
-                                                    <span className="text-sm font-medium text-gray-400">Ocupado (Google Agenda)</span>
-                                                </div>
-                                            ) : booking.isStudioMate ? (
-                                                <div
-                                                    key={booking.id}
-                                                    className="flex flex-col gap-1 p-3 bg-gray-800/50 border border-white/5 rounded-lg opacity-80 select-none"
-                                                    title={`Maca ${booking.macaId || '?'} - Ocupado por ${booking.artist?.user?.name || 'Colega'}`}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-                                                        <span className="text-sm font-bold text-white uppercase">
-                                                            Maca {booking.macaId || '?'}
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-xs text-gray-400 ml-3.5">
-                                                        {booking.artist?.user?.name || 'Colega'}
-                                                    </span>
-                                                </div>
-                                            ) : (
-                                                <BookingCard
-                                                    key={booking.id}
-                                                    booking={booking}
-                                                    onClick={() => onBookingClick(booking)}
-                                                    onStatusChange={onRefresh}
-                                                />
-                                            )
-                                        ))
+                                {/* Events */}
+                                <div className="flex-1 space-y-1">
+                                    {hasEvents ? slotBookings.map(booking =>
+                                        booking.isExternal ? (
+                                            <EventChip key={booking.id} booking={booking} onClick={() => {}} />
+                                        ) : booking.isStudioMate ? (
+                                            <EventChip key={booking.id} booking={booking} onClick={() => {}} />
+                                        ) : (
+                                            <BookingCard
+                                                key={booking.id}
+                                                booking={booking}
+                                                onClick={() => onBookingClick(booking)}
+                                                onStatusChange={onRefresh}
+                                            />
+                                        )
                                     ) : (
-                                        <div className="text-sm text-gray-600 italic">
-                                            Disponível
-                                        </div>
+                                        <span className="text-xs text-gray-700 italic">Disponível</span>
                                     )}
                                 </div>
                             </div>
@@ -103,32 +142,27 @@ export function CalendarView({
         )
     }
 
-    // Week view
-    const weekDays = Array.from({ length: 7 }, (_, i) => {
-        const date = new Date(currentDate)
-        // Adjust to start of week (Sunday)
-        const day = date.getDay()
-        const diff = date.getDate() - day + i
-        return new Date(date.setDate(diff))
-    })
+    // ── Week View ───────────────────────────────────────────────────────────────
+    const weekStart = startOfWeek(currentDate, { weekStartsOn: 0 })
+    const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
 
     return (
         <div className="bg-gray-900/50 rounded-xl border border-white/10 overflow-x-auto">
-            <div className="min-w-[800px]">
-                {/* Header with days */}
-                <div className="grid grid-cols-8 border-b border-white/10">
-                    <div className="p-4"></div>
+            <div className="min-w-[720px]">
+                {/* Week header */}
+                <div className="grid grid-cols-8 border-b border-white/10 sticky top-0 bg-gray-900/95 z-10 backdrop-blur">
+                    <div className="p-3" /> {/* time gutter */}
                     {weekDays.map(day => (
                         <div
                             key={day.toISOString()}
-                            className={`p-4 text-center ${isToday(day) ? 'bg-primary/10' : ''
-                                }`}
+                            className={`p-3 text-center border-l border-white/5 ${isToday(day) ? 'bg-primary/10' : ''}`}
                         >
-                            <div className="text-xs text-gray-500 font-mono uppercase">
+                            <div className="text-[10px] text-gray-500 font-mono uppercase tracking-wider">
                                 {format(day, 'EEE', { locale: ptBR })}
                             </div>
-                            <div className={`text-lg font-bold ${isToday(day) ? 'text-primary' : ''
-                                }`}>
+                            <div className={`text-base font-bold mt-0.5 w-8 h-8 rounded-full flex items-center justify-center mx-auto ${
+                                isToday(day) ? 'bg-primary text-background' : 'text-white'
+                            }`}>
                                 {format(day, 'd')}
                             </div>
                         </div>
@@ -138,51 +172,29 @@ export function CalendarView({
                 {/* Time slots */}
                 <div className="divide-y divide-white/5">
                     {hours.map(hour => (
-                        <div key={hour} className="grid grid-cols-8">
-                            <div className="p-4 border-r border-white/5">
-                                <span className="text-sm font-mono text-gray-400">
+                        <div key={hour} className="grid grid-cols-8 min-h-[64px]">
+                            {/* Hour label */}
+                            <div className="px-3 py-2 border-r border-white/5 flex items-start">
+                                <span className="text-[11px] font-mono text-gray-600">
                                     {String(hour).padStart(2, '0')}:00
                                 </span>
                             </div>
+                            {/* Day columns */}
                             {weekDays.map(day => {
-                                const slotBookings = getBookingsForTimeSlot(day, hour)
+                                const slotBookings = getBookingsForSlot(day, hour)
                                 return (
                                     <div
                                         key={`${day.toISOString()}-${hour}`}
-                                        className="p-2 border-r border-white/5 hover:bg-white/5 transition-colors min-h-[80px]"
+                                        className="px-1 py-1 border-l border-white/5 hover:bg-white/3 transition-colors"
                                     >
-                                        {slotBookings.map(booking => (
-                                            booking.isExternal ? (
-                                                <div
-                                                    key={booking.id}
-                                                    className="p-1 px-2 mb-1 bg-gray-800/50 border border-white/5 rounded text-[10px] text-gray-400 opacity-60 flex items-center gap-1"
-                                                    title={booking.title}
-                                                >
-                                                    <div className="w-1 h-1 rounded-full bg-gray-500" />
-                                                    <span className="truncate">Ocupado</span>
-                                                </div>
-                                            ) : booking.isStudioMate ? (
-                                                <div
-                                                    key={booking.id}
-                                                    className="p-1 px-2 mb-1 bg-gray-800/50 border border-white/5 rounded text-[10px] text-gray-400 opacity-80 flex flex-col gap-0.5"
-                                                    title={`Maca ${booking.macaId || '?'} - Ocupado por ${booking.artist?.user?.name || 'Colega'}`}
-                                                >
-                                                    <div className="flex items-center gap-1">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-                                                        <span className="font-bold text-white truncate">MACA {booking.macaId || '?'}</span>
-                                                    </div>
-                                                    <span className="truncate text-[9px] ml-2.5">{booking.artist?.user?.name?.split(' ')[0] || 'Colega'}</span>
-                                                </div>
-                                            ) : (
-                                                <BookingCard
-                                                    key={booking.id}
-                                                    booking={booking}
-                                                    onClick={() => onBookingClick(booking)}
-                                                    onStatusChange={onRefresh}
-                                                    compact
-                                                />
-                                            )
-                                        ))}
+                                        {slotBookings.map(booking =>
+                                            <EventChip
+                                                key={booking.id}
+                                                booking={booking}
+                                                compact
+                                                onClick={() => !booking.isStudioMate && !booking.isExternal && onBookingClick(booking)}
+                                            />
+                                        )}
                                     </div>
                                 )
                             })}
