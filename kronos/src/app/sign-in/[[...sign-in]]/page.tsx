@@ -81,7 +81,7 @@ function SignInContent() {
 
                     <div className="bg-black/40 border border-white/5 p-4 rounded-xl text-center space-y-3">
                         <p className="text-xs text-zinc-500 font-sans leading-relaxed">
-                            O ecossistema Kronos sincroniza automaticamente sua agenda profissional. Para acessar o painel, autentique-se com sua <strong>Conta Google profissional</strong>.
+                            O ecossistema Kairøs sincroniza automaticamente sua agenda profissional. Para acessar o painel, autentique-se com sua <strong>Conta Google profissional</strong>.
                         </p>
                     </div>
 

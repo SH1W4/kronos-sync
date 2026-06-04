@@ -181,7 +181,7 @@ export async function checkGoogleAvailability(userId: string, start: Date, end: 
             // Filter out "Available" transparency events
             if (event.transparency === 'transparent') return false
 
-            // Filter out our own KRONOS events (optional, but good practice if we don't want to block re-scheduling)
+            // Filter out our own KAIRØS events (optional, but good practice if we don't want to block re-scheduling)
             // But for "new booking", any existing event is a blocker.
             return true
         })

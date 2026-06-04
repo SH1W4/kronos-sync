@@ -70,7 +70,7 @@ export default function ProfilePage() {
                             {data.artist?.name || 'Artista'}
                         </h1>
                         <p className="text-zinc-500 text-sm max-w-md">
-                            Sincronizando alma e tecnologia no Kronos OS.
+                            Sincronizando alma e tecnologia no Kairøs OS.
                             Sua evolução é o combustível da nossa rede.
                         </p>
                     </div>

@@ -113,7 +113,7 @@ export class GoogleCalendarService {
     const event: CalendarEvent = {
       summary: `Tatuagem - ${booking.clientName}`,
       description: `
-Sessão de tatuagem agendada via KRONOS SYNC
+Sessão de tatuagem agendada via KAIRØS OS
 
 Cliente: ${booking.clientName}
 Artista: ${booking.artistName}

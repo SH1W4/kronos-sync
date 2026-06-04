@@ -57,7 +57,7 @@ export const LEVEL_TITLES = [
     { minLevel: 10, title: 'Skin Architect', label: 'Arquiteto de Pele', badge: '/assets/gamification/badges/badge_0_2.png' },
     { minLevel: 20, title: 'Time Weaver', label: 'Tecelão do Tempo', badge: '/assets/gamification/badges/badge_1_0.png' },
     { minLevel: 50, title: 'Soul Etcher', label: 'Escultor de Almas', badge: '/assets/gamification/badges/badge_1_1.png' },
-    { minLevel: 100, title: 'Kronos Titan', label: 'Titã do Kronos', badge: '/assets/gamification/badges/badge_1_2.png' }
+    { minLevel: 100, title: 'Kairøs Titan', label: 'Titã do Kairøs', badge: '/assets/gamification/badges/badge_1_2.png' }
 ]
 
 export function getLevelTitle(level: number): { label: string, badge: string } {

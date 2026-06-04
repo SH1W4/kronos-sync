@@ -9,7 +9,7 @@
 Para começar a trabalhar na infraestrutura do estúdio, siga este fluxo seguro de identificação:
 1. **Login Inicial (Clerk):** Acesse a plataforma e crie sua conta utilizando seu **E-mail pessoal e uma Senha** de sua preferência ou entre rapidamente através de sua conta Google.
 2. **Identificação e Convite:** Após o login, você será direcionado para o portal de **Gatekeeper (Onboarding)**.
-3. **Validação do Convite:** Insira o **Código de Convite** (ex: `KRONOS-XYZ123`) fornecido pela gestão do estúdio.
+3. **Validação do Convite:** Insira o **Código de Convite** (ex: `KAIRØS-XYZ123`) fornecido pela gestão do estúdio.
 4. **Vínculo do Celular (Sua Chave Física):**
     - Digite seu número de telefone celular no formato brasileiro.
     - **Por que pedimos isso?** Este número será a sua chave física de identificação no tablet da recepção (Kiosk) para autorizar novos atendimentos.

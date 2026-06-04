@@ -92,7 +92,7 @@ Isso significa que a curva de dificuldade é linearmente incremental em relaçã
 | **11** | Arquiteto de Pele 📐 | $10.000$ | $2.100$ | $4.2$ sessões |
 | **21** | Tecelão do Tempo ⏳ | $40.000$ | $4.100$ | $8.2$ sessões |
 | **51** | Escultor de Almas 🔥 | $250.000$ | $10.100$ | $20.2$ sessões |
-| **101** | Titã do Kronos ⚡ | $1.000.000$ | $20.100$ | $40.2$ sessões |
+| **101** | Titã do Kairøs ⚡ | $1.000.000$ | $20.100$ | $40.2$ sessões |
 
 ---
 

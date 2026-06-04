@@ -108,7 +108,7 @@ export default async function InvitePage({ params }: PageProps) {
             {/* Footer Hud */}
             <div className="absolute bottom-8 left-0 w-full flex justify-between px-12 pointer-events-none opacity-20 hidden md:flex">
                 <div className="font-mono text-[8px] text-gray-500 uppercase tracking-[0.5em]">
-                    KRONOS_SYNC_V1.2 // ESTABLISHED_CONNECTION
+                    KAIRØS_SYNC_V1.2 // ESTABLISHED_CONNECTION
                 </div>
                 <div className="font-mono text-[8px] text-gray-500 uppercase tracking-[0.5em]">
                     SYSTEM_STATUS: NOMINAL

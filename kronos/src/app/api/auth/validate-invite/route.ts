@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         const cleanCode = code.trim()
 
         // 1. MASTER KEY CHECK (Environment Variable)
-        if (process.env.KRONOS_TEAM_KEY && cleanCode === process.env.KRONOS_TEAM_KEY) {
+        if (process.env.KAIRØS_TEAM_KEY && cleanCode === process.env.KAIRØS_TEAM_KEY) {
             // Already checked above as 'user'
 
             // Busca ou Cria o Workspace principal
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
             if (!workspace) {
                 workspace = await prisma.workspace.create({
                     data: {
-                        name: 'Kronos Studio',
+                        name: 'Kairøs Studio',
                         slug: 'kronos-studio',
                         ownerId: user.id,
                         capacity: 3

@@ -67,7 +67,7 @@ async function validateSettlementWithAI(settlementId: string) {
 
         // 1. AI Logic: Check if proof URL matches Studio identity (Mocking Vision Agent)
         const workspace = settlement.workspace
-        const studioName = workspace?.name || "Kronos Studio"
+        const studioName = workspace?.name || "Kairøs Studio"
         const studioPixRecipient = workspace?.pixRecipient || studioName
 
         // Simulating OCR extraction from Comprovante

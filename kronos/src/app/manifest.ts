@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'Kronos Studio OS',
-        short_name: 'Kronos',
+        name: 'Kairøs Studio OS',
+        short_name: 'Kairøs',
         description: 'Sistema Operacional do Kronos Tattoo Studio',
         start_url: '/',
         display: 'standalone',

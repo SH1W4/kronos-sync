@@ -80,7 +80,7 @@ export default function KioskPage() {
             const res = await registerCompanionLead(formData)
 
             if (res.success) {
-                setSuccessCode(res.couponCode || 'KRONOS_MAGIC')
+                setSuccessCode(res.couponCode || 'KAIRØS_MAGIC')
                 toast({
                     title: "INK PASS Gerado",
                     description: "Seu cupom de desconto está ativo!",

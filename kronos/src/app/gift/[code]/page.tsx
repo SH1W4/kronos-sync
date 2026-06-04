@@ -65,7 +65,7 @@ export default async function GiftCardPage({ params }: { params: Promise<{ code:
                     <h1 className="text-5xl font-orbitron font-bold text-white mb-2">{coupon.discountPercent}%</h1>
                     <p className="font-serif italic text-primary text-lg">de desconto</p>
                     <p className="text-zinc-200 text-sm font-medium mt-6 max-w-[240px] mx-auto drop-shadow-md leading-relaxed">
-                        Válido para sua primeira sessão no Kronos Studio.
+                        Válido para sua primeira sessão no Kairøs Studio.
                     </p>
                 </div>
 
@@ -103,7 +103,7 @@ export default async function GiftCardPage({ params }: { params: Promise<{ code:
 
                     <div className="mt-8 flex items-center gap-2 text-xs text-gray-600">
                         <Clock size={12} />
-                        <span>Presente de: <span className="text-gray-400 font-bold">{coupon.originClient?.name || 'Cliente Kronos'}</span></span>
+                        <span>Presente de: <span className="text-gray-400 font-bold">{coupon.originClient?.name || 'Cliente Kairøs'}</span></span>
                     </div>
                 </div>
             </div>
