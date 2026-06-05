@@ -5,7 +5,7 @@ import { DollarSign, TrendingDown, TrendingUp, AlertCircle, Plus, Wallet, FileTe
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getExpenses, saveExpense, deleteExpense } from '@/app/actions/finance'
-import { getWorkspaceStats } from '@/app/actions/admin-stats'
+import { getAdminDashboardStats } from '@/app/actions/admin-stats'
 import { formatCurrency } from '@/lib/utils'
 
 export default function FinancePage() {
@@ -28,11 +28,16 @@ export default function FinancePage() {
         setLoading(true)
         try {
             const [statsRes, expensesRes] = await Promise.all([
-                getWorkspaceStats({}),
+                getAdminDashboardStats(),
                 getExpenses()
             ])
             
-            if (statsRes.success) setStats(statsRes.stats.thisMonth)
+            if (statsRes) {
+                setStats({
+                    studioRevenue: statsRes.kpis.monthlyStudioRevenue,
+                    totalCommissions: statsRes.kpis.monthlyArtistCommissions
+                })
+            }
             if (expensesRes.success) setExpenses(expensesRes.expenses || [])
         } catch (error) {
             console.error('Error loading finance data', error)
