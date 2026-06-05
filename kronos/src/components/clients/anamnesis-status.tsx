@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Copy, MessageCircle, RefreshCw, MoreHorizontal } from 'lucide-react'
+import { Check, Copy, MessageCircle, RefreshCw, MoreHorizontal, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import {
     DropdownMenu,
