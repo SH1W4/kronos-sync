@@ -35,7 +35,16 @@ Quando o seu cliente chegar ao estúdio:
 
 ---
 
-## 💸 4. Controle Financeiro (Settlements)
+## 📋 4. Ficha de Anamnese Digital
+O sistema inclui uma ficha de saúde digital completa para cada cliente:
+- **Preenchimento no Agendamento:** Acesse a ficha do cliente diretamente pela tela de agendamento.
+- **Smart Reuse:** Se o cliente já possui uma ficha anterior, o sistema oferece a opção de reaproveitá-la com um clique, economizando tempo.
+- **Assinatura Digital:** O cliente assina digitalmente a ficha, que é armazenada de forma segura e criptografada.
+- **Exportar em PDF:** Clique no botão **"Exportar PDF"** para gerar e baixar a ficha completa do cliente em formato PDF imprimível.
+
+---
+
+## 💸 5. Controle Financeiro (Settlements)
 O KRONØS elimina a necessidade de planilhas de rateio confusas no final do mês:
 - **Painel de Rendimentos:** Veja de forma clara e visual o seu saldo acumulado e a porcentagem líquida do estúdio.
 - **Liquidação por PIX:**
@@ -45,4 +54,31 @@ O KRONØS elimina a necessidade de planilhas de rateio confusas no final do mês
     4. Assim que o administrador aprovar o comprovante, os atendimentos correspondentes são dados como quitados e seu saldo financeiro é atualizado.
 
 ---
-**KRONØS NETWORK - Domine seu Tempo.**
+
+## 🎮 6. Meu Perfil & Gamificação (Soul Sync)
+Acesse `/artist/profile` para ver sua evolução dentro do ecossistema KRONØS:
+- **Foto de Perfil Real:** Sua foto de perfil é a mesma imagem configurada nas suas preferências de conta. Para atualizar, acesse as configurações do seu perfil e troque a foto.
+- **Nível & XP:** Acompanhe sua progressão de nível (calculado pela fórmula: Nível = √(XP/100) + 1).
+- **Conquistas (Glyphs):** Badges desbloqueadas por marcos históricos (primeira sessão, 10k faturado, etc).
+- **Alquimia Visual (Skins):** Customize o estilo visual do seu avatar na aba de customização. Skins são desbloqueadas por nível ou por conquistas específicas.
+
+### Como ganhar XP:
+| Ação | XP |
+|---|---|
+| Sessão tatuada concluída | +500 |
+| Lead gerado no Kiosk | +50 |
+| Cupom escaneado | +100 |
+| Acerto financeiro aprovado | +200 |
+
+---
+
+## 🤖 7. KAI — Seu Assistente de IA
+Acesse o chat KAI no seu dashboard para consultas rápidas:
+- `"Quanto eu ganhei?"` → Suas comissões acumuladas.
+- `"Minha agenda"` → Próxima sessão agendada.
+- `"Status do sistema"` → Latência e saúde do servidor.
+- `"Sugestão: [sua ideia]"` → Registra um feedback para a equipe de desenvolvimento.
+
+---
+
+**KRONØS NETWORK - Domine seu Tempo. Versão 2.0.**

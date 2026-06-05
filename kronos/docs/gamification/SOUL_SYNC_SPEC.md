@@ -1,7 +1,7 @@
 # 🎮 SOUL SYNC ENGINE: Especificação Técnica
 
-> **Versão:** 1.0 (Draft)  
-> **Status:** Em Implementação (Fase 17)  
+> **Versão:** 2.0 (Estável)  
+> **Status:** Implementado e em Produção  
 > **Contexto:** Mecânica de engajamento e lealdade para o ecossistema KRONØS.
 
 ---
@@ -10,6 +10,7 @@
 A gamificação no Kairøs não é sobre "jogar", é sobre **reconhecer a senioridade e a contribuição** do artista para o estúdio.
 - **XP (Experiência):** Representa o tempo de voo e a atividade do artista.
 - **Glyphs (Conquistas):** Representam marcos históricos na carreira (Primeiro 10k, 100 Tattoos, etc).
+- **Avatar / Foto Real:** O perfil de gamificação agora exibe a **foto de perfil real** do artista (campo `user.image`), substituindo o avatar SVG para maior identificação.
 
 ---
 
@@ -55,8 +56,8 @@ As conquistas são divididas em 4 raridades:
 ### Lista Inicial (Definida em `src/data/gamification/achievements.ts`)
 1.  **FIRST_INK (Comum):** Realizar o primeiro atendimento.
 2.  **LEAD_MAGNET (Raro):** 10 Leads cadastrados no Kiosk.
-3.  **HIGH_ROLLER (Epíco):** R$ 10k faturado no mês.
-4.  **GUARDIAN (Epíco):** Compliance financeiro perfeito.
+3.  **HIGH_ROLLER (Épico):** R$ 10k faturado no mês.
+4.  **GUARDIAN (Épico):** Compliance financeiro perfeito.
 5.  **VETERAN_INK (Lendário):** 100 Sessões realizadas.
 
 ---
@@ -65,37 +66,61 @@ As conquistas são divididas em 4 raridades:
 
 ### Arquitetura de Dados
 O sistema roda sobre duas tabelas principais no Prisma:
-- `ArtistGamification`: Armazena o estado atual (XP, Level, Streak).
+- `ArtistGamification`: Armazena o estado atual (XP, Level, baseSkinId, maskSkinId, artifactSkinId, auraSkinId).
 - `ArtistAchievement`: Armazena o histórico de desbloqueios (Time-series).
+- `ArtistSkin`: Registra os skins desbloqueados por cada artista.
 
-### Ganchos (Server Actions)
-A lógica é reativa. Não há "job" rodando em background. O XP é concedido no momento da ação (Event-Driven).
+### Server Actions
+- `actions/gamification.ts`:
+  - `getGamificationData()`: Retorna o perfil de gamificação do artista logado, incluindo `artist.user.image`.
+  - `getTeamGamificationData()`: Retorna o leaderboard de toda a equipe do workspace, ordenado por XP desc. Disponível apenas para ADMINs.
+  - `equipSkinAction(slot, skinCode)`: Equipa um skin em um slot específico (BASE, MASK, ARTIFACT, AURA).
+- `lib/gamification.ts`:
+  - `addXP(artistId, amount, source)`: Adiciona XP e verifica level up.
+  - `checkLevelUnlocks(artistId, level)`: Desbloqueia skins por nível.
+  - `unlockAchievement(artistId, code)`: Registra conquista.
+  - `equipSkin(artistId, slot, skinCode)`: Persiste a skin equipada.
 
-- `actions/booking.ts` -> `completeBooking()` -> Dispara `+500 XP`.
-- `actions/leads.ts` -> `registerCompanionLead()` -> Dispara `+50 XP`.
-- `actions/coupons.ts` -> `redeemCouponAction()` -> Dispara `+100 XP`.
+### Ganchos de XP (Event-Driven, sem background job)
+- `actions/booking.ts` → `completeBooking()` → Dispara `+500 XP`.
+- `actions/leads.ts` → `registerCompanionLead()` → Dispara `+50 XP`.
+- `actions/coupons.ts` → `redeemCouponAction()` → Dispara `+100 XP`.
+- `actions/settlements.ts` → aprovação → Dispara `+200 XP`.
 
 ---
 
-- `actions/coupons.ts` -> `redeemCouponAction()` -> Dispara `+100 XP`.
+## 6. Painel de Gamificação (UI)
+
+### Artista (`/artist/profile`)
+- Exibe a **foto de perfil real** (`user.image`) no header, não mais o Avatar SVG.
+- Conquistas desbloqueadas (AchievementGrid).
+- Alquimia Visual (SkinInventory): Skins COMMON são livres; demais precisam de desbloqueio por nível ou conquista.
+
+### Admin (`/artist/profile` — renderização condicional)
+- Se `user.role === 'ADMIN'`, o sistema detecta automaticamente e exibe o **Painel do Time** (Leaderboard):
+  - Foto de perfil real de cada artista.
+  - Nome, XP acumulado, Nível.
+  - Últimas 3 conquistas.
+- Classificação por XP descendente.
 
 ---
 
-## 6. Sistema de Avatar (Skins)
+## 7. Sistema de Skins (Avatar de Alquimia)
 
-Permite ao artista customizar sua identidade visual no ecossistema ("Avatar de Alquimia").
+Permite ao artista customizar sua identidade visual no ecossistema.
 
 ### Slots de Equipamento
-1.  **Base:** O corpo do personagem (Humano, Ciborgue, Etéreo).
-2.  **Aura:** Brilho de fundo (Indica Nível/Senioridade).
-3.  **Máscara:** Acessório facial (Estilo/Personalidade).
-4.  **Artefato:** Item de mão (Máquina, Tablet, Katana).
+1. **Base:** O corpo do personagem (Humano, Ciborgue, Etéreo).
+2. **Aura:** Brilho de fundo (Indica Nível/Senioridade).
+3. **Máscara:** Acessório facial (Estilo/Personalidade).
+4. **Artefato:** Item de mão (Máquina, Tablet, Katana).
 
 ### Regras de Desbloqueio
+- **COMMON:** Livre para todos desde o início.
 - **Por Nível:** Ex: Aura Dourada só no Nível 50.
 - **Por Conquista:** Ex: Máscara Oni só para quem faturou 10k (High Roller).
 - **Loja (Futuro):** Troca de glifos por skins exclusivas.
 
 ---
 
-> *Documento mantido pela equipe de Engenharia do KRONØS SYNC.*
+> *Documento mantido pela equipe de Engenharia do KRONØS SYNC. Versão 2.0.*

@@ -11,16 +11,17 @@ export async function queryAgent(userQuery: string, history: any[]) {
 
     const user = await prisma.user.findUnique({
         where: { clerkId: clerkUserId },
-        include: { memberships: true }
-    })
+        include: { memberships: true, artist: true, ownedWorkspaces: { take: 1 } }
+    }) as any
 
-    const activeWorkspaceId = user?.memberships[0]?.workspaceId
+    const activeWorkspaceId = user?.artist?.workspaceId || user?.ownedWorkspaces[0]?.id || user?.memberships[0]?.workspaceId
 
     if (!user || !activeWorkspaceId) {
         return { text: "Preciso que você selecione um workspace primeiro.", role: 'KAI' }
     }
 
     const query = userQuery.toLowerCase()
+    const isAdmin = user.role === 'ADMIN'
 
     // 1. Identificar Contexto do Usuário no Workspace Ativo
     const artist = await prisma.artist.findFirst({
@@ -48,13 +49,13 @@ export async function queryAgent(userQuery: string, history: any[]) {
         }
     })
 
-    if (!artist) return { text: "Não encontrei seu perfil de artista neste workspace.", role: 'KAI' }
+    if (!artist && !isAdmin) return { text: "Não encontrei seu perfil de artista neste workspace.", role: 'KAI' }
 
-    // 2. Lógica de Resposta baseada em Regras (Com Workspace Isolation)
+    // 2. Lógica de Resposta baseada em Regras
     let responseText = ""
 
     // ---------------------------------------------------------
-    // KAI NATURAL LANGUAGE ENGINE (Pattern Matcher v1.0)
+    // KAI NATURAL LANGUAGE ENGINE (Pattern Matcher v2.0)
     // ---------------------------------------------------------
 
     // 1. HELP / GREETING PATTERNS
@@ -65,16 +66,18 @@ export async function queryAgent(userQuery: string, history: any[]) {
         else if (hour < 18) greeting = "Boa tarde"
         else greeting = "Boa noite"
 
-        const firstName = artist.user.name?.split(' ')[0] || "Artista"
-        responseText = `${greeting}, ${firstName}. Sou KAI. Tente me perguntar: 'Como tá o sistema?', 'Quanto eu ganhei?' ou 'Tenho cliente hoje?'.`
+        const firstName = (artist?.user?.name || user.name)?.split(' ')[0] || "Artista"
+        const adminHint = isAdmin
+            ? "'Ranking do time', 'Despesas do mês', 'Inventário da loja'"
+            : "'Como tá o sistema?', 'Quanto eu ganhei?' ou 'Tenho cliente hoje?'"
+        responseText = `${greeting}, ${firstName}. Sou KAI — o núcleo de inteligência do KRONØS OS. Tente me perguntar: ${adminHint}.`
     }
 
     // 2. STATUS CHECK PATTERNS
-    // Ex: "Como está o sistema?", "Status do servidor", "Diagnóstico"
     else if (/(sistema|servidor|banco|status).*(ok|online|funcionando)|(como).*(sistema|hoje)|diagn[oó]stico|ping/i.test(query)) {
         try {
             const start = Date.now()
-            await prisma.user.count({ take: 1 })
+            await prisma.user.count()
             const latency = Date.now() - start
             responseText = `KRONØS OS [ONLINE]. \nLatência Neural: ${latency}ms. \nTodos os sistemas operacionais e seguros.`
         } catch (e) {
@@ -83,26 +86,29 @@ export async function queryAgent(userQuery: string, history: any[]) {
     }
 
     // 3. FINANCIAL REPORT PATTERNS
-    // Ex: "Quanto eu faturei?", "Meu saldo", "Ver financeiro", "Comissões"
     else if (/(quanto|qual).*(ganhei|faturei|lucro|comiss[aã]o)|(meu).*(dinheiro|saldo|extrato)|financeiro/i.test(query)) {
-        const aggregations = await prisma.booking.aggregate({
-            where: {
-                workspaceId: activeWorkspaceId,
-                artistId: artist.id,
-                status: 'COMPLETED'
-            },
-            _sum: { artistShare: true }
-        })
-        const total = aggregations._sum.artistShare || 0
-        const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
-
-        responseText = `Analisando seus registros financeiros... \nVocê acumulou um total de ${formatted} em comissões neste estúdio.`
+        if (isAdmin) {
+            const aggregations = await prisma.booking.aggregate({
+                where: { workspaceId: activeWorkspaceId, status: 'COMPLETED' },
+                _sum: { price: true }
+            }) as any
+            const total = aggregations._sum?.price || 0
+            const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
+            responseText = `Relatório do Estúdio: \nFaturamento bruto total acumulado: ${formatted}. \nAcesse /artist/finance para o detalhamento completo.`
+        } else {
+            const aggregations = await prisma.booking.aggregate({
+                where: { workspaceId: activeWorkspaceId, artistId: artist!.id, status: 'COMPLETED' },
+                _sum: { artistShare: true }
+            })
+            const total = aggregations._sum.artistShare || 0
+            const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
+            responseText = `Analisando seus registros financeiros... \nVocê acumulou um total de ${formatted} em comissões neste estúdio.`
+        }
     }
 
     // 4. SCHEDULE / BOOKING PATTERNS
-    // Ex: "Quem é o próximo?", "Minha agenda", "Tenho cliente hoje?"
     else if (/(quem|qual|quando).*(pr[oó]xim[oa]|cliente|agendamento|sess[aã]o)|(minha).*(agenda|hoje)|agenda/i.test(query)) {
-        if (artist.bookings.length === 0) {
+        if (!artist || artist.bookings.length === 0) {
             responseText = "Consultei sua agenda e não encontrei agendamentos confirmados para os próximos dias."
         } else {
             const nextBooking = artist.bookings[0]
@@ -112,7 +118,6 @@ export async function queryAgent(userQuery: string, history: any[]) {
     }
 
     // 5. TEAM INFO PATTERNS
-    // Ex: "Quem trabalha aqui?", "Lista de artistas", "Instagram da galera"
     else if (/(quem|lista).*(equipe|trabalha|artistas)|instagram/i.test(query)) {
         const artistsInWorkspace = await prisma.artist.findMany({
             where: { workspaceId: activeWorkspaceId },
@@ -127,14 +132,56 @@ export async function queryAgent(userQuery: string, history: any[]) {
         responseText = `O esquadrão deste estúdio conta com ${count} artistas. \nConexões ativas: ${instaList || 'Nenhum Instagram mapeado.'}`
     }
 
-    // 6. FEEDBACK PATTERNS
-    // Ex: "Sugestão: mudar cor", "Quero deixar um feedback", "Bug no login"
+    // 6. INVENTORY / STORE PATTERNS
+    else if (/(inventário|estoque|produto|loja|boutique|item)/i.test(query)) {
+        const products = await (prisma as any).product.findMany({
+            where: { workspaceId: activeWorkspaceId, isActive: true },
+            orderBy: { createdAt: 'desc' }
+        })
+        if (products.length === 0) {
+            responseText = "A Boutique ainda não tem produtos cadastrados. Acesse /artist/inventory para adicionar."
+        } else {
+            const physicalCount = products.filter((p: any) => p.type === 'PHYSICAL').length
+            const digitalCount = products.filter((p: any) => p.type === 'DIGITAL').length
+            const lowStock = products.filter((p: any) => p.quantity !== undefined && p.quantity <= 2 && p.type === 'PHYSICAL').length
+            responseText = `Boutique: ${products.length} produto(s) ativo(s). \n📦 Físicos: ${physicalCount} | 💾 Digitais: ${digitalCount}.\n${lowStock > 0 ? `⚠️ Atenção: ${lowStock} produto(s) com estoque crítico (≤2 unidades).` : '✅ Todos os itens com estoque saudável.'}`
+        }
+    }
+
+    // 7. GAMIFICATION / RANKING PATTERNS
+    else if (/(ranking|level|n[ií]vel|xp|gamifica[çc][aã]o|time score|progresso)/i.test(query)) {
+        const teamGami = await prisma.artistGamification.findMany({
+            where: { artist: { workspaceId: activeWorkspaceId } },
+            include: { artist: true },
+            orderBy: { xp: 'desc' },
+            take: 3
+        })
+        if (teamGami.length === 0) {
+            responseText = "Ainda não há dados de gamificação registrados para o time."
+        } else {
+            const top = teamGami.map((g: any, i: number) => `#${i + 1} ${g.artist?.name || 'N/A'} — Nível ${g.level} (${g.xp} XP)`).join('\n')
+            responseText = `Leaderboard do Estúdio:\n${top}\n\nVeja o painel completo em /artist/profile.`
+        }
+    }
+
+    // 8. EXPENSES PATTERNS (Admin-only)
+    else if (/(despesas?|gasto|custo|contas?|despesa do m[eê]s)/i.test(query) && isAdmin) {
+        const now = new Date()
+        const startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+        const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+        const expenses = await (prisma as any).expense.findMany({
+            where: { workspaceId: activeWorkspaceId, date: { gte: startDate, lte: endDate } }
+        })
+        const total = expenses.reduce((acc: number, e: any) => acc + e.amount, 0)
+        const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
+        responseText = `Despesas de ${now.toLocaleString('pt-BR', { month: 'long' })}:\n${expenses.length} lançamento(s) — Total: ${formatted}.\nAcesse /artist/finance para gerenciar.`
+    }
+
+    // 9. FEEDBACK PATTERNS
     else if (/(sugest[aã]o|ideia|bug|melhoria):?\s+(.+)|(gostaria|queria).*(deixar|dar).*(feedback|sugest[aã]o)/i.test(query) || query.startsWith('feedback')) {
-        // Tenta extrair o conteúdo se vier no formato "Sugestão: blabla"
         const cleanContent = query.replace(/^(feedback|sugest[aã]o|ideia|bug|melhoria):?\s*/i, '').trim()
 
         if (cleanContent.length < 5 || cleanContent === query) {
-            // Se o cleanContent for igual a query, significa que o regex de replace não achou o prefixo, ou o user só digitou "quero deixar feedback"
             if (query.match(/(gostaria|queria).*(deixar|dar).*(feedback|sugest[aã]o)/i)) {
                 responseText = "Claro, estou ouvindo. Digite: 'Sugestão: [sua ideia]' ou 'Bug: [o problema]' para eu registrar."
             } else {
@@ -157,7 +204,7 @@ export async function queryAgent(userQuery: string, history: any[]) {
 
     // DEFAULT FALLBACK
     else {
-        responseText = `Não consegui decodificar esse padrão de linguagem ("${userQuery}"). \n\nTente ser mais direto, como: \n- "Como está minha agenda?" \n- "Quanto eu ganhei?" \n- "Status do sistema"`
+        responseText = `Não consegui decodificar esse padrão de linguagem ("${userQuery}"). \n\nTente ser mais direto, como: \n- "Como está minha agenda?" \n- "Quanto eu ganhei?" \n- "Estoque da loja" \n- "Ranking do time" \n- "Status do sistema"`
     }
 
     // Log Interaction
