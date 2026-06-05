@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, addDays, subDays, format, addWeeks, subWeeks } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getWorkspaceBookings } from '@/app/actions/bookings'
-import CalendarView from '@/components/agenda/CalendarView'
+import { CalendarView } from '@/components/agenda/CalendarView'
 import { Button } from '@/components/ui/button'
 import { Calendar, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 

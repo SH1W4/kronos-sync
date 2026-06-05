@@ -54,6 +54,16 @@ enum QrType {
   KIOSK
 }
 
+enum ExpenseCategory {
+  RENT
+  SUPPLIES
+  SOFTWARE
+  MARKETING
+  MAINTENANCE
+  TAXES
+  OTHER
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -153,6 +163,7 @@ model Workspace {
   agentLogs      AgentLog[]
   agentFeedbacks AgentFeedback[]
   settlements    Settlement[]
+  expenses       Expense[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -413,6 +424,24 @@ model Order {
   items     OrderItem[]
 
   @@map("orders")
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  workspaceId String
+  title       String
+  description String?         @db.Text
+  amount      Float
+  category    ExpenseCategory @default(OTHER)
+  date        DateTime        @default(now())
+  isPaid      Boolean         @default(true)
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
 }
 
 model OrderItem {

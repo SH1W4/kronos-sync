@@ -1,312 +1,226 @@
-import { auth } from "@clerk/nextjs/server"
-import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
-import FinanceClient from "./FinanceClient"
-import FinanceAdminClient from "./FinanceAdminClient"
+'use client'
 
-export const dynamic = 'force-dynamic'
+import React, { useState, useEffect } from 'react'
+import { DollarSign, TrendingDown, TrendingUp, AlertCircle, Plus, Wallet, FileText, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { getExpenses, saveExpense, deleteExpense } from '@/app/actions/finance'
+import { getWorkspaceStats } from '@/app/actions/admin-stats'
+import { formatCurrency } from '@/lib/utils'
 
-export default async function FinancePage(props: { searchParams: Promise<{ date?: string }> }) {
-    const searchParams = await props.searchParams
-    try {
-        const { userId: clerkUserId } = await auth()
+export default function FinancePage() {
+    const [stats, setStats] = useState<any>(null)
+    const [expenses, setExpenses] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [formData, setFormData] = useState({
+        title: '',
+        amount: 0,
+        category: 'RENT',
+        isPaid: true
+    })
 
-        if (!clerkUserId) {
-            redirect('/sign-in')
+    useEffect(() => {
+        loadData()
+    }, [])
+
+    const loadData = async () => {
+        setLoading(true)
+        try {
+            const [statsRes, expensesRes] = await Promise.all([
+                getWorkspaceStats({}),
+                getExpenses()
+            ])
+            
+            if (statsRes.success) setStats(statsRes.stats.thisMonth)
+            if (expensesRes.success) setExpenses(expensesRes.expenses || [])
+        } catch (error) {
+            console.error('Error loading finance data', error)
         }
-
-        const user = await prisma.user.findUnique({
-            where: { clerkId: clerkUserId },
-            include: {
-                ownedWorkspaces: { select: { id: true }, take: 1 },
-                memberships: { select: { workspaceId: true }, take: 1 }
-            }
-        })
-
-        if (!user) {
-            console.error("❌ FinancePage: Session user missing ID")
-            redirect('/sign-in')
-        }
-        
-        const userId = user.id
-
-        // Parse Date from Search Params (Default to Current Month)
-        // Parse Date with Brazil Timezone consideration
-        const options = { timeZone: 'America/Sao_Paulo' }
-        const nowStr = new Date().toLocaleString('en-US', options)
-        const now = new Date(nowStr)
-
-        let selectedDate = now
-        if (searchParams?.date) {
-            const [year, month] = searchParams.date.split('-').map(Number)
-            if (!isNaN(year) && !isNaN(month)) {
-                selectedDate = new Date(year, month - 1, 1)
-            }
-        }
-
-        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
-        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59)
-
-        // ADMIN VIEW: Fetch all settlements for the Active Workspace
-        if (user.role === 'ADMIN') {
-            const workspaceId = user.ownedWorkspaces[0]?.id || user.memberships[0]?.workspaceId
-
-            if (!workspaceId) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Selecione um Estúdio</div>
-
-            const adminSettlements = await prisma.settlement.findMany({
-                where: {
-                    workspaceId: workspaceId
-                },
-                include: {
-                    artist: {
-                        include: { user: true }
-                    },
-                    _count: {
-                        select: { bookings: true, orders: true }
-                    }
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                }
-            })
-
-            // Serialize Dates for Settlements
-            const safeAdminSettlements = adminSettlements.map(s => ({
-                ...s,
-                createdAt: s.createdAt.toISOString(),
-                updatedAt: s.updatedAt.toISOString(),
-                // Ensure relations are safe
-                artist: {
-                    ...s.artist,
-                    user: s.artist.user || { name: 'Desconhecido' }
-                }
-            }))
-
-            const workspace = await prisma.workspace.findUnique({
-                where: { id: workspaceId },
-                select: { name: true }
-            })
-
-            // Fetch all pending bookings and orders for the workspace to calculate "Projected Revenue"
-            const pendingBookings = await prisma.booking.findMany({
-                where: {
-                    workspaceId: workspaceId,
-                    settlementId: null,
-                    status: 'COMPLETED'
-                }
-            })
-
-            const pendingOrders = await prisma.order.findMany({
-                where: {
-                    workspaceId: workspaceId,
-                    settlementId: null,
-                    status: 'PAID'
-                }
-            })
-
-            const projectedRevenue =
-                (pendingBookings?.reduce((acc, b) => acc + (b.studioShare || 0), 0) || 0) +
-                (pendingOrders?.reduce((acc, o) => acc + (o.studioShare || 0), 0) || 0)
-
-            return (
-                <div className="relative">
-                    <FinanceAdminClient
-                        workspaceName={workspace?.name || 'Estúdio'}
-                        settlements={safeAdminSettlements as any}
-                        projectedRevenue={projectedRevenue}
-                    />
-                </div>
-            )
-        }
-
-        // ARTIST VIEW (Existing Logic)
-        const artist = await prisma.artist.findUnique({
-            where: { userId: userId },
-            include: {
-                user: true,
-                workspace: true
-            }
-        })
-
-        if (!artist) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Perfil de Artista não encontrado</div>
-
-        // Fetch Workspace settings (PIX Key)
-        let workspace = artist.workspace
-
-        if (!workspace) {
-            workspace = await prisma.workspace.findFirst({
-                where: { ownerId: userId } // Fallback
-            })
-        }
-
-        if (!workspace) return <div className="p-10 text-white font-mono uppercase tracking-widest opacity-20">Workspace não configurado</div>
-
-        // NEW: Fetch pending revenue from Action to reuse logic
-        const { bookings: pendingBookings, orders: pendingOrders, availableBonus } = await import('@/app/actions/settlements').then(m => m.getArtistPendingRevenue(artist.id))
-        const realizedEarningsData = { availableBonus }
-
-        // 2. METRICS DATA - Get COMPLETED for Realized and CONFIRMED for Projection
-        const metricsBookings = await prisma.booking.findMany({
-            where: {
-                artistId: artist.id,
-                status: { in: ['COMPLETED', 'CONFIRMED'] },
-                slot: {
-                    startTime: {
-                        gte: startOfMonth,
-                        lte: endOfMonth
-                    }
-                }
-            }
-        })
-
-        const metricsOrders = await prisma.order.findMany({
-            where: {
-                status: 'PAID',
-                createdAt: {
-                    gte: startOfMonth,
-                    lte: endOfMonth
-                },
-                items: {
-                    some: { product: { artistId: artist.id } }
-                }
-            },
-            include: {
-                items: { include: { product: true } }
-            }
-        }) as any
-
-        // Fetch Settlement History (Filtered by Month if user wants history of settlements made in that month)
-        // OR should we show all? The user said "Back to see general of previous months".
-        // Let's filter settlements created in that month.
-        const settlements = await prisma.settlement.findMany({
-            where: {
-                artistId: artist.id,
-                createdAt: {
-                    gte: startOfMonth,
-                    lte: endOfMonth
-                }
-            },
-            include: {
-                _count: {
-                    select: { bookings: true, orders: true }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        })
-
-        // Serialize Dates for Settlements History
-        const safeSettlements = settlements.map(s => ({
-            ...s,
-            createdAt: s.createdAt.toISOString(),
-            updatedAt: s.updatedAt.toISOString(),
-        }))
-
-        // Calculate Metrics for SELECTED Month
-        const realizedBookings = metricsBookings.filter(b => b.status === 'COMPLETED')
-        const projectedBookings = metricsBookings.filter(b => b.status === 'CONFIRMED')
-
-        const realizedEarnings =
-            (realizedBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (metricsOrders.reduce((acc: number, o: any) => {
-                const artistPart = o.items
-                    .filter((item: any) => item.product.artistId === artist.id)
-                    .reduce((itemAcc: number, item: any) => itemAcc + (item.product.basePrice * (item.quantity || 1)), 0)
-                return acc + artistPart
-            }, 0) || 0)
-
-        const projectionEarnings =
-            (projectedBookings.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0)
-
-        const monthlyRevenue =
-            (metricsBookings.reduce((acc, b) => acc + (b.value || 0), 0) || 0) +
-            (metricsOrders.reduce((acc: number, o: any) => {
-                const artistPartTotal = o.items
-                    .filter((item: any) => item.product.artistId === artist.id)
-                    .reduce((itemAcc: number, item: any) => itemAcc + (item.price * (item.quantity || 1)), 0)
-                return acc + artistPartTotal
-            }, 0) || 0)
-
-        // Calculate Total Pending (Accumulated Debt - EVERYTHING already COMPLETED but not settled)
-        const totalPendingEarnings =
-            (pendingBookings?.reduce((acc, b) => acc + (b.artistShare || 0), 0) || 0) +
-            (pendingOrders?.reduce((acc: number, o: any) => {
-                const artistPart = o.items
-                    .filter((item: any) => item.product.artistId === artist.id)
-                    .reduce((itemAcc: number, item: any) => itemAcc + (item.product.basePrice * (item.quantity || 1)), 0)
-                return acc + artistPart
-            }, 0) || 0)
-
-
-        // Map data for Client Component with Safe Date Serialization
-        const mappedBookings = pendingBookings.map(b => ({
-            id: b.id,
-            type: 'TATTOO' as const,
-            value: b.value || 0,
-            artistShare: b.artistShare || 0,
-            studioShare: (b.value || 0) - (b.artistShare || 0),
-            status: b.status,
-            client: { name: b.client?.name || 'Cliente' },
-            date: b.slot?.startTime ? b.slot.startTime.toISOString() : new Date().toISOString()
-        }))
-
-        const mappedOrders = pendingOrders.map((o: any) => {
-            const artistItems = o.items.filter((item: any) => item.product.artistId === artist.id)
-            const artistShare = artistItems.reduce((acc: number, i: any) => acc + (i.product.basePrice * (i.quantity || 1)), 0)
-            const totalItemsValue = artistItems.reduce((acc: number, i: any) => acc + (i.price * (i.quantity || 1)), 0)
-
-            return {
-                id: o.id,
-                type: 'PRODUCT' as const,
-                value: totalItemsValue,
-                artistShare: artistShare,
-                studioShare: totalItemsValue - artistShare,
-                status: o.status,
-                client: { name: o.client?.name || 'Cliente' },
-                date: o.createdAt ? o.createdAt.toISOString() : new Date().toISOString()
-            }
-        })
-
-        const allPendingItems = [...mappedBookings, ...mappedOrders].sort((a, b) =>
-            new Date(b.date).getTime() - new Date(a.date).getTime()
-        )
-
-        return (
-            <FinanceClient
-                artist={{
-                    id: artist.id,
-                    user: { name: artist.user.name, phone: artist.user.phone }
-                }}
-                workspace={{
-                    id: workspace.id,
-                    pixKey: workspace.pixKey,
-                    pixRecipient: workspace.pixRecipient
-                }}
-                items={allPendingItems}
-                settlements={safeSettlements}
-                selectedDate={selectedDate.toISOString()}
-                metrics={{
-                    monthlyRevenue,
-                    realizedEarnings,
-                    projectionEarnings,
-                    totalPendingEarnings,
-                    availableBonus: realizedEarningsData.availableBonus, // Créditos de indicação acumulados
-                    monthlyBookings: metricsBookings.length + metricsOrders.length
-                }}
-            />
-        )
-
-    } catch (error) {
-        console.error("🔥 CRITICAL ERROR in FinancePage:", error)
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] text-white p-10">
-                <h2 className="text-xl font-bold font-orbitron text-red-500 mb-2">ERRO NO SERVIDOR</h2>
-                <p className="font-mono text-xs opacity-50 mb-4">Falha ao processar dados financeiros.</p>
-                <code className="bg-black/50 p-4 rounded text-[10px] font-mono max-w-lg overflow-auto border border-red-500/20">
-                    {String(error)}
-                </code>
-            </div>
-        )
+        setLoading(false)
     }
+
+    const handleAddExpense = async (e: React.FormEvent) => {
+        e.preventDefault()
+        await saveExpense({
+            title: formData.title,
+            amount: formData.amount,
+            category: formData.category,
+            date: new Date(),
+            isPaid: formData.isPaid
+        })
+        setIsModalOpen(false)
+        loadData()
+    }
+
+    const handleDelete = async (id: string) => {
+        if (confirm('Deletar essa despesa permanentemente?')) {
+            await deleteExpense(id)
+            loadData()
+        }
+    }
+
+    if (loading) return <div className="p-10 animate-pulse font-mono text-xs text-center text-gray-500 uppercase tracking-widest">Acessando Cofre do Estúdio...</div>
+
+    const totalExpenses = expenses.reduce((acc, curr) => acc + curr.amount, 0)
+    // A Receita do Estúdio já exclui as comissões dos artistas.
+    const studioRevenue = stats?.studioRevenue || 0
+    // Lucro Líquido Real = O que sobrou pro Estúdio - Despesas Fixas
+    const netProfit = studioRevenue - totalExpenses
+
+    return (
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 relative min-h-screen">
+            <div className="absolute inset-0 data-pattern-grid opacity-20 pointer-events-none" />
+            <div className="scanline" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-orbitron font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-white uppercase italic tracking-tighter">Financeiro</h1>
+                    <p className="text-xs font-mono text-primary/70 uppercase tracking-[0.3em]">Gestão de Capital Soberano</p>
+                </div>
+                <Button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-primary text-black font-black font-orbitron uppercase tracking-widest rounded-xl hover:bg-primary/80 transition-all h-12 shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
+                >
+                    <Plus className="mr-2" size={18} /> Lançar Despesa
+                </Button>
+            </div>
+
+            {/* KPIs */}
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="glass-card p-6 rounded-[2rem] border border-white/5 space-y-2 bg-gray-900/40">
+                    <div className="flex items-center text-gray-400 font-mono text-[10px] uppercase tracking-widest">
+                        <TrendingUp size={14} className="mr-2 text-green-500" /> Receita Estúdio (Líquida)
+                    </div>
+                    <div className="text-2xl font-orbitron font-bold text-white">
+                        {formatCurrency(studioRevenue)}
+                    </div>
+                    <p className="text-[8px] text-gray-600 font-mono uppercase">Já descontadas as comissões.</p>
+                </div>
+
+                <div className="glass-card p-6 rounded-[2rem] border border-white/5 space-y-2 bg-gray-900/40">
+                    <div className="flex items-center text-gray-400 font-mono text-[10px] uppercase tracking-widest">
+                        <Wallet size={14} className="mr-2 text-yellow-500" /> Comissões a Pagar
+                    </div>
+                    <div className="text-2xl font-orbitron font-bold text-gray-300">
+                        {formatCurrency(stats?.totalCommissions || 0)}
+                    </div>
+                    <p className="text-[8px] text-gray-600 font-mono uppercase">Parte dos Artistas.</p>
+                </div>
+
+                <div className="glass-card p-6 rounded-[2rem] border border-red-500/20 bg-red-500/5 space-y-2">
+                    <div className="flex items-center text-red-400 font-mono text-[10px] uppercase tracking-widest">
+                        <TrendingDown size={14} className="mr-2" /> Despesas Fixas
+                    </div>
+                    <div className="text-2xl font-orbitron font-bold text-red-500">
+                        {formatCurrency(totalExpenses)}
+                    </div>
+                    <p className="text-[8px] text-red-500/50 font-mono uppercase">Custos da Operação.</p>
+                </div>
+
+                <div className={`glass-card p-6 rounded-[2rem] border ${netProfit >= 0 ? 'border-primary/50 bg-primary/10 shadow-[0_0_30px_rgba(var(--primary-rgb),0.15)]' : 'border-red-500/50 bg-red-500/10'} space-y-2`}>
+                    <div className="flex items-center text-gray-400 font-mono text-[10px] uppercase tracking-widest">
+                        <DollarSign size={14} className={`mr-2 ${netProfit >= 0 ? 'text-primary' : 'text-red-500'}`} /> Lucro Líquido (Real)
+                    </div>
+                    <div className={`text-3xl font-orbitron font-black ${netProfit >= 0 ? 'text-primary' : 'text-red-500'}`}>
+                        {formatCurrency(netProfit)}
+                    </div>
+                    <p className={`text-[8px] font-mono uppercase ${netProfit >= 0 ? 'text-primary/50' : 'text-red-500/50'}`}>Dinheiro no Caixa do Estúdio.</p>
+                </div>
+            </div>
+
+            {/* Lista de Despesas */}
+            <div className="relative z-10 glass-card p-6 md:p-8 rounded-[2.5rem] border border-white/5 space-y-6">
+                <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                    <FileText className="text-primary" />
+                    <h2 className="font-orbitron font-bold text-xl uppercase tracking-widest text-white">Extrato de Custos</h2>
+                </div>
+
+                {expenses.length === 0 ? (
+                    <div className="text-center py-10 text-gray-500 font-mono text-[10px] uppercase tracking-widest border border-dashed border-white/10 rounded-[2rem]">
+                        Nenhuma despesa lançada neste mês.
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {expenses.map(expense => (
+                            <div key={expense.id} className="flex flex-col md:flex-row md:items-center justify-between p-5 bg-black/40 rounded-2xl border border-white/5 hover:border-white/20 transition-all gap-4 group">
+                                <div>
+                                    <h4 className="font-orbitron font-bold text-white uppercase text-sm tracking-widest">{expense.title}</h4>
+                                    <div className="flex gap-2 items-center mt-2">
+                                        <span className="text-[9px] font-mono bg-white/10 px-2 py-0.5 rounded text-gray-400 uppercase tracking-wider">{expense.category}</span>
+                                        <span className="text-[9px] font-mono text-gray-500">{new Date(expense.date).toLocaleDateString('pt-BR')}</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <div className="text-right">
+                                        <p className="font-mono text-red-400 font-bold tracking-tighter">{formatCurrency(expense.amount)}</p>
+                                        <p className={`text-[9px] font-mono uppercase tracking-widest ${expense.isPaid ? 'text-green-500' : 'text-yellow-500'}`}>
+                                            {expense.isPaid ? 'Liquidado' : 'Aberto'}
+                                        </p>
+                                    </div>
+                                    <button onClick={() => handleDelete(expense.id)} className="p-3 bg-white/5 hover:bg-red-500/20 text-gray-500 hover:text-red-500 rounded-xl transition-colors md:opacity-0 group-hover:opacity-100">
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Modal de Nova Despesa */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="bg-gray-950 border border-white/10 rounded-[3rem] p-8 max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+                        <h3 className="text-xl font-orbitron font-black text-white uppercase italic tracking-widest mb-8">Lançar Despesa</h3>
+                        <form onSubmit={handleAddExpense} className="space-y-6">
+                            <div>
+                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Título da Despesa</label>
+                                <Input 
+                                    className="bg-white/5 border-white/10 h-14 rounded-2xl" 
+                                    placeholder="Ex: Aluguel do Estúdio"
+                                    value={formData.title}
+                                    onChange={e => setFormData({...formData, title: e.target.value})}
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Valor (R$)</label>
+                                    <Input 
+                                        type="number"
+                                        step="0.01"
+                                        className="bg-white/5 border-white/10 h-14 rounded-2xl font-mono" 
+                                        value={formData.amount}
+                                        onChange={e => setFormData({...formData, amount: parseFloat(e.target.value)})}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Categoria</label>
+                                    <select 
+                                        className="w-full bg-white/5 border border-white/10 h-14 rounded-2xl px-4 text-sm text-gray-300 outline-none"
+                                        value={formData.category}
+                                        onChange={e => setFormData({...formData, category: e.target.value})}
+                                    >
+                                        <option value="RENT" className="bg-gray-900">Aluguel</option>
+                                        <option value="SUPPLIES" className="bg-gray-900">Materiais</option>
+                                        <option value="SOFTWARE" className="bg-gray-900">Softwares</option>
+                                        <option value="MARKETING" className="bg-gray-900">Marketing</option>
+                                        <option value="MAINTENANCE" className="bg-gray-900">Manutenção</option>
+                                        <option value="TAXES" className="bg-gray-900">Impostos</option>
+                                        <option value="OTHER" className="bg-gray-900">Outros</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <Button type="button" variant="ghost" className="flex-1 h-14 rounded-2xl text-[10px] font-mono uppercase tracking-widest" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+                                <Button type="submit" className="flex-1 bg-primary hover:bg-primary/80 text-black font-orbitron font-black tracking-widest h-14 rounded-2xl">Registrar</Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
 }

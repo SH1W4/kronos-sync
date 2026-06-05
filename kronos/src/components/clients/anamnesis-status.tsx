@@ -12,6 +12,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { reuseAnamnesis } from '@/app/actions/anamnesis'
+import { PdfExportButton } from '@/components/anamnese/PdfExportButton'
 import { useToast } from '@/components/ui/use-toast'
 
 interface AnamnesisStatusProps {
@@ -31,19 +32,25 @@ export function AnamnesisStatus({
     clientName,
     clientPhone,
     lastValidAnamnesisId,
-    lastValidAnamnesisDate
-}: AnamnesisStatusProps) {
+    lastValidAnamnesisDate,
+    anamnesisData
+}: AnamnesisStatusProps & { anamnesisData?: any }) {
     const { toast } = useToast()
     const [isReusing, setIsReusing] = useState(false)
 
     // Se já está completa, mostra o badge verde com Link
     if (status === 'COMPLETED' && anamnesisId) {
         return (
-            <Link href={`/artist/anamnese/${bookingId}`}>
-                <span className="flex items-center gap-1 px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded text-xs uppercase font-bold hover:bg-green-500/20 transition-colors">
-                    <Check size={12} /> Ficha OK
-                </span>
-            </Link>
+            <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                    <ShieldCheck className="text-primary" />
+                    <div>
+                        <h4 className="text-sm font-bold text-white uppercase font-orbitron tracking-widest">Prontuário Assinado</h4>
+                        <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest mt-1">Todos os termos foram aceitos pelo cliente.</p>
+                    </div>
+                </div>
+                {anamnesisData && <PdfExportButton anamnesisData={anamnesisData} clientName={clientName} />}
+            </div>
         )
     }
 
