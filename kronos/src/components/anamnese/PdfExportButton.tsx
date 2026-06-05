@@ -64,7 +64,7 @@ export function PdfExportButton({ anamnesisData, clientName }: PdfExportButtonPr
                 </div>
             `
 
-            const opt = {
+            const opt: any = {
                 margin: 0,
                 filename: `anamnese-${clientName.replace(/\s+/g, '-').toLowerCase()}-${new Date().getTime()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
