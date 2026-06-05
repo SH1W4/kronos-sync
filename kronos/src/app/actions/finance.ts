@@ -27,7 +27,7 @@ export async function getExpenses(month?: number, year?: number) {
         const startDate = new Date(targetYear, targetMonth, 1)
         const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59)
 
-        const expenses = await prisma.expense.findMany({
+        const expenses = await (prisma as any).expense.findMany({
             where: {
                 workspaceId,
                 date: {
@@ -70,7 +70,7 @@ export async function saveExpense(data: {
         if (!workspaceId) return { success: false, message: 'Acesso negado' }
 
         if (data.id) {
-            await prisma.expense.update({
+            await (prisma as any).expense.update({
                 where: { id: data.id },
                 data: {
                     title: data.title,
@@ -82,7 +82,7 @@ export async function saveExpense(data: {
                 }
             })
         } else {
-            await prisma.expense.create({
+            await (prisma as any).expense.create({
                 data: {
                     workspaceId,
                     title: data.title,
@@ -120,12 +120,12 @@ export async function deleteExpense(id: string) {
         if (!workspaceId) return { success: false, message: 'Acesso negado' }
 
         // Verifica se a despesa pertence ao workspace
-        const expense = await prisma.expense.findUnique({ where: { id } })
+        const expense = await (prisma as any).expense.findUnique({ where: { id } })
         if (!expense || expense.workspaceId !== workspaceId) {
             return { success: false, message: 'Despesa não encontrada' }
         }
 
-        await prisma.expense.delete({ where: { id } })
+        await (prisma as any).expense.delete({ where: { id } })
 
         revalidatePath('/artist/dashboard')
         return { success: true }

@@ -245,7 +245,7 @@ export async function createOrder(data: {
             // 🔴 BAIXA DE ESTOQUE AUTOMÁTICA
             for (const item of data.items) {
                 // Diminui a quantidade no estoque do produto
-                await tx.product.update({
+                await (tx as any).product.update({
                     where: { id: item.productId },
                     data: {
                         quantity: {
