@@ -171,6 +171,20 @@ export default function InventoryPage() {
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
+                                <button
+                                    onClick={async () => {
+                                        if (confirm('Deseja excluir este produto permanentemente?')) {
+                                            const { deleteProduct } = await import('@/app/actions/store');
+                                            const res = await deleteProduct(product.id);
+                                            if (res.success) fetchInventory();
+                                            else alert(res.message);
+                                        }
+                                    }}
+                                    className="p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl flex items-center justify-center transition-all col-span-3 mt-2"
+                                    title="Excluir"
+                                >
+                                    <Trash2 className="w-4 h-4 mr-2" /> Excluir Item
+                                </button>
                             </div>
                         </div>
                     ))

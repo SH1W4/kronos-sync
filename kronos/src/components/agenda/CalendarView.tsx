@@ -32,9 +32,9 @@ function EventChip({ booking, compact, onClick }: { booking: any; compact?: bool
 
     if (booking.isExternal) {
         return (
-            <div className="flex items-center gap-1.5 px-2 py-1 mb-1 rounded bg-gray-700/30 border border-white/5 opacity-50 cursor-default">
+            <div className="flex items-center gap-1.5 px-2 py-1 mb-1 rounded bg-gray-700/30 border border-white/5 opacity-50 cursor-default" title={booking.title || 'Ocupado'}>
                 <div className="w-1.5 h-full min-h-[16px] rounded-full bg-gray-500 flex-shrink-0" />
-                <span className="text-[10px] text-gray-400 truncate">Ocupado</span>
+                <span className="text-[10px] text-gray-400 truncate">{booking.title || 'Ocupado'}</span>
             </div>
         )
     }

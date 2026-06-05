@@ -342,6 +342,8 @@ model Product {
   basePrice   Float
   markup      Float       @default(0.20) // 20% markup padrão
   finalPrice  Float
+  costPrice   Float       @default(0)
+  quantity    Int         @default(0)
   type        ProductType
   imageUrl    String?
   isActive    Boolean     @default(true)

@@ -66,6 +66,8 @@ export async function saveProduct(data: {
     title: string,
     description?: string,
     basePrice: number,
+    costPrice?: number,
+    quantity?: number,
     type: 'PHYSICAL' | 'DIGITAL',
     imageUrl?: string,
     isSold?: boolean
@@ -85,6 +87,8 @@ export async function saveProduct(data: {
             title: data.title,
             description: data.description,
             basePrice: data.basePrice,
+            costPrice: data.costPrice ?? 0,
+            quantity: data.quantity ?? 0,
             finalPrice: calculateProductPrice(data.basePrice, BUSINESS_RULES.DEFAULT_MARKUP), // Auto-markup for BETA
             type: data.type,
             imageUrl: data.imageUrl,
@@ -138,6 +142,20 @@ export async function toggleProductSold(id: string, currentStatus: boolean) {
         return { success: true }
     } catch (error) {
         return { success: false }
+    }
+}
+
+export async function deleteProduct(id: string) {
+    try {
+        await prisma.product.delete({
+            where: { id }
+        })
+        revalidatePath('/artist/inventory')
+        revalidatePath('/marketplace')
+        return { success: true }
+    } catch (error) {
+        console.error("Error deleting product", error)
+        return { success: false, message: 'Erro ao excluir produto. Ele pode estar atrelado a um pedido.' }
     }
 }
 
@@ -220,6 +238,19 @@ export async function createOrder(data: {
                     data: {
                         status: 'USED',
                         usedByUserId: user.id
+                    }
+                })
+            }
+
+            // 🔴 BAIXA DE ESTOQUE AUTOMÁTICA
+            for (const item of data.items) {
+                // Diminui a quantidade no estoque do produto
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: {
+                        quantity: {
+                            decrement: item.quantity
+                        }
                     }
                 })
             }

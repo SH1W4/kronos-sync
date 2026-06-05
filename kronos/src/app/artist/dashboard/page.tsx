@@ -1,10 +1,11 @@
-import { auth, clerkClient } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { Clock, AlertCircle, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import DashboardCharts from "./DashboardCharts"
+import AdminDashboard from "./AdminDashboard"
 
 export const dynamic = 'force-dynamic'
 
@@ -15,16 +16,17 @@ export default async function ArtistDashboard() {
         redirect('/sign-in')
     }
 
-    // 1. Buscar Perfil de Artista
-    const artist = await prisma.artist.findFirst({
-        where: { user: { clerkId: clerkUserId } },
+    // 1. Buscar Perfil do Usuário
+    const user = await prisma.user.findUnique({
+        where: { clerkId: clerkUserId },
         include: {
-            user: true
+            artist: { include: { user: true } },
+            memberships: { select: { role: true } }
         }
     })
 
-    // Se não for artista, mostra tela de dessincronização
-    if (!artist) {
+    // Se não for artista nem tiver user válido, mostra tela de dessincronização
+    if (!user || !user.artist) {
         return (
             <div className="p-10 text-center min-h-[100vh] flex flex-col items-center justify-center bg-black text-white relative">
                 <div className="absolute inset-0 data-pattern-grid opacity-20 pointer-events-none" />
@@ -54,6 +56,21 @@ export default async function ArtistDashboard() {
             </div>
         )
     }
+
+    const isWorkspaceAdmin = user.memberships.some(m => m.role === 'ADMIN')
+    if (user.role === 'ADMIN' || isWorkspaceAdmin) {
+        return (
+            <div className="p-4 md:p-8 min-h-screen relative overflow-hidden">
+                <div className="scanline" />
+                <div className="absolute inset-0 data-pattern-grid opacity-30 pointer-events-none" />
+                <div className="relative z-10">
+                    <AdminDashboard />
+                </div>
+            </div>
+        )
+    }
+
+    const artist = user.artist
 
     // 2. Definir Ranges (Fixo para Brasil/SP)
     const options = { timeZone: 'America/Sao_Paulo' }
