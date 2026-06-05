@@ -20,7 +20,7 @@ export async function getGamificationData() {
         let gamification = await prisma.artistGamification.findUnique({
             where: { artistId: artist.id },
             include: {
-                artist: true,
+                artist: { include: { user: true } },
                 skins: true,
                 achievements: {
                     include: { achievement: true }
@@ -33,7 +33,7 @@ export async function getGamificationData() {
             gamification = await prisma.artistGamification.create({
                 data: { artistId: artist.id },
                 include: {
-                    artist: true,
+                    artist: { include: { user: true } },
                     skins: true,
                     achievements: {
                         include: { achievement: true }
@@ -67,5 +67,45 @@ export async function equipSkinAction(slot: SkinSlot, skinCode: string) {
     } catch (error) {
         console.error("Error in equipSkinAction:", error)
         return { success: false, error: 'Internal Server Error' }
+    }
+}
+
+export async function getTeamGamificationData() {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return null
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: {
+                artist: true,
+                ownedWorkspaces: { take: 1 }
+            }
+        })
+        
+        if (!user) return null
+
+        const workspaceId = user.artist?.workspaceId || user.ownedWorkspaces[0]?.id
+        if (!workspaceId) return null
+
+        const teamGamification = await prisma.artistGamification.findMany({
+            where: {
+                artist: { workspaceId }
+            },
+            include: {
+                artist: {
+                    include: { user: true }
+                },
+                achievements: {
+                    include: { achievement: true }
+                }
+            },
+            orderBy: { xp: 'desc' }
+        })
+
+        return { success: true, teamGamification, isAdmin: user.role === 'ADMIN' }
+    } catch (error) {
+        console.error("Error fetching team gamification:", error)
+        return null
     }
 }
