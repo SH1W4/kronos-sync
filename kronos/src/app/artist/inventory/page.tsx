@@ -16,6 +16,8 @@ export default function InventoryPage() {
         title: '',
         description: '',
         basePrice: 0,
+        costPrice: 0,
+        quantity: 0,
         type: 'PHYSICAL' as 'PHYSICAL' | 'DIGITAL',
         imageUrl: '',
         isSold: false
@@ -56,6 +58,8 @@ export default function InventoryPage() {
                 title: product.title,
                 description: product.description || '',
                 basePrice: product.basePrice,
+                costPrice: product.costPrice || 0,
+                quantity: product.quantity || 0,
                 type: product.type,
                 imageUrl: product.imageUrl || '',
                 isSold: product.isSold || false
@@ -66,6 +70,8 @@ export default function InventoryPage() {
                 title: '',
                 description: '',
                 basePrice: 0,
+                costPrice: 0,
+                quantity: 0,
                 type: 'PHYSICAL',
                 imageUrl: '',
                 isSold: false
@@ -135,7 +141,10 @@ export default function InventoryPage() {
                             <div className="flex-1 space-y-2">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[8px] font-mono text-primary font-black uppercase tracking-widest">{product.type}</span>
-                                    <span className="text-[10px] font-mono text-gray-500">{formatCurrency(product.finalPrice)}</span>
+                                    <div className="flex gap-2 items-center">
+                                        <span className="text-[10px] font-mono text-gray-500">QTD: {product.quantity}</span>
+                                        <span className="text-[10px] font-mono text-gray-500">{formatCurrency(product.finalPrice)}</span>
+                                    </div>
                                 </div>
                                 <h3 className="text-lg font-orbitron font-bold text-white uppercase">{product.title}</h3>
                                 <p className="text-xs text-gray-500 line-clamp-2">{product.description || "Sem descrição."}</p>
@@ -265,7 +274,7 @@ export default function InventoryPage() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Preço Base (R$)</label>
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Preço Base de Venda (R$)</label>
                                         <Input
                                             type="number"
                                             className="bg-white/5 border-white/10 h-14 rounded-2xl"
@@ -274,6 +283,24 @@ export default function InventoryPage() {
                                             required
                                         />
                                         <p className="text-[8px] font-mono text-gray-600 mt-1 uppercase tracking-tighter">Markup de 20% será aplicado automaticamente.</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Custo de Aquisição (R$)</label>
+                                        <Input
+                                            type="number"
+                                            className="bg-white/5 border-white/10 h-14 rounded-2xl"
+                                            value={formData.costPrice}
+                                            onChange={e => setFormData({ ...formData, costPrice: parseFloat(e.target.value) })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Qtd em Estoque</label>
+                                        <Input
+                                            type="number"
+                                            className="bg-white/5 border-white/10 h-14 rounded-2xl"
+                                            value={formData.quantity}
+                                            onChange={e => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
+                                        />
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2 block">Tipo</label>
