@@ -144,6 +144,8 @@ export default function StudioAgendaPage() {
                         view={view}
                         currentDate={currentDate}
                         bookings={bookings}
+                        isReadOnly={true}
+                        filterByArtistId={null}
                         onBookingClick={() => {}}
                         onRefresh={loadBookings}
                         onEmptySlotClick={handleEmptyClick}

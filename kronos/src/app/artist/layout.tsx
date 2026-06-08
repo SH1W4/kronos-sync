@@ -59,7 +59,11 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                         <NavItem href="/artist/profile" icon={<UserIcon size={20} />} label="MEU PERFIL" active={pathname === '/artist/profile'} />
                         <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
                         <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
-                        <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
+                        {user?.publicMetadata?.role === 'ADMIN' ? (
+                            <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
+                        ) : (
+                            <NavItem href="/artist/finance/meus-ganhos" icon={<DollarSign size={20} />} label="MEUS GANHOS" active={pathname === '/artist/finance/meus-ganhos'} />
+                        )}
                         <NavItem href="/artist/scanner" icon={<QrCode size={20} />} label="SCANNER" active={pathname === '/artist/scanner'} />
                         <NavItem href="/artist/inventory" icon={<ShoppingBag size={20} />} label="INVENTÁRIO" active={pathname === '/artist/inventory'} />
                         <NavItem href="/artist/clients" icon={<Users size={20} />} label="CLIENTES" active={pathname === '/artist/clients'} />

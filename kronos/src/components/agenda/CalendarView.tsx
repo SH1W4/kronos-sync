@@ -6,7 +6,10 @@ import { ptBR } from 'date-fns/locale'
 import { BookingCard } from './BookingCard'
 
 interface CalendarViewProps {
-    view: 'day' | 'week'
+    view?: 'day' | 'week'
+    viewMode?: 'day' | 'week'
+    filterByArtistId?: string | null
+    isReadOnly?: boolean
     currentDate: Date
     bookings: any[]
     onBookingClick: (booking: any) => void
@@ -23,7 +26,7 @@ const STATUS_COLORS: Record<string, { bg: string; bar: string; text: string }> =
 }
 
 // Chip de evento no estilo Google Calendar
-function EventChip({ booking, compact, onClick }: { booking: any; compact?: boolean; onClick: () => void }) {
+function EventChip({ booking, compact, onClick, isReadOnly }: { booking: any; compact?: boolean; onClick: () => void, isReadOnly?: boolean }) {
     const isOwn = !booking.isStudioMate && !booking.isExternal
     const artistName: string = booking.artist?.user?.name || booking.artistName || ''
     const clientName: string = booking.client?.name || booking.clientName || '(sem cliente)'
@@ -42,8 +45,8 @@ function EventChip({ booking, compact, onClick }: { booking: any; compact?: bool
     if (compact) {
         return (
             <div
-                onClick={onClick}
-                className={`flex gap-1.5 px-1.5 py-1 mb-0.5 rounded cursor-pointer transition-colors ${colors.bg}`}
+                onClick={!isReadOnly ? onClick : undefined}
+                className={`flex gap-1.5 px-1.5 py-1 mb-0.5 rounded transition-colors ${!isReadOnly ? 'cursor-pointer' : 'cursor-default'} ${colors.bg}`}
                 title={isOwn ? clientName : `${artistName} — ${clientName}`}
             >
                 <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${colors.bar}`} />
@@ -61,8 +64,8 @@ function EventChip({ booking, compact, onClick }: { booking: any; compact?: bool
 
     return (
         <div
-            onClick={onClick}
-            className={`flex gap-2 px-3 py-2 mb-1 rounded-lg cursor-pointer transition-colors border border-white/5 ${colors.bg}`}
+            onClick={!isReadOnly ? onClick : undefined}
+            className={`flex gap-2 px-3 py-2 mb-1 rounded-lg transition-colors border border-white/5 ${!isReadOnly ? 'cursor-pointer' : 'cursor-default'} ${colors.bg}`}
             title={isOwn ? `${clientName} • ${booking.type}` : `${artistName} — ${clientName}`}
         >
             <div className={`w-1 flex-shrink-0 rounded-full self-stretch ${colors.bar}`} />
@@ -81,23 +84,30 @@ function EventChip({ booking, compact, onClick }: { booking: any; compact?: bool
     )
 }
 
-export function CalendarView({ view, currentDate, bookings, onBookingClick, onEmptySlotClick, onRefresh }: CalendarViewProps) {
+export function CalendarView({ view, viewMode, filterByArtistId, isReadOnly = false, currentDate, bookings, onBookingClick, onEmptySlotClick, onRefresh }: CalendarViewProps) {
+    const activeView = viewMode || view || 'week'
     const hours = Array.from({ length: 14 }, (_, i) => i + 7) // 07h–20h
 
+    // Se tiver filterByArtistId, filtramos na visualização
+    const filteredBookings = filterByArtistId !== undefined && filterByArtistId !== null
+        ? bookings.filter(b => b.artistId === filterByArtistId)
+        : bookings
+
     const getBookingsForSlot = (date: Date, hour: number) =>
-        bookings.filter(b => {
+        filteredBookings.filter(b => {
             const d = new Date(b.scheduledFor)
             return isSameDay(d, date) && d.getHours() === hour
         })
 
     const handleEmptyClick = (date: Date, hour: number) => {
-        if (!onEmptySlotClick) return
+        if (isReadOnly || !onEmptySlotClick) return
         const slotDate = new Date(date)
         slotDate.setHours(hour, 0, 0, 0)
         onEmptySlotClick(slotDate)
     }
 
     // ── Day View ────────────────────────────────────────────────────────────────
+
     if (view === 'day') {
         return (
             <div className="bg-gray-900/50 rounded-xl border border-white/10 overflow-hidden">
@@ -131,9 +141,9 @@ export function CalendarView({ view, currentDate, bookings, onBookingClick, onEm
                                 <div className="flex-1 space-y-1">
                                     {hasEvents ? slotBookings.map(booking =>
                                         booking.isExternal ? (
-                                            <EventChip key={booking.id} booking={booking} onClick={() => {}} />
+                                            <EventChip key={booking.id} booking={booking} onClick={() => onBookingClick(booking)} isReadOnly={isReadOnly} />
                                         ) : booking.isStudioMate ? (
-                                            <EventChip key={booking.id} booking={booking} onClick={() => {}} />
+                                            <EventChip key={booking.id} booking={booking} onClick={() => onBookingClick(booking)} isReadOnly={isReadOnly} />
                                         ) : (
                                             <BookingCard
                                                 key={booking.id}
@@ -209,7 +219,8 @@ export function CalendarView({ view, currentDate, bookings, onBookingClick, onEm
                                                 key={booking.id}
                                                 booking={booking}
                                                 compact
-                                                onClick={() => !booking.isStudioMate && !booking.isExternal && onBookingClick(booking)}
+                                                onClick={() => onBookingClick(booking)}
+                                                isReadOnly={isReadOnly}
                                             />
                                         )}
                                     </div>

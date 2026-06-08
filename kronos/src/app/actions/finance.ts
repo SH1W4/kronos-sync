@@ -134,3 +134,54 @@ export async function deleteExpense(id: string) {
         return { success: false, message: 'Erro ao excluir despesa' }
     }
 }
+
+/**
+ * Retorna os ganhos específicos de um artista (Bookings)
+ */
+export async function getArtistEarnings(month?: number, year?: number) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { success: false, message: 'Não autorizado' }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user || !user.artist) {
+            return { success: false, message: 'Perfil de artista não encontrado' }
+        }
+
+        const artistId = user.artist.id
+
+        const now = new Date()
+        const targetMonth = month !== undefined ? month : now.getMonth()
+        const targetYear = year !== undefined ? year : now.getFullYear()
+
+        const startDate = new Date(targetYear, targetMonth, 1)
+        const endDate = new Date(targetYear, targetMonth + 1, 0, 23, 59, 59)
+
+        const bookings = await prisma.booking.findMany({
+            where: {
+                artistId: artistId,
+                startTime: {
+                    gte: startDate,
+                    lte: endDate
+                },
+                status: {
+                    in: ['COMPLETED', 'CONFIRMED'] // Status válidos para faturamento
+                }
+            },
+            include: {
+                client: true
+            },
+            orderBy: { startTime: 'desc' }
+        })
+
+        return { success: true, bookings }
+    } catch (error) {
+        console.error("Error fetching artist earnings:", error)
+        return { success: false, message: 'Erro ao buscar ganhos' }
+    }
+}
+

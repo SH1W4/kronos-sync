@@ -78,8 +78,8 @@ function OnboardingContent() {
         if (!inviteCode) return
 
         if (!isSignedIn) {
-            // Joga para a tela de signin do Clerk e manda voltar com o código
-            router.push(`/auth/signin?callbackUrl=/onboarding?inviteCode=${inviteCode}`)
+            // Vai para a tela de signin customizada passando o convite
+            router.push(`/sign-in?invite=${inviteCode}`)
             return
         }
 
@@ -136,7 +136,7 @@ function OnboardingContent() {
 
                         <div className="space-y-4">
                             <Button
-                                onClick={() => router.push('/auth/signin')}
+                                onClick={() => router.push('/sign-in')}
                                 className="w-full bg-white hover:bg-neutral-200 text-black h-12 rounded-xl font-bold font-orbitron text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                             >
                                 SOU MEMBRO E TENHO ACESSO

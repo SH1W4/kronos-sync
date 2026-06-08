@@ -103,38 +103,40 @@ export default function AgendaPage() {
 
                     <div className="flex items-center gap-3">
                         <GoogleSyncStatus />
-                        <Button
+                        <Button 
+                            variant="outline"
+                            onClick={() => {
+                                window.location.href = '/artist/studio-agenda'
+                            }}
+                            className="bg-gray-900/50 border-white/10 text-gray-400 hover:text-white hidden md:flex"
+                        >
+                            Ver Agenda do Estúdio
+                        </Button>
+                        <Button 
+                            className="bg-primary text-black font-bold hover:bg-primary/90"
                             onClick={() => {
                                 setModalDate(currentDate)
                                 setShowBookingModal(true)
                             }}
-                            className="bg-primary hover:opacity-90 text-background gap-2 font-bold"
                         >
-                            <Plus size={18} />
-                            <span className="hidden sm:inline">Novo</span>
+                            <Plus size={18} className="mr-2" />
+                            Nova Sessão
                         </Button>
                     </div>
                 </div>
 
                 {/* View Controls */}
-                <div className="flex items-center gap-3 flex-wrap">
-                    {/* View Toggle */}
-                    <div className="flex gap-2 bg-gray-900 p-1 rounded-lg">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-gray-900/50 p-2 rounded-xl border border-white/10">
+                    <div className="flex bg-black rounded-lg border border-white/10 overflow-hidden w-full md:w-auto">
                         <button
                             onClick={() => setView('day')}
-                            className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${view === 'day'
-                                ? 'bg-primary text-background'
-                                : 'text-gray-400 hover:text-white'
-                                }`}
+                            className={`flex-1 md:flex-none px-6 py-2 text-sm font-bold transition-colors ${view === 'day' ? 'bg-primary text-black' : 'text-gray-400 hover:text-white'}`}
                         >
                             Dia
                         </button>
                         <button
                             onClick={() => setView('week')}
-                            className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${view === 'week'
-                                ? 'bg-primary text-background'
-                                : 'text-gray-400 hover:text-white'
-                                }`}
+                            className={`flex-1 md:flex-none px-6 py-2 text-sm font-bold transition-colors ${view === 'week' ? 'bg-primary text-black' : 'text-gray-400 hover:text-white'}`}
                         >
                             Semana
                         </button>
