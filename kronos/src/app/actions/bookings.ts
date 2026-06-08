@@ -678,3 +678,110 @@ export async function getWorkspaceBookings(data: {
         return { error: 'Erro ao buscar agenda do estúdio' }
     }
 }
+
+/**
+ * Get ALL bookings for the studio agenda view:
+ * - All internal bookings from the workspace
+ * - Google Calendar events from the studio shared calendar (galeria.kronos@gmail.com)
+ */
+export async function getStudioAgendaBookings(data: {
+    startDate: Date
+    endDate: Date
+}) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { error: 'Não autorizado' }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { memberships: true, artist: true }
+        })
+
+        const workspaceId = user?.memberships[0]?.workspaceId
+        if (!workspaceId) return { error: 'Workspace não selecionado' }
+
+        // Fetch all internal bookings for this workspace
+        const rawBookings = await prisma.booking.findMany({
+            where: {
+                workspaceId,
+                scheduledFor: {
+                    gte: data.startDate,
+                    lte: data.endDate
+                },
+                status: { not: 'CANCELLED' }
+            },
+            include: {
+                client: {
+                    select: { name: true, id: true }
+                },
+                artist: {
+                    include: { user: { select: { name: true, image: true, customColor: true } } }
+                },
+                slot: true
+            },
+            orderBy: { scheduledFor: 'asc' }
+        })
+
+        // Mark each booking with the current user's artist id to distinguish isStudioMate
+        const bookings = rawBookings.map(b => ({
+            ...b,
+            isStudioMate: b.artistId !== user?.artist?.id,
+            isExternal: false
+        }))
+
+        // Fetch Google Calendar events from the studio's shared calendar
+        let allEvents: any[] = [...bookings]
+
+        try {
+            // Get workspace to find the studio Google Calendar ID and owner
+            const workspace = await prisma.workspace.findUnique({
+                where: { id: workspaceId },
+                select: { googleCalendarId: true, ownerId: true }
+            })
+
+            if (workspace?.googleCalendarId && workspace?.ownerId) {
+                const calendar = await getGoogleCalendarClient(workspace.ownerId)
+
+                if (calendar) {
+                    const googleResponse = await calendar.events.list({
+                        calendarId: workspace.googleCalendarId,
+                        timeMin: data.startDate.toISOString(),
+                        timeMax: data.endDate.toISOString(),
+                        singleEvents: true,
+                        orderBy: 'startTime',
+                    })
+
+                    const googleEvents = googleResponse.data.items || []
+
+                    // Deduplicate: filter out events already synced as internal bookings
+                    const kronosGoogleIds = new Set(rawBookings.map(b => b.googleEventId).filter(Boolean))
+
+                    const studioExternalEvents = googleEvents
+                        .filter((ge: any) => !kronosGoogleIds.has(ge.id))
+                        .map((ge: any) => ({
+                            id: `google-studio-${ge.id}`,
+                            isExternal: true,
+                            isStudioMate: false,
+                            title: ge.summary || '(Evento Externo)',
+                            scheduledFor: new Date(ge.start?.dateTime || ge.start?.date || ''),
+                            duration: ge.end?.dateTime
+                                ? Math.floor((new Date(ge.end.dateTime).getTime() - new Date(ge.start?.dateTime || '').getTime()) / 60000)
+                                : 60,
+                            status: 'EXTERNAL'
+                        }))
+
+                    allEvents = [...allEvents, ...studioExternalEvents]
+                }
+            }
+        } catch (syncError) {
+            console.warn('⚠️ Erro ao buscar eventos da agenda do estúdio:', syncError)
+        }
+
+        return { success: true, bookings: allEvents }
+
+    } catch (error) {
+        console.error('Error fetching studio agenda bookings:', error)
+        return { error: 'Erro ao buscar agenda do estúdio' }
+    }
+}
+

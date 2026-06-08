@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useClerk, useUser } from '@clerk/nextjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BrandLogo } from '@/components/ui/brand-logo'
@@ -12,32 +12,41 @@ function SSOCallbackContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const inviteCode = searchParams.get('invite')
+    const [callbackDone, setCallbackDone] = useState(false)
 
+    // PASSO 1: Finaliza o handshake OAuth do Clerk
     useEffect(() => {
         async function process() {
             try {
-                // 1. Finaliza o handshake OAuth do Clerk
                 await handleRedirectCallback({})
-
-                // Aguarda o Clerk carregar o usuário atualizado
-                // (dá tempo ao webhook de sincronizar com o Prisma)
-                await new Promise(resolve => setTimeout(resolve, 1500))
-
+                setCallbackDone(true)
             } catch (err) {
                 console.error('SSO Callback Error:', err)
                 router.push('/sign-in')
             }
         }
         process()
-    }, [handleRedirectCallback, router])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Executa após o Clerk ter o usuário carregado na memória
+    // PASSO 2: Aguarda Clerk carregar o user E o handshake ter terminado
     useEffect(() => {
-        if (!isLoaded || !user) return
+        // Só executa quando: handshake concluído + Clerk carregado + user disponível
+        if (!callbackDone || !isLoaded || !user) return
 
         async function finalizeSession() {
             try {
-                // 2. Se há convite, resgata via API (novo artista)
+                // Garante que o publicMetadata está atualizado (força reload do Clerk)
+                await user?.reload()
+
+                const role = (user?.publicMetadata as any)?.role
+
+                // Artistas/Admins com conta existente → sem invite
+                if ((role === 'ARTIST' || role === 'ADMIN') && !inviteCode) {
+                    router.push('/artist/dashboard')
+                    return
+                }
+
+                // Novo artista com convite (ou artista existente com novo convite)
                 const codeToRedeem = inviteCode || sessionStorage.getItem('pendingInviteCode')
 
                 if (codeToRedeem) {
@@ -47,27 +56,32 @@ function SSOCallbackContent() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ inviteCode: codeToRedeem })
                     })
-                    if (!res.ok) {
-                        console.error('Failed to redeem invite:', await res.text())
-                    } else {
-                        // Recarrega o usuário para obter o role atualizado
+                    if (res.ok) {
                         await user?.reload()
                         console.log('✅ Invite redeemed successfully')
+                    } else {
+                        console.error('Failed to redeem invite:', await res.text())
                     }
                 }
 
-                // 3. Lê o role do publicMetadata do Clerk (já disponível, sem precisar do DB)
-                const role = (user?.publicMetadata as any)?.role
+                // Lê role novamente após possível resgate de convite
+                const finalRole = (user?.publicMetadata as any)?.role
 
-                if (role === 'ARTIST' || role === 'ADMIN') {
-                    // ✅ Artista/Admin existente → vai direto pro dashboard
+                if (finalRole === 'ARTIST' || finalRole === 'ADMIN') {
                     router.push('/artist/dashboard')
-                } else if (role === 'CLIENT') {
+                } else if (finalRole === 'CLIENT') {
                     router.push('/kiosk')
                 } else {
-                    // Role ainda não definido (usuário novo sem invite ou webhook em processamento)
-                    // Redireciona para onboarding para completar o processo de convite
-                    router.push('/onboarding')
+                    // Role ainda não definido — aguarda webhook do Prisma
+                    // Tenta mais uma vez após 2s antes de mandar pro onboarding
+                    await new Promise(resolve => setTimeout(resolve, 2000))
+                    await user?.reload()
+                    const retryRole = (user?.publicMetadata as any)?.role
+                    if (retryRole === 'ARTIST' || retryRole === 'ADMIN') {
+                        router.push('/artist/dashboard')
+                    } else {
+                        router.push('/onboarding')
+                    }
                 }
             } catch (err) {
                 console.error('SSO Finalize Error:', err)
@@ -76,7 +90,7 @@ function SSOCallbackContent() {
         }
 
         finalizeSession()
-    }, [isLoaded, user, inviteCode, router])
+    }, [callbackDone, isLoaded, user]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
@@ -107,4 +121,3 @@ export default function SSOCallbackPage() {
         </Suspense>
     )
 }
-
