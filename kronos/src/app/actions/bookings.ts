@@ -257,6 +257,28 @@ export async function createBooking(data: {
             }).catch(e => console.error('⚠️ Erro ao enviar notificação:', e))
         }
 
+        // 5.1 Notificar Cliente (Background) via WhatsApp Direto
+        const clientPhone = booking.client.phone
+        if (clientPhone) {
+            const rawDate = new Date(data.scheduledFor)
+            const dateStr = rawDate.toLocaleDateString('pt-BR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+            
+            const messageText = `⚡ *KRONØS OS - Agendamento Confirmado* ⚡\n\nOlá, *${booking.client.name || 'Cliente'}*!\nSeu agendamento no *${workspace.name}* foi confirmado com sucesso.\n\n👤 *Artista:* ${user.name || 'Artista'}\n📅 *Data:* ${dateStr}\n💰 *Valor Estimado:* R$ ${data.estimatedPrice.toFixed(2)}\n\n⚠️ *IMPORTANTE:* O preenchimento da sua Ficha de Anamnese é obrigatório antes do início da sessão.\nAcesse o link seguro para respondê-la digitalmente:\n👉 ${process.env.NEXTAUTH_URL}/fichas/${booking.id}\n\nNos vemos em breve!\n_${workspace.name}_`
+
+            import('@/lib/whatsapp').then(({ sendWhatsAppMessage }) => {
+                sendWhatsAppMessage({
+                    phone: clientPhone,
+                    text: messageText
+                })
+            }).catch(e => console.error('⚠️ Erro ao carregar whatsapp helper:', e))
+        }
+
         // 6. Disparo de Automação n8n (WhatsApp / Fluxos Avançados)
         import('@/lib/webhook').then(({ dispatchWebhook }) => {
             dispatchWebhook({

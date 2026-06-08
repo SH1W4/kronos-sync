@@ -73,8 +73,93 @@ export default function KioskPage() {
         return progress
     }
 
+    // Sincronização de leads salvos offline
+    const syncOfflineLeads = async () => {
+        if (typeof window === 'undefined' || !navigator.onLine) return
+        const raw = localStorage.getItem('pending_leads')
+        if (!raw) return
+        try {
+            const leads = JSON.parse(raw)
+            if (leads.length === 0) return
+            
+            console.log(`[Offline Sync] Sincronizando ${leads.length} leads salvos localmente...`)
+            const { registerCompanionLead } = await import('@/app/actions/leads')
+            
+            const remaining: any[] = []
+            for (const lead of leads) {
+                try {
+                    const res = await registerCompanionLead(lead)
+                    if (res.success) {
+                        console.log(`[Offline Sync] Lead ${lead.name} sincronizado com sucesso.`)
+                    } else {
+                        console.warn(`[Offline Sync] Falha ao sincronizar lead ${lead.name}:`, res.message)
+                    }
+                } catch (err) {
+                    console.error(`[Offline Sync] Erro de rede ao sincronizar ${lead.name}, mantendo na fila:`, err)
+                    remaining.push(lead)
+                }
+            }
+            
+            if (remaining.length > 0) {
+                localStorage.setItem('pending_leads', JSON.stringify(remaining))
+            } else {
+                localStorage.removeItem('pending_leads')
+                toast({
+                    title: "Sincronização Concluída",
+                    description: "Seus leads capturados offline foram enviados com sucesso!",
+                })
+            }
+        } catch (e) {
+            console.error('Failed to parse offline leads queue:', e)
+        }
+    }
+
+    // Monitoramento de conexão para sincronização
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        window.addEventListener('online', syncOfflineLeads)
+        const interval = setInterval(syncOfflineLeads, 30000)
+        
+        return () => {
+            window.removeEventListener('online', syncOfflineLeads)
+            clearInterval(interval)
+        }
+    }, [])
+
     const handleRegisterLead = async () => {
         setLoading(true)
+
+        const saveLeadOffline = () => {
+            const newLead = { ...formData, timestamp: new Date().toISOString() }
+            const raw = localStorage.getItem('pending_leads')
+            let leads = []
+            if (raw) {
+                try {
+                    leads = JSON.parse(raw)
+                } catch (e) {
+                    leads = []
+                }
+            }
+            leads.push(newLead)
+            localStorage.setItem('pending_leads', JSON.stringify(leads))
+            
+            // Gerar cupom provisório offline
+            const nameFirst = formData.name.split(' ')[0].toUpperCase()
+            const coupon = `KAIROS_OFFLINE_${nameFirst}`
+            setSuccessCode(coupon)
+            
+            toast({
+                title: "Modo Offline Ativado",
+                description: "Seu cupom INK PASS provisório foi gerado e será sincronizado automaticamente quando a internet retornar!",
+            })
+        }
+
+        if (typeof window !== 'undefined' && !navigator.onLine) {
+            saveLeadOffline()
+            setLoading(false)
+            return
+        }
+
         try {
             const { registerCompanionLead } = await import('@/app/actions/leads')
             const res = await registerCompanionLead(formData)
@@ -86,19 +171,19 @@ export default function KioskPage() {
                     description: "Seu cupom de desconto está ativo!",
                 })
             } else {
-                toast({
-                    title: "Acesso Negado",
-                    description: res.message || "VIP PIN inválido ou erro no sistema.",
-                    variant: "destructive"
-                })
+                if (res.message && res.message.includes('PIN')) {
+                    toast({
+                        title: "Acesso Negado",
+                        description: res.message || "VIP PIN inválido do artista.",
+                        variant: "destructive"
+                    })
+                } else {
+                    saveLeadOffline()
+                }
             }
         } catch (error) {
-            console.error(error)
-            toast({
-                title: "Falha de Rede",
-                description: "Não foi possível conectar ao Ink Link.",
-                variant: "destructive"
-            })
+            console.error("Network failure during lead registration, saving offline:", error)
+            saveLeadOffline()
         } finally {
             setLoading(false)
         }

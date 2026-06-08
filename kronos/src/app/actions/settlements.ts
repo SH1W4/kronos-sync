@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import Tesseract from "tesseract.js"
 
 export async function createSettlement(data: {
     artistId: string
@@ -52,9 +53,6 @@ async function validateSettlementWithAI(settlementId: string) {
     try {
         console.log(`[AI] Starting autonomous validation for settlement ${settlementId}...`)
 
-        // Simulate Neural Processing time
-        await new Promise(resolve => setTimeout(resolve, 4000))
-
         const settlement = await prisma.settlement.findUnique({
             where: { id: settlementId },
             include: {
@@ -65,28 +63,51 @@ async function validateSettlementWithAI(settlementId: string) {
 
         if (!settlement || !settlement.proofUrl) return
 
-        // 1. AI Logic: Check if proof URL matches Studio identity (Mocking Vision Agent)
         const workspace = settlement.workspace
         const studioName = workspace?.name || "Kairøs Studio"
         const studioPixRecipient = workspace?.pixRecipient || studioName
 
-        // Simulating OCR extraction from Comprovante
-        // For testing/mock purposes, we assume the AI "sees" the correct recipient
-        const extractedValue = settlement.totalValue
-        const extractedDestinatario = studioPixRecipient
+        let extractedText = ''
+        let ocrConfidence = 0.50
 
-        console.log(`[AI] Extracted Value: ${extractedValue}, Destinatário: ${extractedDestinatario}`)
+        try {
+            console.log(`[OCR] Executing Tesseract on ${settlement.proofUrl}`)
+            const { data } = await Tesseract.recognize(
+                settlement.proofUrl,
+                'por' // Português
+            )
+            extractedText = data.text || ''
+            ocrConfidence = data.confidence ? data.confidence / 100 : 0.60
+            console.log(`[OCR Success] Extracted text length: ${extractedText.length}, Confidence: ${ocrConfidence}`)
+        } catch (ocrError) {
+            console.error('[OCR Fallback] Tesseract failed, using fallback heuristic:', ocrError)
+            extractedText = ''
+            ocrConfidence = 0.50
+        }
 
-        // 2. Trust Score Algorithm: Recipient must be the Studio
-        const isStudioRecipient = extractedDestinatario.toLowerCase().includes(studioName.toLowerCase()) ||
-            extractedDestinatario.toLowerCase().includes(studioPixRecipient.toLowerCase())
+        // 1. AI Logic: Check if proof URL matches Studio identity
+        const textLower = extractedText.toLowerCase()
+        const studioTerms = [
+            studioName.toLowerCase(),
+            studioPixRecipient.toLowerCase(),
+            'kronos',
+            'galeria'
+        ].filter(Boolean)
 
-        const isValueMatch = Math.abs(extractedValue - settlement.totalValue) < 0.01
+        const isStudioRecipient = studioTerms.some(term => textLower.includes(term))
 
-        // TODO: Replace with real OCR when Tesseract is fully integrated
-        const ocrConfidence = 0.95 // Mock confidence for now
+        // Check if value matches
+        const valueStr = settlement.totalValue.toFixed(2)
+        const valueCommaStr = valueStr.replace('.', ',')
+        const valueIntStr = Math.round(settlement.totalValue).toString()
 
-        // Combine OCR confidence with business logic
+        const isValueMatch = textLower.includes(valueStr) || 
+                             textLower.includes(valueCommaStr) || 
+                             textLower.includes(valueIntStr)
+
+        console.log(`[AI Evaluation] Recipient Match: ${isStudioRecipient}, Value Match: ${isValueMatch}, OCR Confidence: ${ocrConfidence}`)
+
+        // 2. Trust Score Algorithm
         let aiConfidence = 0.0
         if (ocrConfidence > 0.8 && isStudioRecipient && isValueMatch) {
             aiConfidence = 0.99
@@ -96,15 +117,14 @@ async function validateSettlementWithAI(settlementId: string) {
             aiConfidence = 0.30
         }
 
-        // SAFETY: Auto-approval disabled until OCR is fully integrated
-        // All settlements will go to REVIEW for manual verification
-        if (aiConfidence > 1.0) { // Threshold set to impossible value (100%+)
+        // Auto-approval enabled for high confidence (>= 0.90)
+        if (aiConfidence >= 0.90) {
             await prisma.settlement.update({
                 where: { id: settlementId },
                 data: {
                     status: "APPROVED",
                     aiConfidence,
-                    aiFeedback: `✨ Sincronia Perfeita. Comprovante validado: R$ ${extractedValue.toFixed(2)} para ${studioName}. OCR: ${(ocrConfidence * 100).toFixed(0)}%`,
+                    aiFeedback: `✨ Sincronia Perfeita. Comprovante validado autonomamente: R$ ${settlement.totalValue.toFixed(2)} para ${studioName}. OCR: ${(ocrConfidence * 100).toFixed(0)}%`,
                     tokenData: {
                         glyphId: "GLYPH_SYNC_KAI",
                         points: 100,
@@ -112,17 +132,31 @@ async function validateSettlementWithAI(settlementId: string) {
                     }
                 }
             })
-            console.log(`[AI] Settlement ${settlementId} APPROVED autonomamente para o estúdio.`)
+
+            // Decrementar bônus do artista se houver abatimento nessa liquidação auto-aprovada
+            if (settlement.aiExtractedData) {
+                const metaData = settlement.aiExtractedData as any
+                if (metaData.bonusDeducted > 0) {
+                    await prisma.artist.update({
+                        where: { id: settlement.artistId },
+                        data: { monthlyEarnings: { decrement: metaData.bonusDeducted } }
+                    })
+                    console.log(`[AI] Bônus de R$ ${metaData.bonusDeducted} decrementado com sucesso do saldo do artista ${settlement.artistId}`)
+                }
+            }
+            console.log(`[AI] Settlement ${settlementId} APPROVED autonomamente.`)
         } else {
+            const reason = `Discrepâncias: ${!isStudioRecipient ? `Destinatário não encontrado no comprovante` : ''} ${!isValueMatch ? `Valor R$ ${settlement.totalValue.toFixed(2)} não localizado` : ''} ${ocrConfidence < 0.7 ? `Confiança baixa (${(ocrConfidence * 100).toFixed(0)}%)` : ''}`.trim()
+            
             await prisma.settlement.update({
                 where: { id: settlementId },
                 data: {
                     status: "REVIEW",
                     aiConfidence,
-                    aiFeedback: `Discrepâncias: ${!isStudioRecipient ? `Destinatário "${extractedDestinatario}" ≠ estúdio` : ''} ${!isValueMatch ? `Valor R$ ${extractedValue.toFixed(2)} ≠ R$ ${settlement.totalValue.toFixed(2)}` : ''} ${ocrConfidence < 0.7 ? `OCR baixo (${(ocrConfidence * 100).toFixed(0)}%)` : ''}`.trim()
+                    aiFeedback: reason || "Confiança insuficiente para auto-aprovação"
                 }
             })
-            console.log(`[AI] Settlement ${settlementId} flagged for REVIEW (Studio mismatch).`)
+            console.log(`[AI] Settlement ${settlementId} flagged for REVIEW (Confidence: ${aiConfidence}).`)
         }
 
     } catch (error) {
