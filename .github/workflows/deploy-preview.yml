@@ -1,0 +1,39 @@
+name: 🔬 Preview Deploy — feature branches
+
+on:
+  push:
+    branches:
+      - 'feat/**'
+      - 'feature/**'
+      - 'dev'
+
+jobs:
+  preview:
+    name: Deploy Preview (non-production)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: 🏗️ Pull Vercel Environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./kronos
+
+      - name: 🔨 Build Preview
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./kronos
+
+      - name: 🔬 Deploy Preview
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | tail -1)
+          echo "Preview URL: $url"
+        working-directory: ./kronos

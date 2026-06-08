@@ -1,0 +1,16 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "dev": false,
+      "feat/automation-webhooks": false,
+      "feat/kai-agent-rag": false,
+      "feature/setup-project": false,
+      "feature/testing-mcp-assistant": false
+    }
+  },
+  "github": {
+    "silent": true,
+    "autoJobCancelation": true
+  }
+}
