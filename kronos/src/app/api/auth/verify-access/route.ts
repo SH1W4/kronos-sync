@@ -9,23 +9,47 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ authorized: false, error: 'Não autenticado' }, { status: 401 })
         }
 
-        // 1. Buscar o usuário com suas memberships
         const user = await prisma.user.findUnique({
             where: { clerkId: userId },
-            include: { memberships: true }
+            include: { memberships: { include: { workspace: true } } }
         })
 
-        // 2. Se não existir no banco ou não tiver nenhum workspace associado, retorna não autorizado
-        // NOTA: Não deletamos o usuário aqui — pode ser uma race condition com o webhook do Clerk
         if (!user || user.memberships.length === 0) {
-            console.log(`[AUTH] Acesso negado para usuário ${userId}. Nenhum workspace encontrado.`);
+            console.log(`[AUTH] Acesso negado para usuário ${userId}. Nenhum workspace encontrado.`)
             return NextResponse.json({
                 authorized: false,
                 error: 'Sua conta Google não possui acesso ao KAIRØS. Solicite um convite ao administrador.'
             })
         }
 
-        return NextResponse.json({ authorized: true })
+        const workspace = user.memberships[0]?.workspace
+        const resolvedRole = user.role as string
+        const metadata: any = { role: resolvedRole }
+
+        if (workspace) {
+            metadata.workspace = {
+                id: workspace.id,
+                name: workspace.name,
+                primaryColor: workspace.primaryColor,
+                logoUrl: workspace.logoUrl,
+                capacity: workspace.capacity,
+                googleCalendarId: workspace.googleCalendarId
+            }
+        }
+
+        const client = await clerkClient()
+        const clerkUser = await client.users.getUser(userId)
+        const clerkRole = (clerkUser.publicMetadata as any)?.role
+        const clerkWorkspace = (clerkUser.publicMetadata as any)?.workspace
+
+        if (clerkRole !== resolvedRole || JSON.stringify(clerkWorkspace) !== JSON.stringify(metadata.workspace)) {
+            await client.users.updateUserMetadata(userId, {
+                publicMetadata: metadata
+            })
+            console.log(`[AUTH] Metadata Clerk atualizado para usuário ${userId}: role=${resolvedRole}`)
+        }
+
+        return NextResponse.json({ authorized: true, role: resolvedRole, workspace: metadata.workspace || null })
     } catch (error: any) {
         console.error('[AUTH] Erro na verificação de acesso:', error)
         return NextResponse.json({ authorized: false, error: 'Erro interno na verificação' }, { status: 500 })

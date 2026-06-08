@@ -65,23 +65,32 @@ function SSOCallbackContent() {
                 }
 
                 // Lê role novamente após possível resgate de convite
-                const finalRole = (user?.publicMetadata as any)?.role
+                let finalRole = (user?.publicMetadata as any)?.role
+
+                if (finalRole !== 'ARTIST' && finalRole !== 'ADMIN' && finalRole !== 'CLIENT') {
+                    // Role não está definida no Clerk. Aguarda brevemente e tenta novamente.
+                    await new Promise(resolve => setTimeout(resolve, 2000))
+                    await user?.reload()
+                    finalRole = (user?.publicMetadata as any)?.role
+                }
+
+                if (finalRole !== 'ARTIST' && finalRole !== 'ADMIN') {
+                    const verifyRes = await fetch('/api/auth/verify-access')
+                    if (verifyRes.ok) {
+                        const data = await verifyRes.json()
+                        if (data.role === 'ARTIST' || data.role === 'ADMIN') {
+                            finalRole = data.role
+                            await user?.reload()
+                        }
+                    }
+                }
 
                 if (finalRole === 'ARTIST' || finalRole === 'ADMIN') {
                     router.push('/artist/dashboard')
                 } else if (finalRole === 'CLIENT') {
                     router.push('/kiosk')
                 } else {
-                    // Role ainda não definido — aguarda webhook do Prisma
-                    // Tenta mais uma vez após 2s antes de mandar pro onboarding
-                    await new Promise(resolve => setTimeout(resolve, 2000))
-                    await user?.reload()
-                    const retryRole = (user?.publicMetadata as any)?.role
-                    if (retryRole === 'ARTIST' || retryRole === 'ADMIN') {
-                        router.push('/artist/dashboard')
-                    } else {
-                        router.push('/onboarding')
-                    }
+                    router.push('/onboarding')
                 }
             } catch (err) {
                 console.error('SSO Finalize Error:', err)
