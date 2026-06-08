@@ -102,7 +102,7 @@ export default function MeusGanhosPage() {
                                             {booking.type}
                                         </span>
                                         <span className="text-[9px] font-mono text-gray-500">
-                                            {new Date(booking.startTime).toLocaleDateString('pt-BR')}
+                                            {new Date(booking.scheduledFor).toLocaleDateString('pt-BR')}
                                         </span>
                                     </div>
                                 </div>

@@ -164,7 +164,7 @@ export async function getArtistEarnings(month?: number, year?: number) {
         const bookings = await prisma.booking.findMany({
             where: {
                 artistId: artistId,
-                startTime: {
+                scheduledFor: {
                     gte: startDate,
                     lte: endDate
                 },
@@ -175,7 +175,7 @@ export async function getArtistEarnings(month?: number, year?: number) {
             include: {
                 client: true
             },
-            orderBy: { startTime: 'desc' }
+            orderBy: { scheduledFor: 'desc' }
         })
 
         return { success: true, bookings }
