@@ -90,9 +90,9 @@ export async function queryAgent(userQuery: string, history: any[]) {
         if (isAdmin) {
             const aggregations = await prisma.booking.aggregate({
                 where: { workspaceId: activeWorkspaceId, status: 'COMPLETED' },
-                _sum: { price: true }
+                _sum: { value: true }
             }) as any
-            const total = aggregations._sum?.price || 0
+            const total = aggregations._sum?.value || 0
             const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total)
             responseText = `Relatório do Estúdio: \nFaturamento bruto total acumulado: ${formatted}. \nAcesse /artist/finance para o detalhamento completo.`
         } else {
