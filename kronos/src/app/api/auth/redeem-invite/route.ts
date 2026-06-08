@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
 
         // 3. Atualizar o role do usuário conforme o convite
         const targetRole = invite.role || 'ARTIST'
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
             where: { id: user.id },
             data: { role: targetRole }
         })
@@ -103,6 +103,23 @@ export async function POST(req: NextRequest) {
                 })
             }
         }
+
+        // 5. Atualizar metadata do Clerk imediatamente para liberar o login do artista
+        await clerkClient.users.updateUserMetadata(userId, {
+            publicMetadata: {
+                role: targetRole,
+                workspace: invite.workspace
+                    ? {
+                        id: invite.workspace.id,
+                        name: invite.workspace.name,
+                        primaryColor: invite.workspace.primaryColor,
+                        logoUrl: invite.workspace.logoUrl,
+                        capacity: invite.workspace.capacity,
+                        googleCalendarId: invite.workspace.googleCalendarId
+                    }
+                    : null
+            }
+        })
 
         // 6. Incrementar uso do convite
         await prisma.inviteCode.update({
