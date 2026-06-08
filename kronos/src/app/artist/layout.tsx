@@ -57,8 +57,16 @@ export default function ArtistLayout({ children }: { children: React.ReactNode }
                     <nav className="space-y-2">
                         <NavItem href="/artist/dashboard" icon={<LayoutDashboard size={20} />} label="VISÃO GERAL" active={pathname === '/artist/dashboard'} />
                         <NavItem href="/artist/profile" icon={<UserIcon size={20} />} label="MEU PERFIL" active={pathname === '/artist/profile'} />
-                        <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
-                        <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
+                        {user?.publicMetadata?.role === 'ADMIN' ? (
+                            // Admin: só vê Agenda do Estúdio (é a visão deles)
+                            <NavItem href="/artist/studio-agenda" icon={<Calendar size={20} />} label="AGENDA DO ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
+                        ) : (
+                            // Artista: vê sua agenda + pode ver a do estúdio
+                            <>
+                                <NavItem href="/artist/agenda" icon={<Calendar size={20} />} label="MINHA AGENDA" active={pathname === '/artist/agenda'} />
+                                <NavItem href="/artist/studio-agenda" icon={<Users size={20} />} label="AGENDA ESTÚDIO" active={pathname === '/artist/studio-agenda'} />
+                            </>
+                        )}
                         {user?.publicMetadata?.role === 'ADMIN' ? (
                             <NavItem href="/artist/finance" icon={<DollarSign size={20} />} label="FINANCEIRO" active={pathname === '/artist/finance'} />
                         ) : (
