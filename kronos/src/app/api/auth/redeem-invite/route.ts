@@ -105,7 +105,8 @@ export async function POST(req: NextRequest) {
         }
 
         // 5. Atualizar metadata do Clerk imediatamente para liberar o login do artista
-        await clerkClient.users.updateUserMetadata(userId, {
+        const clerkApi = await clerkClient()
+        await clerkApi.users.updateUserMetadata(userId, {
             publicMetadata: {
                 role: targetRole,
                 workspace: invite.workspace
