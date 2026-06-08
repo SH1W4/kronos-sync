@@ -1,3 +1,10 @@
+---
+title: "Manual do Artista"
+docsync:
+  audience: artist
+  priority: 1
+---
+
 # KRONØS SYNC: MANUAL DO ARTISTA ✒️
 **"Controle absoluto para estúdios profissionais."**
 

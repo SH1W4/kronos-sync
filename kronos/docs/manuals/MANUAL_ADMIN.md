@@ -1,3 +1,10 @@
+---
+title: "Manual do Administrador"
+docsync:
+  audience: admin
+  priority: 1
+---
+
 # KRONØS SYNC: MANUAL DO ADMINISTRADOR 🏛️
 **"Controle absoluto para estúdios profissionais."**
 

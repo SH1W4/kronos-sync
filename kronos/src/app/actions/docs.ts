@@ -7,7 +7,7 @@ import matter from 'gray-matter'
 const DOCS_DIR = path.join(process.cwd(), 'docs')
 
 export async function getDocumentation(role: string = 'ARTIST', email: string | null = null) {
-    const categories = ['training', 'governance', 'templates', 'dev']
+    const categories = ['training', 'governance', 'templates', 'manuals', 'dev']
     const allDocs: any[] = []
 
     // O e-mail mestre para acesso root/dev

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { getDocumentation } from '@/app/actions/docs'
 import ReactMarkdown from 'react-markdown'
-import { Book, Shield, FileText, ChevronRight, Terminal, Search, Zap, Cpu } from 'lucide-react'
+import { Book, BookOpen, Shield, FileText, ChevronRight, Terminal, Search, Zap, Cpu } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 
 export default function CodexPage() {
@@ -39,7 +39,8 @@ export default function CodexPage() {
     const categories = {
         training: { icon: <Book size={16} />, label: 'TREINAMENTO' },
         governance: { icon: <Shield size={16} />, label: 'GOVERNANÇA' },
-        templates: { icon: <FileText size={16} />, label: 'TEMPLATES' }
+        templates: { icon: <FileText size={16} />, label: 'TEMPLATES' },
+        manuals: { icon: <BookOpen size={16} />, label: 'MANUAIS' }
     }
 
     if (loading) {
