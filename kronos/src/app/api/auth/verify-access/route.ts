@@ -50,6 +50,13 @@ export async function GET(req: NextRequest) {
         const workspace = membership?.workspace
         // Usar o papel da membership do workspace, não o papel global do usuário
         const resolvedRole = membership?.role || user.role
+        
+        console.log(`[AUTH] User ${userId} (${user.email}):`)
+        console.log(`  - Global role: ${user.role}`)
+        console.log(`  - Memberships: ${user.memberships.length}`)
+        console.log(`  - First membership role: ${membership?.role}`)
+        console.log(`  - Resolved role: ${resolvedRole}`)
+        
         const metadata: any = { role: resolvedRole }
 
         if (workspace) {
