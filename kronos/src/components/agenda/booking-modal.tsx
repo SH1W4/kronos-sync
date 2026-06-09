@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { calculateBookingSplit } from '@/lib/business-rules'
 import { formatCurrency } from '@/lib/utils'
 
 interface Slot {
@@ -125,11 +126,7 @@ const BookingModal: React.FC<BookingModalProps> = ({
     const artist = artists.find(a => a.id === selectedArtist)
     if (!artist) return { finalValue: 0, artistShare: 0, studioShare: 0 }
 
-    const finalValue = value - couponDiscount
-    const artistShare = finalValue * (1 - artist.commissionRate)
-    const studioShare = finalValue * artist.commissionRate
-
-    return { finalValue, artistShare, studioShare }
+    return calculateBookingSplit(value, couponDiscount, artist.commissionRate)
   }
 
   const [isSuccess, setIsSuccess] = useState(false)

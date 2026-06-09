@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, getGoogleCalendarClient } from "@/lib/google"
 import { bookingSchema } from "@/lib/validations"
 import { sendBookingConfirmation } from "@/lib/notifications"
+import { calculateBookingSplit, calculateCommission } from "@/lib/business-rules"
 
 /**
  * Create a new booking
@@ -136,6 +137,13 @@ export async function createBooking(data: {
             }
         })
 
+        const commissionRate = calculateCommission(user.artist.plan, user.artist.monthlyEarnings || 0)
+        const { finalValue, artistShare, studioShare } = calculateBookingSplit(
+            data.estimatedPrice,
+            0,
+            commissionRate
+        )
+
         // Create booking
         const booking = await prisma.booking.create({
             data: {
@@ -144,9 +152,10 @@ export async function createBooking(data: {
                 workspaceId,
                 slotId: slot.id,
                 value: data.estimatedPrice,
-                finalValue: data.estimatedPrice,
-                studioShare: data.estimatedPrice * user.artist.commissionRate,
-                artistShare: data.estimatedPrice * (1 - user.artist.commissionRate),
+                discountValue: 0,
+                finalValue,
+                studioShare,
+                artistShare,
                 status: data.status || 'OPEN',
                 type: data.type,
                 scheduledFor: data.scheduledFor,

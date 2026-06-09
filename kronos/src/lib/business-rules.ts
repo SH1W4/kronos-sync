@@ -23,14 +23,18 @@ export function calculateCommission(
   return BUSINESS_RULES.RESIDENT_INITIAL_COMMISSION_RATE
 }
 
+export function roundMoney(value: number) {
+  return Math.round(value * 100) / 100
+}
+
 export function calculateBookingSplit(
   value: number,
   discountValue: number,
   commissionRate: number
 ) {
-  const finalValue = value - discountValue
-  const artistShare = finalValue * (1 - commissionRate)
-  const studioShare = finalValue * commissionRate
+  const finalValue = roundMoney(Math.max(0, value - discountValue))
+  const artistShare = roundMoney(finalValue * (1 - commissionRate))
+  const studioShare = roundMoney(finalValue - artistShare)
 
   return {
     finalValue,

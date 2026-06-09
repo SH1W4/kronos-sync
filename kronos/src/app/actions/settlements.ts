@@ -20,6 +20,61 @@ export async function createSettlement(data: {
             return { success: false, message: 'Não autorizado' }
         }
 
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user) {
+            return { success: false, message: 'Usuário não encontrado.' }
+        }
+
+        if (user.role !== 'ADMIN' && user.artist?.id !== data.artistId) {
+            return { success: false, message: 'Você só pode criar liquidações para seu próprio perfil.' }
+        }
+
+        if (user.role !== 'ADMIN' && user.artist?.workspaceId && user.artist.workspaceId !== data.workspaceId) {
+            return { success: false, message: 'Workspace inválido para este artista.' }
+        }
+
+        if (data.bookingIds.length === 0 && (data.orderIds || []).length === 0) {
+            return { success: false, message: 'Selecione ao menos um item para liquidar.' }
+        }
+
+        const validBookings = await prisma.booking.findMany({
+            where: {
+                id: { in: data.bookingIds },
+                artistId: data.artistId,
+                settlementId: null
+            }
+        })
+
+        if (validBookings.length !== data.bookingIds.length) {
+            return { success: false, message: 'Alguns agendamentos não podem ser liquidados.' }
+        }
+
+        let validOrders: any[] = []
+        if (data.orderIds?.length) {
+            validOrders = await prisma.order.findMany({
+                where: {
+                    id: { in: data.orderIds },
+                    settlementId: null,
+                    status: 'PAID',
+                    items: {
+                        every: {
+                            product: {
+                                artistId: data.artistId
+                            }
+                        }
+                    }
+                }
+            })
+
+            if (validOrders.length !== data.orderIds.length) {
+                return { success: false, message: 'Alguns pedidos não podem ser liquidados.' }
+            }
+        }
+
         const settlement = await prisma.settlement.create({
             data: {
                 artistId: data.artistId,
@@ -166,6 +221,24 @@ async function validateSettlementWithAI(settlementId: string) {
 
 export async function getArtistPendingRevenue(artistId: string) {
     try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado', bookings: [], orders: [], availableBonus: 0 }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user) {
+            return { error: 'Usuário não encontrado', bookings: [], orders: [], availableBonus: 0 }
+        }
+
+        if (user.role !== 'ADMIN' && user.artist?.id !== artistId) {
+            return { error: 'Não autorizado', bookings: [], orders: [], availableBonus: 0 }
+        }
+
         const bookings = await prisma.booking.findMany({
             where: {
                 artistId,

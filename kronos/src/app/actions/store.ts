@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { BUSINESS_RULES, calculateProductPrice } from "@/lib/business-rules"
+import { BUSINESS_RULES, calculateProductPrice, roundMoney } from "@/lib/business-rules"
 
 export async function getProducts(typeFilter?: string) {
     try {
@@ -205,7 +205,7 @@ export async function createOrder(data: {
         })
 
         // Studio takes the markup. If there's a discount, it's subtracted from the studio's share for now.
-        const studioShare = data.finalTotal - artistShare
+        const studioShare = roundMoney(data.finalTotal - artistShare)
 
         const order = await prisma.$transaction(async (tx) => {
             const newOrder = await (tx.order as any).create({
