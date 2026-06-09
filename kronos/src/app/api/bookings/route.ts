@@ -5,7 +5,7 @@ import { calculateCommission, calculateBookingSplit, BUSINESS_RULES } from '@/li
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = auth()
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
     if (artistId) where.artistId = artistId
     if (status) where.status = status
 
-    const { userId } = auth()
+    const { userId } = await auth()
     if (!userId) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
