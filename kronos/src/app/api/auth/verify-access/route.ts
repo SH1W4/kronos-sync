@@ -9,10 +9,34 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ authorized: false, error: 'Não autenticado' }, { status: 401 })
         }
 
-        const user = await prisma.user.findUnique({
+        const client = await clerkClient()
+        const clerkUser = await client.users.getUser(userId)
+
+        let user = await prisma.user.findUnique({
             where: { clerkId: userId },
             include: { memberships: { include: { workspace: true } } }
         })
+
+        if (!user) {
+            const email = (clerkUser.emailAddresses[0]?.emailAddress || '').toLowerCase()
+            if (email) {
+                const emailUser = await prisma.user.findUnique({
+                    where: { email }
+                })
+
+                if (emailUser) {
+                    await prisma.user.update({
+                        where: { id: emailUser.id },
+                        data: { clerkId: userId }
+                    })
+
+                    user = await prisma.user.findUnique({
+                        where: { id: emailUser.id },
+                        include: { memberships: { include: { workspace: true } } }
+                    })
+                }
+            }
+        }
 
         if (!user || user.memberships.length === 0) {
             console.log(`[AUTH] Acesso negado para usuário ${userId}. Nenhum workspace encontrado.`)
@@ -37,8 +61,6 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        const client = await clerkClient()
-        const clerkUser = await client.users.getUser(userId)
         const clerkRole = (clerkUser.publicMetadata as any)?.role
         const clerkWorkspace = (clerkUser.publicMetadata as any)?.workspace
 

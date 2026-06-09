@@ -39,14 +39,6 @@ function SSOCallbackContent() {
                 await user?.reload()
 
                 const role = (user?.publicMetadata as any)?.role
-
-                // Artistas/Admins com conta existente → sem invite
-                if ((role === 'ARTIST' || role === 'ADMIN') && !inviteCode) {
-                    router.push('/artist/dashboard')
-                    return
-                }
-
-                // Novo artista com convite (ou artista existente com novo convite)
                 const codeToRedeem = inviteCode || sessionStorage.getItem('pendingInviteCode')
 
                 if (codeToRedeem) {
@@ -64,25 +56,19 @@ function SSOCallbackContent() {
                     }
                 }
 
-                // Lê role novamente após possível resgate de convite
+                // Reconcile Clerk metadata with DB for any authorized email.
                 let finalRole = (user?.publicMetadata as any)?.role
-
-                if (finalRole !== 'ARTIST' && finalRole !== 'ADMIN' && finalRole !== 'CLIENT') {
-                    // Role não está definida no Clerk. Aguarda brevemente e tenta novamente.
-                    await new Promise(resolve => setTimeout(resolve, 2000))
+                const verifyRes = await fetch('/api/auth/verify-access')
+                if (verifyRes.ok) {
+                    const data = await verifyRes.json()
+                    if (data.role) {
+                        finalRole = data.role
+                    }
+                    await user?.reload()
+                } else {
+                    // If access verification fails, we still keep the current role if present
                     await user?.reload()
                     finalRole = (user?.publicMetadata as any)?.role
-                }
-
-                if (finalRole !== 'ARTIST' && finalRole !== 'ADMIN') {
-                    const verifyRes = await fetch('/api/auth/verify-access')
-                    if (verifyRes.ok) {
-                        const data = await verifyRes.json()
-                        if (data.role === 'ARTIST' || data.role === 'ADMIN') {
-                            finalRole = data.role
-                            await user?.reload()
-                        }
-                    }
                 }
 
                 if (finalRole === 'ARTIST' || finalRole === 'ADMIN') {
