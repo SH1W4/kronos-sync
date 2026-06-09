@@ -182,7 +182,17 @@ export async function POST(req: NextRequest) {
         const client = await clerkClient()
         await client.users.updateUserMetadata(clerkUserId, {
             publicMetadata: {
-                role: invite?.role || 'ADMIN' // Se for Master Key, role é ADMIN
+                role: invite?.role || 'ADMIN',
+                workspace: invite.workspace
+                    ? {
+                        id: invite.workspace.id,
+                        name: invite.workspace.name,
+                        primaryColor: invite.workspace.primaryColor,
+                        logoUrl: invite.workspace.logoUrl,
+                        capacity: invite.workspace.capacity,
+                        googleCalendarId: invite.workspace.googleCalendarId
+                    }
+                    : null
             }
         })
 
