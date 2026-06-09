@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { getDocumentation } from '@/app/actions/docs'
 import ReactMarkdown from 'react-markdown'
 import { Book, BookOpen, Shield, FileText, ChevronRight, Terminal, Search, Zap, Cpu } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
@@ -12,22 +11,34 @@ export default function CodexPage() {
     const [selectedDoc, setSelectedDoc] = useState<any>(null)
     const [searchQuery, setSearchQuery] = useState('')
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         const fetchDocs = async () => {
-            const userRole = (user?.publicMetadata as any)?.role || 'ARTIST'
-            const userEmail = user?.primaryEmailAddress?.emailAddress || null
-            const data = await getDocumentation(userRole, userEmail)
-            setDocs(data)
-            if (data.length > 0) {
-                setSelectedDoc(data[0])
+            try {
+                const userRole = (user?.publicMetadata as any)?.role || 'ARTIST'
+                const userEmail = user?.primaryEmailAddress?.emailAddress || ''
+                const params = new URLSearchParams({ role: userRole, email: userEmail })
+                const response = await fetch(`/api/docs?${params.toString()}`)
+                if (!response.ok) {
+                    throw new Error(`Falha ao carregar CODEX (${response.status})`)
+                }
+                const data = await response.json()
+                setDocs(data)
+                if (data.length > 0) {
+                    setSelectedDoc(data[0])
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Erro desconhecido ao carregar CODEX')
+            } finally {
+                setLoading(false)
             }
-            setLoading(false)
         }
+
         if (isLoaded && user) {
             fetchDocs()
         } else if (isLoaded && !user) {
-            setLoading(false) // Not authenticated
+            setLoading(false)
         }
     }, [user, isLoaded])
 
@@ -40,7 +51,8 @@ export default function CodexPage() {
         training: { icon: <Book size={16} />, label: 'TREINAMENTO' },
         governance: { icon: <Shield size={16} />, label: 'GOVERNANÇA' },
         templates: { icon: <FileText size={16} />, label: 'TEMPLATES' },
-        manuals: { icon: <BookOpen size={16} />, label: 'MANUAIS' }
+        manuals: { icon: <BookOpen size={16} />, label: 'MANUAIS' },
+        dev: { icon: <Terminal size={16} />, label: 'DESENVOLVIMENTO' }
     }
 
     if (loading) {
@@ -51,6 +63,18 @@ export default function CodexPage() {
                     <span className="font-mono text-[10px] text-primary animate-pulse uppercase tracking-[0.3em]">
                         Carregando Manuais...
                     </span>
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="p-8 flex items-center justify-center min-h-[60vh]">
+                <div className="space-y-4 text-center text-gray-400">
+                    <Shield className="mx-auto text-primary" size={40} />
+                    <p className="text-sm font-mono uppercase tracking-[0.3em] text-primary">Erro ao carregar CODEX</p>
+                    <p className="text-[10px] max-w-md mx-auto">{error}</p>
                 </div>
             </div>
         )
@@ -139,7 +163,12 @@ export default function CodexPage() {
                     </div>
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
-                    {selectedDoc ? (
+                    {docs.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full gap-4 text-gray-500 font-mono text-[10px] uppercase p-10 text-center">
+                            <FileText size={40} className="text-gray-800" />
+                            <span>Não há documentos disponíveis no CODEX para este usuário.</span>
+                        </div>
+                    ) : selectedDoc ? (
                         <div className="p-8 md:p-12 overflow-y-auto max-h-[80vh] custom-scrollbar">
                             {/* Metadata Badge */}
                             {selectedDoc.metadata?.priority && (
