@@ -58,15 +58,20 @@ function SSOCallbackContent() {
 
                 // Reconcile Clerk metadata with DB for any authorized email.
                 let finalRole = (user?.publicMetadata as any)?.role
+                console.log('[SSO] Before verify-access, finalRole:', finalRole)
+                
                 const verifyRes = await fetch('/api/auth/verify-access')
                 if (verifyRes.ok) {
                     const data = await verifyRes.json()
+                    console.log('[SSO] verify-access response:', data)
                     if (data.role) {
                         finalRole = data.role
                     }
                     await user?.reload()
+                    console.log('[SSO] After reload, finalRole:', finalRole, 'publicMetadata:', (user?.publicMetadata as any)?.role)
                 } else {
                     // If access verification fails, we still keep the current role if present
+                    console.log('[SSO] verify-access failed:', await verifyRes.text())
                     await user?.reload()
                     finalRole = (user?.publicMetadata as any)?.role
                 }

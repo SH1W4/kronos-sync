@@ -80,13 +80,16 @@ export async function POST(req: NextRequest) {
             })
 
             if (!existingMembership) {
-                await prisma.workspaceMember.create({
+                const newMembership = await prisma.workspaceMember.create({
                     data: {
                         userId: user.id,
                         workspaceId: invite.workspaceId,
                         role: targetRole
                     }
                 })
+                console.log(`[redeem-invite] Created membership: user=${user.id}, workspace=${invite.workspaceId}, role=${targetRole}`)
+            } else {
+                console.log(`[redeem-invite] Membership already exists: user=${user.id}, workspace=${invite.workspaceId}, role=${existingMembership.role}`)
             }
 
             // 5. Criar perfil de artista se ainda não existir
