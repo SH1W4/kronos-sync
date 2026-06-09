@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Clock, User, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { updateBookingStatus } from '@/app/actions/bookings'
+import { deleteBooking, updateBookingStatus } from '@/app/actions/bookings'
 
 interface BookingCardProps {
     booking: any
@@ -43,6 +43,17 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
             onStatusChange()
         } else {
             alert(result.error || 'Erro ao atualizar status')
+        }
+    }
+
+    const handleDeleteBooking = async () => {
+        if (!confirm('Deseja realmente excluir este agendamento pendente?')) return
+
+        const result = await deleteBooking(booking.id)
+        if (result.success) {
+            onStatusChange()
+        } else {
+            alert(result.error || 'Erro ao excluir agendamento')
         }
     }
 
@@ -154,6 +165,16 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                             className="flex-1 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/20 h-8"
                         >
                             Concluir
+                        </Button>
+                    )}
+                    {booking.status === 'OPEN' && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleDeleteBooking}
+                            className="flex-1 text-xs h-8 text-red-400 border-red-500/20 hover:text-red-300 hover:bg-red-500/10"
+                        >
+                            Excluir
                         </Button>
                     )}
                     <Button
