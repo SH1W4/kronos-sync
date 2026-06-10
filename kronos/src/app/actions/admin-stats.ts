@@ -33,6 +33,10 @@ export async function getAdminDashboardStats() {
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
+    const endOfMonth = new Date(startOfMonth)
+    endOfMonth.setMonth(endOfMonth.getMonth() + 1)
+    endOfMonth.setMilliseconds(-1)
+
     const startOfLastMonth = new Date(startOfMonth)
     startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1)
 
@@ -60,7 +64,7 @@ export async function getAdminDashboardStats() {
             where: {
                 workspaceId,
                 status: { in: ['CONFIRMED', 'COMPLETED'] },
-                scheduledFor: { gte: startOfMonth, lte: now }
+                scheduledFor: { gte: startOfMonth, lte: endOfMonth }
             },
             select: {
                 value: true,
@@ -98,7 +102,7 @@ export async function getAdminDashboardStats() {
                 bookings: {
                     where: {
                         status: { in: ['CONFIRMED', 'COMPLETED'] },
-                        scheduledFor: { gte: startOfMonth }
+                        scheduledFor: { gte: startOfMonth, lte: endOfMonth }
                     },
                     select: { value: true, artistShare: true, studioShare: true }
                 }

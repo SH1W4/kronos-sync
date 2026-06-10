@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { ArrowRight, Loader2, Key } from 'lucide-react'
-import { useUser, useAuth } from '@clerk/nextjs'
+import { useUser, useAuth, useClerk } from '@clerk/nextjs'
 
 export const dynamic = 'force-dynamic'
 
 function OnboardingContent() {
     const { user, isLoaded, isSignedIn } = useUser()
     const { userId } = useAuth()
+    const { signOut } = useClerk()
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -203,6 +204,26 @@ function OnboardingContent() {
                                 </div>
                             </form>
                         </div>
+                    </div>
+                )}
+                {isSignedIn && user && (
+                    <div className="mt-8 pt-6 border-t border-white/5 text-center">
+                        <p className="text-neutral-500 text-[10px] font-mono mb-2 uppercase tracking-widest">
+                            Conectado como {user.primaryEmailAddress?.emailAddress}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={async () => {
+                                setLoading(true)
+                                await signOut()
+                                setLoading(false)
+                                window.location.reload()
+                            }}
+                            disabled={loading}
+                            className="text-red-500 hover:text-red-400 font-mono text-[10px] uppercase underline tracking-wider cursor-pointer"
+                        >
+                            Sair da conta / Entrar com outra conta
+                        </button>
                     </div>
                 )}
             </div>

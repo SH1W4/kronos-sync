@@ -69,6 +69,42 @@ export async function createBooking(data: {
         const start = data.scheduledFor
         const end = new Date(start.getTime() + data.duration * 60000)
 
+        // Verificar conflitos de horário para o mesmo ARTISTA (evitar agendamento duplicado por profissional)
+        const windowStart = new Date(start.getTime() - 12 * 60 * 60000)
+        const windowEnd = new Date(start.getTime() + 12 * 60 * 60000)
+
+        const artistBookings = await prisma.booking.findMany({
+            where: {
+                artistId: user.artist.id,
+                status: { in: ['OPEN', 'CONFIRMED', 'COMPLETED'] },
+                scheduledFor: {
+                    gte: windowStart,
+                    lte: windowEnd
+                }
+            },
+            select: {
+                id: true,
+                scheduledFor: true,
+                duration: true,
+                client: {
+                    select: { name: true }
+                }
+            }
+        })
+
+        for (const b of artistBookings) {
+            const bStart = b.scheduledFor
+            const bEnd = new Date(bStart.getTime() + b.duration * 60000)
+            
+            if (start < bEnd && end > bStart) {
+                const startStr = bStart.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
+                const endStr = bEnd.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
+                return { 
+                    error: `Você já possui um agendamento com ${b.client?.name || 'outro cliente'} neste horário (${startStr} até ${endStr}).`
+                }
+            }
+        }
+
         // 0. Disponibilidade verificada APENAS contra slots internos do banco.
         // Eventos pessoais do Google Calendar do artista NÃO bloqueiam a agenda do estúdio.
         // A agenda compartilhada do estúdio recebe espelhos — não é consultada para disponibilidade.
@@ -815,4 +851,128 @@ export async function getStudioAgendaBookings(data: {
         return { error: 'Erro ao buscar agenda do estúdio' }
     }
 }
+
+/**
+ * Revert a completed booking back to CONFIRMED
+ * Only allowed within a 24-hour window, and if it's not part of any settlement.
+ */
+export async function revertBookingCompletion(bookingId: string) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user?.artist) {
+            return { error: 'Não autorizado' }
+        }
+
+        // Verify ownership
+        const booking = await prisma.booking.findUnique({
+            where: { id: bookingId }
+        })
+
+        if (!booking) {
+            return { error: 'Agendamento não encontrado' }
+        }
+
+        if (booking.artistId !== user.artist.id && user.role !== 'ADMIN') {
+            return { error: 'Você não tem permissão para alterar este agendamento' }
+        }
+
+        if (booking.status !== 'COMPLETED') {
+            return { error: 'Apenas agendamentos concluídos podem ser revertidos' }
+        }
+
+        if (booking.settlementId) {
+            return { error: 'Este agendamento já está vinculado a um acerto financeiro e não pode ser revertido' }
+        }
+
+        // Check 24 hour window
+        const timeSinceUpdate = new Date().getTime() - new Date(booking.updatedAt).getTime()
+        const twentyFourHours = 24 * 60 * 60 * 1000
+        if (timeSinceUpdate > twentyFourHours) {
+            return { error: 'O prazo de 24 horas para reverter a conclusão expirou' }
+        }
+
+        // Revert status to CONFIRMED
+        const updatedBooking = await prisma.booking.update({
+            where: { id: bookingId },
+            data: { status: 'CONFIRMED' },
+            include: {
+                client: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        phone: true
+                    }
+                }
+            }
+        })
+
+        // Atualizar evento no Google Calendar se necessário
+        if (updatedBooking.syncedToGoogle && updatedBooking.googleEventId) {
+            try {
+                const workspace = booking.workspaceId ? await prisma.workspace.findUnique({
+                    where: { id: booking.workspaceId as string },
+                    select: { ownerId: true, googleCalendarId: true }
+                }) : null
+
+                const statusLabel = 'Confirmado 🟢'
+
+                await updateCalendarEvent(user.id, updatedBooking.googleEventId, {
+                    summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
+                    description: [
+                        `🎫 KRONØS OS`,
+                        ``,
+                        `👨‍🎨 Artista: ${user.name}`,
+                        `👤 Cliente: ${updatedBooking.client.name}`,
+                        `📝 Tipo: ${(updatedBooking as any).type || ''}`,
+                        `💬 Obs: ${(updatedBooking as any).notes || 'Nenhuma'}`,
+                        `ℹ️ Status: ${statusLabel}`,
+                        ``,
+                        `*Atualizado automaticamente pelo KRONØS.*`
+                    ].join('\n')
+                })
+
+                if (workspace?.googleCalendarId) {
+                    await updateCalendarEvent(
+                        workspace.ownerId,
+                        updatedBooking.googleEventId,
+                        {
+                            summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
+                            description: [
+                                `🎫 KRONØS OS`,
+                                ``,
+                                `👨‍🎨 Artista: ${user.name}`,
+                                `👤 Cliente: ${updatedBooking.client.name}`,
+                                `📝 Tipo: ${(updatedBooking as any).type || ''}`,
+                                `ℹ️ Status: ${statusLabel}`,
+                                ``,
+                                `*Atualizado automaticamente pelo KRONØS.*`
+                            ].join('\n')
+                        },
+                        workspace.googleCalendarId
+                    ).catch(e => console.warn('⚠️ Não foi possível atualizar agenda compartilhada:', e))
+                }
+            } catch (syncError) {
+                console.warn('⚠️ Falha ao atualizar evento no Google:', syncError)
+            }
+        }
+
+        revalidatePath('/artist/agenda')
+        return { success: true, booking: updatedBooking }
+
+    } catch (error) {
+        console.error('Error reverting booking completion:', error)
+        return { error: 'Erro ao reverter conclusão do agendamento' }
+    }
+}
+
 

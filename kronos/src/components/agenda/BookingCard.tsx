@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Clock, User, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { deleteBooking, updateBookingStatus } from '@/app/actions/bookings'
+import { deleteBooking, updateBookingStatus, revertBookingCompletion } from '@/app/actions/bookings'
 
 interface BookingCardProps {
     booking: any
@@ -184,6 +184,34 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                         className="flex-1 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 h-8"
                     >
                         Cancelar
+                    </Button>
+                </div>
+            )}
+
+            {booking.status === 'COMPLETED' && 
+             booking.updatedAt && 
+             (new Date().getTime() - new Date(booking.updatedAt).getTime() < 24 * 60 * 60 * 1000) &&
+             !booking.settlementId && (
+                <div
+                    className="flex gap-2 pt-3 border-t border-white/5 mt-1"
+                    onClick={e => e.stopPropagation()}
+                >
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                            if (confirm('Deseja reverter a conclusão desta sessão para "Confirmado"?')) {
+                                const result = await revertBookingCompletion(booking.id)
+                                if (result.success) {
+                                    onStatusChange()
+                                } else {
+                                    alert(result.error || 'Erro ao reverter conclusão')
+                                }
+                            }
+                        }}
+                        className="flex-1 text-xs bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 border-yellow-500/20 h-8"
+                    >
+                        Reverter Conclusão
                     </Button>
                 </div>
             )}

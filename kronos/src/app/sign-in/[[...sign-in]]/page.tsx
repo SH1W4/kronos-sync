@@ -1,14 +1,17 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSignIn } from '@clerk/nextjs'
+import { useSignIn, useUser, useClerk } from '@clerk/nextjs'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { Loader2 } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Suspense } from 'react'
 
 function SignInContent() {
     const { isLoaded, signIn } = useSignIn()
+    const { user, isSignedIn } = useUser()
+    const { signOut } = useClerk()
+    const router = useRouter()
     const searchParams = useSearchParams()
     const inviteCode = searchParams.get('invite')
     const urlError = searchParams.get('error')
@@ -16,6 +19,56 @@ function SignInContent() {
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+
+    // Se já estiver logado, exibe botão de Sign Out e de prosseguir
+    if (isSignedIn && user) {
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+                {/* Holographic Cyber Grid Background */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,_transparent_1px),_linear-gradient(90deg,_rgba(255,255,255,0.015)_1px,_transparent_1px)] bg-[size:30px_30px] opacity-20" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,_rgba(0,0,0,0.25)_50%),_linear-gradient(90deg,_rgba(255,0,0,0.06),_rgba(0,255,0,0.02),_rgba(0,0,255,0.06))] bg-[size:100%_4px,_6px_100%] pointer-events-none" />
+                <div className="absolute top-[-10%] left-[-10%] w-[45%] h-[45%] bg-purple-600/10 blur-[130px] rounded-full animate-pulse pointer-events-none" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] bg-emerald-500/10 blur-[130px] rounded-full animate-pulse pointer-events-none" />
+
+                <div className="relative z-10 w-full max-w-md">
+                    <div className="bg-zinc-950/40 backdrop-blur-xl border border-white/5 p-8 rounded-3xl shadow-2xl space-y-8 relative text-center">
+                        <div className="flex flex-col items-center space-y-4">
+                            <BrandLogo size={55} className="mb-2" />
+                            <h2 className="text-2xl font-orbitron font-bold text-white tracking-widest uppercase">
+                                JÁ AUTENTICADO
+                            </h2>
+                            <p className="text-zinc-400 text-[11px] font-mono leading-relaxed tracking-wider uppercase">
+                                Você está conectado como:
+                            </p>
+                            <p className="text-primary font-mono text-sm font-bold bg-white/5 px-4 py-2 rounded-xl border border-white/10">
+                                {user.primaryEmailAddress?.emailAddress}
+                            </p>
+                        </div>
+
+                        <div className="space-y-4 pt-4">
+                            <button
+                                onClick={() => router.push(inviteCode ? `/sso-callback?invite=${inviteCode}` : callbackUrl)}
+                                className="w-full bg-white text-black hover:bg-zinc-200 py-4 px-6 rounded-2xl transition-all duration-300 font-orbitron text-xs tracking-widest uppercase italic font-black active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                            >
+                                IR PARA O PAINEL
+                            </button>
+                            <button
+                                onClick={async () => {
+                                    setLoading(true);
+                                    await signOut();
+                                    setLoading(false);
+                                }}
+                                disabled={loading}
+                                className="w-full border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 py-4 px-6 rounded-2xl transition-all duration-300 font-orbitron text-xs tracking-widest uppercase active:scale-[0.98]"
+                            >
+                                {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto text-red-400" /> : "SAIR E USAR OUTRA CONTA"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     // Ler erros passados via parâmetro de URL (ex: acessos bloqueados)
     useEffect(() => {

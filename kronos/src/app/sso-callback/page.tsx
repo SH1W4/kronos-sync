@@ -60,7 +60,7 @@ function SSOCallbackContent() {
                 let finalRole = (user?.publicMetadata as any)?.role
                 console.log('[SSO] Before verify-access, finalRole:', finalRole)
                 
-                const verifyRes = await fetch('/api/auth/verify-access')
+                const verifyRes = await fetch('/api/auth/verify-access', { cache: 'no-store' })
                 if (verifyRes.ok) {
                     const data = await verifyRes.json()
                     console.log('[SSO] verify-access response:', data)

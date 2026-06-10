@@ -31,7 +31,9 @@ export default clerkMiddleware(async (auth, req) => {
         if (!userId) {
             const signInUrl = new URL('/onboarding', req.url)
             signInUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)
-            return NextResponse.redirect(signInUrl)
+            const response = NextResponse.redirect(signInUrl)
+            response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate')
+            return response
         }
     }
 })
