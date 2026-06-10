@@ -24,6 +24,8 @@ export const viewport: Viewport = {
   userScalable: false, // Impede zoom acidental no app
 }
 
+const appUrl = process.env.NEXTAUTH_URL || 'https://kairos-os-app.vercel.app'
+
 export const metadata: Metadata = {
   title: {
     default: "KAIRØS OS — Sistema de Gestão para Estúdios de Tatuagem",
@@ -44,11 +46,11 @@ export const metadata: Metadata = {
     "tattoo studio management",
   ],
   manifest: "/manifest.json",
-  metadataBase: new URL("https://kairos-os-app.vercel.app"),
+  metadataBase: new URL(appUrl),
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    url: "https://kairos-os-app.vercel.app",
+    url: appUrl,
     siteName: "KAIRØS OS",
     title: "KAIRØS OS — Controle absoluto para estúdios profissionais",
     description: "Agenda, finanças, recepção digital e BI — tudo em uma plataforma feita para estúdios de tatuagem que levam seu negócio a sério.",
