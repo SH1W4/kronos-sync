@@ -3,6 +3,11 @@ import { auth, clerkClient } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
+    // Proteção: Só funciona em desenvolvimento
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+
     try {
         const { userId } = await auth()
         

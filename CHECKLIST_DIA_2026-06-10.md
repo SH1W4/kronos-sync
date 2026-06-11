@@ -12,9 +12,18 @@
 
 ### ✅ AGENDA E BOOKINGS
 - [x] **Reverter Conclusão**: Botão para reverter bookings COMPLETED (até 24h, sem settlement)
+- [x] **Edição de Horário**: Implementada função updateBooking com botão no BookingCard
 - [x] **Proteção de Rotas**: Melhorias em rotas de booking/settlement
 - [x] **Cálculos Financeiros**: Ajustes em artistShare e comissões
 - [x] **Lint Configuration**: Adicionado .eslintrc.json para permitir build sem lint
+
+### ✅ BRANDING
+- [x] **Correção de Nomes**: Plataforma = KAIRØS OS, Estúdio = KRONOS Studio
+- [x] **manifest.json**: Atualizado de KRONOS SYNC para KAIRØS OS
+- [x] **manifest.ts**: Descrição atualizada para Kairøs Tattoo Studio
+- [x] **notifications.ts**: Email atualizado para contato@kairos-os.com.br
+- [x] **validate-invite**: Workspace mantido como Kronos Studio (estúdio específico)
+- [x] **.env.example**: Variáveis atualizadas para KAIROS_TEAM_KEY
 
 ### ✅ GAMIFICAÇÃO
 - [x] **Mapeamento do Problema**: Identificado que XP não estava sendo computado
@@ -57,6 +66,8 @@
 2. **Persistência de sessão**: ✅ Configurada corretamente
 3. **Build falhando**: ✅ Resolvido com configuração de lint
 4. **Cache de autenticação**: ✅ Otimizado com headers
+5. **Edição de horário**: ✅ Implementada função updateBooking com botão no BookingCard
+6. **Inconsistência de nomes**: ✅ Corrigido (Plataforma: KAIRØS OS, Estúdio: KRONOS Studio)
 
 ---
 
@@ -65,9 +76,11 @@
 ### PRONTO PARA ARTISTAS TESTAREM:
 - ✅ Autenticação com persistência
 - ✅ Criação e gestão de bookings
+- ✅ Edição de horário de agendamentos
 - ✅ Conclusão de agendamentos com XP
 - ✅ Reversão de conclusão (24h)
 - ✅ Interface de agenda melhorada
+- ✅ Branding consistente (KAIRØS OS / KRONOS Studio)
 
 ### PRÓXIMOS PASSOS RECOMENDADOS:
 1. **Validação de Gamificação**: Artistas completarem bookings para testar XP
@@ -83,12 +96,15 @@
 2. `9f1286f` - feat(auth): garantir persistência de sessão e melhorias de UX
 3. `f69b433` - ci: allow production build without lint to unblock Vercel deployment
 4. `122eb0a` - feat(gamification): integrar sistema de XP com conclusão de bookings
+5. `93276b6` - fix(branding): corrigir inconsistência de nomes KRONOS → KAIRØS OS
+6. `afb7e05` - fix(branding): manter workspace como Kronos Studio (estúdio específico)
+7. `c25147f` - feat(agenda): implementar edição de horário de bookings
 
 ---
 
 ## 🚀 DEPLOY STATUS
 - **Branch**: main
-- **Commit mais recente**: 122eb0a
+- **Commit mais recente**: c25147f
 - **Vercel**: Deploy automático em andamento
 - **URL Produção**: https://kairos-os-app.vercel.app
 
