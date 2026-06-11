@@ -54,16 +54,16 @@ export async function POST(req: NextRequest) {
         const cleanCode = code.trim()
 
         // 1. MASTER KEY CHECK (Environment Variable)
-        if (process.env.KAIRØS_TEAM_KEY && cleanCode === process.env.KAIRØS_TEAM_KEY) {
+        if (process.env.KAIROS_TEAM_KEY && cleanCode === process.env.KAIROS_TEAM_KEY) {
             // Already checked above as 'user'
 
             // Busca ou Cria o Workspace principal
-            let workspace = await prisma.workspace.findFirst({ where: { slug: 'kronos-studio' } })
+            let workspace = await prisma.workspace.findFirst({ where: { slug: 'kairos-studio' } })
             if (!workspace) {
                 workspace = await prisma.workspace.create({
                     data: {
                         name: 'Kairøs Studio',
-                        slug: 'kronos-studio',
+                        slug: 'kairos-studio',
                         ownerId: user.id,
                         capacity: 3
                     }

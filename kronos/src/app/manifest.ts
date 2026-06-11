@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
     return {
         name: 'Kairøs Studio OS',
         short_name: 'Kairøs',
-        description: 'Sistema Operacional do Kronos Tattoo Studio',
+        description: 'Sistema Operacional do Kairøs Tattoo Studio',
         start_url: '/',
         display: 'standalone',
         background_color: '#050505',
