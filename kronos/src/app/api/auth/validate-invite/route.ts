@@ -58,12 +58,12 @@ export async function POST(req: NextRequest) {
             // Already checked above as 'user'
 
             // Busca ou Cria o Workspace principal
-            let workspace = await prisma.workspace.findFirst({ where: { slug: 'kairos-studio' } })
+            let workspace = await prisma.workspace.findFirst({ where: { slug: 'kronos-studio' } })
             if (!workspace) {
                 workspace = await prisma.workspace.create({
                     data: {
-                        name: 'Kairøs Studio',
-                        slug: 'kairos-studio',
+                        name: 'Kronos Studio',
+                        slug: 'kronos-studio',
                         ownerId: user.id,
                         capacity: 3
                     }
