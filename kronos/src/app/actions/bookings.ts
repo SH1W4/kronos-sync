@@ -648,6 +648,125 @@ export async function updateBookingStatus(data: {
 }
 
 /**
+ * Update booking details (horário, duração, valor, notas)
+ */
+export async function updateBooking(data: {
+    bookingId: string
+    scheduledFor?: Date
+    duration?: number
+    value?: number
+    notes?: string
+}) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user?.artist) {
+            return { error: 'Não autorizado' }
+        }
+
+        // Verify ownership
+        const booking = await prisma.booking.findUnique({
+            where: { id: data.bookingId },
+            include: { slot: true }
+        })
+
+        if (!booking) {
+            return { error: 'Agendamento não encontrado' }
+        }
+
+        if (booking.artistId !== user.artist.id && user.role !== 'ADMIN') {
+            return { error: 'Você não tem permissão para editar este agendamento' }
+        }
+
+        // Não permitir edição de bookings já concluídos ou cancelados
+        if (booking.status === 'COMPLETED' || booking.status === 'CANCELLED') {
+            return { error: 'Não é possível editar agendamentos concluídos ou cancelados' }
+        }
+
+        // Calcular novos valores se necessário
+        let updateData: any = {}
+        
+        if (data.scheduledFor) {
+            updateData.scheduledFor = data.scheduledFor
+        }
+        
+        if (data.duration) {
+            updateData.duration = data.duration
+        }
+        
+        if (data.value !== undefined) {
+            updateData.value = data.value
+        }
+        
+        if (data.notes !== undefined) {
+            updateData.notes = data.notes
+        }
+
+        // Se horário ou duração mudou, atualizar o slot também
+        if (data.scheduledFor || data.duration) {
+            const newStart = data.scheduledFor || booking.scheduledFor
+            const newDuration = data.duration || booking.duration
+            const newEnd = new Date(newStart.getTime() + newDuration * 60000)
+
+            // Atualizar slot
+            await prisma.slot.update({
+                where: { id: booking.slotId },
+                data: {
+                    startTime: newStart,
+                    endTime: newEnd
+                }
+            })
+
+            // Atualizar evento no Google Calendar se estiver sincronizado
+            if (booking.syncedToGoogle && booking.googleEventId) {
+                try {
+                    await updateCalendarEvent(user.id, booking.googleEventId, {
+                        startTime: newStart,
+                        endTime: newEnd
+                    })
+                } catch (syncError) {
+                    console.warn('⚠️ Falha ao atualizar evento no Google:', syncError)
+                }
+            }
+        }
+
+        // Recalcular split se valor mudou
+        if (data.value !== undefined) {
+            const commissionRate = calculateCommission(user.artist.plan, user.artist.monthlyEarnings || 0)
+            const { finalValue, artistShare, studioShare } = calculateBookingSplit(
+                data.value,
+                booking.discountValue || 0,
+                commissionRate
+            )
+            updateData.finalValue = finalValue
+            updateData.artistShare = artistShare
+            updateData.studioShare = studioShare
+        }
+
+        // Atualizar booking
+        const updatedBooking = await prisma.booking.update({
+            where: { id: data.bookingId },
+            data: updateData
+        })
+
+        revalidatePath('/artist/agenda')
+        return { success: true, booking: updatedBooking }
+
+    } catch (error) {
+        console.error('Error updating booking:', error)
+        return { error: 'Erro ao atualizar agendamento' }
+    }
+}
+
+/**
  * Delete booking
  */
 export async function deleteBooking(bookingId: string) {

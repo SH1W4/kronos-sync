@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Clock, User, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { deleteBooking, updateBookingStatus, revertBookingCompletion } from '@/app/actions/bookings'
+import { deleteBooking, updateBookingStatus, revertBookingCompletion, updateBooking } from '@/app/actions/bookings'
 
 interface BookingCardProps {
     booking: any
@@ -188,8 +188,8 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                 </div>
             )}
 
-            {booking.status === 'COMPLETED' && 
-             booking.updatedAt && 
+            {booking.status === 'COMPLETED' &&
+             booking.updatedAt &&
              (new Date().getTime() - new Date(booking.updatedAt).getTime() < 24 * 60 * 60 * 1000) &&
              !booking.settlementId && (
                 <div
@@ -212,6 +212,44 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                         className="flex-1 text-xs bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-400 border-yellow-500/20 h-8"
                     >
                         Reverter Conclusão
+                    </Button>
+                </div>
+            )}
+
+            {booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
+                <div
+                    className="flex gap-2 pt-3 border-t border-white/5 mt-1"
+                    onClick={e => e.stopPropagation()}
+                >
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                            const newTime = prompt('Novo horário (formato: HH:MM, ex: 14:30):', format(booking.scheduledFor, 'HH:mm', { locale: ptBR }))
+                            if (newTime) {
+                                const [hours, minutes] = newTime.split(':').map(Number)
+                                if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+                                    alert('Horário inválido. Use o formato HH:MM (ex: 14:30)')
+                                    return
+                                }
+
+                                const newScheduledFor = new Date(booking.scheduledFor)
+                                newScheduledFor.setHours(hours, minutes, 0, 0)
+
+                                const result = await updateBooking({
+                                    bookingId: booking.id,
+                                    scheduledFor: newScheduledFor
+                                })
+                                if (result.success) {
+                                    onStatusChange()
+                                } else {
+                                    alert(result.error || 'Erro ao atualizar horário')
+                                }
+                            }
+                        }}
+                        className="flex-1 text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/20 h-8"
+                    >
+                        Editar Horário
                     </Button>
                 </div>
             )}
