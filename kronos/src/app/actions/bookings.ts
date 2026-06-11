@@ -7,6 +7,7 @@ import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, getGoogl
 import { bookingSchema } from "@/lib/validations"
 import { sendBookingConfirmation } from "@/lib/notifications"
 import { calculateBookingSplit, calculateCommission } from "@/lib/business-rules"
+import { addXP, unlockAchievement } from "@/lib/gamification"
 
 /**
  * Create a new booking
@@ -600,6 +601,41 @@ export async function updateBookingStatus(data: {
                     }
                 })
             }).catch(e => console.error('Failed to import webhook dispatcher', e))
+        }
+
+        // 5. Gamification: Adicionar XP quando booking for completado
+        if (data.status === 'COMPLETED') {
+            try {
+                // Calcular XP baseado no valor do booking (1 XP por R$ 10)
+                const xpEarned = Math.floor((updatedBooking.finalValue || 0) / 10)
+                
+                if (xpEarned > 0) {
+                    await addXP(user.artist.id, xpEarned, 'TATTOO_SESSION')
+                    console.log(`🎮 Gamification: +${xpEarned} XP adicionados para artista ${user.artist.id}`)
+                }
+
+                // Verificar se é o primeiro booking completado (achievement FIRST_INK)
+                const completedBookingsCount = await prisma.booking.count({
+                    where: {
+                        artistId: user.artist.id,
+                        status: 'COMPLETED'
+                    }
+                })
+
+                if (completedBookingsCount === 1) {
+                    await unlockAchievement(user.artist.id, 'FIRST_INK')
+                    console.log(`🏆 Achievement desbloqueado: FIRST_INK para artista ${user.artist.id}`)
+                }
+
+                // Verificar achievement HIGH_ROLLER (booking acima de R$ 2000)
+                if ((updatedBooking.finalValue || 0) >= 2000) {
+                    await unlockAchievement(user.artist.id, 'HIGH_ROLLER')
+                    console.log(`🏆 Achievement desbloqueado: HIGH_ROLLER para artista ${user.artist.id}`)
+                }
+            } catch (gamificationError) {
+                console.error('Erro ao processar gamificação:', gamificationError)
+                // Não falhar o booking se gamificação falhar
+            }
         }
 
         revalidatePath('/artist/agenda')
