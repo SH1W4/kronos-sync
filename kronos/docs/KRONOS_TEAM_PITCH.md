@@ -1,6 +1,6 @@
-# KRONØS SYNC: O Futuro da Gestão Criativa 🏛️
+# KAIRØS OS: O Futuro da Gestão Criativa 🏛️
 
-![KRONØS SYNC Hero Visual](C:/Users/João/.gemini/antigravity/brain/a94acd8a-fc90-4772-a6df-71a0d6a708f9/kronos_hero_promo_1768845461380.png)
+![KAIRØS OS Hero Visual](C:/Users/João/.gemini/antigravity/brain/a94acd8a-fc90-4772-a6df-71a0d6a708f9/kronos_hero_promo_1768845461380.png)
 
 ## O que é o KRONØS?
 O KRONØS não é apenas um sistema de agendamento; é o seu **Silo de Autonomia**. Projetamos uma ferramenta que protege o seu tempo para que você foque no que importa: **a arte**.

@@ -27,4 +27,4 @@ Siga este passo-a-passo para garantir que todo agendamento ocorra sem imprevisto
 - [ ] Verifique se o status mudou para "Liquidado" no seu painel financeiro.
 
 ---
-*KRONØS // Procedimento Padrão*
+*KAIRØS OS // Procedimento Padrão*

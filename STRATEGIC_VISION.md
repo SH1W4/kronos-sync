@@ -1,4 +1,4 @@
-# KRONOS SYNC // VISÃO ESTRATÉGICA & DESIGN SYSTEM
+# KAIRØS OS // VISÃO ESTRATÉGICA & DESIGN SYSTEM
 
 > "A complexidade é inimiga da execução. O luxo é o domínio do tempo."
 

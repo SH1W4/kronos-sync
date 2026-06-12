@@ -5,7 +5,7 @@ docsync:
   priority: 1
 ---
 
-# KRONØS SYNC: MANUAL DO ARTISTA ✒️
+# KAIRØS OS: MANUAL DO ARTISTA ✒️
 **"Controle absoluto para estúdios profissionais."**
 
 > *Soberania financeira e inteligência de dados. Silencie o caos operacional e foque no que importa: seu legado.*
@@ -63,7 +63,7 @@ O KRONØS elimina a necessidade de planilhas de rateio confusas no final do mês
 ---
 
 ## 🎮 6. Meu Perfil & Gamificação (Soul Sync)
-Acesse `/artist/profile` para ver sua evolução dentro do ecossistema KRONØS:
+Acesse `/artist/profile` para ver sua evolução dentro do ecossistema KAIRØS OS:
 - **Foto de Perfil Real:** Sua foto de perfil é a mesma imagem configurada nas suas preferências de conta. Para atualizar, acesse as configurações do seu perfil e troque a foto.
 - **Nível & XP:** Acompanhe sua progressão de nível (calculado pela fórmula: Nível = √(XP/100) + 1).
 - **Conquistas (Glyphs):** Badges desbloqueadas por marcos históricos (primeira sessão, 10k faturado, etc).
@@ -88,4 +88,4 @@ Acesse o chat KAI no seu dashboard para consultas rápidas:
 
 ---
 
-**KRONØS NETWORK - Domine seu Tempo. Versão 2.0.**
+**KAIRØS OS - Domine seu Tempo. Versão 2.0.**

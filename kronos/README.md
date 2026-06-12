@@ -180,8 +180,8 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/SH1W4/kronos-sync.git
-   cd kronos-sync/kronos
+   git clone https://github.com/SH1W4/KAIRØS OS.git
+   cd KAIRØS OS/kronos
    ```
 
 2. **Install dependencies**
@@ -433,6 +433,6 @@ For inquiries: [Contact](mailto:contact@symbeon.dev)
 
 **KAIRØS OS** - *Where Art Meets Technology*
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SH1W4/kronos-sync)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SH1W4/KAIRØS OS)
 
 </div>

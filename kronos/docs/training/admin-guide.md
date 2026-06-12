@@ -7,7 +7,7 @@ docsync:
 ---
 # Guia do Administrador
 
-Este documento orienta o Administrador (Head Artist ou Gerente) na configuração e manutenção do ambiente KRONØS.
+Este documento orienta o Administrador (Head Artist ou Gerente) na configuração e manutenção do ambiente KAIRØS OS.
 
 ## 1. Configurando seu Estúdio
 O KRONØS opera como um hub central. Sua primeira tarefa é deixá-lo com a cara da sua marca.
@@ -36,4 +36,4 @@ Use o Dashboard principal para acompanhar:
 - **Funil de Vendas**: Quantos leads do Kiosk viraram agendamentos reais.
 
 ---
-*KRONØS // Gestão Profissional*
+*KAIRØS OS // Gestão Profissional*

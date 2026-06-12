@@ -1,5 +1,5 @@
 # CHECKLIST DO DIA - 2026-06-12
-## KRONØS SYNC - Movimento de Produção
+## KAIRØS OS - Movimento de Produção
 
 ---
 
@@ -20,7 +20,7 @@
 
 ### ✅ BRANDING
 - [x] **Correção de Nomes**: Plataforma = KAIRØS OS, Estúdio = KRONOS Studio
-- [x] **manifest.json**: Atualizado de KRONOS SYNC para KAIRØS OS
+- [x] **manifest.json**: Atualizado de KAIRØS OS para KAIRØS OS
 - [x] **manifest.ts**: Descrição atualizada para Kairøs Tattoo Studio
 - [x] **notifications.ts**: Email atualizado para contato@kairos-os.com.br
 - [x] **validate-invite**: Workspace mantido como Kronos Studio (estúdio específico)
@@ -93,4 +93,4 @@
 
 ---
 
-**KRONØS NETWORK - Infraestrutura Proprietária. Versão 2.0.**
+**KAIRØS OS - Infraestrutura Proprietária. Versão 2.0.**

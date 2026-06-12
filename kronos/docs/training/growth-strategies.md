@@ -30,4 +30,4 @@ A percepção de valor começa na organização.
 - Garanta que seu logo e cores estejam configurados corretamente em **Configurações > Workspace**. Isso aparece no celular do cliente quando ele acessa o Kiosk via QR Code.
 
 ---
-*KRONØS // Inteligência de Negócio*
+*KAIRØS OS // Inteligência de Negócio*

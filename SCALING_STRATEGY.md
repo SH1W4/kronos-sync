@@ -1,4 +1,4 @@
-# 🌐 KRONØS SYNC: Estratégia de Expansão e Multi-Workspace
+# 🌐 KAIRØS OS: Estratégia de Expansão e Multi-Workspace
 
 Este documento detalha a visão técnica e comercial para a transição do sistema de um estúdio único para uma plataforma global de gestão de arte e bem-estar (SaaS).
 

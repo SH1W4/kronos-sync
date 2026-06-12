@@ -5,7 +5,7 @@ docsync:
   priority: 1
 ---
 
-# KRONØS SYNC: MANUAL DO ADMINISTRADOR 🏛️
+# KAIRØS OS: MANUAL DO ADMINISTRADOR 🏛️
 **"Controle absoluto para estúdios profissionais."**
 
 > *Soberania financeira e inteligência de dados. Silencie o caos operacional e foque no que importa: seu legado.*
@@ -95,4 +95,4 @@ Acesse o chat KAI no seu dashboard para consultas rápidas em linguagem natural:
 
 ---
 
-**KRONØS NETWORK - Infraestrutura Proprietária. Versão 2.0.**
+**KAIRØS OS - Infraestrutura Proprietária. Versão 2.0.**

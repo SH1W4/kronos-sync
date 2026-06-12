@@ -6,7 +6,7 @@
 - **Admin Promotion:** Migração definitiva de privilégios para `galeria.kronos@gmail.com`.
 
 ### 🏛️ Posicionamento Estratégico (Dossier & Manifesto)
-- **Manifesto Técnico:** Definição do KRONØS SYNC como infraestrutura proprietária e independente (PaaS).
+- **Manifesto Técnico:** Definição do KAIRØS OS como infraestrutura proprietária e independente (PaaS).
 - **Proteção IP:** Estabelecimento de licença de uso comercial limitada e proteção de código-fonte/marca "Ø".
 - **Dados & Mercado:** Inclusão de análise SWOT e dados de mercado (R$ 2.5 Bi Brasil) para validação de modelo de negócio.
 - **Storytelling (Vanguarda):** Refinamento da Landing Page com Hero "Controle Absoluto" e seção de Filosofia "Guardião do Foco".
@@ -35,7 +35,7 @@
 - **Emergency Logging:** Implementado log de segurança no terminal/Vercel Logs para captura manual de códigos de autenticação durante a fase de validação de domínio.
 
 ### 📚 Documentação & IA
-- **Master AI Context:** Criação do `SYSTEM_CONTEXT.md`, um manual definitivo para que qualquer IA entenda a arquitetura e regras de negócio do Kronos Sync.
+- **Master AI Context:** Criação do `SYSTEM_CONTEXT.md`, um manual definitivo para que qualquer IA entenda a arquitetura e regras de negócio do KAIRØS OS.
 - **README Visual:** Update completo do README com logo neon, diagramas de arquitetura e screenshots das principais funcionalidades.
 
 ### 🛠️ Hotfixes de Estabilidade

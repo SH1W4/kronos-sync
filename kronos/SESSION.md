@@ -1,4 +1,4 @@
-# SESSION: KRONØS SYNC
+# SESSION: KAIRØS OS
 **Current Development Session State**
 
 ---
@@ -52,4 +52,4 @@ Implementar a funcionalidade de alteração de senha, realizar commits sistemát
 3. **Beta Testing:** Recrutar estúdios para testes intensivos em ambiente de produção.
 
 ---
-*KRONØS // Session State Protocol*
+*KAIRØS OS // Session State Protocol*

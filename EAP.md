@@ -1,4 +1,4 @@
-# KRONOS SYNC - Estrutura Analítica do Projeto (EAP)
+# KAIRØS OS - Estrutura Analítica do Projeto (EAP)
 ## Fase 1: Fundação & Identidade (Concluído ✅)
 - [x] **Core Architecture**
   - Setup Next.js 15 (App Router) + TypeScript.
@@ -11,9 +11,9 @@
 
 ## Fase 2: Autenticação & Integração (Concluído ✅)
 - [x] **Sistema de Auth (Sovereign Pivot)**
-  - [x] NextAuth.js Configurado (Credentials Provider).
-  - [x] Senhas Hash (Bcrypt) + Token de Convite.
-  - [x] Google Provider rebaixado para Feature Opcional.
+  - [x] Clerk Authentication (SSO-first entry gate).
+  - [x] Metadados de Usuário + Token de Convite.
+  - [x] Google Calendar OAuth Sync via Clerk.
 - [x] **Database Schema**
   - Modelagem de Usuários (Clientes, Artistas, Admin).
   - Modelagem de Agendamentos (Slots, Status).
@@ -46,7 +46,7 @@
   - [x] Visualização de Agenda do Dia.
 - [x] **Segurança & Acesso**
   - [x] Modo Dev (Bypass para testes locais).
-  - [x] Correção de Fluxo de Login (Sovereign Credentials).
+  - [x] Correção de Fluxo de Login (Clerk Authentication).
 - [x] **Módulo 1: Dashboard Inicial** (KPIS, Agendamentos Hoje)
 - [x] **Módulo 2: Agenda** (Visualização, Novo Agendamento, Connect Google)
 - [x] **Módulo 3: Ficha de Anamnese** (Link Público, Assinatura Digital, Persistência)
@@ -114,7 +114,7 @@
 - [x] **Credenciais Mestre:** Protocolo de entrega segura.
 
 ## Fase 15: Sovereign Auth Pivot (Concluído ✅)
-- [x] **Soberania de Acesso:** Migração para Credentials (Email/Senha).
+- [x] **Soberania de Acesso:** Migração para Clerk (Email/Senha/OAuth).
 - [x] **Google Decoupling:** Integração de agenda desacoplada do login.
 - [x] **Database Hardening:** Hashing seguro e validação de convites estrita.
 

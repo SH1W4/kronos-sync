@@ -1,117 +1,75 @@
-# 🗓️ Google Calendar - Guia de Configuração
+# Configuração da Integração Google Calendar 📅
 
-## Status Atual
-❌ **Google Calendar está DESABILITADO**  
-O provider Google está comentado em `auth-options.ts` (linhas 16-29).
+O sistema KAIRØS OS já possui toda a lógica de sincronização implementada (`src/app/actions/calendar.ts`). Para ativá-la, você precisa configurar um projeto no Google Cloud e adicionar as credenciais na Vercel.
 
----
+## Passo 1: Google Cloud Console
 
-## ✅ Checklist de Ativação
+1.  Acesse [console.cloud.google.com](https://console.cloud.google.com/).
+2.  Crie um **Novo Projeto** (ex: `kronos-production`).
+3.  No menu lateral, vá em **APIs & Services > Library**.
+4.  Pesquise por **"Google Calendar API"** e clique em **Enable**.
 
-### 1. Criar Projeto no Google Cloud Console
-1. Acesse: https://console.cloud.google.com/
-2. Crie um novo projeto (ex: "KRONOS SYNC")
-3. Ative a **Google Calendar API**:
-   - Menu → APIs & Services → Library
-   - Busque "Google Calendar API"
-   - Clique em "Enable"
+## Passo 2: Configurar Consent Screen
 
-### 2. Configurar OAuth Consent Screen
-1. Menu → APIs & Services → OAuth consent screen
-2. Escolha **External** (para testes)
-3. Preencha:
-   - App name: `KRONOS SYNC`
-   - User support email: seu email
-   - Developer contact: seu email
-4. Scopes: Adicione:
-   - `https://www.googleapis.com/auth/calendar`
-   - `https://www.googleapis.com/auth/userinfo.email`
-   - `https://www.googleapis.com/auth/userinfo.profile`
+1.  Vá em **APIs & Services > OAuth consent screen**.
+2.  Escolha **External** e clique em Create.
+3.  Preencha:
+    *   **App Name:** Kairøs OS
+    *   **Support Email:** Seu email
+    *   **Developer Contact:** Seu email
+4.  Em **Scopes**, adicione:
+    *   `.../auth/userinfo.email`
+    *   `.../auth/userinfo.profile`
+    *   `.../auth/calendar` (Importante!)
+5.  Em **Test Users**, adicione o seu email (enquanto o app não for verificado).
 
-### 3. Criar Credenciais OAuth 2.0
-1. Menu → APIs & Services → Credentials
-2. Create Credentials → OAuth 2.0 Client ID
-3. Application type: **Web application**
-4. Authorized redirect URIs:
-   ```
-   http://localhost:3000/api/auth/callback/google
-   https://seu-dominio.vercel.app/api/auth/callback/google
-   ```
-5. Copie o **Client ID** e **Client Secret**
+## Passo 3: Criar Credenciais
 
-### 4. Atualizar `.env` ou `.env.local`
+1.  Vá em **APIs & Services > Credentials**.
+2.  Clique em **Create Credentials > OAuth client ID**.
+3.  Application Type: **Web application**.
+4.  **Authorized JavaScript origins:**
+    *   `https://kairos-os-app.vercel.app` (Seu domínio Vercel)
+    *   `http://localhost:3000` (Para testes locais)
+5.  **Authorized redirect URIs:**
+    *   `https://kairos-os-app.vercel.app/api/auth/callback/google`
+    *   `http://localhost:3000/api/auth/callback/google`
+6.  Copie o **Client ID** e o **Client Secret**.
+
+## Passo 4: Configurar na Vercel
+
+Vá nas configurações do seu projeto na Vercel > **Environment Variables** e adicione:
+
 ```env
-GOOGLE_CLIENT_ID=seu-client-id-aqui.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-seu-secret-aqui
+GOOGLE_CLIENT_ID=seu_client_id_aqui
+GOOGLE_CLIENT_SECRET=seu_client_secret_aqui
 ```
 
-### 5. Descomentar GoogleProvider
-Edite `src/lib/auth-options.ts`:
-
-```typescript
-// REMOVA os comentários /* */ das linhas 16-29
-import GoogleProvider from "next-auth/providers/google"
-
-providers: [
-    GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-        authorization: {
-            params: {
-                scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile openid",
-                prompt: "consent",
-                access_type: "offline",
-                response_type: "code"
-            }
-        }
-    }),
-    // ... outros providers
-]
-```
-
-### 6. Reiniciar o Servidor
-```bash
-npm run dev
-```
+Redeploy o projeto (ou aguarde o próximo push) para as variáveis entrarem em vigor.
 
 ---
 
-## 🧪 Como Testar
+## Sobre o Domínio Próprio (`.com.br` ou `.app`)
 
-1. Acesse `/auth/signin`
-2. Clique em "Entrar com Google"
-3. Autorize o acesso ao Google Calendar
-4. Crie um agendamento no Dashboard
-5. Verifique se o evento aparece no Google Calendar
+**Sim, recomendamos comprar o domínio!**
 
----
+1.  **Profissionalismo:** `studio.kronos.app` ou `seuestudio.com` passa muito mais autoridade que `.vercel.app`.
+2.  **Verificação do Google:** Para remover a tela de "App não verificado" no login do Google, você precisará de um domínio próprio verificado no Google Search Console.
+3.  **Links de Convite:** Seus links de recrutamento ficarão mais confiáveis (`seuestudio.com/invite/XYZ`).
 
-## ⚠️ Problemas Comuns
-
-### "Error 400: redirect_uri_mismatch"
-- Verifique se a URL de redirect está EXATAMENTE igual no Google Console
-- Não esqueça o `/api/auth/callback/google` no final
-
-### "Access blocked: This app's request is invalid"
-- Certifique-se de que a Calendar API está habilitada
-- Verifique se os scopes estão corretos no OAuth Consent Screen
-
-### "No access token available"
-- O usuário precisa fazer login com Google, não apenas Magic Link
-- Verifique se `session.accessToken` está sendo salvo no callback JWT
-
-## 📝 Notas Técnicas e Fluxo de Sincronização
-
-- **Autenticação:** O sistema utiliza tokens de acesso OAuth2 integrados via Clerk (`src/lib/google.ts`). Cada artista autoriza sua conta Google de forma individual no seu painel.
-- **Sincronização Híbrida (Individual + Estúdio):**
-  - **Agenda do Artista (Unit):** Os agendamentos são criados na agenda `primary` do artista se ele solicitar ou se a agenda compartilhada estiver ativa.
-  - **Agenda do Estúdio (Torre/Compartilhada):** Se o Workspace tiver um `googleCalendarId` configurado (ex: `galeria.kronos@gmail.com`), o agendamento é **sincronizado automaticamente** como um espelho direto nela, utilizando o token do proprietário do Workspace (`workspace.ownerId`).
-- **Propagação de Atualizações:**
-  - Em atualizações de status (ex: "Confirmado", "Concluído", "Cancelado"), os títulos e descrições dos eventos correspondentes são atualizados em ambas as agendas.
-  - Em caso de cancelamento (`CANCELLED`) ou exclusão do agendamento, o evento é automaticamente removido da agenda compartilhada do estúdio e da agenda do artista.
-- **Checagem de Conflitos:** Ao criar novos agendamentos, o estúdio valida a disponibilidade contra a agenda configurada no `googleCalendarId` (ou a `primary` do dono) para evitar conflitos de macas físicas.
+### Onde comprar?
+*   **Vercel:** Mais fácil. Você compra direto no dashboard e ele já configura tudo (DNS, SSL).
+*   **Registro.br / Namecheap:** Mais barato, mas exige configuração de DNS manual (apontar para Vercel).
 
 ---
 
-**Última atualização:** Maio de 2026
+## ⚙️ Sincronização e Espelhamento Automático
+
+A sincronização de agenda no KAIRØS OS opera de forma automática e integrada:
+
+1. **Agenda do Artista (Unit):** Cada artista autentica individualmente sua conta pelo Clerk. Os agendamentos criados geram eventos na agenda pessoal (`primary`) do artista.
+2. **Agenda Compartilhada (Torre):** Caso o administrador defina o `googleCalendarId` nas configurações do Workspace (ex: `galeria.kronos@gmail.com`), o sistema **espelha e sincroniza automaticamente** cada agendamento nessa agenda central usando a conta do proprietário do Workspace.
+3. **Eventos de Ciclo de Vida:**
+   - **Atualizações de Status:** Qualquer mudança de status ("Confirmado", "Concluído", "Cancelado") atualiza o título e descrição do evento correspondente nas duas agendas.
+   - **Cancelamentos e Exclusão:** Se um agendamento for cancelado (`CANCELLED`) ou deletado no dashboard do artista, ele é removido de forma limpa da agenda compartilhada do estúdio e da agenda pessoal do artista.
 

@@ -13,7 +13,7 @@
 
 ## 🎯 Vision
 
-KAIRØS OS (formerly KRONØS SYNC) is a 
+KAIRØS OS (formerly KAIRØS OS) is a 
 **professional-first SaaS platform** designed exclusively for tattoo studios, artists, and administrators. Unlike traditional booking systems, we've architected a **sovereign ecosystem** where:
 
 - **Professionals** (Artists & Admins) have full access to the management dashboard
@@ -208,8 +208,8 @@ All 55 core operations will be checked, including edge-case limits, decimal divi
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/SH1W4/kronos-sync.git
-   cd kronos-sync/kronos
+   git clone https://github.com/SH1W4/KAIRØS OS.git
+   cd KAIRØS OS/kronos
    ```
 
 2. **Install dependencies**
@@ -230,7 +230,7 @@ All 55 core operations will be checked, including edge-case limits, decimal divi
    
    # Email (Resend)
    RESEND_API_KEY="re_..."
-   RESEND_FROM_EMAIL="KRONOS SYNC <acesso@yourdomain.com>"
+   RESEND_FROM_EMAIL="KAIRØS OS <acesso@yourdomain.com>"
    ```
 
 4. **Initialize database**
@@ -301,8 +301,8 @@ For inquiries: [Contact](mailto:contact@symbeon.dev)
 
 <div align="center">
 
-**KRONØS SYNC** - *Where Art Meets Technology*
+**KAIRØS OS** - *Where Art Meets Technology*
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SH1W4/kronos-sync)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SH1W4/KAIRØS OS)
 
 </div>

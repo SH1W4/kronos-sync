@@ -2,7 +2,7 @@
 
 > **Versão:** 2.0 (Estável)  
 > **Status:** Implementado e em Produção  
-> **Contexto:** Mecânica de engajamento e lealdade para o ecossistema KRONØS.
+> **Contexto:** Mecânica de engajamento e lealdade para o ecossistema KAIRØS OS.
 
 ---
 
@@ -123,4 +123,4 @@ Permite ao artista customizar sua identidade visual no ecossistema.
 
 ---
 
-> *Documento mantido pela equipe de Engenharia do KRONØS SYNC. Versão 2.0.*
+> *Documento mantido pela equipe de Engenharia do KAIRØS OS. Versão 2.0.*

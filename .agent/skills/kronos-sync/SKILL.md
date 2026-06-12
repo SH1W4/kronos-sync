@@ -1,11 +1,11 @@
 ---
-name: kronos-sync
-description: Operative core index for the KRONØS SYNC management platform. Codifies Divine Cybernetics aesthetics, Clerk Authentication Protocols, and Sovereign Architecture.
+name: KAIRØS OS
+description: Operative core index for the KAIRØS OS management platform. Codifies Divine Cybernetics aesthetics, Clerk Authentication Protocols, and Sovereign Architecture.
 ---
 
-# KRONØS SYNC: Operative Core 🏛️
+# KAIRØS OS: Operative Core 🏛️
 
-This skill encapsulates the total domain knowledge of the KRONØS SYNC platform, a high-fidelity management system for professional tattoo studios.
+This skill encapsulates the total domain knowledge of the KAIRØS OS platform, a high-fidelity management system for professional tattoo studios.
 
 ## 👁️ Strategic Vision: Divine Cybernetics
 The project follows specific aesthetic and philosophical guidelines:

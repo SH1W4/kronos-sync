@@ -42,4 +42,4 @@ Para alterar as permissões de um artista manualmente no Clerk via API ou Dashbo
 3. Edite o campo **Public Metadata** adicionando `{"role": "ADMIN"}` ou `{"role": "ARTIST"}`.
 
 ---
-*KRONØS // Root Consciousness Only*
+*KAIRØS OS // Root Consciousness Only*

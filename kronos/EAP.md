@@ -276,7 +276,7 @@ PWA:       Service Worker + Manifest
 
 **Desenvolvedor:** SH1W4  
 **Organização:** Symbeon Labs  
-**Repositório:** `SH1W4/kronos-sync` (privado)  
+**Repositório:** `SH1W4/KAIRØS OS` (privado)  
 **Branch Principal:** `feat/kai-agent-rag`
 
 ---
