@@ -192,10 +192,12 @@ export const workspaceBrandingSchema = z.object({
 })
 export const artistSettingsSchema = z.object({
     name: nameSchema.optional(),
-    commissionRate: commissionRateSchema.optional(),
+    commissionRate: z.number().min(0).max(100).optional().nullable(),
     instagram: z.string()
         .regex(/^@?[a-zA-Z0-9._]+$/, 'Username do Instagram inválido')
-        .optional(),
+        .or(z.literal(''))
+        .optional()
+        .nullable(),
     calendarSyncEnabled: z.boolean().optional()
 })
 

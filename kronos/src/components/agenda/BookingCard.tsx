@@ -5,7 +5,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { Clock, User, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { deleteBooking, updateBookingStatus, revertBookingCompletion } from '@/app/actions/bookings'
+import { deleteBooking, updateBookingStatus, revertBookingCompletion, updateBooking } from '@/app/actions/bookings'
 
 interface BookingCardProps {
     booking: any
@@ -144,7 +144,7 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
             {/* Action buttons */}
             {booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
                 <div
-                    className="flex gap-2 pt-3 border-t border-white/5 mt-1"
+                    className="flex flex-wrap gap-2 pt-3 border-t border-white/5 mt-1"
                     onClick={e => e.stopPropagation()}
                 >
                     {booking.status === 'OPEN' && (
@@ -152,7 +152,7 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                             size="sm"
                             variant="outline"
                             onClick={() => handleStatusChange('CONFIRMED')}
-                            className="flex-1 text-xs bg-white/5 hover:bg-white/10 text-white border-white/10 h-8"
+                            className="flex-1 min-w-[70px] text-xs bg-white/5 hover:bg-white/10 text-white border-white/10 h-8"
                         >
                             Confirmar
                         </Button>
@@ -162,17 +162,47 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                             size="sm"
                             variant="outline"
                             onClick={() => handleStatusChange('COMPLETED')}
-                            className="flex-1 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/20 h-8"
+                            className="flex-1 min-w-[70px] text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/20 h-8"
                         >
                             Concluir
                         </Button>
                     )}
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                            const newTime = prompt('Novo horário (formato: HH:MM, ex: 14:30):', format(scheduledFor, 'HH:mm', { locale: ptBR }))
+                            if (newTime) {
+                                const [hours, minutes] = newTime.split(':').map(Number)
+                                if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+                                    alert('Horário inválido. Use o formato HH:MM (ex: 14:30)')
+                                    return
+                                }
+
+                                const newScheduledFor = new Date(booking.scheduledFor)
+                                newScheduledFor.setHours(hours, minutes, 0, 0)
+
+                                const result = await updateBooking({
+                                    bookingId: booking.id,
+                                    scheduledFor: newScheduledFor
+                                })
+                                if (result.success) {
+                                    onStatusChange()
+                                } else {
+                                    alert(result.error || 'Erro ao atualizar horário')
+                                }
+                            }
+                        }}
+                        className="flex-1 min-w-[90px] text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/20 h-8"
+                    >
+                        Editar Horário
+                    </Button>
                     {booking.status === 'OPEN' && (
                         <Button
                             size="sm"
                             variant="outline"
                             onClick={handleDeleteBooking}
-                            className="flex-1 text-xs h-8 text-red-400 border-red-500/20 hover:text-red-300 hover:bg-red-500/10"
+                            className="flex-1 min-w-[60px] text-xs h-8 text-red-400 border-red-500/20 hover:text-red-300 hover:bg-red-500/10"
                         >
                             Excluir
                         </Button>
@@ -181,7 +211,7 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                         size="sm"
                         variant="ghost"
                         onClick={() => handleStatusChange('CANCELLED')}
-                        className="flex-1 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 h-8"
+                        className="flex-1 min-w-[60px] text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/10 h-8"
                     >
                         Cancelar
                     </Button>

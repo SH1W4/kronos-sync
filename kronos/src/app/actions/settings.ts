@@ -113,6 +113,7 @@ export async function getArtistProfile() {
 
         if (!user) return { error: 'Usuário não encontrado' }
 
+        // Retorna nome e imagem do banco (fonte da verdade para o perfil)
         return { success: true, name: user.name, image: user.image }
     } catch (error) {
         console.error('Erro ao buscar perfil do artista:', error)
@@ -136,28 +137,42 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
 
         const userRole = user.role
 
+        // Sanitizar dados
+        const sanitizedData: any = { ...data }
+        if (data.instagram !== undefined) {
+            sanitizedData.instagram = data.instagram?.trim() || null
+        }
+        if (data.commissionRate !== undefined) {
+            if (data.commissionRate === null || isNaN(data.commissionRate)) {
+                delete sanitizedData.commissionRate
+            }
+        }
+
         // Validação - Partial because we allow updating subsets
         const partialSchema = artistSettingsSchema.partial()
-        const validated = partialSchema.safeParse(data)
+        const validated = partialSchema.safeParse(sanitizedData)
         if (!validated.success) {
             return { error: validated.error.issues[0].message }
         }
 
+        const validData = validated.data
+
         // Update user profile (name, image) if provided
-        if (data.name || data.image) {
+        // Nota: data.image pode ser string vazia para remover a foto — verificamos explicitamente com !== undefined
+        if (validData.name !== undefined || data.image !== undefined) {
             await prisma.user.update({
                 where: { id: userId },
                 data: {
-                    ...(data.name && { name: data.name }),
-                    ...(data.image && { image: data.image })
+                    ...(validData.name !== undefined && { name: validData.name }),
+                    ...(data.image !== undefined && { image: data.image || null })
                 }
             })
 
             // Sincronizar com o Clerk para refletir no useUser() e evitar resets do webhook
-            if (data.name) {
+            if (validData.name) {
                 try {
                     const { clerkClient } = await import('@clerk/nextjs/server')
-                    const names = data.name.trim().split(/\s+/)
+                    const names = validData.name.trim().split(/\s+/)
                     const firstName = names[0] || ''
                     const lastName = names.slice(1).join(' ') || ''
                     const client = await clerkClient()
@@ -172,13 +187,17 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
         }
 
         // Update Artist profile (commissionRate restricted to ADMIN, instagram, calendarSyncEnabled)
-        const artistData: any = {
-            instagram: data.instagram,
-            calendarSyncEnabled: data.calendarSyncEnabled
+        const artistData: any = {}
+        
+        if (validData.instagram !== undefined) {
+            artistData.instagram = validData.instagram
+        }
+        if (validData.calendarSyncEnabled !== undefined) {
+            artistData.calendarSyncEnabled = validData.calendarSyncEnabled
         }
 
-        if (userRole === 'ADMIN' && data.commissionRate !== undefined) {
-            artistData.commissionRate = data.commissionRate / 100
+        if (userRole === 'ADMIN' && validData.commissionRate !== undefined && validData.commissionRate !== null) {
+            artistData.commissionRate = validData.commissionRate / 100
         }
 
         await prisma.artist.update({
@@ -187,6 +206,7 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
         })
 
         revalidatePath('/artist/settings')
+        revalidatePath('/artist/profile') // Garantir que a gamificação reflita a nova foto
         return { success: true }
     } catch (error) {
         console.error("Error updating artist settings:", error)

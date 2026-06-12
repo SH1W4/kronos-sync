@@ -7,6 +7,31 @@ import { Input } from '@/components/ui/input'
 import { getArtistInventory, saveProduct, toggleProductStatus, toggleProductSold } from '@/app/actions/store'
 import { formatCurrency } from '@/lib/utils'
 
+function ProductImage({ src, alt, type }: { src: string | null; alt: string; type: string }) {
+    const [error, setError] = useState(false)
+
+    useEffect(() => {
+        setError(false)
+    }, [src])
+
+    if (!src || error) {
+        return (
+            <div className="w-full h-full flex items-center justify-center text-4xl opacity-10">
+                {type === 'PHYSICAL' ? '📦' : '💾'}
+            </div>
+        )
+    }
+
+    return (
+        <img
+            src={src}
+            alt={alt}
+            onError={() => setError(true)}
+            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+        />
+    )
+}
+
 export default function InventoryPage() {
     const [products, setProducts] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
@@ -129,13 +154,7 @@ export default function InventoryPage() {
                             )}
 
                             <div className="aspect-square bg-black/40 rounded-[2rem] overflow-hidden mb-6 border border-white/5 relative">
-                                {product.imageUrl ? (
-                                    <img src={product.imageUrl} alt={product.title} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-4xl opacity-10">
-                                        {product.type === 'PHYSICAL' ? '📦' : '💾'}
-                                    </div>
-                                )}
+                                <ProductImage src={product.imageUrl} alt={product.title} type={product.type} />
                             </div>
 
                             <div className="flex-1 space-y-2">

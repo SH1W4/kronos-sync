@@ -9,6 +9,31 @@ import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 import { BrandLogo } from '@/components/ui/brand-logo'
 
+function ProductImage({ src, alt, type }: { src: string | null; alt: string; type: string }) {
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    setError(false)
+  }, [src])
+
+  if (!src || error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-6xl opacity-20 filter grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-700">
+        {type === 'PRINT' ? '🖼️' : type === 'PHYSICAL' ? '🧴' : '🎨'}
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setError(true)}
+      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+    />
+  )
+}
+
 interface Product {
   id: string
   title: string
@@ -183,10 +208,7 @@ function MarketplaceContent() {
 
               <div className="aspect-[4/5] bg-black/40 rounded-[2rem] overflow-hidden relative mb-6 border border-white/5 group-hover:border-primary/20 transition-colors">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                {/* Image placeholder */}
-                <div className="w-full h-full flex items-center justify-center text-6xl opacity-20 filter grayscale group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-700">
-                  {product.type === 'PRINT' ? '🖼️' : product.type === 'PHYSICAL' ? '🧴' : '🎨'}
-                </div>
+                <ProductImage src={product.imageUrl || null} alt={product.title} type={product.type} />
                 <div className="absolute top-4 left-4 glass-card px-3 py-1 rounded-full border border-white/10">
                   <span className="text-[8px] font-mono text-primary font-black uppercase tracking-widest">{product.type}</span>
                 </div>

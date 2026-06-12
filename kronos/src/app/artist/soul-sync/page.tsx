@@ -156,12 +156,20 @@ export default async function SoulSyncPage() {
                         
                         <div className="aspect-[3/4] w-full rounded-2xl border border-white/10 bg-black relative overflow-hidden flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(var(--primary-rgb),0.05)]">
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-800/20 via-black to-black" />
-                            <div className="text-gray-600 font-mono text-[10px] uppercase tracking-widest animate-pulse z-10">
-                                AVATAR RENDER PREVIEW
-                            </div>
+                            {gamification.artist?.user?.image ? (
+                                <img 
+                                    src={gamification.artist.user.image} 
+                                    alt="Avatar Projection" 
+                                    className="w-full h-full object-cover opacity-60 mix-blend-screen z-10"
+                                />
+                            ) : (
+                                <div className="text-gray-600 font-mono text-[10px] uppercase tracking-widest animate-pulse z-10">
+                                    AVATAR RENDER PREVIEW
+                                </div>
+                            )}
                             
                             {/* Hologram Scanner Effect */}
-                            <div className="absolute inset-0 scanline opacity-30" />
+                            <div className="absolute inset-0 scanline opacity-30 z-20" />
                         </div>
 
                         <div className="space-y-3">

@@ -218,44 +218,40 @@ export async function createBooking(data: {
         //   • O workspace deve ter um googleCalendarId configurado para o espelho do estúdio
         //   • Eventos pessoais do Google do artista NÃO interferem na disponibilidade de macas
         //   • As macas são gerenciadas internamente no banco — não aparecem no Google Calendar
-        const artistSyncEnabled = user.artist?.calendarSyncEnabled === true
-        const studioCalendarId = workspace.googleCalendarId
-
-        if (artistSyncEnabled) {
-            const eventStart = data.scheduledFor
-            const eventEnd = new Date(data.scheduledFor.getTime() + data.duration * 60000)
-            const eventSummary = `🎨 ${(booking as any).client.name} — ${data.type}`
-            const eventDescription = [
-                `🎫 KRONØS OS`,
-                ``,
-                `👨‍🎨 Artista: ${user.name}`,
-                `👤 Cliente: ${(booking as any).client.name}`,
-                `📝 Tipo: ${data.type}`,
-                `💬 Obs: ${data.notes || 'Nenhuma'}`,
-                ``,
-                `*Gerado automaticamente pelo KRONØS.*`
-            ].join('\n')
-
+        // 4. Sincronização em Background com Google Calendar
+        if (data.syncToGoogle) {
             try {
+                const eventSummary = `🎨 ${booking.client.name} — ${booking.type}`
+                const eventDescription = [
+                    `🎫 KRONØS OS`,
+                    ``,
+                    `👨‍🎨 Artista: ${user.name}`,
+                    `👤 Cliente: ${booking.client.name}`,
+                    `📝 Tipo: ${booking.type}`,
+                    `💬 Obs: ${booking.notes || 'Nenhuma'}`,
+                    ``,
+                    `*Gerado automaticamente pelo KRONØS.*`
+                ].join('\n')
+                const eventStart = booking.scheduledFor
+                const eventEnd = new Date(eventStart.getTime() + booking.duration * 60000)
+
+                const customEventId = Buffer.from(booking.id).toString('hex')
+                let synced = false
+
                 // 3a. Espelho na agenda COMPARTILHADA do estúdio (se configurada)
-                if (studioCalendarId) {
+                if (workspace.googleCalendarId) {
                     const studioResult = await createCalendarEvent(workspace.ownerId, {
+                        id: customEventId,
                         summary: eventSummary,
                         description: eventDescription,
                         startTime: eventStart,
                         endTime: eventEnd,
-                        calendarId: studioCalendarId
+                        calendarId: workspace.googleCalendarId
                     })
 
-                    if (studioResult.success && studioResult.eventId) {
-                        await prisma.booking.update({
-                            where: { id: booking.id },
-                            data: {
-                                googleEventId: studioResult.eventId,
-                                syncedToGoogle: true
-                            }
-                        })
-                        console.log(`✅ Espelho criado na agenda do estúdio: ${studioCalendarId}`)
+                    if (studioResult.success) {
+                        synced = true
+                        console.log(`✅ Espelho criado na agenda do estúdio: ${workspace.googleCalendarId}`)
                     } else {
                         console.warn(`⚠️ Falha ao criar evento na agenda do estúdio: ${studioResult.error}`)
                     }
@@ -263,6 +259,7 @@ export async function createBooking(data: {
 
                 // 3b. Espelho na agenda PESSOAL do artista (calendar 'primary')
                 const personalResult = await createCalendarEvent(user.id, {
+                    id: customEventId,
                     summary: eventSummary,
                     description: eventDescription,
                     startTime: eventStart,
@@ -271,22 +268,23 @@ export async function createBooking(data: {
                 })
 
                 if (personalResult.success) {
+                    synced = true
                     console.log(`✅ Espelho criado na agenda pessoal do artista: ${user.name}`)
-                    // Se não tiver ainda salvo o googleEventId (ex: studio não configurado), salva o pessoal
-                    if (!studioCalendarId && personalResult.eventId) {
-                        await prisma.booking.update({
-                            where: { id: booking.id },
-                            data: {
-                                googleEventId: personalResult.eventId,
-                                syncedToGoogle: true
-                            }
-                        })
-                    }
                 } else {
                     console.warn(`⚠️ Falha ao criar evento na agenda pessoal do artista: ${personalResult.error}`)
                     if (personalResult.error === 'No Google Account') {
                         console.warn(`⚠️ Artista ${user.name} não tem Google OAuth conectado`)
                     }
+                }
+
+                if (synced) {
+                    await prisma.booking.update({
+                        where: { id: booking.id },
+                        data: {
+                            googleEventId: customEventId,
+                            syncedToGoogle: true
+                        }
+                    })
                 }
 
             } catch (syncError) {
@@ -805,12 +803,7 @@ export async function deleteBooking(bookingId: string) {
             return { error: 'Você não tem permissão para deletar este agendamento' }
         }
 
-        // Delete booking
-        await prisma.booking.delete({
-            where: { id: bookingId }
-        })
-
-        // 3. Remover do Google Calendar (agenda pessoal + agenda compartilhada)
+        // 3. Remover do Google Calendar (agenda pessoal + agenda compartilhada) antes de deletar do DB
         if (booking.syncedToGoogle && booking.googleEventId) {
             try {
                 // Busca o workspace para saber se tem agenda compartilhada
@@ -835,6 +828,11 @@ export async function deleteBooking(bookingId: string) {
                 console.warn('⚠️ Falha ao remover evento do Google:', syncError)
             }
         }
+
+        // Delete booking
+        await prisma.booking.delete({
+            where: { id: bookingId }
+        })
 
         // 4. Disparo de Automação n8n
         import('@/lib/webhook').then(({ dispatchWebhook }) => {
@@ -952,11 +950,35 @@ export async function getStudioAgendaBookings(data: {
         })
 
         // Mark each booking with the current user's artist id to distinguish isStudioMate
-        const bookings = rawBookings.map(b => ({
-            ...b,
-            isStudioMate: b.artistId !== user?.artist?.id,
-            isExternal: false
-        }))
+        // Also sanitize sensitive client & financial data for studio mates if the user is not an admin
+        const bookings = rawBookings.map(b => {
+            const isStudioMate = b.artistId !== user?.artist?.id
+            const isUserAdmin = user?.role === 'ADMIN'
+
+            if (isStudioMate && !isUserAdmin) {
+                return {
+                    ...b,
+                    isStudioMate: true,
+                    isExternal: false,
+                    // Sanitize sensitive info
+                    client: { name: 'Reservado (Colega de Estúdio)', id: 'studio-mate-client' },
+                    value: 0,
+                    discountValue: 0,
+                    finalValue: 0,
+                    studioShare: 0,
+                    artistShare: 0,
+                    notes: 'Detalhes privados do agendamento',
+                    fichaUrl: null,
+                    fichaStatus: 'PENDING'
+                }
+            }
+
+            return {
+                ...b,
+                isStudioMate,
+                isExternal: false
+            }
+        })
 
         // Fetch Google Calendar events from the studio's shared calendar
         let allEvents: any[] = [...bookings]

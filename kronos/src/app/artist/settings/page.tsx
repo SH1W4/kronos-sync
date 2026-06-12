@@ -116,28 +116,32 @@ export default function SettingsPage() {
             }).catch(() => {})
             setIsInitialized(true)
 
-            // Buscar o nome real do banco (não do perfil Google/Clerk)
+            // Buscar o nome e imagem reais do banco (não do perfil Google/Clerk)
             getArtistProfile().then(res => {
-                if (res.success && res.name) {
-                    setName(res.name)
+                if (res.success) {
+                    if (res.name) setName(res.name)
+                    else setName(user.fullName || '')
+                    // Imagem: prioriza o banco (onde o usuário pode ter feito upload)
+                    // Se o banco estiver vazio, usa o avatar do Clerk como fallback
+                    if (res.image) {
+                        setImage(res.image)
+                    } else if (user.imageUrl) {
+                        setImage(user.imageUrl)
+                    }
                 } else {
-                    // Fallback para o nome do Clerk se o banco não retornar
+                    // Fallback para o nome e foto do Clerk se o banco não retornar
                     setName(user.fullName || '')
+                    if (user.imageUrl) setImage(user.imageUrl)
                 }
             })
-            
-            // Clerk properties are in publicMetadata or on user object
+
+            // Clerk metadata: commission e instagram
             const commissionRate = user.publicMetadata?.commissionRate as number | undefined
             if (commissionRate !== undefined) {
                 setCommission(String(commissionRate * 100))
             }
-            
             if (user.publicMetadata?.instagram) {
                 setInstagram(user.publicMetadata.instagram as string)
-            }
-            
-            if (user.imageUrl) {
-                setImage(user.imageUrl)
             }
 
             // Initialize Workspace Stats from metadata if available
@@ -178,9 +182,10 @@ export default function SettingsPage() {
         try {
             const result = await updateArtistSettings({
                 name,
-                commissionRate: parseFloat(commission),
+                // Comissão: apenas ADMIN pode alterar. Não enviamos o campo para não-admins.
+                ...(isAdmin && commission ? { commissionRate: parseFloat(commission) } : {}),
                 instagram,
-                image
+                image // sempre inclui, mesmo que seja string vazia (para suportar remover foto)
             })
 
             if (result.success) {
@@ -674,19 +679,18 @@ export default function SettingsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-mono text-gray-500 uppercase">Comissão Padrão (%)</label>
-                                        <Input
-                                            type="number"
-                                            value={commission}
-                                            onChange={(e) => setCommission(e.target.value)}
-                                            className="bg-black/50 border-white/10"
-                                            disabled={!isAdmin}
-                                        />
-                                        {!isAdmin && (
-                                            <p className="text-[8px] text-gray-600 uppercase italic">Apenas administradores podem alterar esta taxa.</p>
-                                        )}
-                                    </div>
+                                    {/* Comissão: visível apenas para ADMIN */}
+                                    {isAdmin && (
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-mono text-gray-500 uppercase">Comissão Padrão (%)</label>
+                                            <Input
+                                                type="number"
+                                                value={commission}
+                                                onChange={(e) => setCommission(e.target.value)}
+                                                className="bg-black/50 border-white/10"
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="flex justify-end pt-4 border-t border-white/5">
                                         <Button

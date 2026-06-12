@@ -234,7 +234,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-2">
+                            <div className="space-y-2 relative">
                                 <Input
                                     placeholder="Buscar cliente por nome ou telefone..."
                                     value={clientSearch}
@@ -244,7 +244,7 @@ export function BookingModal({ onClose, onSuccess, initialDate }: BookingModalPr
                                     <p className="text-sm text-gray-400">Buscando...</p>
                                 )}
                                 {clients.length > 0 && (
-                                    <div className="max-h-40 overflow-y-auto space-y-1 border border-white/10 rounded-lg p-2">
+                                    <div className="absolute z-50 w-full mt-1 bg-gray-950 border border-white/10 rounded-lg shadow-xl max-h-48 overflow-y-auto p-2">
                                         {clients.map(client => (
                                             <button
                                                 key={client.id}

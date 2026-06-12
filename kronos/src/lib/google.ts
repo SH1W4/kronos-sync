@@ -62,6 +62,7 @@ export async function getGoogleCalendarClient(userId: string) {
 export async function createCalendarEvent(
     userId: string,
     eventData: {
+        id?: string,
         summary: string,
         description: string,
         startTime: Date,
@@ -77,6 +78,7 @@ export async function createCalendarEvent(
         const response = await calendar.events.insert({
             calendarId: eventData.calendarId || 'primary',
             requestBody: {
+                id: eventData.id,
                 summary: eventData.summary,
                 description: eventData.description,
                 start: { dateTime: eventData.startTime.toISOString() },
