@@ -105,6 +105,16 @@ export async function POST(req: NextRequest) {
                     }
                 })
             }
+
+            // Compartilhamento automático do Google Calendar
+            if (targetRole === 'ARTIST' && invite.workspace?.googleCalendarId && user.email) {
+                try {
+                    const { shareCalendarWithUser } = await import('@/lib/google-admin')
+                    await shareCalendarWithUser(invite.workspace.googleCalendarId, user.email)
+                } catch (calErr) {
+                    console.error('[redeem-invite] Falha ao compartilhar calendário do estúdio:', calErr)
+                }
+            }
         }
 
         // 5. Atualizar metadata do Clerk imediatamente para liberar o login do artista

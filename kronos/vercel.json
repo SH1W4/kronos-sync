@@ -12,5 +12,11 @@
   "github": {
     "silent": true,
     "autoJobCancelation": true
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/check-expired-guests",
+      "schedule": "0 12 * * *"
+    }
+  ]
 }

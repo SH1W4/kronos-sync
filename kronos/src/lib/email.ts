@@ -104,3 +104,49 @@ export async function sendPasswordResetEmail(email: string, token: string) {
     return { success: false, error }
   }
 }
+
+export async function sendGuestExpirationEmail(email: string, artistName: string) {
+  if (!resend) {
+    console.error('Resend not configured for guest expiration email.')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'KAIRØS OS <acesso@kairos-os.com.br>',
+      to: email,
+      subject: 'Seu acesso temporário expirou - KAIRØS OS',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #000; color: #fff;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #ef4444; margin: 0;">KAIRØS OS</h1>
+            <p style="color: #999; font-size: 12px; margin-top: 5px;">Aviso de Encerramento de Período Guest</p>
+          </div>
+          
+          <div style="background: #111; border: 1px solid #333; border-radius: 12px; padding: 30px; text-align: left;">
+            <p style="color: #fff; font-size: 18px; font-weight: bold; margin-bottom: 20px;">Olá, ${artistName}!</p>
+            <p style="color: #ccc; line-height: 1.6;">
+              Informamos que o seu período como <strong>Artista Convidado (Guest)</strong> no estúdio chegou ao fim e seu acesso ao painel do sistema KAIRØS OS foi desativado automaticamente.
+            </p>
+            <p style="color: #ccc; line-height: 1.6; margin-top: 15px;">
+              Fique tranquilo: <strong>todo o seu histórico financeiro, atendimentos e relatórios permanecem salvos no sistema</strong> para que você e os administradores do estúdio possam realizar acertos futuros.
+            </p>
+            <p style="color: #ccc; line-height: 1.6; margin-top: 15px;">
+              Agradecemos pela parceria e desejamos muito sucesso nos seus próximos projetos!
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+            <p style="color: #666; font-size: 12px;">
+              © 2026 KAIRØS OS. Todos os direitos reservados.
+            </p>
+          </div>
+        </div>
+      `
+    })
+    return { success: true }
+  } catch (error) {
+    console.error('Error sending guest expiration email:', error)
+    return { success: false, error }
+  }
+}

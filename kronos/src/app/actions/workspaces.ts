@@ -353,7 +353,7 @@ export async function revokeArtistAccess(artistId: string) {
         // 2. Buscar o artista para garantir que ele pertence a este workspace
         const targetArtist = await prisma.artist.findUnique({
             where: { id: artistId },
-            include: { user: true }
+            include: { user: true, workspace: true }
         })
 
         if (!targetArtist || targetArtist.workspaceId !== activeWorkspaceId) {
@@ -385,6 +385,16 @@ export async function revokeArtistAccess(artistId: string) {
                 }
             })
         ])
+
+        // Revogar acesso do Google Calendar se aplicável
+        if (targetArtist.workspace?.googleCalendarId && targetArtist.user.email) {
+            try {
+                const { removeCalendarShare } = await import('@/lib/google-admin')
+                await removeCalendarShare(targetArtist.workspace.googleCalendarId, targetArtist.user.email)
+            } catch (calErr) {
+                console.error('[revokeArtistAccess] Erro ao revogar Google Calendar do artista:', calErr)
+            }
+        }
 
         revalidatePath('/artist/team')
         return { success: true, message: `Acesso de ${targetArtist.user.name} revogado com sucesso.` }

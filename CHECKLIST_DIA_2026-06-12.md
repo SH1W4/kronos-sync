@@ -52,16 +52,16 @@
   - **Pago / Em Revisão**: Baseado no status atual do acerto de contas (`SettlementStatus`).
 - [ ] **Fluxo de Liquidação por PIX (Rateio)**: Exibir a chave PIX e recebedor do estúdio (`Workspace.pixKey` e `Workspace.pixRecipient`) na interface do artista, permitindo que ele selecione seus agendamentos concluídos, veja a divisão exata gerada pelo sistema, realize a transferência da porcentagem correspondente ao estúdio (PIX de rateio), anexe o comprovante de transferência diretamente no painel de acertos (`Settlements`) e aguarde a validação administrativa (`Aprovar/Rejeitar/Disputa`) no painel de controle do Admin para quitação do repasse.
 
-### 🚀 PLANEJAMENTO DE IMPLEMENTAÇÃO: GUEST E KIOSK SIMPLIFICADO
-- [ ] **Kiosk Simplificado (Mobile-First)**:
+### ✅ IMPLEMENTAÇÃO DE FASE 2: GUEST E KIOSK SIMPLIFICADO
+- [x] **Kiosk Simplificado (Mobile-First)**:
   - Rota `/kiosk` pública para agendamento direto de clientes sem login.
   - Fluxo em 3 passos: 1. Dados Pessoais (Nome obrigatório, Insta ou Tel como contato); 2. Seleção de Dia e Horários Disponíveis; 3. Detalhes e confirmação.
   - Server Action `createKioskBooking` criando agendamento com status `OPEN` (para confirmação posterior do artista/admin).
-- [ ] **Automação de Guest Temporário (Prisma e Cron)**:
+- [x] **Automação de Guest Temporário (Prisma e Cron)**:
   - Aproveitar a infraestrutura existente do banco: tabela `Artist` com `plan = GUEST` e `validUntil` como data de expiração, atrelada ao convite com `durationDays`.
   - Cron Job diário (`/api/cron/check-expired-guests`) que busca artistas ativos com `plan = GUEST` e `validUntil < hoje`.
   - Ações do Cron: Mudar `Artist.isActive = false`, revogar/apagar a membership no workspace, e enviar o e-mail de encerramento, mantendo o histórico de agendamentos no banco para fins de rateio e histórico financeiro.
-- [ ] **Google Calendar Automático (Service Account)**:
+- [x] **Google Calendar Automático (Service Account)**:
   - Configurar Service Account do Google Cloud Platform com chaves `GOOGLE_SERVICE_ACCOUNT_EMAIL` e `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`.
   - Criar helper `shareCalendarWithUser` para compartilhar de forma automatizada o calendário do estúdio com o e-mail do artista convidado (permissão `writer`) no momento do aceite do convite.
   - Criar helper `removeCalendarShare` para revogar o acesso à agenda no Google Calendar no momento da expiração do contrato do Guest.
