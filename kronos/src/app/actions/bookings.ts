@@ -256,6 +256,8 @@ export async function createBooking(data: {
                             }
                         })
                         console.log(`✅ Espelho criado na agenda do estúdio: ${studioCalendarId}`)
+                    } else {
+                        console.warn(`⚠️ Falha ao criar evento na agenda do estúdio: ${studioResult.error}`)
                     }
                 }
 
@@ -279,6 +281,11 @@ export async function createBooking(data: {
                                 syncedToGoogle: true
                             }
                         })
+                    }
+                } else {
+                    console.warn(`⚠️ Falha ao criar evento na agenda pessoal do artista: ${personalResult.error}`)
+                    if (personalResult.error === 'No Google Account') {
+                        console.warn(`⚠️ Artista ${user.name} não tem Google OAuth conectado`)
                     }
                 }
 

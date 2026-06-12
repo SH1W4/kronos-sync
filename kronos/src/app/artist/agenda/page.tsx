@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
-import { startOfWeek, endOfWeek, addDays, subDays, addWeeks, subWeeks, format } from 'date-fns'
+import { startOfWeek, endOfWeek, addDays, subDays, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getMyBookings } from '@/app/actions/bookings'
 import { Calendar, Plus, Loader2 } from 'lucide-react'
@@ -10,6 +10,7 @@ import { GoogleSyncStatus } from '@/components/agenda/GoogleSyncStatus'
 import { Button } from '@/components/ui/button'
 import { CalendarView } from '@/components/agenda/CalendarView'
 import { BookingModal as NewBookingModal } from '@/components/agenda/NewBookingModal'
+import { BookingDetailModal } from '@/components/agenda/BookingDetailModal'
 
 export default function AgendaPage() {
     const { user } = useUser()
@@ -19,6 +20,7 @@ export default function AgendaPage() {
     const [loading, setLoading] = useState(true)
     const [showBookingModal, setShowBookingModal] = useState(false)
     const [modalDate, setModalDate] = useState<Date | null>(null)
+    const [selectedBooking, setSelectedBooking] = useState<any | null>(null)
 
     // Mobile responsiveness
     useEffect(() => {
@@ -182,8 +184,9 @@ export default function AgendaPage() {
                         currentDate={currentDate}
                         bookings={bookings}
                         onBookingClick={(booking) => {
-                            // TODO: Show booking details
-                            console.log('Booking clicked:', booking)
+                            if (!booking.isExternal) {
+                                setSelectedBooking(booking)
+                            }
                         }}
                         onEmptySlotClick={(date) => {
                             setModalDate(date)
@@ -194,7 +197,7 @@ export default function AgendaPage() {
                 )}
             </div>
 
-            {/* Booking Modal */}
+            {/* New Booking Modal */}
             {showBookingModal && (
                 <NewBookingModal
                     onClose={() => {
@@ -203,6 +206,18 @@ export default function AgendaPage() {
                     }}
                     onSuccess={handleBookingCreated}
                     initialDate={modalDate || currentDate}
+                />
+            )}
+
+            {/* Booking Detail Modal */}
+            {selectedBooking && (
+                <BookingDetailModal
+                    booking={selectedBooking}
+                    onClose={() => setSelectedBooking(null)}
+                    onRefresh={() => {
+                        loadBookings()
+                        setSelectedBooking(null)
+                    }}
                 />
             )}
         </div>

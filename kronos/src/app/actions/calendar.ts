@@ -72,9 +72,19 @@ export async function syncAllBookings() {
 
         let successCount = 0
         for (const booking of bookings) {
+            const eventDescription = [
+                `🎫 KAIRØS OS`,
+                ``,
+                `👨‍🎨 Artista: ${user.name}`,
+                `👤 Cliente: ${booking.client.name}`,
+                `📝 Tipo: ${booking.type || 'Tatuagem'}`,
+                ``,
+                `*Gerado automaticamente pelo KAIRØS.*`
+            ].join('\n')
+
             const result = await createCalendarEvent(user.id, {
-                summary: `Tatuagem: ${booking.client.name}`,
-                description: `Sessão agendada via KRONØS\nURL: ${process.env.NEXTAUTH_URL}/artist/agenda`,
+                summary: `🎨 ${booking.client.name} — ${booking.type || 'Tatuagem'}`,
+                description: eventDescription,
                 startTime: booking.scheduledFor,
                 endTime: new Date(booking.scheduledFor.getTime() + booking.duration * 60000)
             })

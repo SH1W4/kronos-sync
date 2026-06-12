@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, addDays, subDays, addWeeks, subWeeks, format } from 'date-fns'
+import { startOfDay, endOfDay, startOfWeek, endOfWeek, addDays, subDays, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getStudioAgendaBookings } from '@/app/actions/bookings'
 import { CalendarView } from '@/components/agenda/CalendarView'
+import { BookingDetailModal } from '@/components/agenda/BookingDetailModal'
 import { Button } from '@/components/ui/button'
 import { Calendar, Loader2 } from 'lucide-react'
 
@@ -13,6 +14,7 @@ export default function StudioAgendaPage() {
     const [bookings, setBookings] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [view, setView] = useState<'day' | 'week'>('week')
+    const [selectedBooking, setSelectedBooking] = useState<any | null>(null)
 
     // Mobile: default to day view
     useEffect(() => {
@@ -143,11 +145,28 @@ export default function StudioAgendaPage() {
                         currentDate={currentDate}
                         bookings={bookings}
                         isReadOnly={true}
-                        onBookingClick={() => {}}
+                        onBookingClick={(booking) => {
+                            if (!booking.isExternal) {
+                                setSelectedBooking(booking)
+                            }
+                        }}
                         onRefresh={loadBookings}
                     />
                 )}
             </div>
+
+            {/* Booking Detail Modal — somente leitura para o estúdio */}
+            {selectedBooking && (
+                <BookingDetailModal
+                    booking={selectedBooking}
+                    isReadOnly={true}
+                    onClose={() => setSelectedBooking(null)}
+                    onRefresh={() => {
+                        loadBookings()
+                        setSelectedBooking(null)
+                    }}
+                />
+            )}
         </div>
     )
 }
