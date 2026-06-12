@@ -185,3 +185,69 @@ export async function getArtistEarnings(month?: number, year?: number) {
     }
 }
 
+/**
+ * Retorna agendamentos futuros (OPEN/CONFIRMED) de um artista
+ * para compor os KPIs de projeção de ganhos.
+ */
+export async function getArtistFutureEarnings() {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) return { success: false, message: 'Não autorizado' }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true }
+        })
+
+        if (!user || !user.artist) {
+            return { success: false, message: 'Perfil de artista não encontrado' }
+        }
+
+        const artistId = user.artist.id
+        const now = new Date()
+
+        const futureBookings = await prisma.booking.findMany({
+            where: {
+                artistId,
+                scheduledFor: { gt: now },
+                status: { in: ['OPEN', 'CONFIRMED'] }
+            },
+            include: {
+                client: {
+                    select: { name: true }
+                }
+            },
+            orderBy: { scheduledFor: 'asc' }
+        })
+
+        const projectedGross = futureBookings.reduce((acc, b) => acc + b.value, 0)
+        const projectedNet = futureBookings.reduce((acc, b) => acc + b.artistShare, 0)
+        const projectedStudio = futureBookings.reduce((acc, b) => acc + b.studioShare, 0)
+
+        // Group by month for chart
+        const byMonth: Record<string, { month: string; gross: number; net: number; count: number }> = {}
+        for (const b of futureBookings) {
+            const key = new Date(b.scheduledFor).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+            if (!byMonth[key]) byMonth[key] = { month: key, gross: 0, net: 0, count: 0 }
+            byMonth[key].gross += b.value
+            byMonth[key].net += b.artistShare
+            byMonth[key].count++
+        }
+
+        return {
+            success: true,
+            futureBookings,
+            summary: {
+                count: futureBookings.length,
+                projectedGross,
+                projectedNet,
+                projectedStudio,
+            },
+            byMonth: Object.values(byMonth)
+        }
+    } catch (error) {
+        console.error("Error fetching future earnings:", error)
+        return { success: false, message: 'Erro ao buscar projeções' }
+    }
+}
+

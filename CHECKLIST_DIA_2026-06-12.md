@@ -43,14 +43,15 @@
 - [x] **Autocomplete de Clientes**: Dropdown de busca de clientes no `NewBookingModal` com `z-50` e posicionamento `absolute` em relação ao container pai, prevenindo cortes visuais ou invisibilidade no mobile.
 - [x] **Fallback do Inventário**: Substituição da imagem quebrada ou nula de produtos no `/artist/inventory` por um componente estilizado e premium: fundo escuro (`bg-zinc-950/60`), borda neon (`border-primary/20`), efeito glow (`bg-primary/5 blur-xl`) e um ícone `Package` do Lucide animado no hover.
 
-### 📋 ESTUDO & IMPLEMENTAÇÃO: BACKLOG FINANCEIRO & REPASSES (SETTLEMENTS)
-- [ ] **Mapeamento de Ganhos Futuros**: Criar KPI e listagem de faturamento projetado/líquido estimado baseado em agendamentos futuros com status `CONFIRMED` ou `OPEN`.
-- [ ] **Faturamento Bruto vs. Líquido**: Ajustar os cards do painel e extrato do artista para exibir o split de comissões real dele (`booking.artistShare`), em vez de exibir apenas o faturamento cheio cobrado do cliente (`booking.value`).
-- [ ] **Componente de Navegação Temporal**: Adicionar seletores de período (mês e ano) no topo da página de "Meus Ganhos" para permitir ao artista consultar meses passados e planejar fluxos futuros.
-- [ ] **Status de Repasses (Settlements)**: Implementar sinalização visual (tags) de status de acertos financeiros de cada sessão no extrato de faturamento:
+### ✅ ESTUDO & IMPLEMENTAÇÃO: BACKLOG FINANCEIRO & REPASSES (SETTLEMENTS)
+- [x] **Mapeamento de Ganhos Futuros**: Criar KPI e listagem de faturamento projetado/líquido estimado baseado em agendamentos futuros com status `CONFIRMED` ou `OPEN`. (Implementado na aba "Projeção Futura" em Meus Ganhos).
+- [x] **Faturamento Bruto vs. Líquido**: Ajustar os cards do painel e extrato do artista para exibir o split de comissões real dele (`booking.artistShare`), em vez de exibir apenas o faturamento cheio cobrado do cliente (`booking.value`).
+- [x] **Componente de Navegação Temporal**: Adicionar seletores de período (mês e ano) no topo da página de "Meus Ganhos" para permitir ao artista consultar meses passados e planejar fluxos futuros.
+- [x] **Status de Repasses (Settlements)**: Implementar sinalização visual (tags) de status de acertos financeiros de cada sessão no extrato de faturamento:
   - **Aguardando Fechamento**: Sessões sem vínculo de repasse (`booking.settlementId` nulo).
   - **Pago / Em Revisão**: Baseado no status atual do acerto de contas (`SettlementStatus`).
-- [ ] **Fluxo de Liquidação por PIX (Rateio)**: Exibir a chave PIX e recebedor do estúdio (`Workspace.pixKey` e `Workspace.pixRecipient`) na interface do artista, permitindo que ele selecione seus agendamentos concluídos, veja a divisão exata gerada pelo sistema, realize a transferência da porcentagem correspondente ao estúdio (PIX de rateio), anexe o comprovante de transferência diretamente no painel de acertos (`Settlements`) e aguarde a validação administrativa (`Aprovar/Rejeitar/Disputa`) no painel de controle do Admin para quitação do repasse.
+- [ ] **Fluxo de Liquidação por PIX (Rateio)**: Exibir a chave PIX e recebedor do estúdio (`Workspace.pixKey` e `Workspace.pixRecipient`) na interface do artista, permitindo que ele selecione seus agendamentos concluídos, veja a divisão exata gerada pelo sistema, realize a transferência da porcentagem correspondente ao estúdio (PIX de rateio), anexe o comprovante de transferência diretamente no painel de acertos (`Settlements`) e aguarde a validação administrativa (`Aprovar/Rejeitar/Disputa`) no painel de controle do Admin para quitação do repasse. (POSTERGADO - MÓDULO DE REPASSES/SETTLEMENTS)
+- [ ] **Validação de Comprovantes por IA (Gemini OCR)**: Extração inteligente de dados em recibos enviados para pré-aprovação de repasses. (POSTERGADO - INTEGRAÇÃO OCR EM SETTLEMENTS)
 
 ### ✅ IMPLEMENTAÇÃO DE FASE 2: GUEST E KIOSK SIMPLIFICADO
 - [x] **Kiosk Simplificado (Mobile-First)**:
