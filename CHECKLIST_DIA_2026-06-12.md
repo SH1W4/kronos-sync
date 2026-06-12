@@ -43,14 +43,28 @@
 - [x] **Autocomplete de Clientes**: Dropdown de busca de clientes no `NewBookingModal` com `z-50` e posicionamento `absolute` em relação ao container pai, prevenindo cortes visuais ou invisibilidade no mobile.
 - [x] **Fallback do Inventário**: Substituição da imagem quebrada ou nula de produtos no `/artist/inventory` por um componente estilizado e premium: fundo escuro (`bg-zinc-950/60`), borda neon (`border-primary/20`), efeito glow (`bg-primary/5 blur-xl`) e um ícone `Package` do Lucide animado no hover.
 
-### 📋 ESTUDO & IMPLEMENTAÇÃO: BACKLOG FINANCEIRO (PRÓXIMAS MISSÕES)
+### 📋 ESTUDO & IMPLEMENTAÇÃO: BACKLOG FINANCEIRO & REPASSES (SETTLEMENTS)
 - [ ] **Mapeamento de Ganhos Futuros**: Criar KPI e listagem de faturamento projetado/líquido estimado baseado em agendamentos futuros com status `CONFIRMED` ou `OPEN`.
 - [ ] **Faturamento Bruto vs. Líquido**: Ajustar os cards do painel e extrato do artista para exibir o split de comissões real dele (`booking.artistShare`), em vez de exibir apenas o faturamento cheio cobrado do cliente (`booking.value`).
 - [ ] **Componente de Navegação Temporal**: Adicionar seletores de período (mês e ano) no topo da página de "Meus Ganhos" para permitir ao artista consultar meses passados e planejar fluxos futuros.
 - [ ] **Status de Repasses (Settlements)**: Implementar sinalização visual (tags) de status de acertos financeiros de cada sessão no extrato de faturamento:
   - **Aguardando Fechamento**: Sessões sem vínculo de repasse (`booking.settlementId` nulo).
   - **Pago / Em Revisão**: Baseado no status atual do acerto de contas (`SettlementStatus`).
-- [ ] **Fluxo de Liquidação por PIX**: Garantir a exibição da chave PIX e recebedor do estúdio (`Workspace.pixKey` e `Workspace.pixRecipient`) na interface do artista, permitindo que ele selecione seus agendamentos pendentes, veja a divisão exata gerada pelo sistema, faça a transferência da porcentagem correspondente ao estúdio, anexe o comprovante de PIX direto pelo painel e aguarde a validação administrativa do acerto.
+- [ ] **Fluxo de Liquidação por PIX (Rateio)**: Exibir a chave PIX e recebedor do estúdio (`Workspace.pixKey` e `Workspace.pixRecipient`) na interface do artista, permitindo que ele selecione seus agendamentos concluídos, veja a divisão exata gerada pelo sistema, realize a transferência da porcentagem correspondente ao estúdio (PIX de rateio), anexe o comprovante de transferência diretamente no painel de acertos (`Settlements`) e aguarde a validação administrativa (`Aprovar/Rejeitar/Disputa`) no painel de controle do Admin para quitação do repasse.
+
+### 🚀 PLANEJAMENTO DE IMPLEMENTAÇÃO: GUEST E KIOSK SIMPLIFICADO
+- [ ] **Kiosk Simplificado (Mobile-First)**:
+  - Rota `/kiosk` pública para agendamento direto de clientes sem login.
+  - Fluxo em 3 passos: 1. Dados Pessoais (Nome obrigatório, Insta ou Tel como contato); 2. Seleção de Dia e Horários Disponíveis; 3. Detalhes e confirmação.
+  - Server Action `createKioskBooking` criando agendamento com status `OPEN` (para confirmação posterior do artista/admin).
+- [ ] **Automação de Guest Temporário (Prisma e Cron)**:
+  - Aproveitar a infraestrutura existente do banco: tabela `Artist` com `plan = GUEST` e `validUntil` como data de expiração, atrelada ao convite com `durationDays`.
+  - Cron Job diário (`/api/cron/check-expired-guests`) que busca artistas ativos com `plan = GUEST` e `validUntil < hoje`.
+  - Ações do Cron: Mudar `Artist.isActive = false`, revogar/apagar a membership no workspace, e enviar o e-mail de encerramento, mantendo o histórico de agendamentos no banco para fins de rateio e histórico financeiro.
+- [ ] **Google Calendar Automático (Service Account)**:
+  - Configurar Service Account do Google Cloud Platform com chaves `GOOGLE_SERVICE_ACCOUNT_EMAIL` e `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`.
+  - Criar helper `shareCalendarWithUser` para compartilhar de forma automatizada o calendário do estúdio com o e-mail do artista convidado (permissão `writer`) no momento do aceite do convite.
+  - Criar helper `removeCalendarShare` para revogar o acesso à agenda no Google Calendar no momento da expiração do contrato do Guest.
 
 ### ✅ BUILD E DEPLOYMENT
 - [x] **Build Local**: Verificado e aprovado sem erros de build ou de tipos TypeScript (`npx tsc --noEmit`)
