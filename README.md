@@ -1,11 +1,11 @@
-# KRONØS SYNC
+# KAIRØS OS
 
 <div align="center">
 
-![KRONØS SYNC](./kronos/public/brand/logo-neon.png)
+![KAIRØS OS](./kronos/public/brand/logo-neon.png)
 
 > **Enterprise-Grade Tattoo Studio Management Platform**  
-> Built with Next.js 15, Prisma, NextAuth, and cutting-edge UX design.
+> Built with Next.js 15, Prisma, Clerk, and cutting-edge UX design.
 
 </div>
 
@@ -13,7 +13,8 @@
 
 ## 🎯 Vision
 
-KRONØS SYNC is a **professional-first SaaS platform** designed exclusively for tattoo studios, artists, and administrators. Unlike traditional booking systems, we've architected a **sovereign ecosystem** where:
+KAIRØS OS (formerly KRONØS SYNC) is a 
+**professional-first SaaS platform** designed exclusively for tattoo studios, artists, and administrators. Unlike traditional booking systems, we've architected a **sovereign ecosystem** where:
 
 - **Professionals** (Artists & Admins) have full access to the management dashboard
 - **Clients** interact through frictionless, guest-first experiences (Kiosk, Marketplace, Forms)
@@ -25,7 +26,7 @@ KRONØS SYNC is a **professional-first SaaS platform** designed exclusively for 
 
 ### **The Professional Gate**
 
-KRONØS implements a **strict invite-only authentication system** for professional access:
+KAIRØS implements a **strict invite-only authentication system** for professional access:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -115,10 +116,11 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 - 📅 Integrated Google Calendar sync
 - 💰 Financial settlement tracking with AI validation
 - 👥 Team management with invite system
+- 📈 **Personal Earnings & Projections ("Meus Ganhos")**: Complete monthly performance view comparing realized earnings against a future projection timeline (`OPEN`/`CONFIRMED` bookings).
 
 ### 2. **Kiosk Experience**
 - 🎯 Lead capture with gamified "INK PASS" system
-- 📱 WhatsApp integration for instant communication
+- 📱 **Public Scheduling Portal (`/kiosk`)**: Mobile-first multi-step workflow for client check-ins (contact info, slot/date selection, booking creation without logging in).
 - 🎁 Automatic coupon generation (10% off first tattoo)
 - 🔐 Artist PIN validation for fraud prevention
 - 📊 Real-time sync progress visualization
@@ -143,7 +145,11 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 - 🔄 **Intelligent Auto-Allocation Fallback**: Seamless automatic slot selection for clients, finding the first available physical stretcher sequence.
 - 📋 **Integrated Anamnesis Forms** linked to booking context via dynamic QR codes.
 
-### 6. **Gamification: Soul Sync Engine**
+### 6. **Guest Lifecycle & Calendar Auto-Sync**
+- ⏱️ **Cron-Based Guest Deactivation**: Vercel Cron-driven cleanup checking daily for expired contracts (`plan = GUEST` and `validUntil < today`), deactivating artist profiles, revoking membership, and sending expiration alerts.
+- 🔑 **Google Calendar ACL Automation**: Service Account integration dynamically sharing workspace calendars with new guest artists (permisson `writer`) and automatically revoking sharing upon guest expiration or artist removal.
+
+### 7. **Gamification: Soul Sync Engine**
 - 🏅 **Liquid Chrome / Metallic Achievements**: 3D high-fidelity metallic badges representing real milestones (`FIRST_INK`, `HIGH_ROLLER`, `PERFECT_WEEK`, `LEGENDARY_ARTIST`).
 - 📈 **RPG Progression Engine**: Core square-root level progression model:
   $$Level = \lfloor\sqrt{XP/100}\rfloor + 1$$
@@ -246,19 +252,25 @@ All 55 core operations will be checked, including edge-case limits, decimal divi
 
 ## 🚧 Operational Roadmap
 
-### **Phase 1: Foundation & Sovereignty (Q1-Q2 2025) — Done ✅**
+### **Phase 1: Foundation & Sovereignty — Done ✅**
 - [x] **Professional Gate**: Invitation-only Clerk SSO onboarding bypass.
 - [x] **Kiosk Lead Capture System**: Gamified "INK PASS" lead entry & coupon generator.
 - [x] **Gamification Core (Soul Sync)**: Square-root progression engine.
 - [x] **Liquid Chrome Achievement Assets**: Metallic 3D achievements integrated.
 
-### **Phase 2: Capacity & Financial Control (Q3-Q4 2025) — Done ✅**
+### **Phase 2: Capacity & Financial Control — Done ✅**
 - [x] **Studio Capacity Management**: Physical stretcher allocation (`macaId` 1-20) and calendar booking conflict checks.
 - [x] **Dynamic Commission Split**: Automated resident commission scaling (30% $\rightarrow$ 20% over R$ 10k) and guest fixed 30% rate.
 - [x] **Vitest Quality Gate**: 55 automated unit tests protecting formulas.
 - [x] **AI Vision Simulation**: Dynamic settlement validation OCR logic.
 
-### **Phase 3: Integration & Expansion (Q1-Q2 2026) — Active 🚀**
+### **Phase 3: Kiosk, Guest Automation & Projections — Done ✅**
+- [x] **Public Scheduling Portal**: Frictionless `/kiosk` page with capacity and stretcher allocation validations.
+- [x] **Guest Lifecycle Automation**: Automated expiration checking, profile deactivation, and workspace removal.
+- [x] **Google Calendar Auto-Sync**: Automated Service Account ACL share/revoke operations.
+- [x] **Personal Future Projections**: Detailed "Meus Ganhos" page with dynamic temporal selectors, earnings calculation, and timeline.
+
+### **Phase 4: Integration & Payments — Active 🚀**
 - [ ] **Omnichannel WhatsApp CRM**: Trigger automated notifications, coupons, and check-in confirmation dynamically.
 - [ ] **Sovereign Wallet & Real PIX Split**: Instant PIX payout integrations.
 - [ ] **Extended BI Dashboard**: Operational analytics, heatmaps of studio capacity, and artist rankings.
