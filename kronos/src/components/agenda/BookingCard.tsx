@@ -144,7 +144,7 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
             {/* Action buttons */}
             {booking.status !== 'COMPLETED' && booking.status !== 'CANCELLED' && (
                 <div
-                    className="flex flex-wrap gap-2 pt-3 border-t border-white/5 mt-1"
+                    className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-white/5 mt-1"
                     onClick={e => e.stopPropagation()}
                 >
                     {booking.status === 'OPEN' && (
@@ -223,7 +223,7 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
              (new Date().getTime() - new Date(booking.updatedAt).getTime() < 24 * 60 * 60 * 1000) &&
              !booking.settlementId && (
                 <div
-                    className="flex gap-2 pt-3 border-t border-white/5 mt-1"
+                    className="flex flex-col sm:flex-row gap-2 pt-3 border-t border-white/5 mt-1"
                     onClick={e => e.stopPropagation()}
                 >
                     <Button

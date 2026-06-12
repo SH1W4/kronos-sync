@@ -16,8 +16,13 @@ function ProductImage({ src, alt, type }: { src: string | null; alt: string; typ
 
     if (!src || error) {
         return (
-            <div className="w-full h-full flex items-center justify-center text-4xl opacity-10">
-                {type === 'PHYSICAL' ? '📦' : '💾'}
+            <div className="w-full h-full bg-zinc-950/60 border border-primary/20 rounded-[2rem] flex flex-col items-center justify-center relative overflow-hidden group/fallback">
+                {/* Background glow */}
+                <div className="absolute inset-0 bg-primary/5 opacity-50 blur-xl pointer-events-none" />
+                <Package className="w-12 h-12 text-primary/40 group-hover/fallback:text-primary transition-colors duration-500 z-10" />
+                <span className="font-mono text-[9px] text-gray-500 uppercase tracking-widest mt-3 z-10">
+                    {type === 'PHYSICAL' ? 'PRODUTO FÍSICO' : 'FLASHS / ARQUIVO'}
+                </span>
             </div>
         )
     }

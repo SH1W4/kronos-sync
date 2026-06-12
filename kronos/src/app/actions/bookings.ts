@@ -498,7 +498,8 @@ export async function updateBookingStatus(data: {
 
         // Verify ownership
         const booking = await prisma.booking.findUnique({
-            where: { id: data.bookingId }
+            where: { id: data.bookingId },
+            include: { artist: { include: { user: true } } }
         })
 
         if (!booking) {
@@ -525,8 +526,8 @@ export async function updateBookingStatus(data: {
             }
         })
 
-        // 3. Atualizar evento no Google Calendar (agenda pessoal + agenda compartilhada)
-        if (updatedBooking.syncedToGoogle && updatedBooking.googleEventId) {
+        // 3. Atualizar/Deletar evento no Google Calendar (agenda pessoal + agenda compartilhada)
+        if (updatedBooking.syncedToGoogle && updatedBooking.googleEventId && booking?.artist?.user?.id) {
             try {
                 // Busca o workspace para saber se tem agenda compartilhada
                 const workspace = booking.workspaceId ? await prisma.workspace.findUnique({
@@ -541,54 +542,61 @@ export async function updateBookingStatus(data: {
                     OPEN: 'Aberto'
                 }[data.status] || data.status
 
-                // Atualiza na agenda PESSOAL do artista
-                await updateCalendarEvent(user.id, updatedBooking.googleEventId, {
-                    summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
-                    description: [
-                        `🎫 KRONØS OS`,
-                        ``,
-                        `👨‍🎨 Artista: ${user.name}`,
-                        `👤 Cliente: ${updatedBooking.client.name}`,
-                        `📝 Tipo: ${(updatedBooking as any).type || ''}`,
-                        `💬 Obs: ${(updatedBooking as any).notes || 'Nenhuma'}`,
-                        `ℹ️ Status: ${statusLabel}`,
-                        ``,
-                        `*Atualizado automaticamente pelo KRONØS.*`
-                    ].join('\n')
-                })
+                if (data.status === 'CANCELLED') {
+                    // Se for cancelado, remove completamente da agenda PESSOAL do artista
+                    await deleteCalendarEvent(booking.artist.user.id, updatedBooking.googleEventId)
+                        .catch(e => console.warn('⚠️ Não foi possível remover da agenda pessoal:', e))
 
-                // Atualiza/Remove na AGENDA COMPARTILHADA do estúdio
-                if (workspace?.googleCalendarId && data.status === 'CANCELLED') {
-                    // Tenta deletar da agenda compartilhada ao cancelar
-                    await deleteCalendarEvent(
-                        workspace.ownerId,
-                        updatedBooking.googleEventId,
-                        workspace.googleCalendarId
-                    ).catch(e => console.warn('⚠️ Não foi possível remover da agenda compartilhada:', e))
-                } else if (workspace?.googleCalendarId) {
+                    // Remove da AGENDA COMPARTILHADA do estúdio
+                    if (workspace?.googleCalendarId) {
+                        await deleteCalendarEvent(
+                            workspace.ownerId,
+                            updatedBooking.googleEventId,
+                            workspace.googleCalendarId
+                        ).catch(e => console.warn('⚠️ Não foi possível remover da agenda compartilhada:', e))
+                    }
+                } else {
+                    // Atualiza na agenda PESSOAL do artista (usa o ID do dono do booking)
+                    await updateCalendarEvent(booking.artist.user.id, updatedBooking.googleEventId, {
+                        summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
+                        description: [
+                            `🎫 KRONØS OS`,
+                            ``,
+                            `👨‍🎨 Artista: ${booking.artist.user.name || user.name}`,
+                            `👤 Cliente: ${updatedBooking.client.name}`,
+                            `📝 Tipo: ${(updatedBooking as any).type || ''}`,
+                            `💬 Obs: ${(updatedBooking as any).notes || 'Nenhuma'}`,
+                            `ℹ️ Status: ${statusLabel}`,
+                            ``,
+                            `*Atualizado automaticamente pelo KRONØS.*`
+                        ].join('\n')
+                    })
+
                     // Atualiza o status na agenda compartilhada
-                    await updateCalendarEvent(
-                        workspace.ownerId,
-                        updatedBooking.googleEventId,
-                        {
-                            summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
-                            description: [
-                                `🎫 KRONØS OS`,
-                                ``,
-                                `👨‍🎨 Artista: ${user.name}`,
-                                `👤 Cliente: ${updatedBooking.client.name}`,
-                                `📝 Tipo: ${(updatedBooking as any).type || ''}`,
-                                `ℹ️ Status: ${statusLabel}`,
-                                ``,
-                                `*Atualizado automaticamente pelo KRONØS.*`
-                            ].join('\n')
-                        },
-                        workspace.googleCalendarId
-                    ).catch(e => console.warn('⚠️ Não foi possível atualizar agenda compartilhada:', e))
+                    if (workspace?.googleCalendarId) {
+                        await updateCalendarEvent(
+                            workspace.ownerId,
+                            updatedBooking.googleEventId,
+                            {
+                                summary: `🎨 ${updatedBooking.client.name} — ${(updatedBooking as any).type || ''} (${statusLabel})`,
+                                description: [
+                                    `🎫 KRONØS OS`,
+                                    ``,
+                                    `👨‍🎨 Artista: ${booking.artist.user.name || user.name}`,
+                                    `👤 Cliente: ${updatedBooking.client.name}`,
+                                    `📝 Tipo: ${(updatedBooking as any).type || ''}`,
+                                    `ℹ️ Status: ${statusLabel}`,
+                                    ``,
+                                    `*Atualizado automaticamente pelo KRONØS.*`
+                                ].join('\n')
+                            },
+                            workspace.googleCalendarId
+                        ).catch(e => console.warn('⚠️ Não foi possível atualizar agenda compartilhada:', e))
+                    }
                 }
 
             } catch (syncError) {
-                console.warn('⚠️ Falha ao atualizar evento no Google:', syncError)
+                console.warn('⚠️ Falha ao atualizar/deletar evento no Google:', syncError)
             }
         }
 
@@ -792,7 +800,8 @@ export async function deleteBooking(bookingId: string) {
 
         // Verify ownership
         const booking = await prisma.booking.findUnique({
-            where: { id: bookingId }
+            where: { id: bookingId },
+            include: { artist: { include: { user: true } } }
         })
 
         if (!booking) {
@@ -804,7 +813,7 @@ export async function deleteBooking(bookingId: string) {
         }
 
         // 3. Remover do Google Calendar (agenda pessoal + agenda compartilhada) antes de deletar do DB
-        if (booking.syncedToGoogle && booking.googleEventId) {
+        if (booking.syncedToGoogle && booking.googleEventId && booking?.artist?.user?.id) {
             try {
                 // Busca o workspace para saber se tem agenda compartilhada
                 const workspace = booking.workspaceId ? await prisma.workspace.findUnique({
@@ -812,8 +821,8 @@ export async function deleteBooking(bookingId: string) {
                     select: { ownerId: true, googleCalendarId: true }
                 }) : null;
 
-                // Remove da agenda PESSOAL do artista
-                await deleteCalendarEvent(user.id, booking.googleEventId)
+                // Remove da agenda PESSOAL do artista usando o ID de usuário do próprio artista
+                await deleteCalendarEvent(booking.artist.user.id, booking.googleEventId)
 
                 // Remove da AGENDA COMPARTILHADA do estúdio
                 if (workspace?.googleCalendarId) {
