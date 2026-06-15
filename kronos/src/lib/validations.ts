@@ -42,7 +42,10 @@ export const emailSchema = z.string()
     .toLowerCase()
 
 export const phoneSchema = z.string()
-    .regex(/^\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}$/, 'Formato esperado: (11) 99999-9999')
+    .refine((val) => {
+        const cleaned = val.replace(/[^\d]/g, '')
+        return cleaned.length === 10 || cleaned.length === 11
+    }, 'Telefone inválido. Insira o DDD e o número (ex: 71 99999-9999)')
 
 export const cpfSchema = z.string()
     .regex(/^[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}$/, 'Formato esperado: 000.000.000-00')

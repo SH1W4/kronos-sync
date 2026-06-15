@@ -373,7 +373,7 @@ model Product {
 model Coupon {
   id              String  @id @default(cuid())
   code            String  @unique
-  discountPercent Int     @default(10)
+  discountPercent Int     @default(15)
   workspaceId     String?
 
   // Referral Fields

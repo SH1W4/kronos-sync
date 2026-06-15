@@ -29,7 +29,7 @@ export async function generateReferralCode(clientId: string) {
         const coupon = await prisma.coupon.create({
             data: {
                 code,
-                discountPercent: 10,
+                discountPercent: 15,
                 originClientId: clientId,
                 status: 'ACTIVE'
             }

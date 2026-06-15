@@ -7,11 +7,12 @@ export async function validateCoupon(code: string) {
     try {
         if (!code) return { valid: false, message: 'Código não fornecido.' }
 
-        // Caso especial: Cupons de Leads (KAIRØS10_...)
-        if (code.startsWith('KAIRØS10_')) {
+        // Caso especial: Cupons de Leads (KAIRØS15_... ou legado KAIRØS10_...)
+        if (code.startsWith('KAIRØS15_') || code.startsWith('KAIRØS10_')) {
+            const discountPercent = code.startsWith('KAIRØS15_') ? 15 : 10
             return {
                 valid: true,
-                discountPercent: 10,
+                discountPercent,
                 code: code,
                 type: 'LEAD_GEN'
             }
