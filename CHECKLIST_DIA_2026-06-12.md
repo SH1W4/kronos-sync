@@ -72,8 +72,16 @@
 - [x] **Branch Management**: Merge de `fix/secure-bookings-settlements` para `main`
 - [x] **Git Push**: Todas as mudanças de UX e Calendar de hoje pushadas para o GitHub (`0282fd6`)
 - [x] **Vercel Deploy**: Deploy manual de produção efetuado via Vercel CLI com sucesso ✅
+### 🚀 ENTREGAS DE HOJE - 2026-06-15 (CORREÇÕES FINANCEIRAS & EVOLUÇÃO DE ANAMNESE)
+- [x] **Redirecionamento de Anamnese**: Criada rota cliente-side `/anamnese/fill/[bookingId]` para guiar links legados/externos de forma transparente para `/fichas/[bookingId]`. Adicionado `/anamnese(.*)` como rota pública no Clerk `middleware.ts`.
+- [x] **Correção do Split Financeiro na Conclusão**: Modificada a action `updateBookingStatus` para recalcular e persistir o split financeiro (`artistShare`, `studioShare` e `finalValue`) no banco de dados Neon ao marcar como `COMPLETED`. Evita faturamento zerado (R$ 0) para agendamentos vindos do Kiosk.
+- [x] **Botão "Definir Valor" no BookingCard**: Implementado botão dinâmico 💰 para permitir a definição do valor da sessão diretamente na agenda antes de concluí-la, caso ela esteja zerada.
+- [x] **Validação Amigável do WhatsApp/Telefone**: Flexibilizada a validação Zod no `phoneSchema` para apenas validar 10 ou 11 dígitos numéricos após limpar caracteres não-numéricos (espaços, traços, parênteses). Evita bloqueios desnecessários ao cliente.
+- [x] **Cupons com Desconto Padrão de 15%**: Atualizado o desconto padrão de cupons (referrals e leads) de 10% para 15% no [schema.prisma], na action de cupons e adicionado suporte ao código `KAIRØS15_`.
+- [x] **Perguntas Médicas Profissionais na Anamnese**: Integradas 5 novas perguntas de saúde (medicamentos contínuos, gravidez/amamentação, histórico de desmaios/hemofilia, álcool/drogas recentes e tatuagens anteriores) no front, schema, validações e action com criptografia de dados confidenciais e suporte ao Smart Reuse.
 
 ---
+
 
 ## 📊 AVALIAÇÃO GERAL DO PROJETO
 
