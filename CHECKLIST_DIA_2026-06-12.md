@@ -9,6 +9,7 @@
 - [x] **Cache Headers**: Adicionado `Cache-Control` no middleware para evitar problemas de cache
 - [x] **URL Dinâmica**: Configurado `metadataBase` para usar variável `NEXTAUTH_URL`
 - [x] **SSO Callback**: Adicionado `cache: 'no-store'` na chamada `verify-access`
+- [x] **Remoção de Rotas de Debug**: Remoção de rotas vulneráveis de depuração (`/api/debug-db`, `/api/clean-dev`, `/test-env`) e proteção da rota `/api/auth/debug` para execução exclusiva em ambiente de desenvolvimento local.
 
 ### ✅ AGENDA E BOOKINGS
 - [x] **Reverter Conclusão**: Botão para reverter bookings COMPLETED (até 24h, sem settlement)
@@ -17,6 +18,7 @@
 - [x] **Cálculos Financeiros**: Ajustes em artistShare e comissões
 - [x] **Lint Configuration**: Adicionado `.eslintrc.json` para permitir build sem lint
 - [x] **Proteção da Agenda do Estúdio**: Anonimização de clientes, notas e zeramento de dados financeiros para colegas de estúdio (não-admins) na rota `getStudioAgendaBookings`
+- [x] **Modal de Detalhes com Edição Inline**: Implementado o modal de detalhes do agendamento (`BookingDetailModal`) com edição inline em estilo Google Calendar, em conformidade com as diretrizes de privacidade.
 
 ### ✅ BRANDING
 - [x] **Correção de Nomes**: Plataforma = KAIRØS OS, Estúdio = KRONOS Studio
@@ -25,6 +27,8 @@
 - [x] **notifications.ts**: Email atualizado para contato@kairos-os.com.br
 - [x] **validate-invite**: Workspace mantido como Kronos Studio (estúdio específico)
 - [x] **.env.example**: Variáveis atualizadas para `KAIROS_TEAM_KEY`
+- [x] **Refatoração Geral de Documentação**: Limpeza em mais de 20 arquivos de documentação para eliminar referências obsoletas ao NextAuth/autenticação e padronizar sob a identidade de marca do KAIRØS OS.
+- [x] **Roadmap da Fase 3**: Atualização do README com o novo branding corporativo e cronograma estratégico da Fase 3.
 
 ### ✅ GAMIFICAÇÃO & PERFIL
 - [x] **Mapeamento do Problema**: Identificado que XP não estava sendo computado
