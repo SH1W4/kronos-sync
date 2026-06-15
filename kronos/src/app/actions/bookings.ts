@@ -510,10 +510,30 @@ export async function updateBookingStatus(data: {
             return { error: 'Você não tem permissão para alterar este agendamento' }
         }
 
-        // Update status
+        // Recalcular o split financeiro ao CONCLUIR (garante dados corretos mesmo
+        // que o valor tenha sido editado depois da criação, ou veio do Kiosk com value=0)
+        const financialUpdate: Record<string, any> = { status: data.status }
+        if (data.status === 'COMPLETED' && booking.value > 0) {
+            const artist = await prisma.artist.findUnique({
+                where: { id: booking.artistId }
+            })
+            if (artist) {
+                const commissionRate = calculateCommission(artist.plan, artist.monthlyEarnings || 0)
+                const { finalValue, artistShare, studioShare } = calculateBookingSplit(
+                    booking.value,
+                    booking.discountValue || 0,
+                    commissionRate
+                )
+                financialUpdate.finalValue = finalValue
+                financialUpdate.artistShare = artistShare
+                financialUpdate.studioShare = studioShare
+            }
+        }
+
+        // Update status (+ recalculated financials if completing)
         const updatedBooking = await prisma.booking.update({
             where: { id: data.bookingId },
-            data: { status: data.status },
+            data: financialUpdate,
             include: {
                 client: {
                     select: {

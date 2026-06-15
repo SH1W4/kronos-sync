@@ -167,6 +167,32 @@ export function BookingCard({ booking, onClick, onStatusChange, compact = false 
                             Concluir
                         </Button>
                     )}
+                    {/* Botão Definir Valor — aparece para bookings com valor zerado (ex: Kiosk) */}
+                    {(booking.value === 0 || !booking.value) && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={async (e) => {
+                                e.stopPropagation()
+                                const raw = prompt('Valor da sessão (R$):', '0')
+                                if (raw === null) return
+                                const value = parseFloat(raw.replace(',', '.'))
+                                if (isNaN(value) || value < 0) {
+                                    alert('Valor inválido. Digite um número positivo (ex: 350 ou 1200.50)')
+                                    return
+                                }
+                                const result = await updateBooking({ bookingId: booking.id, value })
+                                if (result.success) {
+                                    onStatusChange()
+                                } else {
+                                    alert(result.error || 'Erro ao definir valor')
+                                }
+                            }}
+                            className="flex-1 min-w-[100px] text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/20 h-8"
+                        >
+                            💰 Definir Valor
+                        </Button>
+                    )}
                     <Button
                         size="sm"
                         variant="outline"
