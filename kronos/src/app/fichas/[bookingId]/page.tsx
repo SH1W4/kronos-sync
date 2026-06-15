@@ -25,6 +25,11 @@ export default function FichaAnamnesePage() {
         medicalConditionsHealing: '',
         medicalConditionsHealingDetails: '',
         knownAllergies: '',
+        continuousMedication: '',
+        pregnancyOrLactation: 'NÃO',
+        faintingOrBleedingHistory: '',
+        recentAlcoholOrDrugs: 'NÃO',
+        hasPreviousTattoos: 'NÃO',
         artistHandle: '',
         artDescription: '',
         agreedValue: '',
@@ -216,11 +221,98 @@ export default function FichaAnamnesePage() {
                                     ALERGIAS CONHECIDAS (TINTAS, MATERIAIS, CURATIVOS)
                                 </label>
                                 <Input
-                                    placeholder="Ex: Pigmento vermelho, Iodo, Látex..."
+                                    placeholder="Ex: Pigmento vermelho, Iodo, Látex... (ou 'Não')"
                                     value={formData.knownAllergies}
                                     onChange={(e) => setFormData(prev => ({ ...prev, knownAllergies: e.target.value }))}
                                     className="bg-zinc-900/50 border-white/5 focus:border-primary/50 h-12 rounded-2xl text-sm"
                                 />
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                                    FAZ USO DE MEDICAMENTOS DE USO CONTÍNUO?
+                                </label>
+                                <Input
+                                    placeholder="Ex: Anticoagulantes, Aspirina... (ou 'Não')"
+                                    value={formData.continuousMedication}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, continuousMedication: e.target.value }))}
+                                    className="bg-zinc-900/50 border-white/5 focus:border-primary/50 h-12 rounded-2xl text-sm"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                                    ESTÁ GESTANTE OU AMAMENTANDO?
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['SIM', 'NÃO'].map((opt) => (
+                                        <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, pregnancyOrLactation: opt }))}
+                                            className={`p-3 rounded-xl border text-xs font-bold transition-all ${formData.pregnancyOrLactation === opt
+                                                ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                                                : 'bg-zinc-900/40 border-white/5 text-zinc-500 hover:border-white/10'
+                                                }`}
+                                        >
+                                            {opt}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                                    HISTÓRICO DE DESMAIOS, QUEDA DE PRESSÃO OU HEMOFILIA?
+                                </label>
+                                <Input
+                                    placeholder="Ex: Desmaio com agulhas, Hemofilia... (ou 'Não')"
+                                    value={formData.faintingOrBleedingHistory}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, faintingOrBleedingHistory: e.target.value }))}
+                                    className="bg-zinc-900/50 border-white/5 focus:border-primary/50 h-12 rounded-2xl text-sm"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                                    CONSUMIU BEBIDA ALCOÓLICA OU DROGAS NAS ÚLTIMAS 24 HORAS?
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['SIM', 'NÃO'].map((opt) => (
+                                        <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, recentAlcoholOrDrugs: opt }))}
+                                            className={`p-3 rounded-xl border text-xs font-bold transition-all ${formData.recentAlcoholOrDrugs === opt
+                                                ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                                                : 'bg-zinc-900/40 border-white/5 text-zinc-500 hover:border-white/10'
+                                                }`}
+                                        >
+                                            {opt}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                                    JÁ POSSUI OUTRAS TATUAGENS?
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['SIM', 'NÃO'].map((opt) => (
+                                        <button
+                                            key={opt}
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, hasPreviousTattoos: opt }))}
+                                            className={`p-3 rounded-xl border text-xs font-bold transition-all ${formData.hasPreviousTattoos === opt
+                                                ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                                                : 'bg-zinc-900/40 border-white/5 text-zinc-500 hover:border-white/10'
+                                                }`}
+                                        >
+                                            {opt}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

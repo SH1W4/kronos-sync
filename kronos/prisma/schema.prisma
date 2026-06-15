@@ -527,6 +527,13 @@ model Anamnesis {
   medicalConditionsHealingDetails String? @db.Text // Se sim, qual?
   knownAllergies                  String? @db.Text // Tem alguma alergia conhecida a produtos, como; tintas ou materiais de curativo?
 
+  // Novas perguntas profissionais
+  continuousMedication            String? @db.Text // Faz uso de medicamentos de uso contínuo? Se sim, quais?
+  pregnancyOrLactation            String? // Está gestante ou amamentando? (SIM/NÃO)
+  faintingOrBleedingHistory       String? @db.Text // Histórico de desmaios, queda de pressão ou hemofilia?
+  recentAlcoholOrDrugs            String? // Consumiu bebida alcoólica ou drogas nas últimas 24 horas? (SIM/NÃO)
+  hasPreviousTattoos              String? // Já possui tatuagens? (SIM/NÃO)
+
   // Detalhes do Projeto (Snapshot)
   artistHandle   String? // Qual o @ da(o) artista responsável pelo seu projeto?
   artDescription String? @db.Text // qual a arte?
