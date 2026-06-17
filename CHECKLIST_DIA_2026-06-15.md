@@ -1,4 +1,4 @@
-# CHECKLIST DO DIA - 2026-06-12
+# CHECKLIST DO DIA - 2026-06-17
 ## KAIRØS OS - Movimento de Produção
 
 ---
@@ -76,7 +76,14 @@
 - [x] **Branch Management**: Merge de `fix/secure-bookings-settlements` para `main`
 - [x] **Git Push**: Todas as mudanças de UX e Calendar de hoje pushadas para o GitHub (`0282fd6`)
 - [x] **Vercel Deploy**: Deploy manual de produção efetuado via Vercel CLI com sucesso ✅
-### 🚀 ENTREGAS DE HOJE - 2026-06-15 (CORREÇÕES FINANCEIRAS & EVOLUÇÃO DE ANAMNESE)
+### 🚀 ENTREGAS DE HOJE - 2026-06-17 (CORREÇÃO DE BUG NA ABA CLIENTE)
+- [x] **Correção de Erro de Servidor na Aba Cliente**: Tratamento de valores null/undefined em cálculos de `totalSpent` e acesso a `bookings` e `slot` nas páginas de listagem e detalhes de clientes
+- [x] **Adição de Try/Catch em Queries Prisma**: Prevenção de falhas de servidor em caso de erros no banco de dados
+- [x] **Optional Chaining em Acessos a Dados Relacionados**: Proteção contra erros quando `bookings`, `slot`, ou `anamnesis` são null/undefined
+- [x] **Tipagens TypeScript Explícitas**: Correção de erros de compilação com tipagem adequada para parâmetros de reduce e filter
+- [x] **Git Commit e Push**: Mudanças commitadas e pushadas para o GitHub (commit `52f8cd0`)
+
+### 🚀 ENTREGAS ANTERIORES - 2026-06-15 (CORREÇÕES FINANCEIRAS & EVOLUÇÃO DE ANAMNESE)
 - [x] **Redirecionamento de Anamnese**: Criada rota cliente-side `/anamnese/fill/[bookingId]` para guiar links legados/externos de forma transparente para `/fichas/[bookingId]`. Adicionado `/anamnese(.*)` como rota pública no Clerk `middleware.ts`.
 - [x] **Correção do Split Financeiro na Conclusão**: Modificada a action `updateBookingStatus` para recalcular e persistir o split financeiro (`artistShare`, `studioShare` e `finalValue`) no banco de dados Neon ao marcar como `COMPLETED`. Evita faturamento zerado (R$ 0) para agendamentos vindos do Kiosk.
 - [x] **Botão "Definir Valor" no BookingCard**: Implementado botão dinâmico 💰 para permitir a definição do valor da sessão diretamente na agenda antes de concluí-la, caso ela esteja zerada.
