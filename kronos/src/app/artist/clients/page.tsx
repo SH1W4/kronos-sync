@@ -27,6 +27,15 @@ export default async function ClientsPage() {
     // Buscar Clientes que já fizeram booking com este artista
     // Prisma: Find Users where bookings some artistId
     let clients: any[] = []
+    let debugInfo: any = {
+        artistId: artist.id,
+        artistName: artist.user.name,
+        bookingsCount: 0,
+        bookingsDetails: [],
+        clientsFound: 0,
+        clientsDetails: []
+    }
+
     try {
         // Primeiro, verificar quantos bookings existem para este artista
         const artistBookings = await prisma.booking.findMany({
@@ -35,6 +44,9 @@ export default async function ClientsPage() {
         })
         console.log('🔍 DEBUG - Bookings do artista:', artistBookings.length)
         console.log('🔍 DEBUG - Bookings detalhes:', JSON.stringify(artistBookings, null, 2))
+
+        debugInfo.bookingsCount = artistBookings.length
+        debugInfo.bookingsDetails = artistBookings
 
         // Buscar clientes únicos que têm bookings com este artista
         clients = await prisma.user.findMany({
@@ -57,13 +69,45 @@ export default async function ClientsPage() {
         })
         console.log('🔍 DEBUG - Clientes encontrados:', clients.length)
         console.log('🔍 DEBUG - Clientes detalhes:', JSON.stringify(clients.map(c => ({ id: c.id, name: c.name, email: c.email, bookingsCount: c.bookings?.length })), null, 2))
+
+        debugInfo.clientsFound = clients.length
+        debugInfo.clientsDetails = clients.map(c => ({ id: c.id, name: c.name, email: c.email, bookingsCount: c.bookings?.length }))
     } catch (error) {
         console.error('Error fetching clients:', error)
         clients = []
+        debugInfo.error = error instanceof Error ? error.message : String(error)
     }
 
     return (
         <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 text-white min-h-screen">
+
+            {/* DEBUG INFO */}
+            <div className="bg-red-900/20 border border-red-500/30 p-4 rounded-lg text-xs font-mono">
+                <h3 className="text-red-400 font-bold mb-2">🔍 DEBUG INFO</h3>
+                <div className="space-y-1">
+                    <p><span className="text-gray-400">Artist ID:</span> {debugInfo.artistId}</p>
+                    <p><span className="text-gray-400">Artist Name:</span> {debugInfo.artistName}</p>
+                    <p><span className="text-gray-400">Bookings Count:</span> {debugInfo.bookingsCount}</p>
+                    <p><span className="text-gray-400">Clients Found:</span> {debugInfo.clientsFound}</p>
+                    {debugInfo.error && <p className="text-red-400"><span className="text-gray-400">Error:</span> {debugInfo.error}</p>}
+                </div>
+                {debugInfo.bookingsDetails.length > 0 && (
+                    <details className="mt-2">
+                        <summary className="cursor-pointer text-red-300 hover:text-red-200">Ver Bookings Detalhes</summary>
+                        <pre className="mt-2 bg-black/50 p-2 rounded overflow-auto max-h-40">
+                            {JSON.stringify(debugInfo.bookingsDetails, null, 2)}
+                        </pre>
+                    </details>
+                )}
+                {debugInfo.clientsDetails.length > 0 && (
+                    <details className="mt-2">
+                        <summary className="cursor-pointer text-red-300 hover:text-red-200">Ver Clientes Detalhes</summary>
+                        <pre className="mt-2 bg-black/50 p-2 rounded overflow-auto max-h-40">
+                            {JSON.stringify(debugInfo.clientsDetails, null, 2)}
+                        </pre>
+                    </details>
+                )}
+            </div>
 
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
