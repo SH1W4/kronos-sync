@@ -69,9 +69,9 @@ export default async function InvitePage({ params }: PageProps) {
                             <Sparkles size={16} className="text-primary" />
                             <span className="text-[10px] font-mono text-primary uppercase tracking-[0.3em] font-bold">Protocolo de Recrutamento</span>
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-orbitron font-black tracking-tight uppercase leading-none italic text-glitch" data-text="VOCÊ FOI CONVOCADO.">
+                        <h1 className="text-4xl md:text-6xl font-orbitron font-black tracking-tight uppercase leading-none italic text-glitch" data-text="VOCÊ FOI CONVOCADO(A).">
                             VOCÊ FOI <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">CONVOCADO.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">CONVOCADO(A).</span>
                         </h1>
                         <p className="text-sm text-gray-400 font-mono uppercase leading-relaxed max-w-sm mx-auto md:mx-0">
                             Uma credencial de elite foi gerada em seu nome. O estúdio <span className="text-white font-bold">{invite.workspace?.name || 'KRONØS'}</span> aguarda sua integração.
