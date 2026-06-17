@@ -21,10 +21,22 @@ export default async function ClientsPage() {
 
     if (!artist) return <div>Perfil não encontrado</div>
 
+    console.log('🔍 DEBUG - Artist ID:', artist.id)
+    console.log('🔍 DEBUG - Artist User:', artist.user.name)
+
     // Buscar Clientes que já fizeram booking com este artista
     // Prisma: Find Users where bookings some artistId
     let clients: any[] = []
     try {
+        // Primeiro, verificar quantos bookings existem para este artista
+        const artistBookings = await prisma.booking.findMany({
+            where: { artistId: artist.id },
+            select: { id: true, clientId: true, client: { select: { id: true, name: true, email: true } } }
+        })
+        console.log('🔍 DEBUG - Bookings do artista:', artistBookings.length)
+        console.log('🔍 DEBUG - Bookings detalhes:', JSON.stringify(artistBookings, null, 2))
+
+        // Buscar clientes únicos que têm bookings com este artista
         clients = await prisma.user.findMany({
             where: {
                 bookings: {
@@ -43,6 +55,8 @@ export default async function ClientsPage() {
                 }
             }
         })
+        console.log('🔍 DEBUG - Clientes encontrados:', clients.length)
+        console.log('🔍 DEBUG - Clientes detalhes:', JSON.stringify(clients.map(c => ({ id: c.id, name: c.name, email: c.email, bookingsCount: c.bookings?.length })), null, 2))
     } catch (error) {
         console.error('Error fetching clients:', error)
         clients = []
