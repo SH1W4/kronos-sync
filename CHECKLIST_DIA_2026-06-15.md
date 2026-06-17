@@ -82,6 +82,17 @@
 - [x] **Optional Chaining em Acessos a Dados Relacionados**: Proteção contra erros quando `bookings`, `slot`, ou `anamnesis` são null/undefined
 - [x] **Tipagens TypeScript Explícitas**: Correção de erros de compilação com tipagem adequada para parâmetros de reduce e filter
 - [x] **Git Commit e Push**: Mudanças commitadas e pushadas para o GitHub (commit `52f8cd0`)
+- [x] **Identificação e Correção de Schema Mismatch**: Campos médicos (`continuousMedication`, `pregnancyOrLactation`, `faintingOrBleedingHistory`, `recentAlcoholOrDrugs`, `hasPreviousTattoos`) comentados temporariamente no schema.prisma pois não existiam no banco de dados, causando erro na query de clientes
+- [x] **Comentado Referências a Campos Médicos Removidos**: Comentado referências em `anamnesis.ts`, `fichas/[bookingId]/page.tsx` e `lib/validations.ts` para resolver erros de build após comentar campos no schema
+- [x] **Regeneração do Prisma Client**: Prisma client regenerado após alterações no schema
+- [x] **Painel de Debug Visível**: Adicionado painel de debug visível na página de clientes para identificar a causa do erro (mostrava erro de coluna não existente)
+- [x] **Remoção do Painel de Debug**: Painel de debug removido após confirmar que clientes apareciam corretamente (2 clientes encontrados)
+- [x] **Deploy no Vercel**: Deploy realizado com sucesso após correções
+- [x] **Mudança de "CONVOCADO" para "CONVOCADO(A)"**: Atualizado texto na página de convite para incluir ambos os gêneros sem linguagem adaptativa
+- [x] **Adicionado CLERK_WEBHOOK_SECRET ao .env.example**: Variável de ambiente adicionada com instruções de configuração do webhook do Clerk para sincronização automática de usuários
+- [x] **Cron Job para Confirmação Automática de Agendamentos**: Criado `/api/cron/auto-confirm-bookings` para confirmar automaticamente agendamentos expirados (quando a data passa sem cancelamento) com integração ao sistema de gamificação (XP, achievements)
+- [x] **Função para Reenviar Link da Ficha de Anamnese**: Adicionada função `resendAnamnesisLink()` em `bookings.ts` para reenviar o link da ficha de anamnese via WhatsApp caso o cliente não tenha recebido ou perdido
+- [x] **Link da Ficha Enviado Automaticamente**: Verificado que o link da ficha de anamnese já é enviado automaticamente via WhatsApp quando o booking é criado, com preenchimento automático de dados do cliente na página
 
 ### 🚀 ENTREGAS ANTERIORES - 2026-06-15 (CORREÇÕES FINANCEIRAS & EVOLUÇÃO DE ANAMNESE)
 - [x] **Redirecionamento de Anamnese**: Criada rota cliente-side `/anamnese/fill/[bookingId]` para guiar links legados/externos de forma transparente para `/fichas/[bookingId]`. Adicionado `/anamnese(.*)` como rota pública no Clerk `middleware.ts`.
