@@ -803,6 +803,87 @@ export async function updateBooking(data: {
 }
 
 /**
+ * Resend anamnesis link to client via WhatsApp
+ */
+export async function resendAnamnesisLink(bookingId: string) {
+    try {
+        const { userId: clerkUserId } = await auth()
+        if (!clerkUserId) {
+            return { error: 'Não autorizado' }
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { clerkId: clerkUserId },
+            include: { artist: true, memberships: true }
+        })
+
+        if (!user?.artist) {
+            return { error: 'Apenas artistas podem reenviar ficha de anamnese' }
+        }
+
+        const workspaceId = user.memberships[0]?.workspaceId
+
+        if (!workspaceId) {
+            return { error: 'Workspace não encontrado' }
+        }
+
+        // Verify ownership
+        const booking = await prisma.booking.findUnique({
+            where: { id: bookingId },
+            include: {
+                client: true,
+                artist: { include: { user: true } }
+            }
+        })
+
+        if (!booking) {
+            return { error: 'Agendamento não encontrado' }
+        }
+
+        if (booking.artistId !== user.artist.id && user.role !== 'ADMIN') {
+            return { error: 'Você não tem permissão para este agendamento' }
+        }
+
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            select: { name: true }
+        })
+
+        if (!workspace) {
+            return { error: 'Workspace inválido' }
+        }
+
+        // Get booking details for the message
+        const rawDate = new Date(booking.scheduledFor)
+        const dateStr = rawDate.toLocaleDateString('pt-BR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        })
+
+        const messageText = `⚡ *KRONØS OS - Link da Ficha de Anamnese* ⚡\n\nOlá, *${booking.client.name || 'Cliente'}*!\n\nEste é um lembrete para preencher sua Ficha de Anamnese antes da sua sessão no *${workspace.name}*.\n\n👤 *Artista:* ${booking.artist.user.name || 'Artista'}\n📅 *Data:* ${dateStr}\n\n⚠️ *IMPORTANTE:* O preenchimento da sua Ficha de Anamnese é obrigatório antes do início da sessão.\nAcesse o link seguro para respondê-la digitalmente:\n👉 ${process.env.NEXTAUTH_URL}/fichas/${booking.id}\n\nNos vemos em breve!\n_${workspace.name}_`
+
+        // Send WhatsApp message
+        const clientPhone = booking.client.phone
+        if (clientPhone) {
+            const { sendWhatsAppMessage } = await import('@/lib/whatsapp')
+            await sendWhatsAppMessage({
+                phone: clientPhone,
+                text: messageText
+            })
+        }
+
+        return { success: true, message: 'Link da ficha de anamnese reenviado com sucesso' }
+
+    } catch (error) {
+        console.error('Error resending anamnesis link:', error)
+        return { error: 'Erro ao reenviar link da ficha de anamnese' }
+    }
+}
+
+/**
  * Delete booking
  */
 export async function deleteBooking(bookingId: string) {
