@@ -48,10 +48,10 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 medicalConditionsHealing: encrypt(validData.medicalConditionsHealing || ''),
                 medicalConditionsHealingDetails: encrypt(validData.medicalConditionsHealingDetails || ''),
                 knownAllergies: encrypt(validData.knownAllergies || ''),
-                continuousMedication: encrypt(validData.continuousMedication || ''),
-                pregnancyOrLactation: encrypt(validData.pregnancyOrLactation || ''),
-                faintingOrBleedingHistory: encrypt(validData.faintingOrBleedingHistory || ''),
-                recentAlcoholOrDrugs: encrypt(validData.recentAlcoholOrDrugs || ''),
+                // continuousMedication: encrypt(validData.continuousMedication || ''), // Comentado temporariamente - aguardando migration
+                // pregnancyOrLactation: encrypt(validData.pregnancyOrLactation || ''), // Comentado temporariamente - aguardando migration
+                // faintingOrBleedingHistory: encrypt(validData.faintingOrBleedingHistory || ''), // Comentado temporariamente - aguardando migration
+                // recentAlcoholOrDrugs: encrypt(validData.recentAlcoholOrDrugs || ''), // Comentado temporariamente - aguardando migration
                 hasPreviousTattoos: validData.hasPreviousTattoos || '',
                 artistHandle: validData.artistHandle,
                 artDescription: validData.artDescription,
@@ -74,10 +74,10 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 medicalConditionsHealing: encrypt(validData.medicalConditionsHealing || ''),
                 medicalConditionsHealingDetails: encrypt(validData.medicalConditionsHealingDetails || ''),
                 knownAllergies: encrypt(validData.knownAllergies || ''),
-                continuousMedication: encrypt(validData.continuousMedication || ''),
-                pregnancyOrLactation: encrypt(validData.pregnancyOrLactation || ''),
-                faintingOrBleedingHistory: encrypt(validData.faintingOrBleedingHistory || ''),
-                recentAlcoholOrDrugs: encrypt(validData.recentAlcoholOrDrugs || ''),
+                // continuousMedication: encrypt(validData.continuousMedication || ''), // Comentado temporariamente - aguardando migration
+                // pregnancyOrLactation: encrypt(validData.pregnancyOrLactation || ''), // Comentado temporariamente - aguardando migration
+                // faintingOrBleedingHistory: encrypt(validData.faintingOrBleedingHistory || ''), // Comentado temporariamente - aguardando migration
+                // recentAlcoholOrDrugs: encrypt(validData.recentAlcoholOrDrugs || ''), // Comentado temporariamente - aguardando migration
                 hasPreviousTattoos: validData.hasPreviousTattoos || '',
                 artistHandle: validData.artistHandle,
                 artDescription: validData.artDescription,
@@ -171,10 +171,10 @@ export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId:
                 medicalConditionsHealing: source.medicalConditionsHealing,
                 medicalConditionsHealingDetails: source.medicalConditionsHealingDetails,
                 knownAllergies: source.knownAllergies,
-                continuousMedication: source.continuousMedication,
-                pregnancyOrLactation: source.pregnancyOrLactation,
-                faintingOrBleedingHistory: source.faintingOrBleedingHistory,
-                recentAlcoholOrDrugs: source.recentAlcoholOrDrugs,
+                // continuousMedication: source.continuousMedication, // Comentado temporariamente - aguardando migration
+                // pregnancyOrLactation: source.pregnancyOrLactation, // Comentado temporariamente - aguardando migration
+                // faintingOrBleedingHistory: source.faintingOrBleedingHistory, // Comentado temporariamente - aguardando migration
+                // recentAlcoholOrDrugs: source.recentAlcoholOrDrugs, // Comentado temporariamente - aguardando migration
                 hasPreviousTattoos: source.hasPreviousTattoos,
 
                 // Dados da Sessão (RESET / DEFAULT)

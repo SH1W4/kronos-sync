@@ -112,10 +112,10 @@ export const anamnesisSchema = z.object({
     medicalConditionsHealing: z.string().max(1000).optional(),
     medicalConditionsHealingDetails: z.string().max(1000).optional(),
     knownAllergies: z.string().max(1000).optional(),
-    continuousMedication: z.string().max(1000).optional(),
-    pregnancyOrLactation: z.string().max(50).optional(),
-    faintingOrBleedingHistory: z.string().max(1000).optional(),
-    recentAlcoholOrDrugs: z.string().max(50).optional(),
+    // continuousMedication: z.string().max(1000).optional(), // Comentado temporariamente - aguardando migration
+    // pregnancyOrLactation: z.string().max(50).optional(), // Comentado temporariamente - aguardando migration
+    // faintingOrBleedingHistory: z.string().max(1000).optional(), // Comentado temporariamente - aguardando migration
+    // recentAlcoholOrDrugs: z.string().max(50).optional(), // Comentado temporariamente - aguardando migration
     hasPreviousTattoos: z.string().max(50).optional(),
     artistHandle: z.string().optional(),
     artDescription: z.string().max(1000).optional(),

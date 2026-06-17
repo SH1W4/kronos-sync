@@ -112,4 +112,4 @@
 
 ---
 
-**KAIRØS OS - Infraestrutura Proprietária. Versão 2.0.**
+**KAIRØS OS - Infraestrutura Proprietária. Versão 0.4.**

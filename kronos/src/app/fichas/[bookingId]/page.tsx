@@ -25,10 +25,10 @@ export default function FichaAnamnesePage() {
         medicalConditionsHealing: '',
         medicalConditionsHealingDetails: '',
         knownAllergies: '',
-        continuousMedication: '',
-        pregnancyOrLactation: 'NÃO',
-        faintingOrBleedingHistory: '',
-        recentAlcoholOrDrugs: 'NÃO',
+        // continuousMedication: '', // Comentado temporariamente - aguardando migration
+        // pregnancyOrLactation: 'NÃO', // Comentado temporariamente - aguardando migration
+        // faintingOrBleedingHistory: '', // Comentado temporariamente - aguardando migration
+        // recentAlcoholOrDrugs: 'NÃO', // Comentado temporariamente - aguardando migration
         hasPreviousTattoos: 'NÃO',
         artistHandle: '',
         artDescription: '',
@@ -228,7 +228,8 @@ export default function FichaAnamnesePage() {
                                 />
                             </div>
 
-                            <div className="space-y-3 pt-2">
+                            {/* Comentado temporariamente - aguardando migration */}
+                            {/* <div className="space-y-3 pt-2">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                                     FAZ USO DE MEDICAMENTOS DE USO CONTÍNUO?
                                 </label>
@@ -238,9 +239,10 @@ export default function FichaAnamnesePage() {
                                     onChange={(e) => setFormData(prev => ({ ...prev, continuousMedication: e.target.value }))}
                                     className="bg-zinc-900/50 border-white/5 focus:border-primary/50 h-12 rounded-2xl text-sm"
                                 />
-                            </div>
+                            </div> */}
 
-                            <div className="space-y-4">
+                            {/* Comentado temporariamente - aguardando migration */}
+                            {/* <div className="space-y-4">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                                     ESTÁ GESTANTE OU AMAMENTANDO?
                                 </label>
@@ -259,9 +261,10 @@ export default function FichaAnamnesePage() {
                                         </button>
                                     ))}
                                 </div>
-                            </div>
+                            </div> */}
 
-                            <div className="space-y-3 pt-2">
+                            {/* Comentado temporariamente - aguardando migration */}
+                            {/* <div className="space-y-3 pt-2">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                                     HISTÓRICO DE DESMAIOS, QUEDA DE PRESSÃO OU HEMOFILIA?
                                 </label>
@@ -271,9 +274,10 @@ export default function FichaAnamnesePage() {
                                     onChange={(e) => setFormData(prev => ({ ...prev, faintingOrBleedingHistory: e.target.value }))}
                                     className="bg-zinc-900/50 border-white/5 focus:border-primary/50 h-12 rounded-2xl text-sm"
                                 />
-                            </div>
+                            </div> */}
 
-                            <div className="space-y-4">
+                            {/* Comentado temporariamente - aguardando migration */}
+                            {/* <div className="space-y-4">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                                     CONSUMIU BEBIDA ALCOÓLICA OU DROGAS NAS ÚLTIMAS 24 HORAS?
                                 </label>
@@ -292,7 +296,7 @@ export default function FichaAnamnesePage() {
                                         </button>
                                     ))}
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="space-y-4">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
