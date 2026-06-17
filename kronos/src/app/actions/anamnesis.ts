@@ -52,7 +52,7 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 // pregnancyOrLactation: encrypt(validData.pregnancyOrLactation || ''), // Comentado temporariamente - aguardando migration
                 // faintingOrBleedingHistory: encrypt(validData.faintingOrBleedingHistory || ''), // Comentado temporariamente - aguardando migration
                 // recentAlcoholOrDrugs: encrypt(validData.recentAlcoholOrDrugs || ''), // Comentado temporariamente - aguardando migration
-                hasPreviousTattoos: validData.hasPreviousTattoos || '',
+                // hasPreviousTattoos: validData.hasPreviousTattoos || '', // Comentado temporariamente - aguardando migration
                 artistHandle: validData.artistHandle,
                 artDescription: validData.artDescription,
                 agreedValue: validData.agreedValue,
@@ -78,7 +78,7 @@ export async function saveAnamnesis(bookingId: string, data: unknown) {
                 // pregnancyOrLactation: encrypt(validData.pregnancyOrLactation || ''), // Comentado temporariamente - aguardando migration
                 // faintingOrBleedingHistory: encrypt(validData.faintingOrBleedingHistory || ''), // Comentado temporariamente - aguardando migration
                 // recentAlcoholOrDrugs: encrypt(validData.recentAlcoholOrDrugs || ''), // Comentado temporariamente - aguardando migration
-                hasPreviousTattoos: validData.hasPreviousTattoos || '',
+                // hasPreviousTattoos: validData.hasPreviousTattoos || '', // Comentado temporariamente - aguardando migration
                 artistHandle: validData.artistHandle,
                 artDescription: validData.artDescription,
                 agreedValue: validData.agreedValue,
@@ -175,7 +175,7 @@ export async function reuseAnamnesis(targetBookingId: string, sourceAnamnesisId:
                 // pregnancyOrLactation: source.pregnancyOrLactation, // Comentado temporariamente - aguardando migration
                 // faintingOrBleedingHistory: source.faintingOrBleedingHistory, // Comentado temporariamente - aguardando migration
                 // recentAlcoholOrDrugs: source.recentAlcoholOrDrugs, // Comentado temporariamente - aguardando migration
-                hasPreviousTattoos: source.hasPreviousTattoos,
+                // hasPreviousTattoos: source.hasPreviousTattoos, // Comentado temporariamente - aguardando migration
 
                 // Dados da Sessão (RESET / DEFAULT)
                 artistHandle: source.artistHandle, // Geralmente o mesmo artista, mas editável

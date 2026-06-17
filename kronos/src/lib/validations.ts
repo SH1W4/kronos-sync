@@ -116,7 +116,7 @@ export const anamnesisSchema = z.object({
     // pregnancyOrLactation: z.string().max(50).optional(), // Comentado temporariamente - aguardando migration
     // faintingOrBleedingHistory: z.string().max(1000).optional(), // Comentado temporariamente - aguardando migration
     // recentAlcoholOrDrugs: z.string().max(50).optional(), // Comentado temporariamente - aguardando migration
-    hasPreviousTattoos: z.string().max(50).optional(),
+    // hasPreviousTattoos: z.string().max(50).optional(), // Comentado temporariamente - aguardando migration
     artistHandle: z.string().optional(),
     artDescription: z.string().max(1000).optional(),
     agreedValue: z.string().optional(),

@@ -29,7 +29,7 @@ export default function FichaAnamnesePage() {
         // pregnancyOrLactation: 'NÃO', // Comentado temporariamente - aguardando migration
         // faintingOrBleedingHistory: '', // Comentado temporariamente - aguardando migration
         // recentAlcoholOrDrugs: 'NÃO', // Comentado temporariamente - aguardando migration
-        hasPreviousTattoos: 'NÃO',
+        // hasPreviousTattoos: 'NÃO', // Comentado temporariamente - aguardando migration
         artistHandle: '',
         artDescription: '',
         agreedValue: '',
@@ -298,7 +298,8 @@ export default function FichaAnamnesePage() {
                                 </div>
                             </div> */}
 
-                            <div className="space-y-4">
+                            {/* Comentado temporariamente - aguardando migration */}
+                            {/* <div className="space-y-4">
                                 <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                                     JÁ POSSUI OUTRAS TATUAGENS?
                                 </label>
@@ -317,7 +318,7 @@ export default function FichaAnamnesePage() {
                                         </button>
                                     ))}
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 

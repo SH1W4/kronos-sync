@@ -532,7 +532,7 @@ model Anamnesis {
   // pregnancyOrLactation            String? // Está gestante ou amamentando? (SIM/NÃO)
   // faintingOrBleedingHistory       String? @db.Text // Histórico de desmaios, queda de pressão ou hemofilia?
   // recentAlcoholOrDrugs            String? // Consumiu bebida alcoólica ou drogas nas últimas 24 horas? (SIM/NÃO)
-  hasPreviousTattoos              String? // Já possui tatuagens? (SIM/NÃO)
+  // hasPreviousTattoos              String? // Já possui tatuagens? (SIM/NÃO) // Comentado temporariamente - aguardando migration
 
   // Detalhes do Projeto (Snapshot)
   artistHandle   String? // Qual o @ da(o) artista responsável pelo seu projeto?
