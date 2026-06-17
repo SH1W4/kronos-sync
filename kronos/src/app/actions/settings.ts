@@ -143,8 +143,11 @@ export async function updateArtistSettings(data: { name?: string; commissionRate
             sanitizedData.instagram = data.instagram?.trim() || null
         }
         if (data.commissionRate !== undefined) {
-            if (data.commissionRate === null || isNaN(data.commissionRate)) {
+            const parsedRate = typeof data.commissionRate === 'string' ? parseFloat(data.commissionRate) : Number(data.commissionRate)
+            if (data.commissionRate === null || isNaN(parsedRate)) {
                 delete sanitizedData.commissionRate
+            } else {
+                sanitizedData.commissionRate = parsedRate
             }
         }
 

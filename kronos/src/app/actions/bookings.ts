@@ -363,6 +363,7 @@ export async function getMyBookings(data: {
     startDate: Date
     endDate: Date
     includeGoogleEvents?: boolean
+    myOnly?: boolean // 🔴 BUG FIX: quando true, filtra apenas os agendamentos do próprio artista
 }) {
     try {
         const { userId: clerkUserId } = await auth()
@@ -389,10 +390,12 @@ export async function getMyBookings(data: {
             status: { not: 'CANCELLED' } // Ocultar os cancelados da view
         };
 
-        if (workspaceId) {
-            whereClause.workspaceId = workspaceId; // Traz de todos do estúdio
-        } else {
-            whereClause.artistId = user.artist.id; // Fallback: só o dele
+        // 🔴 BUG FIX: se myOnly=true, sempre filtra por artistId (aba pessoal)
+        // caso contrário usa workspaceId para trazer todos do estúdio (aba studio-agenda)
+        if (data.myOnly || !workspaceId) {
+            whereClause.artistId = user.artist.id;
+        } else if (workspaceId) {
+            whereClause.workspaceId = workspaceId;
         }
 
         const rawBookings = await prisma.booking.findMany({

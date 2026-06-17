@@ -83,13 +83,27 @@ export async function saveProduct(data: {
 
         if (!user?.artist && user?.role !== 'ADMIN') return { success: false, message: 'Apenas artistas podem postar produtos' }
 
+        const basePrice = Number(data.basePrice)
+        const costPrice = Number(data.costPrice ?? 0)
+        const quantity = Number(data.quantity ?? 0)
+
+        if (isNaN(basePrice)) {
+            return { success: false, message: 'O preço base deve ser um número válido.' }
+        }
+        if (isNaN(costPrice)) {
+            return { success: false, message: 'O custo de aquisição deve ser um número válido.' }
+        }
+        if (isNaN(quantity)) {
+            return { success: false, message: 'A quantidade deve ser um número válido.' }
+        }
+
         const productData = {
             title: data.title,
             description: data.description,
-            basePrice: data.basePrice,
-            costPrice: data.costPrice ?? 0,
-            quantity: data.quantity ?? 0,
-            finalPrice: calculateProductPrice(data.basePrice, BUSINESS_RULES.DEFAULT_MARKUP), // Auto-markup for BETA
+            basePrice: basePrice,
+            costPrice: costPrice,
+            quantity: quantity,
+            finalPrice: calculateProductPrice(basePrice, BUSINESS_RULES.DEFAULT_MARKUP), // Auto-markup for BETA
             type: data.type,
             imageUrl: data.imageUrl,
             isSold: data.isSold ?? false,

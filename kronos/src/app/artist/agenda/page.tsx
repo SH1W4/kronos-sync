@@ -48,7 +48,8 @@ export default function AgendaPage() {
             const result = await getMyBookings({
                 startDate,
                 endDate,
-                includeGoogleEvents: true
+                includeGoogleEvents: true,
+                myOnly: true
             })
 
             if (result.success && result.bookings) {

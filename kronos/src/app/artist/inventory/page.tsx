@@ -302,8 +302,8 @@ export default function InventoryPage() {
                                         <Input
                                             type="number"
                                             className="bg-white/5 border-white/10 h-14 rounded-2xl"
-                                            value={formData.basePrice}
-                                            onChange={e => setFormData({ ...formData, basePrice: parseFloat(e.target.value) })}
+                                            value={formData.basePrice || ''}
+                                            onChange={e => setFormData({ ...formData, basePrice: e.target.value === '' ? 0 : parseFloat(e.target.value) })}
                                             required
                                         />
                                         <p className="text-[8px] font-mono text-gray-600 mt-1 uppercase tracking-tighter">Markup de 20% será aplicado automaticamente.</p>
@@ -313,8 +313,8 @@ export default function InventoryPage() {
                                         <Input
                                             type="number"
                                             className="bg-white/5 border-white/10 h-14 rounded-2xl"
-                                            value={formData.costPrice}
-                                            onChange={e => setFormData({ ...formData, costPrice: parseFloat(e.target.value) })}
+                                            value={formData.costPrice || ''}
+                                            onChange={e => setFormData({ ...formData, costPrice: e.target.value === '' ? 0 : parseFloat(e.target.value) })}
                                         />
                                     </div>
                                     <div>

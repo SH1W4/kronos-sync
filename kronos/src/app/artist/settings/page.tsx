@@ -183,7 +183,7 @@ export default function SettingsPage() {
             const result = await updateArtistSettings({
                 name,
                 // Comissão: apenas ADMIN pode alterar. Não enviamos o campo para não-admins.
-                ...(isAdmin && commission ? { commissionRate: parseFloat(commission) } : {}),
+                ...(isAdmin && commission && !isNaN(parseFloat(commission)) ? { commissionRate: parseFloat(commission) } : {}),
                 instagram,
                 image // sempre inclui, mesmo que seja string vazia (para suportar remover foto)
             })

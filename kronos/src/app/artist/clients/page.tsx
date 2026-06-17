@@ -15,31 +15,38 @@ export default async function ClientsPage() {
     }
 
     const artist = await prisma.artist.findFirst({
-        where: { user: { clerkId: clerkUserId } }
+        where: { user: { clerkId: clerkUserId } },
+        include: { user: true }
     })
 
     if (!artist) return <div>Perfil não encontrado</div>
 
     // Buscar Clientes que já fizeram booking com este artista
     // Prisma: Find Users where bookings some artistId
-    const clients = await prisma.user.findMany({
-        where: {
-            bookings: {
-                some: {
-                    artistId: artist.id
+    let clients: any[] = []
+    try {
+        clients = await prisma.user.findMany({
+            where: {
+                bookings: {
+                    some: {
+                        artistId: artist.id
+                    }
+                }
+            },
+            include: {
+                bookings: {
+                    where: { artistId: artist.id },
+                    orderBy: { createdAt: 'desc' },
+                    include: {
+                        anamnesis: true
+                    }
                 }
             }
-        },
-        include: {
-            bookings: {
-                where: { artistId: artist.id },
-                orderBy: { createdAt: 'desc' },
-                include: {
-                    anamnesis: true
-                }
-            }
-        }
-    })
+        })
+    } catch (error) {
+        console.error('Error fetching clients:', error)
+        clients = []
+    }
 
     return (
         <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8 text-white min-h-screen">
@@ -72,7 +79,7 @@ export default async function ClientsPage() {
                     </div>
                 ) : (
                     clients.map((client) => {
-                        const totalSpent = client.bookings.reduce((acc, b) => acc + b.value, 0)
+                        const totalSpent = client.bookings.reduce((acc: number, b: any) => acc + (b.value || 0), 0)
                         const lastVisit = client.bookings[0]?.createdAt
                             ? new Date(client.bookings[0].createdAt).toLocaleDateString()
                             : 'N/A'
@@ -112,7 +119,7 @@ export default async function ClientsPage() {
                                     <div className="text-right">
                                         <p className="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Anamneses</p>
                                         <p className="text-sm font-bold text-white font-orbitron">
-                                            {client.bookings.filter(b => b.anamnesis).length} Assinadas
+                                            {client.bookings.filter((b: any) => b.anamnesis).length} Assinadas
                                         </p>
                                     </div>
                                 </div>

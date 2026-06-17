@@ -1,3 +1,28 @@
+## [15/06/2026] - Billing Splits, Booking Card Enhancements & Advanced Anamnesis
+
+### 💰 Financeiro & Split Recalculation
+- **Automatic Recalculation:** Implementado recálculo automático de splits financeiros (comissão e share do artista/estúdio) no momento da conclusão do agendamento (`COMPLETED`), garantindo valores íntegros mesmo se alterados após a criação.
+- **Manual Price Setting:** Adicionado o botão "Definir Valor" diretamente nos cartões de agendamento (`BookingCard`) com valor zero (ex. agendamentos vindos do Kiosk), permitindo ajuste rápido inline pelo profissional.
+
+### 🛡️ Validação & UX do Onboarding
+- **Flexible Phone Validation:** Flexibilização das regras de validação de telefone no fluxo de onboarding para evitar problemas com formatações locais e código do país (+55).
+- **Legacy Anamnesis URLs:** Suporte a URLs antigas de anamnese para retrocompatibilidade e evitar quebras de links compartilhados anteriormente.
+
+### 🏥 Anamnese Médica Avançada
+- **Professional Form Upgrade:** Inclusão de novas perguntas médicas profissionais obrigatórias na anamnese, cobrindo histórico cirúrgico, alergias, e uso de anticoagulantes ou marca-passo.
+
+### ⚙️ Scripts & Ferramentas de Diagnóstico
+- **Utility Scripts Suite:** Criação de scripts especializados na pasta `kronos/scripts/` para validação e auditoria:
+  - `check-bookings-dates.ts`: Auditoria de agendamentos e datas.
+  - `check-feedback-and-users.ts` e `check-newer-feedbacks.ts`: Inspeção de feedbacks de usuários e logs de IA.
+  - `simulate-earnings.ts`: Simulação de ganhos consolidados por artista.
+
+### 🔜 Próximos Passos
+- Realizar deploy das melhorias financeiras no ambiente de produção (Vercel).
+- Continuar o monitoramento de splits nas sessões de teste.
+
+---
+
 ## [04/01/2026] - Supreme Showcase, Security Shield & Strategic Sovereignty
 
 ### 🛡️ Produção & Segurança (Hardening)
