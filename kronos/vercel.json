@@ -17,6 +17,10 @@
     {
       "path": "/api/cron/check-expired-guests",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/auto-confirm-bookings",
+      "schedule": "0 * * * *"
     }
   ]
 }
