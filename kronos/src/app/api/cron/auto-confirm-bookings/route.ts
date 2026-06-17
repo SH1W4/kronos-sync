@@ -64,6 +64,9 @@ export async function GET(req: NextRequest) {
                         finalValue,
                         artistShare,
                         studioShare
+                    },
+                    include: {
+                        client: true
                     }
                 })
 
