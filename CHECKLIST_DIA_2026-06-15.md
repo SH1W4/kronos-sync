@@ -123,4 +123,45 @@
 
 ---
 
+## 🎯 PONTOS DE MELHORIA PARA FUTURAS SESSÕES
+
+### 🧪 TESTES E QUALIDADE
+- [ ] **Testes Unitários**: Implementar testes unitários para server actions críticas (bookings, anamnesis, gamificação)
+- [ ] **Testes E2E**: Adicionar testes end-to-end com Playwright para fluxos principais (agendamento, checkout, perfil)
+- [ ] **Testes de Integração**: Criar testes para webhooks (Clerk, n8n) e integrações externas
+- [ ] **Coverage**: Configurar ferramenta de coverage (Jest/Vitest) com meta mínima de 80%
+
+### 📊 MONITORAMENTO E OBSERVABILIDADE
+- [ ] **Logs Estruturados**: Migrar de console.log para logger estruturado (pino, winston)
+- [ ] **Sentry**: Integrar Sentry para captura de erros em produção
+- [ ] **Métricas de Performance**: Adicionar Web Vitals e métricas customizadas
+- [ ] **Dashboards**: Criar dashboards no Datadog ou similar para monitoramento
+
+### 📚 DOCUMENTAÇÃO TÉCNICA
+- [ ] **Documentação de API**: Criar documentação OpenAPI/Swagger para endpoints
+- [ ] **Diagramas de Arquitetura**: Adicionar diagramas C4 ou Mermaid para arquitetura do sistema
+- [ ] **Documentação de Fluxos**: Documentar fluxos complexos (gamificação, settlements, webhooks)
+- [ ] **README Técnico**: Criar README detalhado para desenvolvedores
+
+### 🎨 GESTÃO DE ESTADO E PERFORMANCE
+- [ ] **Estado Global**: Avaliar necessidade de Zustand/Redux para estado global
+- [ ] **Otimização de Re-renders**: Implementar React.memo, useMemo, useCallback onde necessário
+- [ ] **Lazy Loading**: Adicionar dynamic import para componentes pesados
+- [ ] **Cache Avançado**: Implementar estratégias de cache (SWR, React Query)
+- [ ] **Image Optimization**: Revisar uso de next/image para otimização
+
+### 🔒 SEGURANÇA AVANÇADA
+- [ ] **Rate Limiting**: Implementar rate limiting em APIs críticas
+- [ ] **Input Validation**: Revisar e fortalecer validações Zod
+- [ ] **Security Headers**: Adicionar headers de segurança (CSP, HSTS)
+- [ ] **Auditoria**: Implementar logs de auditoria para ações sensíveis
+
+### 🚀 ESCALABILIDADE
+- [ ] **Database Indexing**: Revisar e otimizar índices no Prisma
+- [ ] **Connection Pooling**: Configurar pooling adequado para PostgreSQL
+- [ ] **CDN**: Configurar CDN para assets estáticos
+- [ ] **Edge Functions**: Mover APIs críticas para Edge Functions
+
+---
+
 **KAIRØS OS - Infraestrutura Proprietária. Versão 0.4.**
