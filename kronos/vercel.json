@@ -7,7 +7,9 @@
       "feat/kai-agent-rag": false,
       "feature/setup-project": false,
       "feature/testing-mcp-assistant": false
-    }
+    },
+    "prebuiltGit": true,
+    "autoBranches": true
   },
   "github": {
     "silent": true,
