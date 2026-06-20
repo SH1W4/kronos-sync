@@ -1,10 +1,3 @@
----
-title: "Manual do Administrador"
-docsync:
-  audience: admin
-  priority: 1
----
-
 # KAIRØS OS: MANUAL DO ADMINISTRADOR 🏛️
 **"Controle absoluto para estúdios profissionais."**
 
@@ -95,4 +88,4 @@ Acesse o chat KAI no seu dashboard para consultas rápidas em linguagem natural:
 
 ---
 
-**KAIRØS OS - Infraestrutura Proprietária. Versão 2.0.**
+**KRONØS NETWORK - Infraestrutura Proprietária. Versão 2.0.**
