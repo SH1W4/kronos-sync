@@ -20,7 +20,11 @@
     },
     {
       "path": "/api/cron/auto-confirm-bookings",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/confirm-past-bookings",
+      "schedule": "0 1 * * *"
     }
   ]
 }

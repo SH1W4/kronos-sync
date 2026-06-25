@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 // Rotas que precisam de autenticação (artistas/admins)
 const isProtectedRoute = createRouteMatcher([
@@ -23,6 +24,7 @@ const isPublicRoute = createRouteMatcher([
     '/api/kiosk(.*)',
     '/api/cron(.*)',
     '/api/bookings/anamnesis(.*)',
+    '/api/diagnostic(.*)',
     '/manifest.webmanifest',
 ])
 
@@ -36,6 +38,27 @@ export default clerkMiddleware(async (auth, req) => {
             const response = NextResponse.redirect(signInUrl)
             response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate')
             return response
+        }
+
+        // Verificar se usuário tem workspace membership
+        try {
+            const user = await prisma.user.findUnique({
+                where: { clerkId: userId },
+                include: { memberships: true }
+            })
+
+            if (!user || user.memberships.length === 0) {
+                console.log(`[MIDDLEWARE] Usuário ${userId} sem workspace, redirecionando para onboarding`)
+                const onboardingUrl = new URL('/onboarding', req.url)
+                onboardingUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)
+                onboardingUrl.searchParams.set('noWorkspace', 'true')
+                const response = NextResponse.redirect(onboardingUrl)
+                response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate')
+                return response
+            }
+        } catch (error) {
+            console.error('[MIDDLEWARE] Erro ao verificar workspace:', error)
+            // Em caso de erro, permite acesso para evitar bloqueio
         }
     }
 })

@@ -19,8 +19,24 @@ function OnboardingContent() {
 
     // Redirecionamento automático se já estiver logado (e sem código de convite)
     React.useEffect(() => {
-        if (isLoaded && isSignedIn && user && !searchParams.get('inviteCode')) {
+        if (isLoaded && isSignedIn && user) {
             const role = (user.publicMetadata as any)?.role
+            const noWorkspace = searchParams.get('noWorkspace') === 'true'
+            const hasInviteCode = !!searchParams.get('inviteCode')
+            
+            // Se usuário não tem workspace, não redireciona automaticamente
+            if (noWorkspace) {
+                setMode('RESTRICTED')
+                setError('Você precisa de um código de convite para acessar o sistema. Entre em contato com o administrador do estúdio.')
+                return
+            }
+            
+            // Se tem código de convite na URL, não redireciona - processa o convite
+            if (hasInviteCode) {
+                return
+            }
+            
+            // Só redireciona se não tem convite para processar
             if (role === 'ARTIST' || role === 'ADMIN') {
                 router.replace('/artist/dashboard')
             } else if (role === 'CLIENT') {

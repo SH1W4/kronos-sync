@@ -4,7 +4,14 @@ import { config } from 'dotenv'
 // Carregar variáveis de ambiente
 config({ path: '.env.local' })
 
-const prisma = new PrismaClient()
+// Usar DATABASE_URL direto do ambiente (já deve estar configurado para Neon)
+const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: process.env.DATABASE_URL
+        }
+    }
+})
 
 async function checkGabriella() {
     console.log('🔍 Verificando status da artista Gabriella...\n')
@@ -112,7 +119,7 @@ async function checkGabriella() {
         console.log(`  - Código: ${invite.code}`)
         console.log(`    Role: ${invite.role}`)
         console.log(`    Target Plan: ${invite.targetPlan}`)
-        console.log(`    Workspace: ${invite.workspace.name}`)
+        console.log(`    Workspace: ${invite.workspace?.name || 'N/A'}`)
         console.log(`    Current Uses: ${invite.currentUses}/${invite.maxUses}`)
         console.log(`    Expires At: ${invite.expiresAt}`)
         console.log('')

@@ -41,7 +41,8 @@ export async function GET(req: NextRequest) {
             try {
                 // Recalcular o split financeiro ao confirmar automaticamente
                 const artist = await prisma.artist.findUnique({
-                    where: { id: booking.artistId }
+                    where: { id: booking.artistId },
+                    include: { user: true }
                 })
 
                 if (!artist) {

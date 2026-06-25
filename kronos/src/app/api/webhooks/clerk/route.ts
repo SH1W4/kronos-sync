@@ -48,8 +48,11 @@ export async function POST(req: Request) {
     const email = email_addresses[0]?.email_address;
 
     if (!email) {
+      console.error(`[CLERK WEBHOOK] No email found for user ${id}`);
       return new Response('No email found', { status: 400 });
     }
+
+    console.log(`[CLERK WEBHOOK] Processing ${eventType} for user ${id}, email: ${email}`);
 
     try {
       // 1. Buscar usuário existente para preservar nome customizado
@@ -81,6 +84,8 @@ export async function POST(req: Request) {
         },
       });
 
+      console.log(`[CLERK WEBHOOK] User synced to Prisma: ${dbUser.id}, role: ${dbUser.role}`);
+
       // 2. Sync Role & Workspace to Clerk Metadata (for client-side access)
       const userWithWorkspace = await prisma.user.findUnique({
         where: { id: dbUser.id },
@@ -88,6 +93,12 @@ export async function POST(req: Request) {
       });
 
       const activeWorkspace = userWithWorkspace?.memberships[0]?.workspace;
+      const membershipsCount = userWithWorkspace?.memberships.length || 0;
+
+      console.log(`[CLERK WEBHOOK] User has ${membershipsCount} workspace membership(s)`);
+      if (!activeWorkspace) {
+        console.warn(`[CLERK WEBHOOK] User ${id} has no workspace membership - will need invite code`);
+      }
 
       const client = await clerkClient();
       await client.users.updateUserMetadata(id, {
@@ -104,9 +115,9 @@ export async function POST(req: Request) {
         }
       });
 
-      console.log(`✅ User ${id} synced with Prisma and Clerk Metadata (Role: ${dbUser.role}).`);
+      console.log(`[CLERK WEBHOOK] Metadata updated for user ${id}, workspace: ${activeWorkspace?.name || 'none'}`);
     } catch (error) {
-      console.error('Error syncing user with Prisma:', error);
+      console.error('[CLERK WEBHOOK] Error syncing user with Prisma:', error);
       return new Response('Internal Server Error', { status: 500 });
     }
   }

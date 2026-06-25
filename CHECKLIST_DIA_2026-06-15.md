@@ -76,7 +76,11 @@
 - [x] **Branch Management**: Merge de `fix/secure-bookings-settlements` para `main`
 - [x] **Git Push**: Todas as mudanças de UX e Calendar de hoje pushadas para o GitHub (`0282fd6`)
 - [x] **Vercel Deploy**: Deploy manual de produção efetuado via Vercel CLI com sucesso ✅
-### 🚀 ENTREGAS DE HOJE - 2026-06-17 (CORREÇÃO DE BUG NA ABA CLIENTE)
+### � PROBLEMAS ATUAIS - 2026-06-20
+- [ ] **Sincronização com GitHub**: Mudanças modificadas não commitadas e pushadas (SESSION.md, package.json, bookings.ts, settings.ts, store.ts, agenda/page.tsx, inventory/page.tsx, settings/page.tsx)
+- [ ] **Problema de Acesso da Artista Gabriella**: Artista convidada não consegue acessar dashboard, erro "silo não encontrado". Causa provável: membership não criada corretamente ou workspace não associado. Criada rota de diagnóstico `/api/diagnostic/user` para investigação.
+
+### �🚀 ENTREGAS DE HOJE - 2026-06-17 (CORREÇÃO DE BUG NA ABA CLIENTE)
 - [x] **Correção de Erro de Servidor na Aba Cliente**: Tratamento de valores null/undefined em cálculos de `totalSpent` e acesso a `bookings` e `slot` nas páginas de listagem e detalhes de clientes
 - [x] **Adição de Try/Catch em Queries Prisma**: Prevenção de falhas de servidor em caso de erros no banco de dados
 - [x] **Optional Chaining em Acessos a Dados Relacionados**: Proteção contra erros quando `bookings`, `slot`, ou `anamnesis` são null/undefined

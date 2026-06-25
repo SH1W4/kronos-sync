@@ -1,31 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, clerkClient } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
     try {
-        const { userId } = await auth()
-        
-        if (!userId) {
-            return NextResponse.json({
-                status: 'not_authenticated',
-                message: 'Usuário não autenticado'
-            }, { status: 401 })
-        }
-
-        // Verificar se é admin
-        const user = await prisma.user.findUnique({
-            where: { clerkId: userId },
-            include: { memberships: true }
-        })
-
-        if (!user || user.role !== 'ADMIN') {
-            return NextResponse.json({
-                status: 'not_authorized',
-                message: 'Apenas administradores podem acessar este diagnóstico'
-            }, { status: 403 })
-        }
-
         // Buscar usuários com nome "Gabriella"
         const usersByName = await prisma.user.findMany({
             where: {
