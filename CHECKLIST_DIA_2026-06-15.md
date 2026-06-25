@@ -106,6 +106,19 @@
 - [x] **Cupons com Desconto Padrão de 15%**: Atualizado o desconto padrão de cupons (referrals e leads) de 10% para 15% no [schema.prisma], na action de cupons e adicionado suporte ao código `KAIRØS15_`.
 - [x] **Perguntas Médicas Profissionais na Anamnese**: Integradas 5 novas perguntas de saúde (medicamentos contínuos, gravidez/amamentação, histórico de desmaios/hemofilia, álcool/drogas recentes e tatuagens anteriores) no front, schema, validações e action com criptografia de dados confidenciais e suporte ao Smart Reuse.
 
+### 🚀 ENTREGAS RECENTES - 2026-06-23 (SISTEMA DE COMISSÕES & MELHORIAS DE ACESSO)
+- [x] **Middleware com Verificação de Workspace**: Implementada verificação de workspace membership no middleware para redirecionar usuários sem membership para onboarding com mensagem clara
+- [x] **Onboarding Melhorado**: Corrigido onboarding para processar convites automaticamente mesmo quando usuário já está logado, evitando necessidade de múltiplos logins
+- [x] **Logs Detalhados no Webhook Clerk**: Adicionados logs detalhados no webhook para identificar problemas de sincronização e membership
+- [x] **Cron Job de Confirmação de Agendamentos Passados**: Criado `/api/cron/confirm-past-bookings` para confirmar automaticamente agendamentos passados não cancelados (roda diariamente às 01:00 UTC)
+- [x] **Integração com Gamificação**: Cron job adiciona XP aos artistas via ArtistGamification e desbloqueia achievements (first_10_bookings, veteran_artist)
+- [x] **API para ADM Gerenciar Comissões**: Criada `/api/admin/settlements` (GET e POST) para listar agendamentos pendentes e criar settlements manualmente
+- [x] **Interface de Gerenciamento de Comissões**: Criada página `/admin/settlements` para ADM visualizar e finalizar comissões manualmente
+- [x] **Rotas de Diagnóstico**: Criadas rotas `/api/diagnostic/public`, `/api/diagnostic/fix-gabriella` e `/api/diagnostic/sync-and-fix-gabriella` para troubleshooting
+- [x] **Verificação de Sistema de Convites**: Confirmado que convites já estão corretamente associados ao workspace e criador (creatorId e workspaceId)
+- [x] **Deploy das Funcionalidades**: Todas as novas funcionalidades foram build e deploy com sucesso no Vercel
+- [x] **Atualização do README**: README atualizado para modo beta (v4.0.0) com novas funcionalidades documentadas
+
 ---
 
 

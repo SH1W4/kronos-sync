@@ -5,7 +5,10 @@
 ![KAIRØS OS](./public/brand/logo-neon.png)
 
 > **Enterprise-Grade Tattoo Studio Management Platform**  
-> Built with Next.js 15, Prisma, NextAuth, and cutting-edge UX design.
+> Built with Next.js 15, Prisma, Clerk, and cutting-edge UX design.
+
+![Beta Badge](https://img.shields.io/badge/status-BETA-yellow)
+![Version](https://img.shields.io/badge/version-4.0.0-blue)
 
 </div>
 
@@ -91,6 +94,19 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 
 ## 🚀 Core Features
 
+### **🎉 Beta Release Features (v4.0.0)**
+
+- ✅ **Clerk Authentication Integration** - Enterprise-grade auth with Google OAuth
+- ✅ **Workspace Membership System** - Multi-tenant architecture with invite-based access
+- ✅ **Automatic Booking Confirmation** - Cron job confirms past bookings automatically
+- ✅ **Gamification Integration** - XP and achievements for completed bookings
+- ✅ **Admin Settlement Management** - Manual commission finalization interface
+- ✅ **Diagnostic Routes** - Troubleshooting tools for user access issues
+- ✅ **Enhanced Onboarding** - Improved invite redemption flow
+- ✅ **Middleware Protection** - Workspace membership verification
+
+### **Core Platform Features**
+
 <div align="center">
 
 ### Professional Dashboard
@@ -156,7 +172,7 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 
 ### **Backend**
 - **Prisma ORM** (PostgreSQL)
-- **NextAuth.js** (Authentication)
+- **Clerk** (Authentication & User Management)
 - **Server Actions** (Type-safe API)
 - **Resend** (Email delivery)
 
@@ -229,23 +245,26 @@ All client data is **scoped to the workspace**, ensuring studios maintain full o
 
 ## 🔐 Authentication System
 
-### **Magic Link (Primary)**
-1. User enters email
-2. System sends 6-digit code
-3. User verifies code
-4. System checks:
-   - Is user an existing Artist/Admin? → **Grant access**
-   - Is there an invite code in URL? → **Create as Artist**
-   - Neither? → **Reject with error**
+### **Clerk Authentication (Primary)**
+- Enterprise-grade authentication with Clerk
+- Google OAuth integration
+- Secure session management
+- Multi-factor authentication support
+- User metadata synchronization with database
 
-### **Google OAuth (Optional)**
-- One-click login for team members
-- Automatically syncs with Google Calendar
-- Requires pre-existing account or invite
+### **Invite-Based Access Control**
+1. User attempts login
+2. System checks workspace membership
+3. If no membership → Redirects to onboarding
+4. User redeems invite code
+5. System creates workspace membership
+6. Access granted to dashboard
 
-### **Dev Mode (Development Only)**
-- Username: `dev` → Creates artist account
-- Username: `master` → Creates admin account with demo data
+### **Workspace Membership Verification**
+- Middleware checks membership on protected routes
+- Automatic redirection to onboarding for users without workspace
+- Role-based access control (ADMIN, ARTIST, CLIENT)
+- Invite code tracking (creator, workspace, usage)
 
 ---
 
@@ -384,12 +403,45 @@ model KioskEntry {
 
 ---
 
+## ⚙️ Cron Jobs
+
+### **Automatic Booking Confirmation**
+- **Schedule**: Daily at 01:00 UTC
+- **Purpose**: Confirm past bookings that weren't cancelled
+- **Features**:
+  - Changes status from OPEN to CONFIRMED
+  - Adds XP to artists via gamification system
+  - Unlocks achievements (first_10_bookings, veteran_artist)
+  - Integrated with ArtistGamification model
+
+### **Guest Expiry Check**
+- **Schedule**: Daily at 12:00 UTC
+- **Purpose**: Check and expire GUEST artist profiles
+- **Features**:
+  - Validates validUntil dates
+  - Deactivates expired GUEST accounts
+  - Sends notifications to admins
+
+### **Auto-Confirm Bookings**
+- **Schedule**: Daily at 00:00 UTC
+- **Purpose**: Automatic confirmation of eligible bookings
+- **Features**:
+  - Calculates financial splits
+  - Updates artist earnings
+  - Triggers webhooks
+
+---
+
 ## 🚧 Roadmap
 
-### **Q1 2025**
-- [x] Professional Gate implementation
-- [x] Kiosk lead capture system
-- [x] Unified financial settlement
+### **Beta Phase (Current)**
+- [x] Clerk Authentication Integration
+- [x] Workspace Membership System
+- [x] Automatic Booking Confirmation
+- [x] Gamification Integration
+- [x] Admin Settlement Management
+- [x] Diagnostic Routes
+- [x] Enhanced Onboarding Flow
 - [ ] WhatsApp notification system
 - [ ] Advanced BI dashboard
 
@@ -397,7 +449,7 @@ model KioskEntry {
 - [ ] Mobile app (React Native)
 - [ ] Multi-studio franchise mode
 - [ ] AI-powered scheduling optimization
-- [ ] Inventory management
+- [ ] Automated commission settlements
 
 ### **Q3 2025**
 - [ ] Client loyalty program
