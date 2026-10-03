@@ -51,7 +51,14 @@ export default clerkMiddleware(async (auth, req) => {
                 return NextResponse.next()
             }
 
-            if (user && user.memberships.length === 0) {
+            if (!user) {
+                return NextResponse.json(
+                    { error: 'Usuário não autorizado' },
+                    { status: 403 }
+                )
+            }
+
+            if (user.memberships.length === 0) {
                 console.log(`[MIDDLEWARE] Usuário ${userId} sem workspace, redirecionando para onboarding`)
                 const onboardingUrl = new URL('/onboarding', req.url)
                 onboardingUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)
@@ -62,7 +69,10 @@ export default clerkMiddleware(async (auth, req) => {
             }
         } catch (error) {
             console.error('[MIDDLEWARE] Erro ao verificar workspace:', error)
-            // Em caso de erro, permite acesso para evitar bloqueio
+            return NextResponse.json(
+                { error: 'Não foi possível validar a autorização' },
+                { status: 503 }
+            )
         }
     }
 })
