@@ -24,7 +24,6 @@ const isPublicRoute = createRouteMatcher([
     '/api/kiosk(.*)',
     '/api/cron(.*)',
     '/api/bookings/anamnesis(.*)',
-    '/api/diagnostic(.*)',
     '/manifest.webmanifest',
 ])
 
