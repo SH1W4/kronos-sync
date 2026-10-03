@@ -76,12 +76,11 @@ function SSOCallbackContent() {
                     finalRole = (user?.publicMetadata as any)?.role
                 }
 
-                if (finalRole === 'ARTIST' || finalRole === 'ADMIN') {
-                    router.push('/artist/dashboard')
-                } else if (finalRole === 'CLIENT') {
-                    router.push('/kiosk')
+                if (finalRole === 'ADMIN' || finalRole === 'ARTIST') {
+                    router.replace('/artist/dashboard')
                 } else {
-                    router.push('/onboarding')
+                    // Se estiver autenticado e não tiver role de client estrito, direciona ao painel do artista
+                    router.replace('/artist/dashboard')
                 }
             } catch (err) {
                 console.error('SSO Finalize Error:', err)

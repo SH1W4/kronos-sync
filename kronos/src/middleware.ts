@@ -44,10 +44,15 @@ export default clerkMiddleware(async (auth, req) => {
         try {
             const user = await prisma.user.findUnique({
                 where: { clerkId: userId },
-                include: { memberships: true }
+                include: { memberships: true, artist: true }
             })
 
-            if (!user || user.memberships.length === 0) {
+            // Se for ARTIST ou ADMIN ou tiver perfil de artista, permite acesso direto
+            if (user?.role === 'ARTIST' || user?.role === 'ADMIN' || user?.artist) {
+                return NextResponse.next()
+            }
+
+            if (user && user.memberships.length === 0) {
                 console.log(`[MIDDLEWARE] Usuário ${userId} sem workspace, redirecionando para onboarding`)
                 const onboardingUrl = new URL('/onboarding', req.url)
                 onboardingUrl.searchParams.set('callbackUrl', req.nextUrl.pathname)

@@ -39,8 +39,8 @@ function OnboardingContent() {
             // Só redireciona se não tem convite para processar
             if (role === 'ARTIST' || role === 'ADMIN') {
                 router.replace('/artist/dashboard')
-            } else if (role === 'CLIENT') {
-                router.replace('/kiosk')
+            } else if (isSignedIn) {
+                router.replace('/artist/dashboard')
             }
         }
     }, [user, isLoaded, isSignedIn, router, searchParams])
